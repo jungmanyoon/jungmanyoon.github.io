@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오프라인 - 레시피북</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #FFF8DC 0%, #F5DEB3 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .offline-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .offline-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 24px;
+            background: #F5DEB3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+        }
+        
+        h1 {
+            color: #8B4513;
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+        
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        
+        .cached-recipes {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid #eee;
+        }
+        
+        .cached-recipes h2 {
+            color: #8B4513;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .recipe-list {
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .recipe-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #FFF8DC;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .recipe-item:hover {
+            background: #F5DEB3;
+        }
+        
+        .recipe-name {
+            font-weight: 600;
+            color: #8B4513;
+            margin-bottom: 4px;
+        }
+        
+        .recipe-meta {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .retry-button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .retry-button:hover {
+            background: #A0522D;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 16px;
+        }
+        
+        .status.offline {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .status.online {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📵</div>
+        <h1>오프라인 모드</h1>
+        <p>
+            인터넷 연결이 없습니다.<br>
+            캐시된 레시피는 계속 사용할 수 있습니다.
+        </p>
+        
+        <button class="retry-button" onclick="checkConnection()">
+            연결 다시 시도
+        </button>
+        
+        <div class="status offline" id="status">
+            오프라인
+        </div>
+        
+        <div class="cached-recipes">
+            <h2>📚 저장된 레시피</h2>
+            <div class="recipe-list" id="recipeList">
+                <!-- 캐시된 레시피 목록이 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 연결 상태 확인
+        function checkConnection() {
+            fetch('/ping')
+                .then(() => {
+                    document.getElementById('status').className = 'status online';
+                    document.getElementById('status').textContent = '온라인';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                })
+                .catch(() => {
+                    document.getElementById('status').className = 'status offline';
+                    document.getElementById('status').textContent = '오프라인';
+                });
+        }
+        
+        // 캐시된 레시피 목록 로드
+        async function loadCachedRecipes() {
+            if ('caches' in window) {
+                try {
+                    const cache = await caches.open('recipe-data');
+                    const requests = await cache.keys();
+                    const recipeList = document.getElementById('recipeList');
+                    
+                    if (requests.length === 0) {
+                        recipeList.innerHTML = '<p style="color: #999; text-align: center;">저장된 레시피가 없습니다.</p>';
+                        return;
+                    }
+                    
+                    for (const request of requests) {
+                        const response = await cache.match(request);
+                        if (response) {
+                            const recipe = await response.json();
+                            const item = createRecipeItem(recipe);
+                            recipeList.appendChild(item);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load cached recipes:', error);
+                }
+            }
+        }
+        
+        // 레시피 아이템 생성
+        function createRecipeItem(recipe) {
+            const div = document.createElement('div');
+            div.className = 'recipe-item';
+            div.innerHTML = `
+                <div class="recipe-name">${recipe.name || '제목 없음'}</div>
+                <div class="recipe-meta">
+                    ${recipe.category || '미분류'} · 
+                    재료 ${recipe.ingredients?.length || 0}개
+                </div>
+            `;
+            div.onclick = () => {
+                // 레시피 상세 보기 (오프라인 모드)
+                localStorage.setItem('offlineRecipe', JSON.stringify(recipe));
+                window.location.href = '#recipe/' + recipe.id;
+            };
+            return div;
+        }
+        
+        // 온라인 상태 감지
+        window.addEventListener('online', () => {
+            document.getElementById('status').className = 'status online';
+            document.getElementById('status').textContent = '온라인';
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('status').className = 'status offline';
+            document.getElementById('status').textContent = '오프라인';
+        });
+        
+        // 페이지 로드 시 캐시된 레시피 표시
+        loadCachedRecipes();
+        
+        // 주기적으로 연결 상태 확인 (10초마다)
+        setInterval(checkConnection, 10000);
+    </script>
+</body>
+</html>

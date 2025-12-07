@@ -1,0 +1,201 @@
+/**
+ * IngredientPanel.css
+ *
+ * 재료 패널 스타일
+ */
+
+.ingredient-panel {
+  display: flex;
+  flex-direction: column;
+  background: #f5f9ff;
+  border-radius: 8px;
+  padding: 10px;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Panel Header */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #cde0f7;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0d47a1;
+  margin: 0;
+}
+
+.ingredient-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: #1976d2;
+  background: white;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+/* Ingredient List */
+.ingredient-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.ingredient-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  background: white;
+  border: 1px solid #dde8f5;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.ingredient-item:hover {
+  background: #f5f5f5;
+  border-color: #90caf9;
+  transform: translateX(2px);
+}
+
+.ingredient-item.checked {
+  background: #f0f0f0;
+  border-color: #ccc;
+  opacity: 0.7;
+}
+
+.ingredient-item.checked .ingredient-name {
+  text-decoration: line-through;
+  color: #999;
+}
+
+/* Checkbox */
+.ingredient-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ingredient-checkbox input[type='checkbox'] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #90caf9;
+  border-radius: 3px;
+  background: white;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.ingredient-checkbox input:checked + .checkbox-custom {
+  background: #0066cc;
+  border-color: #0066cc;
+}
+
+.ingredient-checkbox input:checked + .checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Ingredient Info */
+.ingredient-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ingredient-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.ingredient-amounts {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.ingredient-weight {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0066cc;
+  font-variant-numeric: tabular-nums;
+}
+
+.ingredient-percentage {
+  font-size: 11px;
+  font-weight: 500;
+  color: #888;
+}
+
+/* Panel Footer */
+.panel-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 2px solid #90caf9;
+}
+
+.mode-explanation {
+  font-size: 14px;
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.mode-explanation p {
+  margin: 0;
+}
+
+/* Scrollbar */
+.ingredient-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ingredient-list::-webkit-scrollbar-track {
+  background: #e3f2fd;
+}
+
+.ingredient-list::-webkit-scrollbar-thumb {
+  background: #90caf9;
+  border-radius: 3px;
+}
+
+.ingredient-list::-webkit-scrollbar-thumb:hover {
+  background: #64b5f6;
+}
+
+/* Responsive */
+@media (max-height: 900px) {
+  .ingredient-name {
+    font-size: 18px;
+  }
+
+  .ingredient-weight {
+    font-size: 20px;
+  }
+
+  .ingredient-percentage {
+    font-size: 16px;
+  }
+}

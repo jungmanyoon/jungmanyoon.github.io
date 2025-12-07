@@ -1,0 +1,273 @@
+/**
+ * ProcessPanel.css
+ *
+ * 공정 패널 스타일
+ */
+
+.process-panel {
+  display: flex;
+  flex-direction: column;
+  background: #fffbf0;
+  border-radius: 8px;
+  padding: 10px;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Panel Header */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ffe0a0;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e65100;
+  margin: 0;
+}
+
+.step-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: #f57c00;
+  background: white;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+/* Method Changed Notice */
+.method-changed-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 6px;
+  border-left: 3px solid #4caf50;
+  font-size: 11px;
+}
+
+.method-changed-notice strong {
+  color: #2e7d32;
+  font-size: 12px;
+}
+
+.method-changed-notice .method-desc {
+  color: #555;
+}
+
+.method-changed-notice .method-time {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+/* Process List */
+.process-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.process-step {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 6px;
+  background: white;
+  border: 1px solid #ffe0a0;
+  border-left: 3px solid #ffa726;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.process-step:hover {
+  background: #fffef7;
+  border-color: #ffb74d;
+}
+
+.process-step.baking-step {
+  border-left-color: #d32f2f;
+  background: #fff8f8;
+}
+
+/* Step Number */
+.step-number {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+  border-radius: 50%;
+}
+
+/* Step Content */
+.step-content {
+  flex: 1;
+}
+
+.step-action {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+}
+
+.step-description {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Step Details */
+.step-details {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #fff3e0;
+  border-radius: 6px;
+}
+
+.detail-item.time {
+  background: #e3f2fd;
+}
+
+.detail-item.temperature {
+  background: #ffebee;
+}
+
+.detail-icon {
+  font-size: 18px;
+}
+
+.detail-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.detail-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-item.time .detail-value {
+  color: #0066cc;
+}
+
+.detail-item.temperature .detail-value {
+  color: #d32f2f;
+}
+
+/* Tips & Checkpoints */
+.step-tips,
+.step-checkpoints {
+  margin-top: 8px;
+}
+
+.tip-item,
+.checkpoint-item {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.6;
+  padding: 4px 0;
+}
+
+.tip-item {
+  color: #1976d2;
+}
+
+.checkpoint-item {
+  color: #388e3c;
+}
+
+/* Baking Settings */
+.baking-settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.baking-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: white;
+  border: 2px solid #ffcdd2;
+  border-radius: 6px;
+}
+
+.baking-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.baking-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.temperature-value {
+  color: #d32f2f;
+  font-size: 28px;
+}
+
+/* Scrollbar */
+.process-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.process-list::-webkit-scrollbar-track {
+  background: #fff9e6;
+}
+
+.process-list::-webkit-scrollbar-thumb {
+  background: #ffd54f;
+  border-radius: 3px;
+}
+
+.process-list::-webkit-scrollbar-thumb:hover {
+  background: #ffb74d;
+}
+
+/* Responsive */
+@media (max-height: 900px) {
+  .step-action {
+    font-size: 20px;
+  }
+
+  .step-description {
+    font-size: 16px;
+  }
+
+  .detail-value {
+    font-size: 18px;
+  }
+}

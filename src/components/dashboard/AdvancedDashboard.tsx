@@ -14,13 +14,14 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useDashboardStore } from '@/stores/useDashboardStore';
 import { useRecipeStore } from '@/stores/useRecipeStore';
+import { useToastStore } from '@/stores/useToastStore';
 import { useLayoutSettings } from '@/hooks/useLayoutSettings';
 import ResizeHandle from '@/components/common/ResizeHandle';
 import {
   ChevronDown, ChevronRight, ChevronUp, Plus, Minus, X,
-  Save, Download, Flame, Scale, Wheat, Droplets,
+  Save, Flame, Scale, Wheat, Droplets,
   Cookie, Layers, ThermometerSun, Link, Unlink,
-  Clock, ListOrdered, RotateCcw, GripVertical
+  Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText
 } from 'lucide-react';
 
 // ============================================
@@ -129,39 +130,43 @@ const CAKE_PAN_DATA = {
 // 현재 화면은 제빵용이므로 BREAD_PAN_DATA 사용
 const PAN_DATA = BREAD_PAN_DATA;
 
-// 제빵용 비용적 (cm³/g)
+// 제빵용 비용적 (cm³/g) - 학술 기준 참조
+// 비용적이 높을수록 가볍고 에어리, 낮을수록 조밀함
 const BREAD_SPECIFIC_VOLUMES: Record<string, number> = {
-  '풀먼식빵': 4.2,
-  '산형식빵': 3.4,
-  '버터톱식빵': 4.2,
-  '옥수수식빵': 3.95,
-  '우유식빵': 4.0,
-  '모닝빵': 3.2,
-  '베이글': 2.8,
-  '브리오슈': 3.5,
-  '치아바타': 4.5,
-  '바게트': 5.0,
+  '풀먼식빵': 3.4,      // 뚜껑 덮어 구움 → 조밀 (제과기능장 기준)
+  '산형식빵': 4.2,      // 자유롭게 부풀음 → 에어리 (4.0~4.5)
+  '버터톱식빵': 4.0,    // 산형 계열
+  '옥수수식빵': 3.8,    // 중간
+  '우유식빵': 4.0,      // 산형 계열
+  '모닝빵': 3.2,        // 소형빵
+  '베이글': 2.5,        // 매우 조밀 (삶는 공정)
+  '브리오슈': 3.5,      // 버터 풍부, 중간 밀도
+  '치아바타': 5.0,      // 고수화율 80%, 큰 기공
+  '바게트': 5.5,        // 크러스트 비율 높음, 에어리
 };
 
-// 제과용 비용적 - 나중에 제과 화면에서 사용
+// 제과용 비용적 - 나중에 제과 화면에서 사용 (학술 논문 기준)
 const CAKE_SPECIFIC_VOLUMES: Record<string, number> = {
-  '파운드케이크': 2.4,
-  '레이어케이크': 2.96,
-  '엔젤푸드케이크': 4.7,
-  '스펀지케이크': 5.8,
-  '시폰케이크': 5.5,
-  '무스케이크': 2.0,
+  '파운드케이크': 1.8,      // 조밀함 (1.5~2.0)
+  '레이어케이크': 2.8,      // 중간
+  '엔젤푸드케이크': 4.5,    // 달걀흰자, 가벼움
+  '스펀지케이크': 2.4,      // 제누아즈 (2.3~2.5, KCI 논문 기준)
+  '시폰케이크': 3.5,        // 식용유 사용, 가벼움 (3.0~4.0)
+  '무스케이크': 1.8,        // 매우 조밀
 };
 
 // 현재 화면은 제빵용
 const SPECIFIC_VOLUMES = BREAD_SPECIFIC_VOLUMES;
 
+// 제법 비율 (ChainBaker, Weekend Bakery 참조)
+// flour: 전체 밀가루 중 사전반죽에 사용할 비율
+// water: 사전반죽 밀가루 대비 수분 비율 (베이커스 퍼센트)
 const METHOD_RATIOS: Record<string, { flour: number; water: number }> = {
   straight: { flour: 0, water: 0 },
-  sponge: { flour: 0.5, water: 1.0 },
-  poolish: { flour: 0.6, water: 0.7 },
-  biga: { flour: 0.5, water: 0.3 },
-  levain: { flour: 0.2, water: 0.2 },
+  sponge: { flour: 0.5, water: 0.6 },     // 중종법: 밀가루 50%, 수분 60% (50-80%)
+  poolish: { flour: 0.3, water: 1.0 },    // 폴리쉬: 밀가루 30%, 수분 100% (1:1 액종)
+  biga: { flour: 0.3, water: 0.55 },      // 비가: 밀가루 30%, 수분 55% (건조한 반죽)
+  levain: { flour: 0.2, water: 1.0 },     // 르방: 밀가루 20%, 수분 100% (1:1 사워도우)
 };
 
 const METHOD_LABELS: Record<string, string> = {
@@ -192,21 +197,22 @@ interface CollapsibleSectionProps {
   defaultOpen?: boolean;
   badge?: string;
   badgeColor?: string;
+  onReset?: () => void;  // 초기화 콜백
   children: React.ReactNode;
 }
 
 const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
-  title, icon, defaultOpen = true, badge, badgeColor = 'bg-amber-100 text-amber-700', children
+  title, icon, defaultOpen = true, badge, badgeColor = 'bg-amber-100 text-amber-700', onReset, children
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
     <div className="border-b border-gray-200 last:border-b-0">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 text-left"
-      >
-        <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+      <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex-1 flex items-center gap-2 text-sm font-semibold text-gray-700 text-left"
+        >
           {icon}
           <span>{title}</span>
           {badge && (
@@ -214,9 +220,22 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
               {badge}
             </span>
           )}
+        </button>
+        <div className="flex items-center gap-1">
+          {onReset && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onReset(); }}
+              className="p-1 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+              title="초기화"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <button onClick={() => setIsOpen(!isOpen)} className="p-1">
+            {isOpen ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
+          </button>
         </div>
-        {isOpen ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
-      </button>
+      </div>
       {isOpen && <div className="px-3 pb-3">{children}</div>}
     </div>
   );
@@ -227,7 +246,8 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 // ============================================
 
 const AdvancedDashboard: React.FC = () => {
-  const { recipes } = useRecipeStore();
+  const { addRecipe, currentRecipe } = useRecipeStore();
+  const { addToast } = useToastStore();
 
   // 레이아웃 설정 (localStorage 자동 저장)
   const {
@@ -241,8 +261,7 @@ const AdvancedDashboard: React.FC = () => {
 
   // 제품 정보
   const [productName, setProductName] = useState('새 레시피');
-  const [author, setAuthor] = useState('');
-
+  
   // 원래 팬 설정 (레시피 원본) - 비용적으로 계산된 초기값 사용
   const defaultPanWeight = Math.round(2350 / 3.4);  // 풀먼식빵팬(2350) / 산형식빵(3.4) = 691g
   const [originalPan, setOriginalPan] = useState({
@@ -294,6 +313,98 @@ const AdvancedDashboard: React.FC = () => {
     { id: '7', order: 7, description: '2차 발효 (35°C, 85%)', time: 50, temp: 35 },
     { id: '8', order: 8, description: '굽기', time: 24, temp: 200 },
   ]);
+
+  // 메모
+  const [memo, setMemo] = useState('');
+
+  // 중복 로드 방지를 위한 ref
+  const lastLoadedRecipeId = useRef<string | null>(null);
+
+  // ============================================
+  // currentRecipe 로드
+  // ============================================
+  useEffect(() => {
+    if (currentRecipe && currentRecipe.id !== lastLoadedRecipeId.current) {
+      lastLoadedRecipeId.current = currentRecipe.id;
+
+      // 레시피 이름 로드
+      setProductName(currentRecipe.name || '새 레시피');
+
+      // 재료 로드
+      if (currentRecipe.ingredients && Array.isArray(currentRecipe.ingredients)) {
+        const loadedIngredients: IngredientEntry[] = currentRecipe.ingredients.map((ing: any, idx: number) => {
+          // 카테고리 매핑 (실제 데이터는 category 필드 사용)
+          const cat = ing.category || ing.type || 'other';
+          let dashboardCategory: 'flour' | 'liquid' | 'wetOther' | 'other' = 'other';
+          let subCat = '기타';
+
+          if (cat === 'flour' || ing.isFlour) {
+            dashboardCategory = 'flour';
+            subCat = '가루';
+          } else if (cat === 'liquid') {
+            dashboardCategory = 'liquid';
+            subCat = '수분';
+          } else if (cat === 'fat') {
+            dashboardCategory = 'wetOther';
+            subCat = '유지';
+          }
+
+          return {
+            id: ing.id || `${Date.now()}-${idx}`,
+            order: idx + 1,
+            category: dashboardCategory,
+            subCategory: subCat,
+            name: ing.name || '',
+            ratio: ing.percentage || 0,
+            amount: parseFloat(ing.amount) || 0,
+            note: ing.note || '',
+            moistureContent: ing.moistureContent,
+          };
+        });
+        if (loadedIngredients.length > 0) {
+          setIngredients(loadedIngredients);
+        }
+      }
+
+      // 공정 로드
+      if (currentRecipe.steps && Array.isArray(currentRecipe.steps)) {
+        const loadedProcesses: ProcessStep[] = currentRecipe.steps.map((step: any, idx: number) => ({
+          id: step.id || `${Date.now()}-${idx}`,
+          order: step.order || idx + 1,
+          description: step.instruction || step.action || step.description || '',
+          time: step.duration?.target || step.time,
+          temp: step.temperature?.target || step.temp,
+        }));
+        if (loadedProcesses.length > 0) {
+          setProcesses(loadedProcesses);
+        }
+      }
+
+      // 오븐 설정 로드
+      if (currentRecipe.ovenSettings) {
+        const ovenData = currentRecipe.ovenSettings as any;
+        setOven({
+          type: ovenData.mode === 'deck' ? 'deck' :
+                ovenData.mode === 'airfryer' ? 'airfryer' : 'convection',
+          level: ovenData.deck || '',
+          firstBake: {
+            topTemp: ovenData.temperature || 200,
+            bottomTemp: ovenData.temperature || 170,
+            time: 24,
+          },
+          secondBake: { topTemp: 0, bottomTemp: 0, time: 0 },
+        });
+      }
+
+      // 메모 로드
+      if (currentRecipe.notes) {
+        setMemo(currentRecipe.notes);
+      }
+
+      // 로드 완료 알림
+      addToast({ type: 'success', message: `"${currentRecipe.name}" 레시피를 불러왔습니다.` });
+    }
+  }, [currentRecipe]);
 
   // 배수 및 연동 설정
   const [multiplier, setMultiplier] = useState(1);
@@ -429,20 +540,31 @@ const AdvancedDashboard: React.FC = () => {
   );
 
   // 사전반죽 재료
+  // 핵심: 수분 % = 사전반죽 밀가루 대비 베이커스 퍼센트 (원래 레시피 수분 기준 아님!)
   const prefermentIngredients = useMemo(() => {
     if (!usePreferment || method.type === 'straight') return [];
     const result: any[] = [];
 
+    // 1. 사전반죽 밀가루 계산 (원래 밀가루 × flourRatio)
+    let prefermentFlourTotal = 0;
     ingredients.filter(i => i.category === 'flour').forEach(ing => {
       const amount = Math.round(ing.amount * method.flourRatio * effectiveMultiplier * 10) / 10;
-      if (amount > 0) result.push({ ...ing, id: `pref-${ing.id}`, convertedAmount: amount });
+      if (amount > 0) {
+        result.push({ ...ing, id: `pref-${ing.id}`, convertedAmount: amount });
+        prefermentFlourTotal += ing.amount * method.flourRatio;  // 배수 적용 전 밀가루량
+      }
     });
 
-    ingredients.filter(i => i.category === 'liquid').forEach(ing => {
-      const amount = Math.round(ing.amount * method.waterRatio * effectiveMultiplier * 10) / 10;
-      if (amount > 0) result.push({ ...ing, id: `pref-${ing.id}`, convertedAmount: amount });
-    });
+    // 2. 사전반죽 수분 = 사전반죽 밀가루 × waterRatio (베이커스 퍼센트)
+    // 폴리쉬 100%: 사전반죽 밀가루 300g × 1.0 = 300g
+    // 종종법 60%: 사전반죽 밀가루 300g × 0.6 = 180g
+    const prefermentWaterAmount = Math.round(prefermentFlourTotal * method.waterRatio * effectiveMultiplier * 10) / 10;
+    const waterIng = ingredients.find(i => i.category === 'liquid' && i.name === '물');
+    if (waterIng && prefermentWaterAmount > 0) {
+      result.push({ ...waterIng, id: `pref-${waterIng.id}`, convertedAmount: prefermentWaterAmount });
+    }
 
+    // 3. 이스트 (사전반죽에 30% 사용)
     const yeast = ingredients.find(i => i.name.includes('이스트'));
     if (yeast) {
       result.push({ ...yeast, id: `pref-${yeast.id}`, convertedAmount: Math.round(yeast.amount * 0.3 * effectiveMultiplier * 10) / 10 });
@@ -452,14 +574,30 @@ const AdvancedDashboard: React.FC = () => {
   }, [ingredients, method, usePreferment, effectiveMultiplier]);
 
   // 본반죽 재료
+  // 핵심: 수분 차감량 = 사전반죽 밀가루 × waterRatio (베이커스 퍼센트)
   const mainDoughIngredients = useMemo(() => {
     if (!usePreferment || method.type === 'straight') return convertedIngredients;
 
+    // 1. 사전반죽에 들어간 밀가루 총량 계산 (배수 적용 전)
+    const prefermentFlourTotal = ingredients
+      .filter(i => i.category === 'flour')
+      .reduce((sum, ing) => sum + ing.amount * method.flourRatio, 0);
+
+    // 2. 사전반죽 수분량 = 사전반죽 밀가루 × waterRatio
+    const prefermentWaterAmount = prefermentFlourTotal * method.waterRatio;
+
     return ingredients.map(ing => {
       let deduction = 0;
-      if (ing.category === 'flour') deduction = ing.amount * method.flourRatio;
-      else if (ing.category === 'liquid') deduction = ing.amount * method.waterRatio;
-      else if (ing.name.includes('이스트')) deduction = ing.amount * 0.3;
+      if (ing.category === 'flour') {
+        // 밀가루: 원래 양 × flourRatio 만큼 차감
+        deduction = ing.amount * method.flourRatio;
+      } else if (ing.category === 'liquid' && ing.name === '물') {
+        // 물: 사전반죽 수분량 차감 (단, 원래 물 양을 초과하지 않음)
+        deduction = Math.min(ing.amount, prefermentWaterAmount);
+      } else if (ing.name.includes('이스트')) {
+        // 이스트: 30% 사전반죽에 사용
+        deduction = ing.amount * 0.3;
+      }
 
       const mainAmount = Math.round((ing.amount - deduction) * 10) / 10;
       return {
@@ -561,6 +699,239 @@ const AdvancedDashboard: React.FC = () => {
   const removePan = useCallback((id: string) => {
     setPans(prev => prev.length > 1 ? prev.filter(p => p.id !== id) : prev);
   }, []);
+
+  // ===== 초기화 함수들 =====
+  // 팬 설정 초기화: 변환 팬을 원래 팬과 동일하게
+  const resetPanSettings = useCallback(() => {
+    setPans([{
+      id: '1',
+      mode: originalPan.mode,
+      category: originalPan.category,
+      type: originalPan.type,
+      quantity: originalPan.quantity,
+      divisionCount: originalPan.divisionCount,
+      panWeight: originalPan.panWeight,
+      divisionWeight: originalPan.divisionWeight,
+      unitCount: originalPan.unitCount,
+      unitWeight: originalPan.unitWeight,
+    }]);
+    setIsPanLinked(true);
+  }, [originalPan]);
+
+  // 비용적 초기화: 변환 비용적을 원래 비용적과 동일하게
+  const resetSpecificVolume = useCallback(() => {
+    setConvertedProduct(originalProduct);
+  }, [originalProduct]);
+
+  // 오븐 초기화: 기본값으로
+  const resetOvenSettings = useCallback(() => {
+    setOven({
+      type: 'convection',
+      level: '',
+      firstBake: { topTemp: 200, bottomTemp: 170, time: 24 },
+      secondBake: { topTemp: 0, bottomTemp: 0, time: 0 },
+    });
+  }, []);
+
+  // 전체 변환 초기화
+  const resetAllConversion = useCallback(() => {
+    resetPanSettings();
+    resetSpecificVolume();
+    resetOvenSettings();
+    setMultiplier(1);
+  }, [resetPanSettings, resetSpecificVolume, resetOvenSettings]);
+
+  // 레시피 저장
+  const handleSaveRecipe = useCallback(() => {
+    const recipeData = {
+      id: `recipe-${Date.now()}`,
+      name: productName || '새 레시피',
+      nameKo: productName,
+      category: 'bread' as const,
+      difficulty: 'intermediate' as const,
+      servings: pans.reduce((s, p) => s + p.quantity, 0),
+      prepTime: 30,
+      cookTime: oven.firstBake.time + oven.secondBake.time,
+      totalTime: 60 + oven.firstBake.time + oven.secondBake.time,
+      ingredients: (usePreferment ? mainDoughIngredients : convertedIngredients).map(ing => ({
+        name: ing.name,
+        amount: ing.convertedAmount,
+        unit: 'g',
+        category: ing.category,
+      })),
+      prefermentIngredients: usePreferment ? prefermentIngredients.map(ing => ({
+        name: ing.name,
+        amount: ing.convertedAmount,
+        unit: 'g',
+        category: ing.category,
+      })) : [],
+      steps: processes.map(p => p.description),
+      tags: [convertedProduct, METHOD_LABELS[method.type]].filter(Boolean),
+      notes: memo,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      // 추가 메타데이터
+      meta: {
+        multiplier: effectiveMultiplier,
+        originalTotal: totalWeight,
+        convertedTotal,
+        panSettings: pans,
+        ovenSettings: oven,
+        method: method,
+        specificVolume: convertedProduct,
+      }
+    };
+
+    addRecipe(recipeData as any);
+    addToast({ type: 'success', message: `"${productName}" 레시피가 저장되었습니다.` });
+  }, [productName, pans, oven, usePreferment, mainDoughIngredients, convertedIngredients, prefermentIngredients, processes, memo, convertedProduct, method, effectiveMultiplier, totalWeight, convertedTotal, addRecipe, addToast]);
+
+  // 레시피 내보내기 (JSON)
+  const handleExportRecipe = useCallback(() => {
+    const exportData = {
+      name: productName,
+      exportedAt: new Date().toISOString(),
+      version: '1.0',
+      settings: {
+        multiplier: effectiveMultiplier,
+        originalTotal: totalWeight,
+        convertedTotal,
+        panSettings: {
+          original: originalPan,
+          converted: pans,
+        },
+        oven,
+        method,
+        specificVolume: {
+          original: originalProduct,
+          converted: convertedProduct,
+        },
+      },
+      originalIngredients: ingredients.map(ing => ({
+        name: ing.name,
+        category: ing.category,
+        amount: ing.amount,
+        ratio: ing.ratio,
+      })),
+      convertedIngredients: (usePreferment ? mainDoughIngredients : convertedIngredients).map(ing => ({
+        name: ing.name,
+        category: ing.category,
+        amount: ing.convertedAmount,
+      })),
+      prefermentIngredients: usePreferment ? prefermentIngredients.map(ing => ({
+        name: ing.name,
+        amount: ing.convertedAmount,
+      })) : [],
+      processes: processes.map(p => ({
+        description: p.description,
+        time: p.time,
+        temp: p.temp,
+      })),
+      memo,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${productName || 'recipe'}_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    addToast({ type: 'success', message: '레시피가 JSON 파일로 내보내졌습니다.' });
+  }, [productName, effectiveMultiplier, totalWeight, convertedTotal, originalPan, pans, oven, method, originalProduct, convertedProduct, ingredients, usePreferment, mainDoughIngredients, convertedIngredients, prefermentIngredients, processes, memo, addToast]);
+
+  // 텍스트로 복사 (일반 사용자용)
+  const handleCopyAsText = useCallback(async () => {
+    const categoryNames: Record<string, string> = {
+      flour: '밀가루', liquid: '수분', yeast: '이스트', fat: '유지',
+      sugar: '당류', dairy: '유제품', egg: '계란', salt: '소금', other: '기타'
+    };
+
+    const ingredientList = (usePreferment ? mainDoughIngredients : convertedIngredients);
+
+    let text = `🍞 ${productName}\n`;
+    text += `${'─'.repeat(30)}\n\n`;
+
+    // 기본 정보
+    text += `📊 기본 정보\n`;
+    text += `• 배수: ×${effectiveMultiplier}\n`;
+    text += `• 원량: ${totalWeight}g → 변환: ${convertedTotal}g\n`;
+    text += `• 팬: ${pans.map(p => `${p.type} ${p.quantity}개`).join(', ')}\n`;
+    text += `• 제법: ${METHOD_LABELS[method.type]}\n\n`;
+
+    // 사전반죽 (있는 경우)
+    if (usePreferment && prefermentIngredients.length > 0) {
+      text += `🥣 사전반죽 (${METHOD_LABELS[method.type]})\n`;
+      prefermentIngredients.forEach(ing => {
+        text += `• ${ing.name}: ${ing.convertedAmount}g\n`;
+      });
+      text += `\n`;
+    }
+
+    // 본반죽 재료
+    text += usePreferment ? `🍞 본반죽\n` : `🍞 재료\n`;
+    const categories = [...new Set(ingredientList.map(i => i.category))];
+    categories.forEach(cat => {
+      const items = ingredientList.filter(i => i.category === cat);
+      if (items.length > 0) {
+        text += `[${categoryNames[cat] || cat}]\n`;
+        items.forEach(ing => {
+          text += `• ${ing.name}: ${ing.convertedAmount}g\n`;
+        });
+      }
+    });
+    text += `\n`;
+
+    // 오븐 설정
+    text += `🔥 오븐 설정\n`;
+    const ovenType = { convection: '컨벡션', deck: '데크', airfryer: '에어프라이' }[oven.type];
+    if (oven.type === 'deck') {
+      text += `• ${ovenType}: 상 ${oven.firstBake.topTemp}°C / 하 ${oven.firstBake.bottomTemp}°C, ${oven.firstBake.time}분\n`;
+    } else {
+      text += `• ${ovenType}: ${oven.firstBake.topTemp}°C, ${oven.firstBake.time}분\n`;
+    }
+    if (oven.secondBake.time > 0) {
+      text += `• 2차: ${oven.secondBake.topTemp}°C, ${oven.secondBake.time}분\n`;
+    }
+    text += `\n`;
+
+    // 공정
+    text += `📝 공정\n`;
+    processes.forEach((p, i) => {
+      let step = `${i + 1}. ${p.description}`;
+      if (p.time) step += ` (${p.time}분)`;
+      if (p.temp) step += ` [${p.temp}°C]`;
+      text += `${step}\n`;
+    });
+
+    // 메모 (있는 경우)
+    if (memo) {
+      text += `\n📌 메모\n${memo}\n`;
+    }
+
+    text += `\n${'─'.repeat(30)}\n`;
+    text += `생성일: ${new Date().toLocaleDateString('ko-KR')}\n`;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      addToast({ type: 'success', message: '레시피가 클립보드에 복사되었습니다!' });
+    } catch (err) {
+      // 클립보드 실패 시 다운로드
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${productName || 'recipe'}_${new Date().toISOString().slice(0,10)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      addToast({ type: 'success', message: '레시피가 텍스트 파일로 저장되었습니다.' });
+    }
+  }, [productName, effectiveMultiplier, totalWeight, convertedTotal, pans, method, usePreferment, prefermentIngredients, mainDoughIngredients, convertedIngredients, oven, processes, memo, addToast]);
 
   const updatePan = useCallback((id: string, field: keyof PanEntry, value: any) => {
     setPans(prev => prev.map(p => {
@@ -692,13 +1063,6 @@ const AdvancedDashboard: React.FC = () => {
             className="text-lg font-bold w-36 border-b border-transparent hover:border-gray-300 focus:border-amber-500 focus:outline-none"
             placeholder="제품명"
           />
-          <input
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            className="text-xs text-gray-400 w-20 border-b border-transparent hover:border-gray-300 focus:outline-none"
-            placeholder="작성자"
-          />
         </div>
 
         {/* 중앙: 배수 조절 */}
@@ -766,11 +1130,33 @@ const AdvancedDashboard: React.FC = () => {
             <span>손실률:<b className={`ml-1 ${lossRate > 100 ? 'text-red-500' : lossRate < 95 ? 'text-orange-500' : 'text-green-600'}`}>{lossRate}%</b></span>
           </div>
           <div className="flex gap-1.5">
-            <button className="flex items-center gap-1 px-3 py-1.5 text-xs bg-amber-500 text-white rounded hover:bg-amber-600">
+            <button
+              onClick={resetAllConversion}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 border border-gray-300"
+              title="변환 설정 전체 초기화 (원본 레시피는 유지)"
+            >
+              <RotateCcw className="w-4 h-4" />초기화
+            </button>
+            <button
+              onClick={handleSaveRecipe}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-amber-500 text-white rounded hover:bg-amber-600"
+              title="레시피 저장 (레시피 목록에 추가)"
+            >
               <Save className="w-4 h-4" />저장
             </button>
-            <button className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-200 rounded hover:bg-gray-300">
-              <Download className="w-4 h-4" />내보내기
+            <button
+              onClick={handleCopyAsText}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+              title="텍스트로 복사 (카톡/메모장에 붙여넣기 가능)"
+            >
+              <Copy className="w-4 h-4" />복사
+            </button>
+            <button
+              onClick={handleExportRecipe}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-200 rounded hover:bg-gray-300"
+              title="JSON 파일로 내보내기 (백업용)"
+            >
+              <FileText className="w-4 h-4" />JSON
             </button>
           </div>
         </div>
@@ -790,6 +1176,7 @@ const AdvancedDashboard: React.FC = () => {
             icon={<Layers className="w-4 h-4" />}
             badge={`${originalPan.quantity}팬→${pans.reduce((s, p) => s + p.quantity, 0)}팬`}
             badgeColor="bg-blue-100 text-blue-700"
+            onReset={resetPanSettings}
           >
             <div className="space-y-3">
               {/* 원래 팬 (레시피 원본) */}
@@ -986,7 +1373,7 @@ const AdvancedDashboard: React.FC = () => {
           </CollapsibleSection>
 
           {/* 비용적 설정 */}
-          <CollapsibleSection title="비용적" icon={<Scale className="w-4 h-4" />} defaultOpen={false}>
+          <CollapsibleSection title="비용적" icon={<Scale className="w-4 h-4" />} defaultOpen={false} onReset={resetSpecificVolume}>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-gray-500 block mb-1">원제품</label>
@@ -1027,6 +1414,7 @@ const AdvancedDashboard: React.FC = () => {
               return `${typeLabel}${levelInfo} ${firstBake}${secondBake}`;
             })()}
             badgeColor="bg-orange-100 text-orange-700"
+            onReset={resetOvenSettings}
           >
             <div className="space-y-2">
               <div className="flex gap-1.5">
@@ -1156,11 +1544,11 @@ const AdvancedDashboard: React.FC = () => {
                   <div className="text-xs font-medium text-amber-700 mb-1.5">사전반죽 비율</div>
                   <div className="grid grid-cols-2 gap-2">
                     <div><label className="text-xs text-gray-500">밀가루 %</label>
-                      <input type="number" value={method.flourRatio * 100}
+                      <input type="number" value={Math.round(method.flourRatio * 100)}
                         onChange={(e) => setMethod({ ...method, flourRatio: (parseFloat(e.target.value) || 0) / 100 })}
                         className="w-full text-xs border rounded px-1.5 py-1 text-center" step="10" /></div>
                     <div><label className="text-xs text-gray-500">수분 %</label>
-                      <input type="number" value={method.waterRatio * 100}
+                      <input type="number" value={Math.round(method.waterRatio * 100)}
                         onChange={(e) => setMethod({ ...method, waterRatio: (parseFloat(e.target.value) || 0) / 100 })}
                         className="w-full text-xs border rounded px-1.5 py-1 text-center" step="10" /></div>
                   </div>
@@ -1380,18 +1768,18 @@ const AdvancedDashboard: React.FC = () => {
                     />
                     {/* 시간: 값이 있을 때 뱃지 표시 + 삭제 버튼 */}
                     {proc.time ? (
-                      <div className="flex items-center gap-0.5 text-[11px] text-blue-600 bg-blue-50 px-1 py-0.5 rounded group/time">
-                        <Clock className="w-3 h-3" />
+                      <div className="flex items-center gap-0.5 text-[11px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded group/time">
+                        <Clock className="w-3 h-3 flex-shrink-0" />
                         <input
                           type="number"
                           value={proc.time}
                           onChange={(e) => updateProcess(proc.id, 'time', parseInt(e.target.value) || 0)}
-                          className="w-5 bg-transparent border-0 p-0 text-center focus:outline-none"
+                          className="w-8 bg-transparent border-0 p-0 text-center focus:outline-none"
                         />
-                        <span className="text-[9px]">분</span>
+                        <span className="text-[10px] flex-shrink-0">분</span>
                         <button
                           onClick={() => updateProcess(proc.id, 'time', undefined)}
-                          className="text-blue-400 hover:text-blue-600 opacity-0 group-hover/time:opacity-100 ml-0.5"
+                          className="text-blue-400 hover:text-blue-600 opacity-0 group-hover/time:opacity-100 ml-0.5 flex-shrink-0"
                           title="시간 삭제"
                         >
                           <X className="w-2.5 h-2.5" />
@@ -1408,18 +1796,18 @@ const AdvancedDashboard: React.FC = () => {
                     )}
                     {/* 온도: 값이 있을 때 뱃지 표시 + 삭제 버튼 */}
                     {proc.temp ? (
-                      <div className="flex items-center gap-0.5 text-[11px] text-orange-600 bg-orange-50 px-1 py-0.5 rounded group/temp">
-                        <ThermometerSun className="w-3 h-3" />
+                      <div className="flex items-center gap-0.5 text-[11px] text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded group/temp">
+                        <ThermometerSun className="w-3 h-3 flex-shrink-0" />
                         <input
                           type="number"
                           value={proc.temp}
                           onChange={(e) => updateProcess(proc.id, 'temp', parseInt(e.target.value) || 0)}
-                          className="w-5 bg-transparent border-0 p-0 text-center focus:outline-none"
+                          className="w-8 bg-transparent border-0 p-0 text-center focus:outline-none"
                         />
-                        <span className="text-[9px]">°C</span>
+                        <span className="text-[10px] flex-shrink-0">°C</span>
                         <button
                           onClick={() => updateProcess(proc.id, 'temp', undefined)}
-                          className="text-orange-400 hover:text-orange-600 opacity-0 group-hover/temp:opacity-100 ml-0.5"
+                          className="text-orange-400 hover:text-orange-600 opacity-0 group-hover/temp:opacity-100 ml-0.5 flex-shrink-0"
                           title="온도 삭제"
                         >
                           <X className="w-2.5 h-2.5" />
@@ -1470,6 +1858,20 @@ const AdvancedDashboard: React.FC = () => {
                   </div>
                   );
                 })}
+              </div>
+              {/* 메모 입력 */}
+              <div className="mt-2 pt-2 border-t border-gray-200">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-medium text-gray-500">📌 메모</span>
+                  {memo && <span className="text-[10px] text-gray-400">({memo.length}자)</span>}
+                </div>
+                <textarea
+                  value={memo}
+                  onChange={(e) => setMemo(e.target.value)}
+                  placeholder="특이사항, 팁, 주의점 등을 메모하세요..."
+                  className="w-full text-xs border rounded px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  rows={2}
+                />
               </div>
             </div>
           </div>

@@ -45,8 +45,8 @@ class NotificationManager {
     }
 
     const defaultOptions = {
-      icon: '/icon-192.png',
-      badge: '/icon-192.png',
+      icon: '/icon.svg',
+      badge: '/icon.svg',
       lang: 'ko-KR',
       dir: 'ltr',
       requireInteraction: false,

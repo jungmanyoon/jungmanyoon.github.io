@@ -60,11 +60,16 @@ const RecipeCard = memo<RecipeCardProps>(({
     [recipe.category]
   )
 
-  // 제법 이름 메모이제이션
-  const methodName = useMemo(() =>
-    METHOD_NAMES[recipe.method as BreadMethod] || recipe.method,
-    [recipe.method]
-  )
+  // 제법 이름 메모이제이션 (method가 객체일 수 있음)
+  const methodName = useMemo(() => {
+    // method가 객체인 경우 (새 저장 형식)
+    if (typeof recipe.method === 'object' && recipe.method !== null) {
+      const methodType = (recipe.method as any).method || (recipe.method as any).type;
+      return METHOD_NAMES[methodType as BreadMethod] || methodType || '스트레이트';
+    }
+    // method가 문자열인 경우 (기존 형식)
+    return METHOD_NAMES[recipe.method as BreadMethod] || recipe.method || '스트레이트';
+  }, [recipe.method])
 
   // 카테고리 이름 메모이제이션
   const categoryName = useMemo(() =>

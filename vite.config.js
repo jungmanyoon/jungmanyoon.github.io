@@ -41,7 +41,7 @@ export default defineConfig({
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.ts',
-      includeAssets: ['favicon.ico', 'icon-192.png', 'icon-512.png'],
+      includeAssets: ['favicon.ico', 'icon.svg'],
       manifest: {
         name: '레시피북 - 제과제빵 레시피 변환기',
         short_name: '레시피북',
@@ -55,16 +55,16 @@ export default defineConfig({
         categories: ['food', 'lifestyle', 'productivity'],
         icons: [
           {
-            src: '/icon-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
+            src: '/icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any'
           },
           {
-            src: '/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
+            src: '/icon.svg',
+            sizes: '192x192 512x512',
+            type: 'image/svg+xml',
+            purpose: 'maskable'
           }
         ],
         shortcuts: [
@@ -73,14 +73,14 @@ export default defineConfig({
             short_name: "새 레시피",
             description: "새로운 레시피를 만듭니다",
             url: "/?shortcut=new-recipe",
-            icons: [{ src: "/icon-192.png", sizes: "192x192" }]
+            icons: [{ src: "/icon.svg", sizes: "any" }]
           },
           {
             name: "레시피 목록",
             short_name: "목록",
             description: "저장된 레시피 목록을 봅니다",
             url: "/?shortcut=recipe-list",
-            icons: [{ src: "/icon-192.png", sizes: "192x192" }]
+            icons: [{ src: "/icon.svg", sizes: "any" }]
           }
         ],
         share_target: {

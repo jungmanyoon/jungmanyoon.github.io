@@ -15,9 +15,6 @@ function Header() {
   const moreTabs = [
     { id: 'workspace', label: '📋 워크스페이스', title: '기존 워크스페이스' },
     { id: 'calculator', label: '🌡️ DDT', title: 'DDT 계산기' },
-    { id: 'pan-calculator', label: '🍞 팬 계산', title: '빠른 팬 반죽량 계산' },
-    { id: 'excel-calculator', label: '📊 엑셀 계산', title: '엑셀 스타일 레시피 계산' },
-    { id: 'converter', label: '🔧 변환 콘솔', title: '기존 변환 콘솔' },
   ]
 
   const utilTabs = [

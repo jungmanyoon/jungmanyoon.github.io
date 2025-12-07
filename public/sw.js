@@ -12,8 +12,7 @@ const STATIC_FILES = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/icon.svg'
 ]
 
 // 설치 이벤트 - 정적 파일 캐싱
@@ -174,8 +173,8 @@ self.addEventListener('push', event => {
   const options = {
     title: '레시피북 알림',
     body: event.data ? event.data.text() : '새로운 레시피가 추가되었습니다!',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: '/icon.svg',
+    badge: '/icon.svg',
     vibrate: [200, 100, 200],
     data: {
       dateOfArrival: Date.now(),
@@ -185,12 +184,12 @@ self.addEventListener('push', event => {
       {
         action: 'explore',
         title: '레시피 보기',
-        icon: '/icon-192.png'
+        icon: '/icon.svg'
       },
       {
         action: 'close',
         title: '닫기',
-        icon: '/icon-192.png'
+        icon: '/icon.svg'
       }
     ]
   }
@@ -237,7 +236,7 @@ async function updateRecipes() {
     if (recipes.hasNew) {
       self.registration.showNotification('새로운 레시피', {
         body: '새로운 레시피가 추가되었습니다!',
-        icon: '/icon-192.png'
+        icon: '/icon.svg'
       })
     }
   } catch (error) {

@@ -13,8 +13,7 @@ const STATIC_FILES = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/icon.svg'
 ]
 
 // Workbox가 빌드 시 주입하는 프리캐시 매니페스트
@@ -122,8 +121,8 @@ async function syncRecipes() {
 self.addEventListener('push', (event: any) => {
   const options: NotificationOptions = {
     body: event.data ? event.data.text() : '새로운 레시피가 추가되었습니다!',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: '/icon.svg',
+    badge: '/icon.svg',
     vibrate: [200, 100, 200]
   }
   event.waitUntil(self.registration.showNotification('레시피북', options))

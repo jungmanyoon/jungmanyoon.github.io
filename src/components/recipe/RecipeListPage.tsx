@@ -50,8 +50,8 @@ const RecipeListPage: React.FC = () => {
 
   const handleSelect = useCallback((recipe: any) => {
     setCurrentRecipe(recipe)
-    // currentRecipe가 반영된 다음 탭 전환되도록 마이크로태스크 뒤로 미룸
-    setTimeout(() => setActiveTab('converter'), 0)
+    // 대시보드로 이동 (converter 탭 삭제됨)
+    setTimeout(() => setActiveTab('dashboard'), 0)
   }, [setCurrentRecipe, setActiveTab])
 
   const handleDelete = useCallback((id: string) => {

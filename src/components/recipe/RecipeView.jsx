@@ -15,9 +15,27 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
     const flourTotal = ingredients
       .filter(ing => ing.type === 'flour')
       .reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
-    
+
     if (flourTotal === 0) return 0
     return ((amount / flourTotal) * 100).toFixed(1)
+  }
+
+  // method가 객체일 수 있으므로 안전하게 표시
+  const getMethodName = (method) => {
+    const METHOD_NAMES = {
+      straight: '스트레이트법',
+      sponge: '중종법',
+      poolish: '폴리쉬법',
+      biga: '비가법',
+      coldFermentation: '저온숙성법',
+      noTime: '노타임법'
+    }
+
+    if (typeof method === 'object' && method !== null) {
+      const methodType = method.method || method.type
+      return METHOD_NAMES[methodType] || methodType || '스트레이트법'
+    }
+    return METHOD_NAMES[method] || method || '스트레이트법'
   }
 
   // 재료 테이블 렌더링 함수
@@ -194,7 +212,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
               </div>
               <div className="flex justify-between py-1 border-b border-bread-100">
                 <span>제법</span>
-                <span className="font-medium">{recipe.method}</span>
+                <span className="font-medium">{getMethodName(recipe.method)}</span>
               </div>
             </div>
           </div>

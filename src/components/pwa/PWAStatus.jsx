@@ -12,27 +12,24 @@ const PWAStatus = () => {
   const syncStatus = getSyncStatus()
   const activeTimers = getActiveTimers()
 
+  // 온라인 상태이고 동기화/타이머/알림이 없으면 숨김
+  const hasNotifications = syncStatus.queueLength > 0 || activeTimers.length > 0 || permission === 'granted'
+
+  // 온라인 상태에서 알림 없으면 숨김
+  if (isOnline && !hasNotifications) {
+    return null
+  }
+
   return (
-    <div className="fixed top-4 right-4 z-40">
+    <div className="fixed bottom-4 right-4 z-40">
       <div className="flex flex-col space-y-2">
-        {/* 연결 상태 */}
-        <div className={`flex items-center px-3 py-2 rounded-full text-xs font-medium shadow-md transition-all duration-300 ${
-          isOnline 
-            ? 'bg-green-100 text-green-800 border border-green-200' 
-            : 'bg-red-100 text-red-800 border border-red-200'
-        }`}>
-          {isOnline ? (
-            <>
-              <Wifi className="w-3 h-3 mr-1.5" />
-              온라인
-            </>
-          ) : (
-            <>
-              <WifiOff className="w-3 h-3 mr-1.5" />
-              오프라인
-            </>
-          )}
-        </div>
+        {/* 연결 상태 - 오프라인일 때만 표시 */}
+        {isOffline && (
+          <div className="flex items-center px-3 py-2 rounded-full text-xs font-medium shadow-md transition-all duration-300 bg-red-100 text-red-800 border border-red-200">
+            <WifiOff className="w-3 h-3 mr-1.5" />
+            오프라인
+          </div>
+        )}
 
         {/* 동기화 상태 */}
         {syncStatus.queueLength > 0 && (

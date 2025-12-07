@@ -26,11 +26,6 @@ import AdvancedDashboardDirect from '@components/dashboard/AdvancedDashboard'
 import RecipeListDirect from '@components/recipe/RecipeListPage'
 import RecipeEditorDirect from '@components/recipe/RecipeEditor.jsx'
 import DDTCalculatorDirect from '@components/conversion/DDTCalculator'
-import ConversionConsoleDirect from '@components/conversion/ConversionConsole'
-import MethodSelectorDirect from '@components/conversion/MethodSelector.jsx'
-import PanSelectorDirect from '@components/conversion/PanSelector.jsx'
-import QuickPanCalculatorDirect from '@components/calculator/QuickPanCalculator.jsx'
-import RecipeExcelViewDirect from '@components/calculator/RecipeExcelView'
 import SettingsDirect from '@components/settings/Settings.jsx'
 import HelpDirect from '@components/help/Help.jsx'
 
@@ -39,11 +34,6 @@ const AdvancedDashboardLazy = lazy(() => import('@components/dashboard/AdvancedD
 const RecipeListLazy = lazy(() => import('@components/recipe/RecipeListPage'))
 const RecipeEditorLazy = lazy(() => import('@components/recipe/RecipeEditor.jsx'))
 const DDTCalculatorLazy = lazy(() => import('@components/conversion/DDTCalculator'))
-const ConversionConsoleLazy = lazy(() => import('@components/conversion/ConversionConsole'))
-const MethodSelectorLazy = lazy(() => import('@components/conversion/MethodSelector.jsx'))
-const PanSelectorLazy = lazy(() => import('@components/conversion/PanSelector.jsx'))
-const QuickPanCalculatorLazy = lazy(() => import('@components/calculator/QuickPanCalculator.jsx'))
-const RecipeExcelViewLazy = lazy(() => import('@components/calculator/RecipeExcelView'))
 const SettingsLazy = lazy(() => import('@components/settings/Settings.jsx'))
 const HelpLazy = lazy(() => import('@components/help/Help.jsx'))
 
@@ -52,11 +42,6 @@ const AdvancedDashboard = isDev ? AdvancedDashboardDirect : AdvancedDashboardLaz
 const RecipeList = isDev ? RecipeListDirect : RecipeListLazy
 const RecipeEditor = isDev ? RecipeEditorDirect : RecipeEditorLazy
 const DDTCalculator = isDev ? DDTCalculatorDirect : DDTCalculatorLazy
-const ConversionConsole = isDev ? ConversionConsoleDirect : ConversionConsoleLazy
-const MethodSelector = isDev ? MethodSelectorDirect : MethodSelectorLazy
-const PanSelector = isDev ? PanSelectorDirect : PanSelectorLazy
-const QuickPanCalculator = isDev ? QuickPanCalculatorDirect : QuickPanCalculatorLazy
-const RecipeExcelView = isDev ? RecipeExcelViewDirect : RecipeExcelViewLazy
 const Settings = isDev ? SettingsDirect : SettingsLazy
 const Help = isDev ? HelpDirect : HelpLazy
 
@@ -64,20 +49,6 @@ const Help = isDev ? HelpDirect : HelpLazy
 function App() {
     const { activeTab, setActiveTab } = useAppStore()
     const { currentRecipe, addRecipe, setCurrentRecipe } = useRecipeStore()
-
-    // 저장 핸들러: 변환 레시피를 새 레시피로 저장
-    const handleSaveConverted = (converted: any) => {
-        const saved = {
-            id: `recipe-${Date.now()}`,
-            name: converted?.name || (currentRecipe?.name ? `${currentRecipe.name} (변환)` : '변환 레시피'),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            ...converted
-        }
-        addRecipe(saved)
-        setCurrentRecipe(saved)
-        setActiveTab('recipes')
-    }
 
     // 수정 핸들러: 기존 레시피 업데이트
     const handleSaveEdit = (updated: any) => {
@@ -101,14 +72,6 @@ function App() {
                 return <AdvancedDashboard />
             case 'recipes':
                 return <RecipeList />
-            case 'converter':
-                return (
-                    <ConversionConsole
-                        recipe={currentRecipe}
-                        onUpdate={handleSaveConverted}
-                        onBack={() => setActiveTab('recipes')}
-                    />
-                )
             case 'editor':
                 return (
                     <RecipeEditor
@@ -122,14 +85,6 @@ function App() {
                 )
             case 'calculator':
                 return <DDTCalculator recipe={currentRecipe as any} />
-            case 'pan-calculator':
-                return <QuickPanCalculator />
-            case 'excel-calculator':
-                return <RecipeExcelView />
-            case 'pan-converter':
-                return <PanSelector />
-            case 'method-converter':
-                return <MethodSelector />
             case 'settings':
                 return <Settings />
             case 'help':

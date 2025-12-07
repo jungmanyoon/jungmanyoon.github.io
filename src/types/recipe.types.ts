@@ -133,6 +133,9 @@ export interface Recipe {
   notes?: string;
   tips?: string[];
   troubleshooting?: TroubleshootingGuide[];
+
+  // 출처 정보
+  source?: RecipeSource;
   
   // 영양 정보 (optional)
   nutrition?: NutritionInfo;
@@ -299,3 +302,21 @@ export interface ConversionChange {
   to: any;
   reason?: string;
 }
+
+// ===== 출처 정보 타입 =====
+export interface RecipeSource {
+  name: string;           // 출처 이름 (유튜버명, 책 이름 등)
+  type: SourceType;       // 출처 유형
+  url?: string;           // 출처 URL (유튜브, 블로그 등)
+  author?: string;        // 원작자 이름
+  publishedAt?: Date;     // 원본 게시일
+}
+
+export type SourceType =
+  | 'youtube'     // 유튜브
+  | 'blog'        // 블로그
+  | 'book'        // 책/서적
+  | 'website'     // 웹사이트
+  | 'personal'    // 개인 레시피
+  | 'school'      // 제과제빵 학교/학원
+  | 'other';      // 기타

@@ -5,7 +5,7 @@ import FilterControls from './FilterControls'
 import { useRecipeStore, selectFilteredRecipes } from '@stores/useRecipeStore'
 import { useAppStore } from '@stores/useAppStore'
 import sampleRecipes from '@data/sampleRecipes.js'
-import { Download, Upload } from 'lucide-react'
+import { Download, Upload, RefreshCw } from 'lucide-react'
 import { toast } from '@utils/toast'
 import Button from '@components/common/Button'
 
@@ -22,31 +22,35 @@ const RecipeListPage: React.FC = () => {
     clearFilters,
     getAvailableTags,
     importRecipes,
-    exportRecipes
+    exportRecipes,
+    resetToSampleRecipes
   } = useRecipeStore()
   const filteredRecipes = useRecipeStore(selectFilteredRecipes)
   const availableTags = useRecipeStore(getAvailableTags)
   const { setActiveTab } = useAppStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // 초기 진입 시 빈 경우 샘플 레시피 주입
+  // 초기 진입 시 빈 경우 또는 출처 정보 없는 경우 샘플 레시피 주입
   useEffect(() => {
+    // 레시피가 없으면 샘플 로드
     if (!recipes || recipes.length === 0) {
-      try {
-        const first = sampleRecipes[0]
-        if (first) {
-          addRecipe({
-            ...first,
-            id: `sample-${Date.now()}`,
-            createdAt: new Date(first.createdAt || Date.now()),
-            updatedAt: new Date(first.updatedAt || Date.now())
-          } as any)
-        }
-      } catch (_) {
-        // 무시
+      resetToSampleRecipes()
+      toast.success('샘플 레시피 10개를 불러왔습니다.')
+      return
+    }
+
+    // 기존 레시피에 출처(source) 정보가 없으면 샘플로 교체
+    // (이전 버전 데이터 마이그레이션)
+    const hasRecipesWithoutSource = recipes.some(r => !r.source)
+    if (hasRecipesWithoutSource && recipes.length > 0) {
+      // 모든 레시피에 출처가 없으면 샘플로 교체
+      const allWithoutSource = recipes.every(r => !r.source)
+      if (allWithoutSource) {
+        resetToSampleRecipes()
+        toast.success('새로운 샘플 레시피로 업데이트했습니다! (출처 정보 포함)')
       }
     }
-  }, [recipes?.length, addRecipe])
+  }, [])
 
   const handleSelect = useCallback((recipe: any) => {
     setCurrentRecipe(recipe)
@@ -164,11 +168,19 @@ const RecipeListPage: React.FC = () => {
     fileInputRef.current?.click()
   }, [])
 
+  // 샘플 레시피 다시 불러오기
+  const handleResetToSamples = useCallback(() => {
+    if (window.confirm('기존 레시피를 모두 삭제하고 샘플 레시피 10개로 교체합니다. 계속하시겠습니까?')) {
+      resetToSampleRecipes()
+      toast.success('샘플 레시피 10개를 불러왔습니다! (빵준서 5개 + 호야TV 5개)')
+    }
+  }, [resetToSampleRecipes])
+
   return (
     <div className="flex flex-col h-full">
       {/* Search and Filter Controls */}
       <div className="flex-none space-y-3 p-4 bg-bread-50 border-b border-bread-200">
-        {/* Import/Export Buttons */}
+        {/* Import/Export/Reset Buttons */}
         <div className="flex justify-end gap-2">
           <input
             ref={fileInputRef}
@@ -178,6 +190,15 @@ const RecipeListPage: React.FC = () => {
             className="hidden"
             aria-label="레시피 파일 선택"
           />
+          <Button
+            variant="secondary"
+            onClick={handleResetToSamples}
+            className="flex items-center gap-2"
+            title="샘플 레시피 10개로 초기화 (빵준서 5개 + 호야TV 5개)"
+          >
+            <RefreshCw className="w-4 h-4" />
+            샘플 불러오기
+          </Button>
           <Button
             variant="secondary"
             onClick={handleImportClick}

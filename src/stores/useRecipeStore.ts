@@ -7,6 +7,7 @@ import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { Recipe } from '@types/recipe.types'
 import { RecipeStore, RecipeFilters, RecipeSortOption } from '@types/store.types'
+import sampleRecipes from '@data/sampleRecipes.js'
 
 const initialFilters: RecipeFilters = {
   category: [],
@@ -132,6 +133,20 @@ export const useRecipeStore = create<RecipeStore>()(
             }
           })
           return Array.from(allTags).sort()
+        },
+
+        resetToSampleRecipes: () => {
+          const newRecipes = sampleRecipes.map((recipe: any, idx: number) => ({
+            ...recipe,
+            id: recipe.id || `sample-${Date.now()}-${idx}`,
+            createdAt: new Date(recipe.createdAt || Date.now()),
+            updatedAt: new Date(recipe.updatedAt || Date.now())
+          }))
+          set({
+            recipes: newRecipes,
+            currentRecipe: newRecipes[0] || null,
+            selectedRecipeIds: []
+          })
         }
       }),
       {

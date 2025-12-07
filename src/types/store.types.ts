@@ -92,6 +92,9 @@ export interface RecipeStore {
   clearFilters: () => void;
   getActiveFilterCount: () => number;
   getAvailableTags: () => string[];
+
+  // 샘플 레시피 관리
+  resetToSampleRecipes: () => void;
 }
 
 export interface RecipeFilters {

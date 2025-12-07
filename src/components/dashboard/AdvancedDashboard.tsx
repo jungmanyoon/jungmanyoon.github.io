@@ -21,8 +21,10 @@ import {
   ChevronDown, ChevronRight, ChevronUp, Plus, Minus, X,
   Save, Flame, Scale, Wheat, Droplets,
   Cookie, Layers, ThermometerSun, Link, Unlink,
-  Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText
+  Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText,
+  Youtube, Globe, BookOpen, User, GraduationCap
 } from 'lucide-react';
+import { SourceType } from '@types/recipe.types';
 
 // ============================================
 // 타입 정의
@@ -246,7 +248,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 // ============================================
 
 const AdvancedDashboard: React.FC = () => {
-  const { addRecipe, currentRecipe } = useRecipeStore();
+  const { addRecipe, updateRecipe, currentRecipe, recipes } = useRecipeStore();
   const { addToast } = useToastStore();
 
   // 레이아웃 설정 (localStorage 자동 저장)
@@ -261,7 +263,20 @@ const AdvancedDashboard: React.FC = () => {
 
   // 제품 정보
   const [productName, setProductName] = useState('새 레시피');
-  
+
+  // 출처 정보
+  const [source, setSource] = useState<{
+    name: string;
+    type: SourceType;
+    url?: string;
+    author?: string;
+  }>({
+    name: '',
+    type: 'personal',
+    url: '',
+    author: ''
+  });
+
   // 원래 팬 설정 (레시피 원본) - 비용적으로 계산된 초기값 사용
   const defaultPanWeight = Math.round(2350 / 3.4);  // 풀먼식빵팬(2350) / 산형식빵(3.4) = 691g
   const [originalPan, setOriginalPan] = useState({
@@ -317,18 +332,36 @@ const AdvancedDashboard: React.FC = () => {
   // 메모
   const [memo, setMemo] = useState('');
 
-  // 중복 로드 방지를 위한 ref
-  const lastLoadedRecipeId = useRef<string | null>(null);
+  // 중복 로드 방지를 위한 ref (ID + updatedAt으로 변경 감지)
+  const lastLoadedRecipeKey = useRef<string | null>(null);
 
   // ============================================
   // currentRecipe 로드
   // ============================================
   useEffect(() => {
-    if (currentRecipe && currentRecipe.id !== lastLoadedRecipeId.current) {
-      lastLoadedRecipeId.current = currentRecipe.id;
+    if (currentRecipe) {
+      // ID + updatedAt으로 고유 키 생성 (저장 후 변경사항 반영)
+      const recipeKey = `${currentRecipe.id}-${currentRecipe.updatedAt?.toString() || ''}`;
+
+      if (recipeKey === lastLoadedRecipeKey.current) {
+        return; // 이미 로드된 동일한 레시피
+      }
+      lastLoadedRecipeKey.current = recipeKey;
 
       // 레시피 이름 로드
       setProductName(currentRecipe.name || '새 레시피');
+
+      // 출처 정보 로드
+      if (currentRecipe.source) {
+        setSource({
+          name: currentRecipe.source.name || '',
+          type: currentRecipe.source.type || 'personal',
+          url: currentRecipe.source.url || '',
+          author: currentRecipe.source.author || ''
+        });
+      } else {
+        setSource({ name: '', type: 'personal', url: '', author: '' });
+      }
 
       // 재료 로드
       if (currentRecipe.ingredients && Array.isArray(currentRecipe.ingredients)) {
@@ -383,17 +416,164 @@ const AdvancedDashboard: React.FC = () => {
       // 오븐 설정 로드
       if (currentRecipe.ovenSettings) {
         const ovenData = currentRecipe.ovenSettings as any;
+        const secondBakeData = ovenData.secondBake;
         setOven({
           type: ovenData.mode === 'deck' ? 'deck' :
                 ovenData.mode === 'airfryer' ? 'airfryer' : 'convection',
           level: ovenData.deck || '',
           firstBake: {
             topTemp: ovenData.temperature || 200,
-            bottomTemp: ovenData.temperature || 170,
-            time: 24,
+            bottomTemp: ovenData.bottomTemperature || ovenData.temperature || 170,  // 하부 온도 로드
+            time: ovenData.duration || 24,  // 저장된 굽기 시간 로드
           },
-          secondBake: { topTemp: 0, bottomTemp: 0, time: 0 },
+          secondBake: secondBakeData ? {
+            topTemp: secondBakeData.topTemp || 0,
+            bottomTemp: secondBakeData.bottomTemp || 0,
+            time: secondBakeData.time || 0,
+          } : { topTemp: 0, bottomTemp: 0, time: 0 },
         });
+      }
+
+      // 제법 설정 로드
+      if (currentRecipe.method) {
+        const methodData = currentRecipe.method as any;
+        let methodType = methodData.method || methodData.type || 'straight';
+        // sourdough는 levain으로 매핑 (동일한 개념)
+        if (methodType === 'sourdough') methodType = 'levain';
+        // 유효한 제법 타입으로 제한
+        const validMethods = ['straight', 'sponge', 'poolish', 'biga', 'levain'];
+        if (!validMethods.includes(methodType)) methodType = 'straight';
+
+        setMethod({
+          type: methodType as 'straight' | 'sponge' | 'poolish' | 'biga' | 'levain',
+          flourRatio: methodData.prefermentRatio || 0,
+          waterRatio: methodData.waterRatio || 0,
+        });
+        // 중종법, 폴리쉬법 등이면 발효종 사용 활성화
+        setUsePreferment(methodType !== 'straight');
+      }
+
+      // 팬 설정 로드
+      if (currentRecipe.panConfig) {
+        const panData = currentRecipe.panConfig as any;
+        const panType = panData.type || '풀먼식빵팬';
+        const panCategory = panData.name || '식빵팬';
+        const panQuantity = panData.quantity || 1;
+        const panMode = panData.mode || 'pan';
+
+        // 저장된 팬 무게가 있으면 사용, 없으면 계산
+        let panWeight = panData.panWeight;
+        if (!panWeight) {
+          // 팬 볼륨 찾기
+          let panVolume = 2350; // 기본값 (풀먼식빵팬)
+          for (const [, panList] of Object.entries(PAN_DATA)) {
+            const found = (panList as any[]).find(p => p.name === panType);
+            if (found) {
+              panVolume = found.volume;
+              break;
+            }
+          }
+          // 비용적 기반 팬 무게 계산 (산형식빵 기준: 4.2)
+          const specificVolume = SPECIFIC_VOLUMES[convertedProduct] || 4.2;
+          panWeight = Math.round(panVolume / specificVolume);
+        }
+
+        // 원래 팬 설정 (저장된 originalPan이 있으면 사용) + 유효성 검증
+        if (panData.originalPan) {
+          const op = panData.originalPan;
+          const unitCount = Math.max(1, op.unitCount || 10);
+          const unitWeight = Math.max(1, op.unitWeight || 50);
+
+          // count 모드일 때 panWeight를 unitCount × unitWeight로 재계산
+          let calculatedPanWeight = Math.abs(op.panWeight || 500);
+          if (op.mode === 'count') {
+            calculatedPanWeight = unitCount * unitWeight;
+          }
+
+          setOriginalPan({
+            ...op,
+            panWeight: calculatedPanWeight,
+            quantity: Math.max(1, Math.abs(op.quantity || 1)),
+            divisionCount: Math.max(1, op.divisionCount || 1),
+            divisionWeight: Math.abs(op.divisionWeight || calculatedPanWeight || 500),
+            unitCount: unitCount,
+            unitWeight: unitWeight,
+          });
+        } else {
+          setOriginalPan(prev => ({
+            ...prev,
+            mode: panMode as 'pan' | 'count',
+            category: panCategory,
+            type: panType,
+            quantity: Math.max(1, panQuantity),
+            panWeight: Math.abs(panWeight || 500),
+            divisionWeight: Math.abs(panWeight || 500),
+          }));
+        }
+
+        // 변환 팬 설정 (저장된 전체 팬 배열이 있으면 사용)
+        if (panData.pans && Array.isArray(panData.pans) && panData.pans.length > 0) {
+          // 저장된 팬 배열 복원 + 유효성 검증 (음수 방지)
+          const validatedPans = panData.pans.map((p: any) => {
+            const pUnitCount = Math.max(1, p.unitCount || 10);
+            const pUnitWeight = Math.max(1, p.unitWeight || 50);
+            // count 모드일 때 panWeight를 unitCount × unitWeight로 재계산
+            let pPanWeight = Math.abs(p.panWeight || 500);
+            if (p.mode === 'count') {
+              pPanWeight = pUnitCount * pUnitWeight;
+            }
+            return {
+              ...p,
+              panWeight: pPanWeight,
+              quantity: Math.max(1, Math.abs(p.quantity || 1)),
+              divisionCount: Math.max(1, p.divisionCount || 1),
+              divisionWeight: Math.abs(p.divisionWeight || pPanWeight || 500),
+              unitCount: pUnitCount,
+              unitWeight: pUnitWeight,
+            };
+          });
+          setPans(validatedPans);
+        } else {
+          // 이전 형식 호환: 단일 팬으로 복원
+          setPans([{
+            id: '1',
+            mode: panMode as 'pan' | 'count',
+            category: panCategory,
+            type: panType,
+            quantity: Math.max(1, panQuantity),
+            divisionCount: 1,
+            panWeight: Math.abs(panWeight || 500),
+            divisionWeight: Math.abs(panWeight || 500),
+            unitCount: 10,
+            unitWeight: 50,
+          }]);
+        }
+      }
+
+      // 비용적 설정 로드
+      if (currentRecipe.specificVolume) {
+        const svData = currentRecipe.specificVolume as any;
+        if (svData.original) setOriginalProduct(svData.original);
+        if (svData.converted) setConvertedProduct(svData.converted);
+      } else if (currentRecipe.tags && Array.isArray(currentRecipe.tags)) {
+        // 이전 형식: tags에서 비용적 추출 시도
+        const svFromTags = currentRecipe.tags.find((t: string) =>
+          SPECIFIC_VOLUMES[t] !== undefined
+        );
+        if (svFromTags) {
+          setOriginalProduct(svFromTags);
+          setConvertedProduct(svFromTags);
+        }
+      }
+
+      // 배수 설정 로드 + 유효성 검증 (음수/0 방지)
+      if (currentRecipe.multiplierConfig) {
+        const mcData = currentRecipe.multiplierConfig as any;
+        if (typeof mcData.multiplier === 'number') {
+          // 배수는 최소 0.01 이상 보장
+          setMultiplier(Math.max(0.01, Math.abs(mcData.multiplier) || 1));
+        }
+        if (typeof mcData.isPanLinked === 'boolean') setIsPanLinked(mcData.isPanLinked);
       }
 
       // 메모 로드
@@ -440,23 +620,44 @@ const AdvancedDashboard: React.FC = () => {
     [flourTotal, liquidTotal, wetOtherMoisture]
   );
 
-  // 원래 팬 합계 (레시피 원본 기준)
-  const originalPanTotalWeight = useMemo(() =>
-    originalPan.panWeight * (originalPan.mode === 'pan' ? originalPan.quantity : 1),
-    [originalPan.panWeight, originalPan.quantity, originalPan.mode]
-  );
+  // 원래 팬 합계 (레시피 원본 기준) - 음수 방지
+  const originalPanTotalWeight = useMemo(() => {
+    // count 모드일 때는 unitCount × unitWeight로 직접 계산
+    if (originalPan.mode === 'count') {
+      return Math.max((originalPan.unitCount || 10) * (originalPan.unitWeight || 50), 1);
+    }
+    // 팬 모드일 때는 panWeight × quantity
+    const weight = Math.abs(originalPan.panWeight || 500);
+    const qty = Math.max(1, Math.abs(originalPan.quantity || 1));
+    return Math.max(weight * qty, 1);  // 최소 1g
+  }, [originalPan.panWeight, originalPan.quantity, originalPan.mode, originalPan.unitCount, originalPan.unitWeight]);
 
-  // 변환 팬 합계 (목표)
-  const panTotalWeight = useMemo(() =>
-    pans.reduce((sum, p) => sum + (p.panWeight * p.quantity), 0),
-    [pans]
-  );
+  // 변환 팬 합계 (목표) - 음수 방지
+  const panTotalWeight = useMemo(() => {
+    const total = pans.reduce((sum, p) => {
+      // count 모드일 때는 unitCount × unitWeight로 직접 계산
+      if (p.mode === 'count') {
+        return sum + ((p.unitCount || 10) * (p.unitWeight || 50));
+      }
+      // 팬 모드일 때는 panWeight × quantity
+      const weight = Math.abs(p.panWeight || 0);
+      const qty = Math.abs(p.quantity || 1);
+      return sum + (weight * qty);
+    }, 0);
+    return Math.max(total, 0);
+  }, [pans]);
 
   // 자동 계산된 배수 (팬 연동 시 사용)
   // 핵심: 원래팬 → 변환팬의 비율이 배수가 됨
+  // 안전장치: 배수는 항상 양수 (최소 0.01)
   const autoMultiplier = useMemo(() => {
-    if (originalPanTotalWeight === 0 || panTotalWeight === 0) return 1;
-    return Math.round((panTotalWeight / originalPanTotalWeight) * 100) / 100;
+    // 0 또는 음수 방지
+    const origWeight = Math.abs(originalPanTotalWeight) || 1;
+    const targetWeight = Math.abs(panTotalWeight) || 1;
+    if (origWeight === 0) return 1;
+    const ratio = targetWeight / origWeight;
+    // 최소 0.01, 최대 제한 없음
+    return Math.max(0.01, Math.round(ratio * 100) / 100);
   }, [panTotalWeight, originalPanTotalWeight]);
 
   // 실제 사용할 배수: 연동 시 자동계산, 비연동 시 수동입력
@@ -741,55 +942,144 @@ const AdvancedDashboard: React.FC = () => {
     setMultiplier(1);
   }, [resetPanSettings, resetSpecificVolume, resetOvenSettings]);
 
-  // 레시피 저장
-  const handleSaveRecipe = useCallback(() => {
+  // 레시피 저장 (실제 저장 로직)
+  const saveRecipeData = useCallback((overwriteId?: string) => {
+    // 저장할 재료 데이터 - 원래 레시피 그대로 저장 (변환값 아님!)
+    const ingredientsToSave = ingredients.map((ing, idx) => ({
+      id: ing.id || `ing-${Date.now()}-${idx}`,
+      name: ing.name,
+      amount: ing.amount,  // 원래 레시피 양 저장 (convertedAmount 아님!)
+      percentage: ing.ratio,  // 베이커스 퍼센트 저장
+      unit: 'g',
+      category: ing.category === 'flour' ? 'flour' :
+                ing.category === 'liquid' ? 'liquid' :
+                ing.category === 'wetOther' ? 'fat' : 'other',
+      isFlour: ing.category === 'flour',
+      note: ing.note || '',  // 메모 저장
+      moistureContent: ing.moistureContent,  // 수분 함량 저장
+    }));
+
+    // 저장할 공정 데이터 (로드 형식과 일치하도록)
+    const stepsToSave = processes.map((p, idx) => ({
+      id: p.id || `step-${Date.now()}-${idx}`,
+      order: p.order || idx + 1,
+      instruction: p.description,
+      time: p.time,
+      temp: p.temp,
+    }));
+
+    // 저장할 오븐 설정 (로드 형식과 일치하도록)
+    const ovenSettingsToSave = {
+      temperature: oven.firstBake.topTemp,
+      bottomTemperature: oven.firstBake.bottomTemp,  // 하부 온도 추가
+      mode: oven.type === 'deck' ? 'deck' : oven.type === 'airfryer' ? 'airfryer' : 'conventional',
+      preheating: true,
+      deck: oven.level || 'middle',
+      duration: oven.firstBake.time,
+      // 2차 굽기 설정 추가
+      secondBake: oven.secondBake.time > 0 ? {
+        topTemp: oven.secondBake.topTemp,
+        bottomTemp: oven.secondBake.bottomTemp,
+        time: oven.secondBake.time,
+      } : null,
+    };
+
     const recipeData = {
-      id: `recipe-${Date.now()}`,
       name: productName || '새 레시피',
       nameKo: productName,
       category: 'bread' as const,
       difficulty: 'intermediate' as const,
       servings: pans.reduce((s, p) => s + p.quantity, 0),
       prepTime: 30,
-      cookTime: oven.firstBake.time + oven.secondBake.time,
       totalTime: 60 + oven.firstBake.time + oven.secondBake.time,
-      ingredients: (usePreferment ? mainDoughIngredients : convertedIngredients).map(ing => ({
-        name: ing.name,
-        amount: ing.convertedAmount,
-        unit: 'g',
-        category: ing.category,
-      })),
-      prefermentIngredients: usePreferment ? prefermentIngredients.map(ing => ({
-        name: ing.name,
-        amount: ing.convertedAmount,
-        unit: 'g',
-        category: ing.category,
-      })) : [],
-      steps: processes.map(p => p.description),
+      ingredients: ingredientsToSave,
+      steps: stepsToSave,
+      ovenSettings: ovenSettingsToSave,
+      method: {
+        method: method.type,
+        prefermentRatio: method.flourRatio,
+        waterRatio: method.waterRatio,  // 수분 비율 저장 추가
+      },
+      panConfig: {
+        type: pans[0]?.type || '풀먼식빵팬',
+        name: pans[0]?.category || '식빵팬',  // 카테고리 저장
+        quantity: pans.reduce((s, p) => s + p.quantity, 0),
+        panWeight: pans[0]?.panWeight,  // 팬 무게 저장
+        mode: pans[0]?.mode || 'pan',  // 모드 저장 (pan/count)
+        originalPan: originalPan,  // 원래 팬 설정 저장
+        pans: pans,  // 전체 팬 배열 저장 (개별 팬 수량 유지)
+      },
+      // 비용적 설정 저장
+      specificVolume: {
+        original: originalProduct,
+        converted: convertedProduct,
+      },
+      // 배수 설정 저장
+      multiplierConfig: {
+        multiplier: multiplier,
+        isPanLinked: isPanLinked,
+      },
+      // 출처 정보
+      source: source.name ? {
+        name: source.name,
+        type: source.type,
+        url: source.url || undefined,
+        author: source.author || undefined,
+      } : undefined,
       tags: [convertedProduct, METHOD_LABELS[method.type]].filter(Boolean),
       notes: memo,
-      createdAt: new Date(),
       updatedAt: new Date(),
-      // 추가 메타데이터
-      meta: {
-        multiplier: effectiveMultiplier,
-        originalTotal: totalWeight,
-        convertedTotal,
-        panSettings: pans,
-        ovenSettings: oven,
-        method: method,
-        specificVolume: convertedProduct,
-      }
     };
 
-    addRecipe(recipeData as any);
-    addToast({ type: 'success', message: `"${productName}" 레시피가 저장되었습니다.` });
-  }, [productName, pans, oven, usePreferment, mainDoughIngredients, convertedIngredients, prefermentIngredients, processes, memo, convertedProduct, method, effectiveMultiplier, totalWeight, convertedTotal, addRecipe, addToast]);
+    // 덮어쓰기 또는 현재 레시피 업데이트
+    const targetId = overwriteId || currentRecipe?.id;
+    if (targetId) {
+      updateRecipe(targetId, recipeData as any);
+      addToast({ type: 'success', message: `"${productName}" 레시피가 업데이트되었습니다.` });
+    } else {
+      const newRecipe = {
+        ...recipeData,
+        id: `recipe-${Date.now()}`,
+        createdAt: new Date(),
+      };
+      addRecipe(newRecipe as any);
+      addToast({ type: 'success', message: `"${productName}" 레시피가 저장되었습니다.` });
+    }
+  }, [productName, source, pans, oven, usePreferment, mainDoughIngredients, convertedIngredients, processes, memo, convertedProduct, method, currentRecipe, addRecipe, updateRecipe, addToast]);
+
+  // 레시피 저장 (중복 이름 확인)
+  const handleSaveRecipe = useCallback(() => {
+    const trimmedName = (productName || '새 레시피').trim();
+
+    // 동일한 이름의 기존 레시피 찾기 (현재 편집 중인 레시피 제외)
+    const existingRecipe = recipes.find(
+      r => r.name?.trim() === trimmedName && r.id !== currentRecipe?.id
+    );
+
+    if (existingRecipe) {
+      // 중복 이름 발견 - 사용자에게 선택지 제공
+      const choice = window.confirm(
+        `"${trimmedName}" 이름의 레시피가 이미 존재합니다.\n\n` +
+        `[확인] - 기존 레시피 덮어쓰기\n` +
+        `[취소] - 저장 취소 (다른 이름으로 변경 후 저장하세요)`
+      );
+
+      if (choice) {
+        // 덮어쓰기 선택
+        saveRecipeData(existingRecipe.id);
+      }
+      // 취소 선택 시 아무것도 하지 않음
+    } else {
+      // 중복 없음 - 바로 저장
+      saveRecipeData();
+    }
+  }, [productName, recipes, currentRecipe?.id, saveRecipeData]);
 
   // 레시피 내보내기 (JSON)
   const handleExportRecipe = useCallback(() => {
     const exportData = {
       name: productName,
+      source: source.name ? source : undefined,
       exportedAt: new Date().toISOString(),
       version: '1.0',
       settings: {
@@ -841,7 +1131,7 @@ const AdvancedDashboard: React.FC = () => {
     URL.revokeObjectURL(url);
 
     addToast({ type: 'success', message: '레시피가 JSON 파일로 내보내졌습니다.' });
-  }, [productName, effectiveMultiplier, totalWeight, convertedTotal, originalPan, pans, oven, method, originalProduct, convertedProduct, ingredients, usePreferment, mainDoughIngredients, convertedIngredients, prefermentIngredients, processes, memo, addToast]);
+  }, [productName, source, effectiveMultiplier, totalWeight, convertedTotal, originalPan, pans, oven, method, originalProduct, convertedProduct, ingredients, usePreferment, mainDoughIngredients, convertedIngredients, prefermentIngredients, processes, memo, addToast]);
 
   // 텍스트로 복사 (일반 사용자용)
   const handleCopyAsText = useCallback(async () => {
@@ -1053,7 +1343,7 @@ const AdvancedDashboard: React.FC = () => {
     <div className="h-screen flex flex-col bg-gray-100 text-sm">
       {/* ===== 상단 헤더 ===== */}
       <div className="bg-white border-b shadow-sm px-4 py-2 flex items-center justify-between gap-4 flex-shrink-0">
-        {/* 좌측: 제품 정보 */}
+        {/* 좌측: 제품 정보 + 출처 */}
         <div className="flex items-center gap-3">
           <Cookie className="w-5 h-5 text-amber-600" />
           <input
@@ -1063,6 +1353,30 @@ const AdvancedDashboard: React.FC = () => {
             className="text-lg font-bold w-36 border-b border-transparent hover:border-gray-300 focus:border-amber-500 focus:outline-none"
             placeholder="제품명"
           />
+          <div className="flex items-center gap-1 text-xs border-l pl-3">
+            <select
+              value={source.type}
+              onChange={(e) => setSource({ ...source, type: e.target.value as SourceType })}
+              className="bg-gray-50 border border-gray-200 rounded px-1.5 py-1 text-xs focus:outline-none focus:border-amber-400"
+              title="출처 유형"
+            >
+              <option value="youtube">📺 유튜브</option>
+              <option value="blog">🌐 블로그</option>
+              <option value="book">📖 책</option>
+              <option value="website">🔗 웹사이트</option>
+              <option value="personal">👤 개인</option>
+              <option value="school">🎓 학교</option>
+              <option value="other">📌 기타</option>
+            </select>
+            <input
+              type="text"
+              value={source.name}
+              onChange={(e) => setSource({ ...source, name: e.target.value })}
+              className="w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:border-amber-400"
+              placeholder="출처명"
+              title="출처 이름 (예: 빵준서, 호야TV)"
+            />
+          </div>
         </div>
 
         {/* 중앙: 배수 조절 */}
@@ -1255,13 +1569,17 @@ const AdvancedDashboard: React.FC = () => {
                     </div>
                     <div>
                       <label className="text-xs text-gray-500 block">합계</label>
-                      <div className="text-center py-1 font-mono bg-white rounded border font-semibold">{originalPan.panWeight}g</div>
+                      <div className="text-center py-1 font-mono bg-white rounded border font-semibold">
+                        {(originalPan.unitCount || 10) * (originalPan.unitWeight || 50)}g
+                      </div>
                     </div>
                   </div>
                 )}
 
                 <div className="text-xs text-gray-500 mt-1 text-right">
-                  합계: <b>{originalPan.panWeight * (originalPan.mode === 'pan' ? originalPan.quantity : 1)}g</b>
+                  합계: <b>{originalPan.mode === 'count'
+                    ? (originalPan.unitCount || 10) * (originalPan.unitWeight || 50)
+                    : originalPan.panWeight * originalPan.quantity}g</b>
                 </div>
               </div>
 
@@ -1356,7 +1674,9 @@ const AdvancedDashboard: React.FC = () => {
                         </div>
                         <div>
                           <label className="text-xs text-gray-500 block">합계</label>
-                          <div className="text-center py-1 font-mono bg-white rounded border font-semibold">{pan.panWeight}g</div>
+                          <div className="text-center py-1 font-mono bg-white rounded border font-semibold">
+                            {(pan.unitCount || 10) * (pan.unitWeight || 50)}g
+                          </div>
                         </div>
                       </div>
                     )}

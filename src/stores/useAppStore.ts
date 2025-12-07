@@ -44,7 +44,7 @@ export const useAppStore = create<AppStore>()(
     persist(
       (set, get) => ({
         // 상태
-        activeTab: 'workspace',
+        activeTab: 'recipes',
         isLoading: false,
         error: null,
         userPreferences: initialPreferences,

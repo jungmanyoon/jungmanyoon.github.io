@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useAppStore } from '@stores/useAppStore'
 import Header from '@components/common/Header.jsx'
+import Footer from '@components/common/Footer'
 import PWAStatus from '@components/pwa/PWAStatus.jsx'
 import PWAInstallPrompt from '@components/pwa/PWAInstallPrompt.jsx'
 import { ToastContainer } from '@components/common/ToastContainer'
@@ -30,6 +31,8 @@ import RecipeEditorDirect from '@components/recipe/RecipeEditor.jsx'
 import DDTCalculatorDirect from '@components/conversion/DDTCalculator'
 import SettingsPageDirect from '@components/settings/SettingsPage'
 import HelpDirect from '@components/help/Help.jsx'
+// Legal 페이지
+import { PrivacyPolicy, TermsOfService, UserGuide, Contact } from '@components/legal'
 
 // 프로덕션용 lazy import (사용하지 않지만 번들 최적화를 위해 유지)
 const HomePageLazy = lazy(() => import('@components/home/HomePage'))
@@ -50,7 +53,7 @@ const SettingsPage = isDev ? SettingsPageDirect : SettingsPageLazy
 const Help = isDev ? HelpDirect : HelpLazy
 
 // 유효한 탭 목록
-const VALID_TABS = ['home', 'dashboard', 'workspace', 'recipes', 'editor', 'calculator', 'settings', 'help']
+const VALID_TABS = ['home', 'dashboard', 'workspace', 'recipes', 'editor', 'calculator', 'settings', 'help', 'privacy', 'terms', 'guide', 'contact']
 
 // 메인 앱 컴포넌트
 function App() {
@@ -134,31 +137,42 @@ function App() {
                 return <SettingsPage onClose={() => setActiveTab('home')} />
             case 'help':
                 return <Help />
+            case 'privacy':
+                return <PrivacyPolicy onBack={() => setActiveTab('home')} />
+            case 'terms':
+                return <TermsOfService onBack={() => setActiveTab('home')} />
+            case 'guide':
+                return <UserGuide onBack={() => setActiveTab('home')} onNavigate={(tab) => setActiveTab(tab as any)} />
+            case 'contact':
+                return <Contact onBack={() => setActiveTab('home')} />
             default:
                 return <HomePage />
         }
     }
 
     const isFullWidth = activeTab === 'dashboard' || activeTab === 'workspace' || activeTab === 'home' || !activeTab;
+    const showFooter = ['home', 'privacy', 'terms', 'guide', 'contact', 'help'].includes(activeTab || 'home');
 
     // 개발환경: Suspense 불필요 (직접 import 사용)
     // 프로덕션: Suspense 필요 (lazy loading 사용)
     const content = renderActive()
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
             <Header />
             <PWAStatus />
             <PWAInstallPrompt />
             <ToastContainer />
 
-            <main className={isFullWidth ? "" : "container mx-auto px-4 py-6"}>
+            <main className={`flex-grow ${isFullWidth ? "" : "container mx-auto px-4 py-6"}`}>
                 {isDev ? content : (
                     <Suspense fallback={<LoadingSpinner />}>
                         {content}
                     </Suspense>
                 )}
             </main>
+
+            {showFooter && <Footer />}
         </div>
     )
 }

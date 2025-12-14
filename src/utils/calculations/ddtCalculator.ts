@@ -24,10 +24,11 @@ interface TemperatureInputs {
 export class DDTCalculator {
   /**
    * 기본 마찰계수 (Friction Factor)
-   * 믹서 종류별 평균값
+   * 믹서 종류별 평균값 (°F 기준, 섭씨 환산 시 약 60% 값)
+   * 참고: King Arthur Baking, SFBI 표준
    */
   static readonly FRICTION_FACTORS: Record<MixerType, number> = {
-    'hand': 0,           // 손반죽
+    'hand': 4,           // 손반죽 (체온 + 약간의 마찰열)
     'stand': 24,         // 스탠드 믹서
     'spiral': 22,        // 스파이럴 믹서
     'planetary': 26,     // 플래니터리 믹서
@@ -82,26 +83,31 @@ export class DDTCalculator {
 
   /**
    * 얼음 필요량 계산
+   * 열평형 방정식 기반 정밀 계산
    */
   static calculateIceAmount(
-    totalWater: number, 
-    currentWaterTemp: number, 
+    totalWater: number,
+    currentWaterTemp: number,
     targetWaterTemp: number
   ): IceCalculation {
     if (currentWaterTemp <= targetWaterTemp) {
       return { ice: 0, water: totalWater, percentage: 0 }
     }
 
-    // 얼음의 융해열: 80 kcal/kg
-    // 물의 비열: 1 kcal/kg·°C
-    // 얼음 온도: -10°C 가정
-    const iceTemp = -10
-    const meltingHeat = 80
-    
-    // 열평형 방정식
-    const tempDiff = currentWaterTemp - targetWaterTemp
-    const iceRatio = tempDiff / (meltingHeat + Math.abs(iceTemp) + targetWaterTemp)
-    
+    // 물리 상수 (kcal/kg 기준)
+    const ICE_SPECIFIC_HEAT = 0.5    // 얼음 비열: 0.5 kcal/kg·°C
+    const WATER_SPECIFIC_HEAT = 1.0  // 물 비열: 1.0 kcal/kg·°C
+    const MELTING_HEAT = 80          // 융해열: 80 kcal/kg
+    const ICE_TEMP = -10             // 얼음 초기 온도 (°C)
+
+    // 열평형 방정식:
+    // 물이 잃는 열 = 얼음이 얻는 열
+    // m_w × C_w × (T_water - T_target) = m_i × [C_i × |T_ice| + L + C_w × T_target]
+    const waterCooling = WATER_SPECIFIC_HEAT * (currentWaterTemp - targetWaterTemp)
+    const iceHeating = ICE_SPECIFIC_HEAT * Math.abs(ICE_TEMP) + MELTING_HEAT + WATER_SPECIFIC_HEAT * targetWaterTemp
+
+    const iceRatio = waterCooling / (waterCooling + iceHeating)
+
     const iceAmount = Math.round(totalWater * iceRatio)
     const waterAmount = totalWater - iceAmount
 

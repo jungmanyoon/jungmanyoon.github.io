@@ -147,8 +147,8 @@ const METHOD_RATIOS: Record<string, { flour: number; water: number }> = {
 const DEFAULT_METHOD_YEAST: Record<string, { yeastAdjustment: number; prefermentYeastRatio: number }> = {
   straight: { yeastAdjustment: 1.0, prefermentYeastRatio: 0 },
   sponge: { yeastAdjustment: 0.75, prefermentYeastRatio: 1.0 },    // 중종법: 이스트 75%, 전량 사전반죽
-  poolish: { yeastAdjustment: 0.55, prefermentYeastRatio: 0.15 },  // 폴리쉬: 이스트 55%, 15% 사전반죽
-  biga: { yeastAdjustment: 0.45, prefermentYeastRatio: 0.1 },      // 비가: 이스트 45%, 10% 사전반죽
+  poolish: { yeastAdjustment: 0.66, prefermentYeastRatio: 0.15 },  // 폴리쉬: 이스트 66% (SFBI 권장), 15% 사전반죽
+  biga: { yeastAdjustment: 0.50, prefermentYeastRatio: 0.1 },      // 비가: 이스트 50% (SFBI 권장), 10% 사전반죽
   tangzhong: { yeastAdjustment: 1.0, prefermentYeastRatio: 0 },    // 탕종: 이스트 동일, 사전반죽 없음
   autolyse: { yeastAdjustment: 1.0, prefermentYeastRatio: 0 },     // 오토리즈: 이스트 동일, 사전반죽 없음
   levain: { yeastAdjustment: 0, prefermentYeastRatio: 0 },         // 르방: 상업 이스트 미사용

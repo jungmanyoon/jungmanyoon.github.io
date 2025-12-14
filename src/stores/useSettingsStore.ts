@@ -184,7 +184,7 @@ const DEFAULT_METHOD_CONFIGS: Record<string, MethodConfig> = {
     nameKo: '폴리쉬법',
     flourRatio: 0.3,      // 30%
     waterRatio: 1.0,      // 100% (1:1)
-    yeastAdjustment: 0.55, // 전체 이스트 55%
+    yeastAdjustment: 0.66, // 전체 이스트 66% (SFBI 권장)
     prefermentYeastRatio: 0.15, // 폴리쉬에 15% (극소량)
     prefermentTime: { min: 12, max: 16 },
     prefermentTemp: { min: 18, max: 21 },
@@ -197,7 +197,7 @@ const DEFAULT_METHOD_CONFIGS: Record<string, MethodConfig> = {
     nameKo: '비가법',
     flourRatio: 0.4,      // 40%
     waterRatio: 0.55,     // 55%
-    yeastAdjustment: 0.45, // 전체 이스트 45%
+    yeastAdjustment: 0.50, // 전체 이스트 50% (SFBI 권장)
     prefermentYeastRatio: 0.1,  // 비가에 10% (극소량)
     prefermentTime: { min: 12, max: 18 },
     prefermentTemp: { min: 16, max: 18 },

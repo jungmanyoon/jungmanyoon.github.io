@@ -42,8 +42,11 @@ export class EnvironmentalTS {
 
   static calculateBoilingPoint(altitude: number): number {
     // 기압에 따른 물 끓는점 근사(°C)
+    // Clausius-Clapeyron 방정식 기반 근사식
+    // 해수면(101.325 kPa)에서 100°C, 고도 상승에 따라 약 3°C/1000m 감소
     const pressure = this.calculatePressure(altitude)
-    return Math.round((49.161 * Math.log(pressure) + 44.932) * 10) / 10
+    // 수정된 공식: 해수면에서 100°C 출력
+    return Math.round((28.4 * Math.log(pressure) - 31.1) * 10) / 10
   }
 
   static adjustFlourForHumidity(humidity: number, flourAmount: number): number {

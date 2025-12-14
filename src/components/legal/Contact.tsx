@@ -9,7 +9,7 @@ interface ContactProps {
 
 export default function Contact({ onBack }: ContactProps) {
   const handleEmailClick = () => {
-    window.location.href = 'mailto:jmyoon@iljin.co.kr?subject=[레시피북] 문의드립니다'
+    window.location.href = 'mailto:jungman0702@gmail.com?subject=[레시피북] 문의드립니다'
   }
 
   const handleGithubClick = () => {
@@ -52,7 +52,7 @@ export default function Contact({ onBack }: ContactProps) {
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900">이메일</h3>
-                    <p className="text-bread-600">jmyoon@iljin.co.kr</p>
+                    <p className="text-bread-600">jungman0702@gmail.com</p>
                   </div>
                 </div>
                 <p className="mt-3 text-sm text-gray-500">

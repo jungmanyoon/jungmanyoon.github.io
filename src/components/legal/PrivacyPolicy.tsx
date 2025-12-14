@@ -154,7 +154,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                 <strong>서비스명:</strong> 레시피북 - 제과제빵 레시피 변환기
               </p>
               <p className="text-gray-700">
-                <strong>이메일:</strong> jmyoon@iljin.co.kr
+                <strong>이메일:</strong> jungman0702@gmail.com
               </p>
             </div>
           </section>

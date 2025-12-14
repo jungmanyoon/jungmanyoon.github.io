@@ -1,19 +1,15 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import { useAppStore } from '@stores/useAppStore'
 
 function Header() {
   const { activeTab, setActiveTab } = useAppStore()
-  const [showMore, setShowMore] = useState(false)
 
-  // 메인 탭과 더보기 탭 구분
-  const mainTabs = [
-    { id: 'dashboard', label: '🔄 변환', title: '레시피 변환 대시보드 (권장)' },
+  // 네비게이션 탭 - 깔끔하게 정리
+  const navTabs = [
+    { id: 'home', label: '🏠 홈', title: '홈' },
+    { id: 'dashboard', label: '⚖️ 변환기', title: '레시피 변환 대시보드' },
     { id: 'recipes', label: '📖 레시피', title: '레시피 목록' },
-  ]
-
-  const moreTabs = [
-    { id: 'workspace', label: '📋 워크스페이스', title: '기존 워크스페이스' },
     { id: 'calculator', label: '🌡️ DDT', title: 'DDT 계산기' },
   ]
 
@@ -28,7 +24,7 @@ function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <button
-            onClick={() => setActiveTab('dashboard')}
+            onClick={() => setActiveTab('home')}
             className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
           >
             <span className="text-xl">🍞</span>
@@ -37,15 +33,16 @@ function Header() {
 
           {/* Navigation */}
           <nav className="flex items-center space-x-1">
-            {/* Main Tabs */}
-            {mainTabs.map(tab => (
+            {/* Main Navigation */}
+            {navTabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-3 py-2 rounded text-sm font-medium focus:outline-none focus:ring-2 focus:ring-white/70 transition-colors ${activeTab === tab.id
+                className={`px-3 py-2 rounded text-sm font-medium focus:outline-none focus:ring-2 focus:ring-white/70 transition-colors ${
+                  activeTab === tab.id
                     ? 'bg-white/20 text-white'
                     : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  }`}
+                }`}
                 aria-label={tab.title}
                 title={tab.title}
               >
@@ -54,55 +51,18 @@ function Header() {
             ))}
 
             {/* Divider */}
-            <span className="w-px h-6 bg-white/20 mx-1"></span>
+            <span className="w-px h-6 bg-white/20 mx-2"></span>
 
-            {/* More Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setShowMore(!showMore)}
-                className={`px-2 py-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-white/70 transition-colors ${showMore ? 'bg-white/20' : 'hover:bg-white/10'
-                  }`}
-                aria-label="더보기"
-              >
-                ⋯ 더보기
-              </button>
-
-              {showMore && (
-                <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setShowMore(false)}
-                  />
-                  <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 z-20">
-                    {moreTabs.map(tab => (
-                      <button
-                        key={tab.id}
-                        onClick={() => {
-                          setActiveTab(tab.id)
-                          setShowMore(false)
-                        }}
-                        className={`w-full text-left px-4 py-2 text-sm transition-colors ${activeTab === tab.id
-                            ? 'bg-bread-100 dark:bg-bread-900 text-bread-700 dark:text-bread-300'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                          }`}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Util Tabs */}
+            {/* Utility Tabs */}
             {utilTabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-2 py-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-white/70 transition-colors ${activeTab === tab.id
+                className={`px-2 py-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-white/70 transition-colors ${
+                  activeTab === tab.id
                     ? 'bg-white/20'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
-                  }`}
+                }`}
                 aria-label={tab.title}
                 title={tab.title}
               >

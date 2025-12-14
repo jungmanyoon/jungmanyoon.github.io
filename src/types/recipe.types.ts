@@ -43,14 +43,42 @@ export type IngredientCategory =
   | 'other'; // 기타
 
 // ===== 제법 관련 타입 =====
-export type BreadMethod = 
-  | 'straight' // 스트레이트법
-  | 'sponge' // 중종법
-  | 'poolish' // 폴리쉬법
-  | 'biga' // 비가법
-  | 'overnight' // 저온숙성법
-  | 'no-time' // 노타임법
-  | 'sourdough'; // 사워도우
+export type BreadMethod =
+  | 'straight'    // 스트레이트법
+  | 'sponge'      // 중종법
+  | 'poolish'     // 폴리쉬법
+  | 'biga'        // 비가법
+  | 'tangzhong'   // 탕종법 (Water Roux)
+  | 'autolyse'    // 오토리즈 (자가분해법)
+  | 'overnight'   // 저온숙성법
+  | 'no-time'     // 노타임법
+  | 'sourdough';  // 사워도우/르방
+
+// ===== 재료 단계(Phase) 관련 타입 =====
+export type PhaseType =
+  | 'preferment'  // 사전반죽 (폴리쉬, 비가, 르방 등)
+  | 'tangzhong'   // 탕종 (별도 분리 - 호화 과정 필요)
+  | 'autolyse'    // 오토리즈 (밀가루+물만)
+  | 'main'        // 본반죽
+  | 'topping'     // 토핑 (크럼블, 견과류 등)
+  | 'filling'     // 충전물 (크림, 앙금 등)
+  | 'frosting'    // 프로스팅/아이싱
+  | 'glaze'       // 글레이즈
+  | 'other';      // 기타
+
+export interface IngredientPhase {
+  id: string;
+  name: string;           // "탕종", "폴리쉬", "본반죽", "크림치즈 필링"
+  nameKo?: string;        // 한글명
+  type: PhaseType;
+  ingredients: Ingredient[];
+  steps?: ProcessStep[];  // 해당 단계의 공정
+  order: number;          // 단계 순서 (0: 가장 먼저)
+  // 단계별 특수 설정
+  fermentationTime?: TimeRange;
+  fermentationTemp?: TemperatureRange;
+  notes?: string;
+}
 
 export interface MethodConfig {
   method: BreadMethod;
@@ -111,13 +139,15 @@ export interface Recipe {
   bakingTime: number; // 분
   totalTime: number; // 분
   
-  // 재료
-  ingredients: Ingredient[];
-  totalWeight?: number; // 총 반죽 중량 (g)
-  totalHydration?: number; // 총 수분율 (%)
+  // 재료 (단계별 구조)
+  phases?: IngredientPhase[];      // 단계별 재료 그룹 (탕종, 본반죽, 토핑 등)
+  ingredients: Ingredient[];       // 평탄화된 전체 재료 (기존 호환용)
+  totalWeight?: number;            // 총 반죽 중량 (g)
+  totalHydration?: number;         // 총 수분율 (%)
   
   // 제법
   method: MethodConfig;
+  originalMethod?: BreadMethod;     // 원본 레시피 제법 (변환 시 원본 추적용)
   
   // 오븐 설정
   ovenSettings: OvenSettings;

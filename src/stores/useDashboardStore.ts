@@ -374,6 +374,8 @@ function getMethodNameKo(method: BreadMethod): string {
     sponge: '중종법',
     poolish: '폴리쉬법',
     biga: '비가법',
+    tangzhong: '탕종법',
+    autolyse: '오토리즈',
     overnight: '저온숙성법',
     'no-time': '노타임법',
     sourdough: '사워도우',

@@ -1,151 +1,92 @@
-# Recipe Book 프로젝트 개발 가이드
+# CLAUDE.md
 
-## 프로젝트 개요
-무료 제과제빵 레시피 변환 웹 애플리케이션
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 기술 스택
-- React 18.2 + TypeScript
-- Vite 5.x (빌드 도구)
-- Zustand (상태 관리)
-- TailwindCSS (스타일링)
-- PWA (vite-plugin-pwa)
+## Commands
 
----
+```bash
+# Development
+npm run dev              # Start dev server (port 5173)
+npm run build            # Production build
+npm run preview          # Preview production build
 
-## 알려진 이슈 및 재발 방지 대책
+# Testing
+npm run test             # Run Vitest in watch mode
+npm run test:run         # Run tests once
+npm run test:coverage    # Run tests with coverage report
+npm run e2e              # Run Playwright E2E tests
+npm run e2e:ui           # Run Playwright with UI
 
-### React Hooks "Invalid hook call" 오류 - 완전 해결됨 ✅
-
-**증상:**
+# Utilities
+npm run cleanup          # Run cleanup script
 ```
-Invalid hook call. Hooks can only be called inside of the body of a function component.
-Cannot read properties of null (reading 'useRef')
-```
-- `App.lazy.tsx:39` 등 lazy 파일명으로 오류 표시
-- 대시보드 등 대형 컴포넌트 수정 시 주로 발생
 
-**근본 원인:**
-1. Vite HMR + React.lazy() 조합에서 모듈 교체 시 React 컨텍스트 손상
-2. 여러 React 인스턴스가 로드되어 hooks 상태 불일치
-3. Fast Refresh가 lazy 컴포넌트 경계를 넘지 못함
+## Architecture
 
-**영구 해결책 (App.tsx에 적용됨):**
+### Tech Stack
+React 18 + TypeScript, Vite 5, Zustand (state), TailwindCSS, PWA (vite-plugin-pwa)
+
+### Path Aliases (configured in vite.config.js)
+- `@/` → `src/`
+- `@components/` → `src/components/`
+- `@stores/` → `src/stores/`
+- `@utils/` → `src/utils/`
+- `@types/` → `src/types/`
+- `@hooks/` → `src/hooks/`
+- `@data/` → `src/data/`
+
+### State Management (Zustand)
+- **useRecipeStore**: Recipe CRUD, filtering, sorting, import/export
+- **useDashboardStore**: Dashboard UI state, conversion settings
+- **useAppStore**: App-wide state (active tab, navigation)
+- **usePanPresetStore**: Pan configuration presets
+- **useWorkspaceStore**: Workspace layout state
+- **useToastStore**: Toast notifications
+
+Use selective subscriptions to avoid unnecessary re-renders:
 ```tsx
-// 개발환경: 직접 import (HMR 안정성) ✅
-// 프로덕션: lazy loading (번들 최적화) ✅
+const { recipes } = useRecipeStore()  // Good
+const store = useRecipeStore()        // Avoid
+```
+
+### Core Domain Concepts
+This is a baking recipe converter. Key calculations in `src/utils/calculations/`:
+- **Baker's Percentage**: All ingredients as % of flour weight (`bakersPercentage.ts`)
+- **DDT (Desired Dough Temperature)**: Calculate water temp for target dough temp (`ddtCalculator.ts`)
+- **Pan Scaling**: Adjust recipes for different pan sizes (`panScaling.ts`)
+- **Environmental Adjustments**: Temperature/humidity/altitude compensation (`environmental.ts`)
+
+### Type System
+Recipe types in `src/types/recipe.types.ts` define the domain model:
+- `Recipe`: Main recipe structure with ingredients, method, pan, steps
+- `Ingredient`: With baker's percentage, hydration, category
+- `BreadMethod`: straight, sponge, poolish, biga, overnight, sourdough
+- `PanConfig`: Pan dimensions, volume, material, fill ratio
+
+## Known Issue: React HMR with Lazy Components
+
+**Solved via environment-based loading in App.tsx:**
+- Development: Direct imports (stable HMR)
+- Production: React.lazy() (bundle optimization)
+
+```tsx
 const isDev = import.meta.env.DEV
-
-// 개발환경용 직접 import
 import AdvancedDashboardDirect from '@components/dashboard/AdvancedDashboard'
-// ... 기타 컴포넌트
-
-// 프로덕션용 lazy import
 const AdvancedDashboardLazy = lazy(() => import('@components/dashboard/AdvancedDashboard'))
-// ... 기타 컴포넌트
-
-// 환경에 따른 컴포넌트 선택
 const AdvancedDashboard = isDev ? AdvancedDashboardDirect : AdvancedDashboardLazy
 ```
 
-**보조 설정 (vite.config.js):**
+Supporting config in `vite.config.js`:
 ```js
-resolve: {
-  dedupe: ['react', 'react-dom']  // React 중복 인스턴스 방지
-},
-optimizeDeps: {
-  include: ['react', 'react-dom']  // 사전 번들링
-}
+resolve: { dedupe: ['react', 'react-dom'] }
+optimizeDeps: { include: ['react', 'react-dom'] }
 ```
 
-**이 방식의 장점:**
-1. 개발환경: 직접 import로 HMR 충돌 완전 방지
-2. 프로덕션: lazy loading으로 번들 최적화 유지
-3. 코드 수정 시 새로고침 불필요
+If "Invalid hook call" errors occur: browser refresh or restart dev server.
 
-**만약 오류 발생 시 (거의 없음):**
-- 브라우저 새로고침 (F5)
-- 개발 서버 재시작 (`npm run dev`)
+## Testing
 
----
-
-## 개발 규칙
-
-### 컴포넌트 구조
-```
-src/
-├── components/
-│   ├── dashboard/    # 대시보드 관련 (AdvancedDashboard, SimpleDashboard 등)
-│   ├── recipe/       # 레시피 관련
-│   ├── conversion/   # 변환 도구
-│   ├── calculator/   # 계산기
-│   └── common/       # 공통 컴포넌트
-├── stores/           # Zustand 스토어
-├── utils/            # 유틸리티 함수
-└── types/            # TypeScript 타입 정의
-```
-
-### Lazy Loading 컴포넌트 작성 시 주의사항
-1. **모든 hooks는 컴포넌트 최상위에서 호출**
-2. **조건부 hooks 호출 금지**
-3. **useEffect/useMemo 의존성 배열 정확히 명시**
-
-```tsx
-// 올바른 예시
-const MyComponent = () => {
-  const [state, setState] = useState(0);  // 항상 최상위
-  const memoized = useMemo(() => {...}, [deps]);  // 의존성 명시
-
-  return <div>{state}</div>;
-};
-
-// 잘못된 예시
-const MyComponent = () => {
-  if (condition) {
-    const [state, setState] = useState(0);  // 조건부 hooks - 금지!
-  }
-  return <div />;
-};
-```
-
-### 스토어 사용 규칙
-- Zustand 스토어 import 시 선택적 구독 사용
-```tsx
-// 좋은 예시 - 필요한 것만 구독
-const { recipes } = useRecipeStore();
-
-// 피해야 할 예시 - 전체 스토어 구독 (불필요한 리렌더링)
-const store = useRecipeStore();
-```
-
----
-
-## 개발 서버 트러블슈팅
-
-### WebSocket 연결 실패
-```
-WebSocket connection to 'ws://localhost:5173/...' failed
-```
-**해결:** 개발 서버 재시작 (`npm run dev`)
-
-### HMR 작동 안 함
-**해결:**
-1. 브라우저 캐시 삭제
-2. 개발 서버 재시작
-3. `node_modules/.vite` 폴더 삭제 후 재시작
-
-### 빌드 오류
-```bash
-# 클린 빌드
-rm -rf node_modules/.vite dist
-npm run build
-```
-
----
-
-## 커밋 메시지 규칙
-- feat: 새 기능
-- fix: 버그 수정
-- refactor: 리팩토링
-- style: 스타일 변경
-- docs: 문서 수정
-- chore: 기타 변경
+- **Unit tests**: `src/**/*.test.ts`, `tests/unit/**/*.test.ts`
+- **E2E tests**: `tests/e2e/**/*.spec.ts` (Playwright)
+- **Setup**: `src/test/setup.ts` (mocks localStorage, matchMedia, etc.)
+- **Coverage threshold**: 80% (branches, functions, lines, statements)

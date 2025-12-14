@@ -1,13 +1,10 @@
-import React, { useEffect, useCallback, useRef } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import RecipeList from './RecipeList'
 import SearchBar from '@components/common/SearchBar'
 import FilterControls from './FilterControls'
 import { useRecipeStore, selectFilteredRecipes } from '@stores/useRecipeStore'
 import { useAppStore } from '@stores/useAppStore'
-import sampleRecipes from '@data/sampleRecipes.js'
-import { Download, Upload, RefreshCw } from 'lucide-react'
 import { toast } from '@utils/toast'
-import Button from '@components/common/Button'
 
 const RecipeListPage: React.FC = () => {
   const {
@@ -21,14 +18,11 @@ const RecipeListPage: React.FC = () => {
     setSortBy,
     clearFilters,
     getAvailableTags,
-    importRecipes,
-    exportRecipes,
     resetToSampleRecipes
   } = useRecipeStore()
   const filteredRecipes = useRecipeStore(selectFilteredRecipes)
   const availableTags = useRecipeStore(getAvailableTags)
   const { setActiveTab } = useAppStore()
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 초기 진입 시 빈 경우 또는 출처 정보 없는 경우 샘플 레시피 주입
   useEffect(() => {
@@ -105,121 +99,10 @@ const RecipeListPage: React.FC = () => {
     clearFilters()
   }, [clearFilters])
 
-  // Export recipes handler
-  const handleExport = useCallback(async () => {
-    try {
-      const blob = await exportRecipes()
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `recipes-export-${new Date().toISOString().split('T')[0]}.json`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-
-      toast.success(`${recipes.length}개의 레시피를 성공적으로 내보냈습니다.`)
-    } catch (error) {
-      toast.error('레시피 내보내기에 실패했습니다.')
-      console.error('Export error:', error)
-    }
-  }, [exportRecipes, recipes.length])
-
-  // Import recipes handler
-  const handleImport = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    try {
-      const text = await file.text()
-      const importedRecipes = JSON.parse(text)
-
-      // Validate imported data
-      if (!Array.isArray(importedRecipes)) {
-        throw new Error('잘못된 파일 형식입니다.')
-      }
-
-      // Convert date strings to Date objects
-      const recipesWithDates = importedRecipes.map((recipe: any) => ({
-        ...recipe,
-        createdAt: recipe.createdAt ? new Date(recipe.createdAt) : new Date(),
-        updatedAt: recipe.updatedAt ? new Date(recipe.updatedAt) : new Date()
-      }))
-
-      await importRecipes(recipesWithDates)
-
-      toast.success(`${importedRecipes.length}개의 레시피를 성공적으로 가져왔습니다.`, {
-        duration: 4000
-      })
-    } catch (error) {
-      toast.error('레시피 가져오기에 실패했습니다. 파일 형식을 확인해주세요.', {
-        duration: 5000
-      })
-      console.error('Import error:', error)
-    } finally {
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-    }
-  }, [importRecipes])
-
-  const handleImportClick = useCallback(() => {
-    fileInputRef.current?.click()
-  }, [])
-
-  // 샘플 레시피 다시 불러오기
-  const handleResetToSamples = useCallback(() => {
-    if (window.confirm('기존 레시피를 모두 삭제하고 샘플 레시피 10개로 교체합니다. 계속하시겠습니까?')) {
-      resetToSampleRecipes()
-      toast.success('샘플 레시피 10개를 불러왔습니다! (빵준서 5개 + 호야TV 5개)')
-    }
-  }, [resetToSampleRecipes])
-
   return (
     <div className="flex flex-col h-full">
       {/* Search and Filter Controls */}
       <div className="flex-none space-y-3 p-4 bg-bread-50 border-b border-bread-200">
-        {/* Import/Export/Reset Buttons */}
-        <div className="flex justify-end gap-2">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleImport}
-            className="hidden"
-            aria-label="레시피 파일 선택"
-          />
-          <Button
-            variant="secondary"
-            onClick={handleResetToSamples}
-            className="flex items-center gap-2"
-            title="샘플 레시피 10개로 초기화 (빵준서 5개 + 호야TV 5개)"
-          >
-            <RefreshCw className="w-4 h-4" />
-            샘플 불러오기
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={handleImportClick}
-            className="flex items-center gap-2"
-            title="JSON 파일에서 레시피 가져오기"
-          >
-            <Upload className="w-4 h-4" />
-            가져오기
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={handleExport}
-            disabled={recipes.length === 0}
-            className="flex items-center gap-2"
-            title="모든 레시피를 JSON 파일로 내보내기"
-          >
-            <Download className="w-4 h-4" />
-            내보내기
-          </Button>
-        </div>
-
         <SearchBar
           value={filters.searchQuery || ''}
           onChange={handleSearchChange}

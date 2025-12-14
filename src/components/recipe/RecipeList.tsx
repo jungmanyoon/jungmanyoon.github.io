@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, memo } from 'react'
 import Button from '../common/Button'
 import RecipeCard from './RecipeCard'
 import { Recipe } from '@types/recipe.types'
+import { Plus } from 'lucide-react'
 
 interface RecipeListProps {
   recipes: Recipe[]
@@ -115,10 +116,16 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
   }, [onNew])
 
   return (
-    <div className="max-w-7xl mx-auto px-2">
+    <div className="max-w-7xl mx-auto px-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-bread-700">내 레시피</h2>
-        <Button size="small" onClick={handleNewRecipe}>새 레시피</Button>
+        <Button
+          onClick={handleNewRecipe}
+          className="flex items-center gap-2 px-4 py-2"
+        >
+          <Plus className="w-4 h-4" />
+          새 레시피
+        </Button>
       </div>
 
       {/* 카테고리 탭 - 최적화된 컴포넌트 사용 */}
@@ -149,9 +156,13 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
               ? '아직 저장된 레시피가 없습니다.'
               : `${categorizedRecipes[selectedCategory]?.name} 레시피가 없습니다.`}
           </p>
-          <Button size="small" onClick={handleNewRecipe}>
-            {selectedCategory === 'all' 
-              ? '첫 레시피 만들기' 
+          <Button
+            onClick={handleNewRecipe}
+            className="inline-flex items-center gap-2 px-4 py-2"
+          >
+            <Plus className="w-4 h-4" />
+            {selectedCategory === 'all'
+              ? '첫 레시피 만들기'
               : `${categorizedRecipes[selectedCategory]?.name} 레시피 만들기`}
           </Button>
         </div>

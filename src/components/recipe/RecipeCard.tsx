@@ -29,6 +29,8 @@ const METHOD_NAMES: Record<BreadMethod, string> = {
   sponge: '중종법',
   poolish: '폴리쉬',
   biga: '비가',
+  tangzhong: '탕종법',
+  autolyse: '오토리즈',
   overnight: '저온숙성',
   'no-time': '노타임',
   sourdough: '사워도우'

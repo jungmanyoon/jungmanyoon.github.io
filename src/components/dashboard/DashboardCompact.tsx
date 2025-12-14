@@ -49,6 +49,8 @@ const METHOD_PRESETS: { id: BreadMethod; name: string; icon: string }[] = [
   { id: 'sponge', name: '중종법', icon: '🧪' },
   { id: 'poolish', name: '폴리쉬', icon: '💧' },
   { id: 'biga', name: '비가', icon: '🇮🇹' },
+  { id: 'tangzhong', name: '탕종법', icon: '🍜' },
+  { id: 'autolyse', name: '오토리즈', icon: '⏳' },
   { id: 'overnight', name: '저온숙성', icon: '❄️' },
   { id: 'sourdough', name: '사워도우', icon: '🫧' },
 ]

@@ -52,8 +52,14 @@ export const useAppStore = create<AppStore>()(
         maxHistorySize: 50,
 
         // 액션
-        setActiveTab: (tab: TabType) => {
+        setActiveTab: (tab: TabType, pushHistory: boolean = true) => {
           set({ activeTab: tab })
+          // 브라우저 히스토리에 상태 푸시 (뒤로가기 지원)
+          if (pushHistory && typeof window !== 'undefined') {
+            const url = new URL(window.location.href)
+            url.hash = tab
+            window.history.pushState({ tab }, '', url.toString())
+          }
         },
 
         setLoading: (loading: boolean) => {

@@ -261,13 +261,15 @@ export const sampleRecipes = [
       author: '박준서 명장'
     },
     method: {
-      method: 'straight',
-      prefermentRatio: 0,
+      method: 'tangzhong',  // 탕종법으로 변경
+      prefermentRatio: 0.067,  // 20g / 300g = 6.7% (탕종용 밀가루 비율)
       fermentationTime: {
+        preferment: { min: 30, max: 60, unit: 'min' },  // 탕종 식히는 시간
         bulk: { min: 60, max: 90, unit: 'min' },
         final: { min: 50, max: 70, unit: 'min' }
       },
       temperature: {
+        preferment: { min: 65, max: 68, unit: 'C' },  // 탕종 호화 온도
         bulk: { min: 27, max: 28, unit: 'C' },
         final: { min: 30, max: 32, unit: 'C' }
       }
@@ -303,6 +305,52 @@ export const sampleRecipes = [
       }]
     },
     yield: { quantity: 1, unit: '개' },
+    // 새로운 phases 구조
+    phases: [
+      {
+        id: 'phase-tangzhong',
+        name: '탕종',
+        nameKo: '탕종',
+        type: 'tangzhong',
+        order: 0,
+        ingredients: [
+          { id: 'ing-t1', name: '강력분', amount: 20, unit: 'g', category: 'flour', isFlour: true },
+          { id: 'ing-t2', name: '물', amount: 100, unit: 'g', category: 'liquid' }
+        ],
+        steps: [
+          { id: 'step-t1', order: 1, instruction: '밀가루와 물을 냄비에 넣고 잘 섞기' },
+          { id: 'step-t2', order: 2, instruction: '약불에서 저어가며 65-68°C까지 가열 (주걱에 선이 남을 정도)' },
+          { id: 'step-t3', order: 3, instruction: '랩씌워 냉장 보관 (최소 2시간, 하룻밤 권장)' }
+        ],
+        fermentationTime: { min: 120, max: 720, unit: 'min' },
+        notes: '탕종은 반드시 식혀서 사용 (뜨거우면 이스트 사멸)'
+      },
+      {
+        id: 'phase-main',
+        name: '본반죽',
+        nameKo: '본반죽',
+        type: 'main',
+        order: 1,
+        ingredients: [
+          { id: 'ing-m1', name: '강력분', amount: 280, unit: 'g', category: 'flour', isFlour: true },
+          { id: 'ing-m2', name: '우유', amount: 130, unit: 'g', category: 'liquid' },
+          { id: 'ing-m3', name: '설탕', amount: 30, unit: 'g', category: 'sugar' },
+          { id: 'ing-m4', name: '소금', amount: 6, unit: 'g', category: 'salt' },
+          { id: 'ing-m5', name: '인스턴트 드라이이스트', amount: 5, unit: 'g', category: 'leavening' },
+          { id: 'ing-m6', name: '버터', amount: 25, unit: 'g', category: 'fat' }
+        ],
+        steps: [
+          { id: 'step-m1', order: 1, instruction: '버터 제외 재료 + 탕종 믹싱' },
+          { id: 'step-m2', order: 2, instruction: '버터 투입 후 최종단계까지 반죽' },
+          { id: 'step-m3', order: 3, instruction: '1차 발효 60-90분' },
+          { id: 'step-m4', order: 4, instruction: '분할, 둥글리기, 벤치타임 15분' },
+          { id: 'step-m5', order: 5, instruction: '성형하여 식빵틀에 넣기' },
+          { id: 'step-m6', order: 6, instruction: '2차 발효 50-70분 (틀의 80%)' },
+          { id: 'step-m7', order: 7, instruction: '175°C에서 35-40분 굽기' }
+        ]
+      }
+    ],
+    // 기존 호환용 (평탄화된 재료)
     ingredients: [
       { id: 'ing-1', name: '강력분', amount: 280, unit: 'g', category: 'flour', isFlour: true },
       { id: 'ing-2', name: '강력분(탕종용)', amount: 20, unit: 'g', category: 'flour', isFlour: true },
@@ -313,16 +361,17 @@ export const sampleRecipes = [
       { id: 'ing-7', name: '인스턴트 드라이이스트', amount: 5, unit: 'g', category: 'leavening' },
       { id: 'ing-8', name: '버터', amount: 25, unit: 'g', category: 'fat' }
     ],
+    // 기존 호환용 (평탄화된 공정)
     steps: [
-      { id: 'step-1', order: 1, instruction: '탕종: 밀가루 20g + 물 100g을 약불에서 65-68도까지 저어가며 가열' },
-      { id: 'step-2', order: 2, instruction: '탕종을 랩씌워 냉장 보관 (최소 2시간, 하룻밤 권장)' },
-      { id: 'step-3', order: 3, instruction: '탕종과 버터 제외 재료 믹싱' },
-      { id: 'step-4', order: 4, instruction: '탕종과 버터를 넣고 최종단계까지 반죽' },
+      { id: 'step-1', order: 1, instruction: '【탕종】 밀가루 20g + 물 100g을 약불에서 65-68°C까지 저어가며 가열' },
+      { id: 'step-2', order: 2, instruction: '【탕종】 랩씌워 냉장 보관 (최소 2시간, 하룻밤 권장)' },
+      { id: 'step-3', order: 3, instruction: '【본반죽】 탕종과 버터 제외 재료 믹싱' },
+      { id: 'step-4', order: 4, instruction: '【본반죽】 탕종과 버터를 넣고 최종단계까지 반죽' },
       { id: 'step-5', order: 5, instruction: '1차 발효 60-90분' },
       { id: 'step-6', order: 6, instruction: '분할, 둥글리기, 중간발효 15분' },
       { id: 'step-7', order: 7, instruction: '성형하여 식빵틀에 넣기' },
       { id: 'step-8', order: 8, instruction: '2차 발효 50-70분 (틀의 80%까지)' },
-      { id: 'step-9', order: 9, instruction: '175도에서 35-40분 굽기' }
+      { id: 'step-9', order: 9, instruction: '175°C에서 35-40분 굽기' }
     ],
     createdAt: new Date(),
     updatedAt: new Date()

@@ -83,6 +83,8 @@ const METHODS: { id: BreadMethod; name: string; description: string }[] = [
   { id: 'sponge', name: '중종법', description: '종반죽 + 본반죽 (2-4시간 발효)' },
   { id: 'poolish', name: '폴리쉬법', description: '액종 사용 (12-16시간 발효)' },
   { id: 'biga', name: '비가법', description: '이탈리아 종반죽 (16-24시간)' },
+  { id: 'tangzhong', name: '탕종법', description: '호화반죽으로 촉촉한 식감 (1:5 비율)' },
+  { id: 'autolyse', name: '오토리즈', description: '밀가루+물 휴지 (20-60분)' },
   { id: 'overnight', name: '저온숙성법', description: '냉장 발효 (12-24시간)' },
   { id: 'sourdough', name: '사워도우', description: '천연발효종 (1-2일)' },
 ]

@@ -21,6 +21,7 @@ export interface AppState {
 }
 
 export type TabType =
+  | 'home'
   | 'dashboard'
   | 'workspace'
   | 'calculator'

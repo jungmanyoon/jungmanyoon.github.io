@@ -11,7 +11,7 @@ import { create } from 'zustand'
 import type { Recipe, Ingredient, PanConfig, ProcessStep } from '@/types/recipe.types'
 
 export type CalculationMode = 'bakers' | 'weight' | 'recipe'
-export type MethodType = 'straight' | 'sponge' | 'poolish' | 'biga' | 'overnight'
+export type MethodType = 'straight' | 'sponge' | 'poolish' | 'biga' | 'tangzhong' | 'autolyse' | 'overnight' | 'sourdough'
 
 interface WorkspaceState {
   // 선택 상태

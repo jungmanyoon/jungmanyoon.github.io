@@ -15,11 +15,18 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useDashboardStore } from '@/stores/useDashboardStore';
 import { useRecipeStore } from '@/stores/useRecipeStore';
 import { useToastStore } from '@/stores/useToastStore';
+import { useSettingsStore } from '@/stores/useSettingsStore';
 import { useLayoutSettings } from '@/hooks/useLayoutSettings';
 import ResizeHandle from '@/components/common/ResizeHandle';
+import AutocompleteInput from '@/components/common/AutocompleteInput';
+import BulkIngredientInput from '@/components/common/BulkIngredientInput';
+import YieldLossCalculator from '@/components/common/YieldLossCalculator';
+import PhaseIngredientsView from '@/components/recipe/PhaseIngredientsView';
+import { ProcessStageSelection, DEFAULT_STAGE_SELECTION } from '@/utils/calculations/yieldLoss';
+import { findIngredientInfo } from '@/data/ingredientDatabase';
 import {
   ChevronDown, ChevronRight, ChevronUp, Plus, Minus, X,
-  Save, Flame, Scale, Wheat, Droplets,
+  Save, Flame, Scale, Wheat, Droplets, TrendingDown,
   Cookie, Layers, ThermometerSun, Link, Unlink,
   Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText,
   Youtube, Globe, BookOpen, User, GraduationCap
@@ -53,9 +60,11 @@ interface OvenSettings {
 }
 
 interface MethodSettings {
-  type: 'straight' | 'sponge' | 'poolish' | 'biga' | 'levain';
+  type: 'straight' | 'sponge' | 'poolish' | 'biga' | 'tangzhong' | 'autolyse' | 'levain' | 'coldFerment' | 'retard';
   flourRatio: number;
   waterRatio: number;
+  yeastAdjustment: number;      // 전체 이스트 조정 계수 (1.0 = 100%)
+  prefermentYeastRatio: number; // 사전반죽에 들어가는 이스트 비율 (0.0~1.0)
 }
 
 interface IngredientEntry {
@@ -68,6 +77,8 @@ interface IngredientEntry {
   amount: number;
   note: string;
   moistureContent?: number;
+  phase?: string;  // 'tangzhong', 'preferment', 'main', 'topping' 등
+  phaseOrder?: number;  // 단계 내 순서
 }
 
 interface ProcessStep {
@@ -82,55 +93,8 @@ interface ProcessStep {
 // 상수 데이터
 // ============================================
 
-// 제빵용 팬 데이터 (식빵류)
-const BREAD_PAN_DATA = {
-  식빵팬: [
-    { name: '풀먼식빵팬', volume: 2350 },
-    { name: '산형식빵팬', volume: 2350 },
-    { name: '우유식빵(4구)', volume: 2580 },
-    { name: '옥수수식빵(3구)', volume: 1821 },
-    { name: '큐브식빵팬', volume: 857 },
-  ],
-  소형팬: [
-    { name: '오란다(소)', volume: 322 },
-    { name: '오란다(대)', volume: 662 },
-    { name: '미니식빵팬', volume: 450 },
-    { name: '실리콘큐브', volume: 125 },
-  ],
-  파운드팬: [
-    { name: '파운드팬(소)', volume: 980 },
-    { name: '파운드팬(중)', volume: 1456 },
-    { name: '파운드팬(대)', volume: 2100 },
-  ],
-};
-
-// 제과용 팬 데이터 (케이크류) - 나중에 별도 화면에서 사용
-const CAKE_PAN_DATA = {
-  원형팬: [
-    { name: '높은원형틀 1호', volume: 1325 },
-    { name: '높은원형틀 2호', volume: 1909 },
-    { name: '높은원형틀 3호', volume: 2598 },
-    { name: '원형무스링1호', volume: 1237 },
-    { name: '원형무스링2호', volume: 1781 },
-  ],
-  타르트팬: [
-    { name: '타르트팬1호', volume: 265 },
-    { name: '타르트팬2호', volume: 428 },
-    { name: '타르트팬3호', volume: 620 },
-  ],
-  쉬폰팬: [
-    { name: '쉬폰팬 1호', volume: 1253 },
-    { name: '쉬폰팬 2호', volume: 1990 },
-    { name: '쉬폰팬 3호', volume: 3175 },
-  ],
-  정사각틀: [
-    { name: '정사각틀 1호', volume: 820 },
-    { name: '정사각틀 2호', volume: 1225 },
-  ],
-};
-
-// 현재 화면은 제빵용이므로 BREAD_PAN_DATA 사용
-const PAN_DATA = BREAD_PAN_DATA;
+// 팬 데이터는 컴포넌트 내부에서 useSettingsStore를 통해 동적으로 생성됨
+// (PAN_DATA는 AdvancedDashboard 컴포넌트 내 useMemo로 관리)
 
 // 제빵용 비용적 (cm³/g) - 학술 기준 참조
 // 비용적이 높을수록 가볍고 에어리, 낮을수록 조밀함
@@ -157,27 +121,66 @@ const CAKE_SPECIFIC_VOLUMES: Record<string, number> = {
   '무스케이크': 1.8,        // 매우 조밀
 };
 
-// 현재 화면은 제빵용
-const SPECIFIC_VOLUMES = BREAD_SPECIFIC_VOLUMES;
+// 현재 화면은 제빵용 - 동적 비용적은 컴포넌트 내부에서 useMemo로 생성됨
+// (기본값 BREAD_SPECIFIC_VOLUMES + 설정 스토어의 오버라이드)
+
+// 팬 카테고리/타입 유효성 검증 헬퍼 함수는 컴포넌트 내부에서 동적 PAN_DATA와 함께 정의됨
 
 // 제법 비율 (ChainBaker, Weekend Bakery 참조)
 // flour: 전체 밀가루 중 사전반죽에 사용할 비율
 // water: 사전반죽 밀가루 대비 수분 비율 (베이커스 퍼센트)
 const METHOD_RATIOS: Record<string, { flour: number; water: number }> = {
   straight: { flour: 0, water: 0 },
-  sponge: { flour: 0.5, water: 0.6 },     // 중종법: 밀가루 50%, 수분 60% (50-80%)
-  poolish: { flour: 0.3, water: 1.0 },    // 폴리쉬: 밀가루 30%, 수분 100% (1:1 액종)
-  biga: { flour: 0.3, water: 0.55 },      // 비가: 밀가루 30%, 수분 55% (건조한 반죽)
-  levain: { flour: 0.2, water: 1.0 },     // 르방: 밀가루 20%, 수분 100% (1:1 사워도우)
+  sponge: { flour: 0.5, water: 0.6 },       // 중종법: 밀가루 50%, 수분 60% (50-80%)
+  poolish: { flour: 0.3, water: 1.0 },      // 폴리쉬: 밀가루 30%, 수분 100% (1:1 액종)
+  biga: { flour: 0.3, water: 0.55 },        // 비가: 밀가루 30%, 수분 55% (건조한 반죽)
+  tangzhong: { flour: 0.1, water: 5.0 },    // 탕종법: 밀가루 10%, 물 500% (1:5 호화)
+  autolyse: { flour: 1.0, water: 0.65 },    // 오토리즈: 전체 밀가루, 수분 65%
+  levain: { flour: 0.2, water: 1.0 },       // 르방: 밀가루 20%, 수분 100% (1:1 사워도우)
+  coldFerment: { flour: 0, water: 0 },      // 저온발효: 사전반죽 없음 (냉장 발효)
+  retard: { flour: 0, water: 0 },           // 저온숙성: 사전반죽 없음 (성형 후 냉장)
+};
+
+// 제법별 이스트 조정 기본값 (설정 스토어 fallback용)
+// yeastAdjustment: 전체 이스트 조정 계수
+// prefermentYeastRatio: 사전반죽에 들어가는 이스트 비율
+const DEFAULT_METHOD_YEAST: Record<string, { yeastAdjustment: number; prefermentYeastRatio: number }> = {
+  straight: { yeastAdjustment: 1.0, prefermentYeastRatio: 0 },
+  sponge: { yeastAdjustment: 0.75, prefermentYeastRatio: 1.0 },    // 중종법: 이스트 75%, 전량 사전반죽
+  poolish: { yeastAdjustment: 0.55, prefermentYeastRatio: 0.15 },  // 폴리쉬: 이스트 55%, 15% 사전반죽
+  biga: { yeastAdjustment: 0.45, prefermentYeastRatio: 0.1 },      // 비가: 이스트 45%, 10% 사전반죽
+  tangzhong: { yeastAdjustment: 1.0, prefermentYeastRatio: 0 },    // 탕종: 이스트 동일, 사전반죽 없음
+  autolyse: { yeastAdjustment: 1.0, prefermentYeastRatio: 0 },     // 오토리즈: 이스트 동일, 사전반죽 없음
+  levain: { yeastAdjustment: 0, prefermentYeastRatio: 0 },         // 르방: 상업 이스트 미사용
+  coldFerment: { yeastAdjustment: 0.4, prefermentYeastRatio: 0 },  // 저온발효: 이스트 40% (장시간 발효로 감량)
+  retard: { yeastAdjustment: 1.0, prefermentYeastRatio: 0 },       // 저온숙성: 성형 후 숙성이라 이스트 동일
 };
 
 const METHOD_LABELS: Record<string, string> = {
   straight: '스트레이트', sponge: '중종법', poolish: '폴리쉬',
-  biga: '비가', levain: '르방',
+  biga: '비가', tangzhong: '탕종법', autolyse: '오토리즈', levain: '르방',
+  coldFerment: '저온발효', retard: '저온숙성',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
   flour: '가루', liquid: '수분', wetOther: '유지', other: '기타',
+};
+
+// 단계(Phase) 메타데이터 - 구분선 표시용
+const PHASE_META: Record<string, { icon: string; label: string; bgColor: string; textColor: string; borderColor: string }> = {
+  tangzhong: { icon: '🍜', label: '탕종', bgColor: 'bg-pink-50', textColor: 'text-pink-700', borderColor: 'border-pink-200' },
+  preferment: { icon: '🧪', label: '사전반죽', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  poolish: { icon: '🧪', label: '폴리쉬', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  biga: { icon: '🧪', label: '비가', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  sponge: { icon: '🧪', label: '중종', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  levain: { icon: '🥖', label: '르방', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  autolyse: { icon: '⏳', label: '오토리즈', bgColor: 'bg-purple-50', textColor: 'text-purple-700', borderColor: 'border-purple-200' },
+  main: { icon: '🍞', label: '본반죽', bgColor: 'bg-blue-50', textColor: 'text-blue-700', borderColor: 'border-blue-200' },
+  topping: { icon: '✨', label: '토핑', bgColor: 'bg-orange-50', textColor: 'text-orange-700', borderColor: 'border-orange-200' },
+  filling: { icon: '🎂', label: '충전물', bgColor: 'bg-rose-50', textColor: 'text-rose-700', borderColor: 'border-rose-200' },
+  frosting: { icon: '🍰', label: '프로스팅', bgColor: 'bg-indigo-50', textColor: 'text-indigo-700', borderColor: 'border-indigo-200' },
+  glaze: { icon: '💧', label: '글레이즈', bgColor: 'bg-cyan-50', textColor: 'text-cyan-700', borderColor: 'border-cyan-200' },
+  other: { icon: '📦', label: '기타', bgColor: 'bg-gray-50', textColor: 'text-gray-700', borderColor: 'border-gray-200' },
 };
 
 // 동적 크기 계산 (20-25개 재료 기준) - v2.2: 컴팩트 버전
@@ -250,6 +253,70 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 const AdvancedDashboard: React.FC = () => {
   const { addRecipe, updateRecipe, currentRecipe, recipes } = useRecipeStore();
   const { addToast } = useToastStore();
+  const { pan: panSettings, product: productSettings, method: methodSettings } = useSettingsStore();
+
+  // 설정에서 비용적 데이터를 동적으로 생성 (기본값 + 오버라이드)
+  const SPECIFIC_VOLUMES = useMemo(() => {
+    // 기본값을 복사하고 설정 스토어의 오버라이드 적용
+    return {
+      ...BREAD_SPECIFIC_VOLUMES,
+      ...productSettings.breadVolumes,
+      // 커스텀 제품 추가
+      ...productSettings.customProducts
+        .filter(p => p.category === 'bread' || p.category === 'pastry')
+        .reduce((acc, p) => ({ ...acc, [p.name]: p.specificVolume }), {} as Record<string, number>)
+    };
+  }, [productSettings.breadVolumes, productSettings.customProducts]);
+
+  // 설정에서 팬 데이터를 동적으로 생성 (카테고리별 그룹화)
+  const PAN_DATA = useMemo(() => {
+    const grouped: Record<string, { name: string; volume: number }[]> = {};
+
+    // 설정의 모든 팬을 카테고리별로 그룹화
+    panSettings.myPans.forEach(pan => {
+      const category = pan.category || '기타';
+      if (!grouped[category]) {
+        grouped[category] = [];
+      }
+      grouped[category].push({
+        name: pan.name,
+        volume: pan.volume
+      });
+    });
+
+    // 빈 카테고리 방지: 최소 하나의 기본 카테고리 보장
+    if (Object.keys(grouped).length === 0) {
+      grouped['식빵틀'] = [{ name: '기본 식빵틀', volume: 2350 }];
+    }
+
+    return grouped;
+  }, [panSettings.myPans]);
+
+  // 팬 카테고리 목록 (동적으로 생성)
+  const panCategories = useMemo(() => Object.keys(PAN_DATA), [PAN_DATA]);
+
+  // 기본 카테고리 및 팬 타입
+  const defaultCategory = panCategories[0] || '식빵틀';
+  const defaultPanType = PAN_DATA[defaultCategory]?.[0]?.name || '옥수수 식빵틀 (22.5cm)';
+  const defaultPanVolume = PAN_DATA[defaultCategory]?.[0]?.volume || 2350;
+
+  // 팬 카테고리 유효성 검증 헬퍼 함수 (동적 PAN_DATA 사용)
+  const getValidPanCategory = useCallback((category: string | undefined): string => {
+    if (category && panCategories.includes(category)) {
+      return category;
+    }
+    return defaultCategory;
+  }, [panCategories, defaultCategory]);
+
+  // 팬 타입 유효성 검증 헬퍼 함수 (동적 PAN_DATA 사용)
+  const getValidPanType = useCallback((category: string, type: string | undefined): string => {
+    const panList = PAN_DATA[category];
+    if (panList && type) {
+      const found = panList.find((p: { name: string; volume: number }) => p.name === type);
+      if (found) return type;
+    }
+    return panList?.[0]?.name || defaultPanType;
+  }, [PAN_DATA, defaultPanType]);
 
   // 레이아웃 설정 (localStorage 자동 저장)
   const {
@@ -278,17 +345,19 @@ const AdvancedDashboard: React.FC = () => {
   });
 
   // 원래 팬 설정 (레시피 원본) - 비용적으로 계산된 초기값 사용
-  const defaultPanWeight = Math.round(2350 / 3.4);  // 풀먼식빵팬(2350) / 산형식빵(3.4) = 691g
+  // 기본 팬 용량 및 무게 계산 (동적 설정에서 가져옴)
+  const initialPanVolume = defaultPanVolume || 2350;
+  const defaultPanWeight = Math.round(initialPanVolume / 3.4);  // 비용적 3.4 기준
   const [originalPan, setOriginalPan] = useState({
     mode: 'pan' as 'pan' | 'count',
-    category: '식빵팬', type: '풀먼식빵팬', quantity: 1, panWeight: defaultPanWeight,
+    category: defaultCategory, type: defaultPanType, quantity: 1, panWeight: defaultPanWeight,
     divisionCount: 1, divisionWeight: defaultPanWeight,  // 분할 정보
     unitCount: 10, unitWeight: 50,  // 개수 모드용
   });
 
   // 변환 팬 설정 (목표)
   const [pans, setPans] = useState<PanEntry[]>([
-    { id: '1', mode: 'pan', category: '식빵팬', type: '풀먼식빵팬', quantity: 1, divisionCount: 1, panWeight: defaultPanWeight, divisionWeight: defaultPanWeight, unitCount: 10, unitWeight: 50 }
+    { id: '1', mode: 'pan', category: defaultCategory, type: defaultPanType, quantity: 1, divisionCount: 1, panWeight: defaultPanWeight, divisionWeight: defaultPanWeight, unitCount: 10, unitWeight: 50 }
   ]);
 
   // 비용적 설정
@@ -304,7 +373,13 @@ const AdvancedDashboard: React.FC = () => {
   });
 
   // 제법 설정
-  const [method, setMethod] = useState<MethodSettings>({ type: 'straight', flourRatio: 0, waterRatio: 0 });
+  const [method, setMethod] = useState<MethodSettings>({
+    type: 'straight',
+    flourRatio: 0,
+    waterRatio: 0,
+    yeastAdjustment: 1.0,
+    prefermentYeastRatio: 0
+  });
   const [usePreferment, setUsePreferment] = useState(false);
 
   // 재료 (기본 예시: 식빵 레시피)
@@ -331,6 +406,11 @@ const AdvancedDashboard: React.FC = () => {
 
   // 메모
   const [memo, setMemo] = useState('');
+
+  // 수율 예측 공정 선택 상태
+  const [yieldStageSelection, setYieldStageSelection] = useState<ProcessStageSelection>({
+    ...DEFAULT_STAGE_SELECTION
+  });
 
   // 중복 로드 방지를 위한 ref (ID + updatedAt으로 변경 감지)
   const lastLoadedRecipeKey = useRef<string | null>(null);
@@ -363,10 +443,50 @@ const AdvancedDashboard: React.FC = () => {
         setSource({ name: '', type: 'personal', url: '', author: '' });
       }
 
-      // 재료 로드
-      if (currentRecipe.ingredients && Array.isArray(currentRecipe.ingredients)) {
-        const loadedIngredients: IngredientEntry[] = currentRecipe.ingredients.map((ing: any, idx: number) => {
-          // 카테고리 매핑 (실제 데이터는 category 필드 사용)
+      // 재료 로드 (phases가 있으면 phases에서, 없으면 ingredients에서)
+      const loadedIngredients: IngredientEntry[] = [];
+
+      // phases가 있는 레시피 (탕종, 사전반죽 등)
+      if (currentRecipe.phases && Array.isArray(currentRecipe.phases) && currentRecipe.phases.length > 0) {
+        let globalOrder = 1;
+        currentRecipe.phases.forEach((phase: any) => {
+          if (phase.ingredients && Array.isArray(phase.ingredients)) {
+            phase.ingredients.forEach((ing: any, ingIdx: number) => {
+              const cat = ing.category || 'other';
+              let dashboardCategory: 'flour' | 'liquid' | 'wetOther' | 'other' = 'other';
+              let subCat = '기타';
+
+              if (cat === 'flour' || ing.isFlour) {
+                dashboardCategory = 'flour';
+                subCat = '가루';
+              } else if (cat === 'liquid') {
+                dashboardCategory = 'liquid';
+                subCat = '수분';
+              } else if (cat === 'fat') {
+                dashboardCategory = 'wetOther';
+                subCat = '유지';
+              }
+
+              loadedIngredients.push({
+                id: ing.id || `${Date.now()}-${phase.id}-${ingIdx}`,
+                order: globalOrder++,
+                category: dashboardCategory,
+                subCategory: subCat,
+                name: ing.name || '',
+                ratio: ing.percentage || 0,
+                amount: parseFloat(ing.amount) || 0,
+                note: ing.note || '',
+                moistureContent: ing.moistureContent,
+                phase: phase.type || phase.id || 'main',  // 단계 타입
+                phaseOrder: phase.order || 0,  // 단계 순서
+              });
+            });
+          }
+        });
+      }
+      // phases가 없는 레시피 (일반 레시피)
+      else if (currentRecipe.ingredients && Array.isArray(currentRecipe.ingredients)) {
+        currentRecipe.ingredients.forEach((ing: any, idx: number) => {
           const cat = ing.category || ing.type || 'other';
           let dashboardCategory: 'flour' | 'liquid' | 'wetOther' | 'other' = 'other';
           let subCat = '기타';
@@ -382,7 +502,7 @@ const AdvancedDashboard: React.FC = () => {
             subCat = '유지';
           }
 
-          return {
+          loadedIngredients.push({
             id: ing.id || `${Date.now()}-${idx}`,
             order: idx + 1,
             category: dashboardCategory,
@@ -392,11 +512,14 @@ const AdvancedDashboard: React.FC = () => {
             amount: parseFloat(ing.amount) || 0,
             note: ing.note || '',
             moistureContent: ing.moistureContent,
-          };
+            phase: 'main',  // 기본값: 본반죽
+            phaseOrder: 0,
+          });
         });
-        if (loadedIngredients.length > 0) {
-          setIngredients(loadedIngredients);
-        }
+      }
+
+      if (loadedIngredients.length > 0) {
+        setIngredients(loadedIngredients);
       }
 
       // 공정 로드
@@ -441,13 +564,18 @@ const AdvancedDashboard: React.FC = () => {
         // sourdough는 levain으로 매핑 (동일한 개념)
         if (methodType === 'sourdough') methodType = 'levain';
         // 유효한 제법 타입으로 제한
-        const validMethods = ['straight', 'sponge', 'poolish', 'biga', 'levain'];
+        const validMethods = ['straight', 'sponge', 'poolish', 'biga', 'tangzhong', 'autolyse', 'levain', 'coldFerment', 'retard'];
         if (!validMethods.includes(methodType)) methodType = 'straight';
 
+        // 설정 스토어에서 해당 제법의 이스트 조정값 가져오기 (없으면 로컬 기본값 사용)
+        const methodConfig = methodSettings?.methods?.[methodType];
+        const defaultYeast = DEFAULT_METHOD_YEAST[methodType] || { yeastAdjustment: 1.0, prefermentYeastRatio: 0 };
         setMethod({
-          type: methodType as 'straight' | 'sponge' | 'poolish' | 'biga' | 'levain',
+          type: methodType as 'straight' | 'sponge' | 'poolish' | 'biga' | 'tangzhong' | 'autolyse' | 'levain' | 'coldFerment' | 'retard',
           flourRatio: methodData.prefermentRatio || 0,
           waterRatio: methodData.waterRatio || 0,
+          yeastAdjustment: methodConfig?.yeastAdjustment ?? defaultYeast.yeastAdjustment,
+          prefermentYeastRatio: methodConfig?.prefermentYeastRatio ?? defaultYeast.prefermentYeastRatio,
         });
         // 중종법, 폴리쉬법 등이면 발효종 사용 활성화
         setUsePreferment(methodType !== 'straight');
@@ -456,8 +584,12 @@ const AdvancedDashboard: React.FC = () => {
       // 팬 설정 로드
       if (currentRecipe.panConfig) {
         const panData = currentRecipe.panConfig as any;
-        const panType = panData.type || '풀먼식빵팬';
-        const panCategory = panData.name || '식빵팬';
+        // 카테고리 유효성 검증 - PAN_DATA에 없는 카테고리는 기본값으로 fallback
+        const rawCategory = panData.name || panData.category || defaultCategory;
+        const panCategory = getValidPanCategory(rawCategory);
+        // 팬 타입 유효성 검증 - 해당 카테고리에 없는 타입은 첫 번째 팬으로 fallback
+        const rawType = panData.type || defaultPanType;
+        const panType = getValidPanType(panCategory, rawType);
         const panQuantity = panData.quantity || 1;
         const panMode = panData.mode || 'pan';
 
@@ -465,7 +597,7 @@ const AdvancedDashboard: React.FC = () => {
         let panWeight = panData.panWeight;
         if (!panWeight) {
           // 팬 볼륨 찾기
-          let panVolume = 2350; // 기본값 (풀먼식빵팬)
+          let panVolume = defaultPanVolume; // 설정의 기본 팬 볼륨
           for (const [, panList] of Object.entries(PAN_DATA)) {
             const found = (panList as any[]).find(p => p.name === panType);
             if (found) {
@@ -484,6 +616,10 @@ const AdvancedDashboard: React.FC = () => {
           const unitCount = Math.max(1, op.unitCount || 10);
           const unitWeight = Math.max(1, op.unitWeight || 50);
 
+          // 카테고리/타입 유효성 검증
+          const opCategory = getValidPanCategory(op.category);
+          const opType = getValidPanType(opCategory, op.type);
+
           // count 모드일 때 panWeight를 unitCount × unitWeight로 재계산
           let calculatedPanWeight = Math.abs(op.panWeight || 500);
           if (op.mode === 'count') {
@@ -492,6 +628,8 @@ const AdvancedDashboard: React.FC = () => {
 
           setOriginalPan({
             ...op,
+            category: opCategory,
+            type: opType,
             panWeight: calculatedPanWeight,
             quantity: Math.max(1, Math.abs(op.quantity || 1)),
             divisionCount: Math.max(1, op.divisionCount || 1),
@@ -513,10 +651,13 @@ const AdvancedDashboard: React.FC = () => {
 
         // 변환 팬 설정 (저장된 전체 팬 배열이 있으면 사용)
         if (panData.pans && Array.isArray(panData.pans) && panData.pans.length > 0) {
-          // 저장된 팬 배열 복원 + 유효성 검증 (음수 방지)
+          // 저장된 팬 배열 복원 + 유효성 검증 (음수 방지 + 카테고리/타입 검증)
           const validatedPans = panData.pans.map((p: any) => {
             const pUnitCount = Math.max(1, p.unitCount || 10);
             const pUnitWeight = Math.max(1, p.unitWeight || 50);
+            // 카테고리/타입 유효성 검증
+            const pCategory = getValidPanCategory(p.category);
+            const pType = getValidPanType(pCategory, p.type);
             // count 모드일 때 panWeight를 unitCount × unitWeight로 재계산
             let pPanWeight = Math.abs(p.panWeight || 500);
             if (p.mode === 'count') {
@@ -524,6 +665,8 @@ const AdvancedDashboard: React.FC = () => {
             }
             return {
               ...p,
+              category: pCategory,
+              type: pType,
               panWeight: pPanWeight,
               quantity: Math.max(1, Math.abs(p.quantity || 1)),
               divisionCount: Math.max(1, p.divisionCount || 1),
@@ -581,6 +724,17 @@ const AdvancedDashboard: React.FC = () => {
         setMemo(currentRecipe.notes);
       }
 
+      // 수율 예측 공정 선택 상태 로드
+      if ((currentRecipe as any).yieldStageSelection) {
+        setYieldStageSelection({
+          ...DEFAULT_STAGE_SELECTION,
+          ...(currentRecipe as any).yieldStageSelection
+        });
+      } else {
+        // 저장된 상태가 없으면 기본값으로 리셋
+        setYieldStageSelection({ ...DEFAULT_STAGE_SELECTION });
+      }
+
       // 로드 완료 알림
       addToast({ type: 'success', message: `"${currentRecipe.name}" 레시피를 불러왔습니다.` });
     }
@@ -589,6 +743,70 @@ const AdvancedDashboard: React.FC = () => {
   // 배수 및 연동 설정
   const [multiplier, setMultiplier] = useState(1);
   const [isPanLinked, setIsPanLinked] = useState(true); // 팬-배수 연동 여부
+  const [multiplierInput, setMultiplierInput] = useState('1'); // 배수 입력 필드
+
+  /**
+   * 배수 입력 파싱 (다양한 형식 지원)
+   * x2, 2x, 2배, ×2, *2 → 2
+   * /2, 1/2, ÷2 → 0.5
+   * 0.5, .5 → 0.5
+   */
+  const parseMultiplierInput = useCallback((input: string): number | null => {
+    const trimmed = input.trim().toLowerCase();
+    if (!trimmed) return null;
+
+    // x2, 2x, ×2, *2, 2배 형식
+    let match = trimmed.match(/^[x×*]?\s*(\d+\.?\d*)\s*[x×배]?$/);
+    if (match) {
+      const val = parseFloat(match[1]);
+      if (!isNaN(val) && val > 0) return val;
+    }
+
+    // /2, ÷2 형식 (나누기)
+    match = trimmed.match(/^[/÷]\s*(\d+\.?\d*)$/);
+    if (match) {
+      const val = parseFloat(match[1]);
+      if (!isNaN(val) && val > 0) return 1 / val;
+    }
+
+    // 1/2, 1/3 분수 형식
+    match = trimmed.match(/^(\d+)\s*[/÷]\s*(\d+)$/);
+    if (match) {
+      const num = parseFloat(match[1]);
+      const den = parseFloat(match[2]);
+      if (!isNaN(num) && !isNaN(den) && den > 0) return num / den;
+    }
+
+    // 순수 숫자
+    const numVal = parseFloat(trimmed);
+    if (!isNaN(numVal) && numVal > 0) return numVal;
+
+    return null;
+  }, []);
+
+  // 배수 입력 처리
+  const handleMultiplierInputChange = useCallback((value: string) => {
+    setMultiplierInput(value);
+  }, []);
+
+  // 배수 입력 확정 (Enter 또는 blur)
+  const handleMultiplierInputConfirm = useCallback(() => {
+    const parsed = parseMultiplierInput(multiplierInput);
+    if (parsed !== null) {
+      const clamped = Math.max(0.01, Math.min(100, parsed));
+      setMultiplier(Math.round(clamped * 100) / 100);
+      setMultiplierInput(String(Math.round(clamped * 100) / 100));
+    } else {
+      // 파싱 실패 시 현재 값으로 복원
+      setMultiplierInput(String(multiplier));
+    }
+  }, [multiplierInput, multiplier, parseMultiplierInput]);
+
+  // 빠른 배수 클릭
+  const handleQuickMultiplier = useCallback((value: number) => {
+    setMultiplier(value);
+    setMultiplierInput(String(value));
+  }, []);
 
   // ============================================
   // 계산 함수
@@ -614,6 +832,35 @@ const AdvancedDashboard: React.FC = () => {
     ingredients.reduce((sum, i) => sum + i.amount, 0),
     [ingredients]
   );
+
+  // 재료를 단계(phase)별로 그룹화 - 구분선 표시용
+  const ingredientsByPhase = useMemo(() => {
+    // 단계 순서 정의 (사전반죽 계열 먼저, 본반죽, 그 다음 토핑 등)
+    const phaseOrder: Record<string, number> = {
+      tangzhong: 0, preferment: 1, poolish: 1, biga: 1, sponge: 1, levain: 1, autolyse: 2,
+      main: 10, topping: 20, filling: 21, frosting: 22, glaze: 23, other: 99
+    };
+
+    // 재료를 단계별로 그룹화
+    const grouped = ingredients.reduce((acc, ing) => {
+      const phase = ing.phase || 'main';
+      if (!acc[phase]) {
+        acc[phase] = [];
+      }
+      acc[phase].push(ing);
+      return acc;
+    }, {} as Record<string, IngredientEntry[]>);
+
+    // 단계 순서대로 정렬하여 배열로 변환
+    const sortedPhases = Object.entries(grouped)
+      .sort(([a], [b]) => (phaseOrder[a] ?? 50) - (phaseOrder[b] ?? 50))
+      .map(([phase, items]) => ({ phase, items }));
+
+    return sortedPhases;
+  }, [ingredients]);
+
+  // 단계가 2개 이상인지 (구분선 표시 여부 결정)
+  const hasMultiplePhases = ingredientsByPhase.length > 1;
 
   const hydration = useMemo(() =>
     flourTotal === 0 ? 0 : Math.round(((liquidTotal + wetOtherMoisture) / flourTotal) * 1000) / 10,
@@ -741,73 +988,159 @@ const AdvancedDashboard: React.FC = () => {
   );
 
   // 사전반죽 재료
-  // 핵심: 수분 % = 사전반죽 밀가루 대비 베이커스 퍼센트 (원래 레시피 수분 기준 아님!)
+  // 핵심: 총 밀가루를 합산 후 단일 항목으로 생성 (중복 방지)
   const prefermentIngredients = useMemo(() => {
     if (!usePreferment || method.type === 'straight') return [];
     const result: any[] = [];
 
-    // 1. 사전반죽 밀가루 계산 (원래 밀가루 × flourRatio)
-    let prefermentFlourTotal = 0;
-    ingredients.filter(i => i.category === 'flour').forEach(ing => {
-      const amount = Math.round(ing.amount * method.flourRatio * effectiveMultiplier * 10) / 10;
-      if (amount > 0) {
-        result.push({ ...ing, id: `pref-${ing.id}`, convertedAmount: amount });
-        prefermentFlourTotal += ing.amount * method.flourRatio;  // 배수 적용 전 밀가루량
-      }
-    });
+    // 1. 전체 밀가루 총량 계산 (모든 밀가루 합산)
+    const totalFlour = ingredients
+      .filter(i => i.category === 'flour')
+      .reduce((sum, ing) => sum + ing.amount, 0);
 
-    // 2. 사전반죽 수분 = 사전반죽 밀가루 × waterRatio (베이커스 퍼센트)
-    // 폴리쉬 100%: 사전반죽 밀가루 300g × 1.0 = 300g
-    // 종종법 60%: 사전반죽 밀가루 300g × 0.6 = 180g
-    const prefermentWaterAmount = Math.round(prefermentFlourTotal * method.waterRatio * effectiveMultiplier * 10) / 10;
-    const waterIng = ingredients.find(i => i.category === 'liquid' && i.name === '물');
-    if (waterIng && prefermentWaterAmount > 0) {
-      result.push({ ...waterIng, id: `pref-${waterIng.id}`, convertedAmount: prefermentWaterAmount });
+    if (totalFlour === 0) return [];
+
+    // 2. 사전반죽 밀가루 = 총 밀가루 × flourRatio (단일 항목)
+    const prefermentFlourAmount = Math.round(totalFlour * method.flourRatio * effectiveMultiplier * 10) / 10;
+    if (prefermentFlourAmount > 0) {
+      // 첫 번째 밀가루의 이름 사용 (보통 강력분)
+      const firstFlour = ingredients.find(i => i.category === 'flour');
+      result.push({
+        id: 'pref-flour',
+        name: firstFlour?.name || '강력분',
+        category: 'flour',
+        convertedAmount: prefermentFlourAmount,
+      });
     }
 
-    // 3. 이스트 (사전반죽에 30% 사용)
-    const yeast = ingredients.find(i => i.name.includes('이스트'));
-    if (yeast) {
-      result.push({ ...yeast, id: `pref-${yeast.id}`, convertedAmount: Math.round(yeast.amount * 0.3 * effectiveMultiplier * 10) / 10 });
+    // 3. 사전반죽 수분 = 사전반죽 밀가루(배수적용전) × waterRatio (단일 항목)
+    const prefermentFlourBase = totalFlour * method.flourRatio;
+    const prefermentWaterAmount = Math.round(prefermentFlourBase * method.waterRatio * effectiveMultiplier * 10) / 10;
+    if (prefermentWaterAmount > 0) {
+      result.push({
+        id: 'pref-water',
+        name: '물',
+        category: 'liquid',
+        convertedAmount: prefermentWaterAmount,
+      });
+    }
+
+    // 4. 이스트 - 제법별 설정 사용 (prefermentYeastRatio)
+    // - 오토리즈, 탕종, 르방: 사전반죽에 이스트 없음 (prefermentYeastRatio = 0)
+    // - 중종법: 전량(100%) 사전반죽에 (prefermentYeastRatio = 1.0)
+    // - 폴리쉬/비가: 극소량(10-15%) 사전반죽에
+    const totalYeast = ingredients
+      .filter(i => i.name.includes('이스트'))
+      .reduce((sum, ing) => sum + ing.amount, 0);
+
+    // 제법별 사전반죽 이스트 비율 (method.prefermentYeastRatio 사용)
+    const prefermentYeastRatio = method.prefermentYeastRatio ?? 0;
+
+    if (totalYeast > 0 && prefermentYeastRatio > 0) {
+      const yeast = ingredients.find(i => i.name.includes('이스트'));
+      // 1) 전체 이스트 조정 (yeastAdjustment 적용)
+      const adjustedTotalYeast = totalYeast * (method.yeastAdjustment ?? 1.0);
+      // 2) 사전반죽에 들어가는 양
+      const prefermentYeastAmount = adjustedTotalYeast * prefermentYeastRatio;
+
+      result.push({
+        id: 'pref-yeast',
+        name: yeast?.name || '인스턴트 드라이이스트',
+        category: 'other',
+        convertedAmount: Math.round(prefermentYeastAmount * effectiveMultiplier * 10) / 10,
+      });
     }
 
     return result;
   }, [ingredients, method, usePreferment, effectiveMultiplier]);
 
   // 본반죽 재료
-  // 핵심: 수분 차감량 = 사전반죽 밀가루 × waterRatio (베이커스 퍼센트)
+  // 핵심: 같은 카테고리 재료를 합산 후 사전반죽 차감량 계산 (중복 방지)
   const mainDoughIngredients = useMemo(() => {
     if (!usePreferment || method.type === 'straight') return convertedIngredients;
 
-    // 1. 사전반죽에 들어간 밀가루 총량 계산 (배수 적용 전)
-    const prefermentFlourTotal = ingredients
-      .filter(i => i.category === 'flour')
-      .reduce((sum, ing) => sum + ing.amount * method.flourRatio, 0);
+    const result: any[] = [];
 
-    // 2. 사전반죽 수분량 = 사전반죽 밀가루 × waterRatio
-    const prefermentWaterAmount = prefermentFlourTotal * method.waterRatio;
+    // 1. 총량 계산
+    const totalFlour = ingredients.filter(i => i.category === 'flour').reduce((sum, ing) => sum + ing.amount, 0);
+    const totalWater = ingredients.filter(i => i.category === 'liquid' && i.name === '물').reduce((sum, ing) => sum + ing.amount, 0);
+    const totalYeast = ingredients.filter(i => i.name.includes('이스트')).reduce((sum, ing) => sum + ing.amount, 0);
 
-    return ingredients.map(ing => {
-      let deduction = 0;
-      if (ing.category === 'flour') {
-        // 밀가루: 원래 양 × flourRatio 만큼 차감
-        deduction = ing.amount * method.flourRatio;
-      } else if (ing.category === 'liquid' && ing.name === '물') {
-        // 물: 사전반죽 수분량 차감 (단, 원래 물 양을 초과하지 않음)
-        deduction = Math.min(ing.amount, prefermentWaterAmount);
-      } else if (ing.name.includes('이스트')) {
-        // 이스트: 30% 사전반죽에 사용
-        deduction = ing.amount * 0.3;
-      }
+    // 2. 사전반죽에 들어간 양 계산
+    const prefermentFlour = totalFlour * method.flourRatio;
+    const prefermentWater = prefermentFlour * method.waterRatio;
 
-      const mainAmount = Math.round((ing.amount - deduction) * 10) / 10;
-      return {
+    // 제법별 이스트 조정 적용
+    const yeastAdjustment = method.yeastAdjustment ?? 1.0;
+    const prefermentYeastRatio = method.prefermentYeastRatio ?? 0;
+    // 조정된 전체 이스트량
+    const adjustedTotalYeast = totalYeast * yeastAdjustment;
+    // 사전반죽에 들어간 이스트
+    const prefermentYeast = adjustedTotalYeast * prefermentYeastRatio;
+
+    // 3. 본반죽 밀가루 (총량 - 사전반죽) = 단일 항목
+    const mainFlourAmount = Math.round((totalFlour - prefermentFlour) * 10) / 10;
+    if (mainFlourAmount > 0) {
+      const firstFlour = ingredients.find(i => i.category === 'flour');
+      result.push({
+        id: 'main-flour',
+        name: firstFlour?.name || '강력분',
+        category: 'flour',
+        amount: mainFlourAmount,
+        convertedAmount: Math.round(mainFlourAmount * effectiveMultiplier * 10) / 10,
+      });
+    }
+
+    // 4. 본반죽 물 (총량 - 사전반죽) = 단일 항목
+    const mainWaterAmount = Math.round((totalWater - Math.min(totalWater, prefermentWater)) * 10) / 10;
+    if (mainWaterAmount > 0) {
+      result.push({
+        id: 'main-water',
+        name: '물',
+        category: 'liquid',
+        amount: mainWaterAmount,
+        convertedAmount: Math.round(mainWaterAmount * effectiveMultiplier * 10) / 10,
+      });
+    }
+
+    // 5. 나머지 수분(우유 등) - 그대로 포함
+    ingredients.filter(i => i.category === 'liquid' && i.name !== '물').forEach(ing => {
+      result.push({
         ...ing,
         id: `main-${ing.id}`,
-        amount: mainAmount,
-        convertedAmount: Math.round(mainAmount * effectiveMultiplier * 10) / 10,
-      };
+        convertedAmount: Math.round(ing.amount * effectiveMultiplier * 10) / 10,
+      });
     });
+
+    // 6. 나머지 재료 (밀가루, 물, 이스트 제외)
+    ingredients.filter(i =>
+      i.category !== 'flour' &&
+      !(i.category === 'liquid' && i.name === '물') &&
+      !i.name.includes('이스트')
+    ).filter(i => i.category !== 'liquid').forEach(ing => {
+      result.push({
+        ...ing,
+        id: `main-${ing.id}`,
+        convertedAmount: Math.round(ing.amount * effectiveMultiplier * 10) / 10,
+      });
+    });
+
+    // 7. 본반죽 이스트 = 조정된 전체 이스트 - 사전반죽 이스트
+    // 예: 폴리쉬 (yeastAdjustment=0.55, prefermentYeastRatio=0.15)
+    //     → 본반죽 = 원래이스트 × 0.55 × (1 - 0.15) = 46.75%
+    const mainYeastAmount = Math.round((adjustedTotalYeast - prefermentYeast) * 10) / 10;
+    if (mainYeastAmount > 0) {
+      const yeast = ingredients.find(i => i.name.includes('이스트'));
+      result.push({
+        id: 'main-yeast',
+        name: yeast?.name || '인스턴트 드라이이스트',
+        category: 'other',
+        amount: mainYeastAmount,
+        convertedAmount: Math.round(mainYeastAmount * effectiveMultiplier * 10) / 10,
+      });
+    }
+
+    return result;
   }, [ingredients, method, usePreferment, effectiveMultiplier, convertedIngredients]);
 
   const prefermentTotal = useMemo(() =>
@@ -820,8 +1153,136 @@ const AdvancedDashboard: React.FC = () => {
     [mainDoughIngredients]
   );
 
+  // 원본 레시피의 제법 타입 감지 (phase 속성 기반)
+  const originalMethodType = useMemo(() => {
+    const prefermentPhases = ['tangzhong', 'poolish', 'biga', 'sponge', 'levain', 'autolyse', 'preferment'];
+    const foundPhase = ingredients.find(ing => ing.phase && prefermentPhases.includes(ing.phase));
+    return foundPhase?.phase || 'straight';
+  }, [ingredients]);
+
+  // 원본 제법과 선택 제법이 같은지 확인
+  const isSameMethod = originalMethodType === method.type ||
+    (originalMethodType === 'straight' && method.type === 'straight');
+
+  // 변환 재료를 단계별로 그룹화 (사전반죽 + 본반죽을 하나의 테이블에 표시)
+  const convertedIngredientsByPhase = useMemo(() => {
+    const phaseOrder: Record<string, number> = {
+      tangzhong: 0, preferment: 1, poolish: 1, biga: 1, sponge: 1, levain: 1, autolyse: 2,
+      main: 10, topping: 20, filling: 21, frosting: 22, glaze: 23, other: 99
+    };
+
+    // 스트레이트법: 모든 재료를 합산하여 'main' 하나로 통합
+    if (!usePreferment || method.type === 'straight') {
+      const combinedItems: any[] = [];
+
+      // 밀가루 합산
+      const totalFlour = convertedIngredients
+        .filter(i => i.category === 'flour')
+        .reduce((sum, ing) => sum + ing.convertedAmount, 0);
+      if (totalFlour > 0) {
+        const firstFlour = convertedIngredients.find(i => i.category === 'flour');
+        combinedItems.push({
+          id: 'straight-flour',
+          name: firstFlour?.name || '강력분',
+          category: 'flour',
+          convertedAmount: Math.round(totalFlour * 10) / 10,
+        });
+      }
+
+      // 수분 합산 (물 / 우유 / 기타 각각)
+      const liquidNames = [...new Set(convertedIngredients.filter(i => i.category === 'liquid').map(i => i.name))];
+      liquidNames.forEach(name => {
+        const total = convertedIngredients
+          .filter(i => i.category === 'liquid' && i.name === name)
+          .reduce((sum, ing) => sum + ing.convertedAmount, 0);
+        if (total > 0) {
+          combinedItems.push({
+            id: `straight-${name}`,
+            name,
+            category: 'liquid',
+            convertedAmount: Math.round(total * 10) / 10,
+          });
+        }
+      });
+
+      // 나머지 재료 - 같은 이름끼리 합산
+      const otherNames = [...new Set(convertedIngredients
+        .filter(i => i.category !== 'flour' && i.category !== 'liquid')
+        .map(i => i.name))];
+      otherNames.forEach(name => {
+        const items = convertedIngredients.filter(i => i.name === name && i.category !== 'flour' && i.category !== 'liquid');
+        const total = items.reduce((sum, ing) => sum + ing.convertedAmount, 0);
+        if (total > 0) {
+          combinedItems.push({
+            id: `straight-${name}`,
+            name,
+            category: items[0]?.category || 'other',
+            convertedAmount: Math.round(total * 10) / 10,
+          });
+        }
+      });
+
+      return [{ phase: 'main', items: combinedItems }];
+    }
+
+    // ★ 핵심: 원본 제법과 선택 제법이 같으면 원본 그대로 유지
+    if (isSameMethod && originalMethodType !== 'straight') {
+      // convertedIngredients를 원본 phase 기준으로 그룹화 (값은 이미 effectiveMultiplier 적용됨)
+      const grouped = convertedIngredients.reduce((acc, ing) => {
+        const phase = ing.phase || 'main';
+        if (!acc[phase]) acc[phase] = [];
+        acc[phase].push(ing);
+        return acc;
+      }, {} as Record<string, typeof convertedIngredients>);
+
+      return Object.entries(grouped)
+        .sort(([a], [b]) => (phaseOrder[a] ?? 50) - (phaseOrder[b] ?? 50))
+        .map(([phase, items]) => ({ phase, items }));
+    }
+
+    // 제법이 다를 때: prefermentIngredients + mainDoughIngredients 사용
+    const result: { phase: string; items: any[] }[] = [];
+
+    if (prefermentIngredients.length > 0) {
+      result.push({
+        phase: method.type,
+        items: prefermentIngredients.map(ing => ({ ...ing, phase: method.type }))
+      });
+    }
+
+    const mainItems = mainDoughIngredients.filter(ing => (ing.convertedAmount || 0) > 0);
+    if (mainItems.length > 0) {
+      result.push({
+        phase: 'main',
+        items: mainItems.map(ing => ({ ...ing, phase: 'main' }))
+      });
+    }
+
+    return result;
+  }, [convertedIngredients, prefermentIngredients, mainDoughIngredients, usePreferment, method.type, isSameMethod, originalMethodType]);
+
+  // 변환 재료에 단계가 2개 이상인지
+  const convertedHasMultiplePhases = convertedIngredientsByPhase.length > 1;
+
   // 동적 스타일
   const dynamicStyles = useMemo(() => getDynamicStyles(ingredients.length), [ingredients.length]);
+
+  // PhaseIngredientsView용 Recipe 객체 생성
+  const recipeForPhaseView = useMemo(() => ({
+    id: currentRecipe?.id || 'temp',
+    name: productName,
+    ingredients: ingredients.map(ing => ({
+      id: ing.id,
+      name: ing.name,
+      category: ing.category === 'wetOther' ? 'fat' : ing.category,
+      amount: ing.amount,
+      unit: 'g' as const,
+      bakersPercentage: ing.ratio,
+      isFlour: ing.category === 'flour'
+    })),
+    // phases가 있으면 currentRecipe에서 가져옴
+    phases: currentRecipe?.phases
+  }), [currentRecipe, productName, ingredients]);
 
   // ============================================
   // 이벤트 핸들러
@@ -829,9 +1290,23 @@ const AdvancedDashboard: React.FC = () => {
 
   const handleMethodChange = useCallback((type: string) => {
     const ratios = METHOD_RATIOS[type] || { flour: 0, water: 0 };
-    setMethod({ type: type as any, flourRatio: ratios.flour, waterRatio: ratios.water });
+    // 설정 스토어에서 해당 제법의 이스트 조정값 가져오기 (없으면 로컬 기본값 사용)
+    const methodConfig = methodSettings?.methods?.[type];
+    const defaultYeast = DEFAULT_METHOD_YEAST[type] || { yeastAdjustment: 1.0, prefermentYeastRatio: 0 };
+    const yeastAdjustment = methodConfig?.yeastAdjustment ?? defaultYeast.yeastAdjustment;
+    const prefermentYeastRatio = methodConfig?.prefermentYeastRatio ?? defaultYeast.prefermentYeastRatio;
+
+    setMethod({
+      type: type as any,
+      flourRatio: ratios.flour,
+      waterRatio: ratios.water,
+      yeastAdjustment,
+      prefermentYeastRatio
+    });
     setUsePreferment(type !== 'straight');
-  }, []);
+    // 원본 레시피(ingredients)는 수정하지 않음
+    // 변환 레시피는 prefermentIngredients와 mainDoughIngredients useMemo에서 자동 계산
+  }, [methodSettings]);
 
   // 원래 팬 업데이트
   const updateOriginalPan = useCallback((field: string, value: any) => {
@@ -884,18 +1359,18 @@ const AdvancedDashboard: React.FC = () => {
   }, [originalProduct]);
 
   const addPan = useCallback(() => {
-    // 풀먼식빵팬 볼륨: 2350, 변환 대상 제품 비용적으로 계산
-    const defaultPanVolume = PAN_DATA['식빵팬']?.find(p => p.name === '풀먼식빵팬')?.volume || 2350;
-    const calculatedWeight = Math.round(defaultPanVolume / (SPECIFIC_VOLUMES[convertedProduct] || 3.4));
+    // 설정의 첫 번째 팬 볼륨 사용, 변환 대상 제품 비용적으로 계산
+    const newPanVolume = PAN_DATA[defaultCategory]?.[0]?.volume || 2350;
+    const calculatedWeight = Math.round(newPanVolume / (SPECIFIC_VOLUMES[convertedProduct] || 3.4));
 
     setPans(prev => [...prev, {
       id: Date.now().toString(),
       mode: 'pan',
-      category: '식빵팬', type: '풀먼식빵팬',
+      category: defaultCategory, type: defaultPanType,
       quantity: 1, divisionCount: 1, panWeight: calculatedWeight, divisionWeight: calculatedWeight,
       unitCount: 10, unitWeight: 50,
     }]);
-  }, [convertedProduct]);
+  }, [convertedProduct, defaultCategory, defaultPanType, PAN_DATA]);
 
   const removePan = useCallback((id: string) => {
     setPans(prev => prev.length > 1 ? prev.filter(p => p.id !== id) : prev);
@@ -1001,8 +1476,8 @@ const AdvancedDashboard: React.FC = () => {
         waterRatio: method.waterRatio,  // 수분 비율 저장 추가
       },
       panConfig: {
-        type: pans[0]?.type || '풀먼식빵팬',
-        name: pans[0]?.category || '식빵팬',  // 카테고리 저장
+        type: pans[0]?.type || defaultPanType,
+        name: pans[0]?.category || defaultCategory,  // 카테고리 저장
         quantity: pans.reduce((s, p) => s + p.quantity, 0),
         panWeight: pans[0]?.panWeight,  // 팬 무게 저장
         mode: pans[0]?.mode || 'pan',  // 모드 저장 (pan/count)
@@ -1028,6 +1503,8 @@ const AdvancedDashboard: React.FC = () => {
       } : undefined,
       tags: [convertedProduct, METHOD_LABELS[method.type]].filter(Boolean),
       notes: memo,
+      // 수율 예측 공정 선택 상태
+      yieldStageSelection: yieldStageSelection,
       updatedAt: new Date(),
     };
 
@@ -1045,7 +1522,7 @@ const AdvancedDashboard: React.FC = () => {
       addRecipe(newRecipe as any);
       addToast({ type: 'success', message: `"${productName}" 레시피가 저장되었습니다.` });
     }
-  }, [productName, source, pans, oven, usePreferment, mainDoughIngredients, convertedIngredients, processes, memo, convertedProduct, method, currentRecipe, addRecipe, updateRecipe, addToast]);
+  }, [productName, source, pans, oven, usePreferment, mainDoughIngredients, convertedIngredients, processes, memo, convertedProduct, method, yieldStageSelection, currentRecipe, addRecipe, updateRecipe, addToast]);
 
   // 레시피 저장 (중복 이름 확인)
   const handleSaveRecipe = useCallback(() => {
@@ -1276,6 +1753,10 @@ const AdvancedDashboard: React.FC = () => {
     }));
   }, [convertedProduct]);
 
+  // 일괄 입력 모달 상태
+  const [isBulkInputOpen, setIsBulkInputOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'phase'>('table'); // 뷰 모드: 테이블 vs 단계
+
   const addIngredient = useCallback(() => {
     const newOrder = Math.max(...ingredients.map(i => i.order), 0) + 1;
     setIngredients(prev => [...prev, {
@@ -1284,6 +1765,23 @@ const AdvancedDashboard: React.FC = () => {
       name: '', ratio: 0, amount: 0, note: '',
     }]);
   }, [ingredients]);
+
+  // 일괄 입력으로 재료 추가
+  const handleBulkImport = useCallback((importedIngredients: Array<{ name: string; amount: number; category: string }>) => {
+    const startOrder = Math.max(...ingredients.map(i => i.order), 0) + 1;
+    const newIngredients = importedIngredients.map((ing, idx) => ({
+      id: `bulk-${Date.now()}-${idx}`,
+      order: startOrder + idx,
+      category: ing.category as any,
+      subCategory: '',
+      name: ing.name,
+      ratio: 0,
+      amount: ing.amount,
+      note: ''
+    }));
+    setIngredients(prev => [...prev, ...newIngredients]);
+    addToast({ type: 'success', message: `${newIngredients.length}개 재료가 추가되었습니다.` });
+  }, [ingredients, addToast]);
 
   const removeIngredient = useCallback((id: string) => {
     setIngredients(prev => prev.filter(i => i.id !== id));
@@ -1398,32 +1896,39 @@ const AdvancedDashboard: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* 수동 모드: 배수 입력 가능 */
+            /* 수동 모드: 배수 입력 가능 (x2, /2, 1/2 등 다양한 형식) */
             <div className="flex items-center border rounded overflow-hidden bg-white">
-              <button onClick={() => setMultiplier(Math.max(0.1, multiplier - 0.5))} className="px-2 py-1 hover:bg-gray-100 border-r">
+              <button onClick={() => handleQuickMultiplier(Math.max(0.1, multiplier - 0.5))} className="px-2 py-1 hover:bg-gray-100 border-r">
                 <Minus className="w-4 h-4" />
               </button>
               <input
-                type="number"
-                value={multiplier}
-                onChange={(e) => setMultiplier(Math.max(0.1, parseFloat(e.target.value) || 1))}
-                className="w-16 text-center py-1 font-bold text-sm"
-                step="0.1"
+                type="text"
+                value={multiplierInput}
+                onChange={(e) => handleMultiplierInputChange(e.target.value)}
+                onBlur={handleMultiplierInputConfirm}
+                onKeyDown={(e) => e.key === 'Enter' && handleMultiplierInputConfirm()}
+                className="w-20 text-center py-1 font-bold text-sm"
+                placeholder="x2, /2"
+                title="x2, 2배, /2, 1/2 등 입력 가능"
               />
-              <button onClick={() => setMultiplier(Math.min(20, multiplier + 0.5))} className="px-2 py-1 hover:bg-gray-100 border-l">
+              <button onClick={() => handleQuickMultiplier(Math.min(20, multiplier + 0.5))} className="px-2 py-1 hover:bg-gray-100 border-l">
                 <Plus className="w-4 h-4" />
               </button>
             </div>
           )}
           {!isPanLinked && (
-            <div className="flex gap-1">
-              {[0.5, 1, 1.5, 2, 3].map(m => (
+            <div className="flex gap-1 flex-wrap">
+              {[0.25, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5].map(m => (
                 <button
                   key={m}
-                  onClick={() => setMultiplier(m)}
-                  className={`px-2 py-1 text-xs rounded ${multiplier === m ? 'bg-amber-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+                  onClick={() => handleQuickMultiplier(m)}
+                  className={`px-1.5 py-0.5 text-xs rounded transition-colors ${
+                    multiplier === m
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  }`}
                 >
-                  ×{m}
+                  {m < 1 ? `1/${Math.round(1/m)}` : `×${m}`}
                 </button>
               ))}
             </div>
@@ -1714,6 +2219,36 @@ const AdvancedDashboard: React.FC = () => {
             </div>
           </CollapsibleSection>
 
+          {/* 수율 손실 예측 */}
+          <CollapsibleSection
+            title="수율 예측"
+            icon={<TrendingDown className="w-4 h-4" />}
+            defaultOpen={false}
+            badge={`${Math.round((1 - 0.19) * totalWeight)}g 예상`}
+          >
+            <YieldLossCalculator
+              inputWeight={totalWeight}
+              category={originalProduct === '쉬폰케이크' || originalProduct === '제누와즈' || originalProduct === '파운드케이크' ? 'cake'
+                : originalProduct === '크루아상' || originalProduct === '데니쉬' ? 'pastry'
+                : originalProduct === '쿠키' ? 'cookie'
+                : 'bread'}
+              productType={
+                originalProduct === '풀먼식빵' ? 'pullman'
+                : originalProduct === '산형식빵' ? 'mountain'
+                : originalProduct === '브리오슈' ? 'brioche'
+                : originalProduct === '제누와즈' ? 'genoise'
+                : originalProduct === '쉬폰케이크' ? 'chiffon'
+                : originalProduct === '파운드케이크' ? 'pound'
+                : originalProduct === '크루아상' ? 'croissant'
+                : undefined
+              }
+              stageSelection={yieldStageSelection}
+              onStageSelectionChange={setYieldStageSelection}
+              compact={false}
+              className="border-0 shadow-none"
+            />
+          </CollapsibleSection>
+
           {/* 오븐 설정 */}
           <CollapsibleSection
             title="오븐"
@@ -1859,7 +2394,22 @@ const AdvancedDashboard: React.FC = () => {
                   </button>
                 ))}
               </div>
-              {method.type !== 'straight' && (
+              {/* 저온발효/저온숙성: 이스트 조정 정보 표시 */}
+              {(method.type === 'coldFerment' || method.type === 'retard') && (
+                <div className="bg-blue-50 rounded p-2">
+                  <div className="text-xs font-medium text-blue-700 mb-1">
+                    {method.type === 'coldFerment' ? '❄️ 저온발효' : '🌙 저온숙성'}
+                  </div>
+                  <div className="text-xs text-blue-600">
+                    {method.type === 'coldFerment'
+                      ? `이스트 ${Math.round(method.yeastAdjustment * 100)}%로 감량 (냉장 장시간 발효)`
+                      : '이스트량 유지 (성형 후 냉장 숙성)'
+                    }
+                  </div>
+                </div>
+              )}
+              {/* 사전반죽이 있는 제법만 비율 조정 표시 (coldFerment/retard 제외) */}
+              {method.type !== 'straight' && method.type !== 'coldFerment' && method.type !== 'retard' && (
                 <div className="bg-amber-50 rounded p-2">
                   <div className="text-xs font-medium text-amber-700 mb-1.5">사전반죽 비율</div>
                   <div className="grid grid-cols-2 gap-2">
@@ -1900,7 +2450,7 @@ const AdvancedDashboard: React.FC = () => {
         {/* ===== 중앙: 레시피 테이블 (컴팩트) ===== */}
         <div className="flex-1 flex flex-col overflow-hidden min-h-0">
           <div className="flex-1 overflow-auto p-1 min-h-0">
-            <div className={`grid gap-1 h-full ${usePreferment ? 'grid-cols-3' : 'grid-cols-2'}`}>
+            <div className="grid gap-1 h-full grid-cols-2">
 
               {/* 원래 레시피 */}
               <div className="bg-white rounded shadow-sm border flex flex-col overflow-hidden min-w-0">
@@ -1908,7 +2458,10 @@ const AdvancedDashboard: React.FC = () => {
                   <span className="font-semibold text-gray-700 flex items-center gap-1 text-[11px]">
                     <Droplets className="w-3 h-3" />원래 레시피
                   </span>
-                  <button onClick={addIngredient} className="text-[10px] text-amber-600 hover:text-amber-700 font-medium">+ 재료</button>
+                  <div className="flex gap-2">
+                    <button onClick={() => setIsBulkInputOpen(true)} className="text-[10px] text-blue-600 hover:text-blue-700 font-medium">📋 일괄입력</button>
+                    <button onClick={addIngredient} className="text-[10px] text-amber-600 hover:text-amber-700 font-medium">+ 재료</button>
+                  </div>
                 </div>
                 <div className="flex-1 overflow-auto">
                   <table className="w-full">
@@ -1922,30 +2475,70 @@ const AdvancedDashboard: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className={dynamicStyles.fontSize}>
-                      {ingredients.map(ing => (
-                        <tr key={ing.id} className={`border-b border-gray-100 hover:bg-gray-50 ${dynamicStyles.rowHeight}`}>
-                          <td className="px-1.5">
-                            <select value={ing.category} onChange={(e) => updateIngredient(ing.id, 'category', e.target.value)}
-                              className="w-full text-xs border-0 bg-transparent p-0 focus:outline-none appearance-none cursor-pointer">
-                              {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                            </select>
-                          </td>
-                          <td className="px-1.5">
-                            <input type="text" value={ing.name} onChange={(e) => updateIngredient(ing.id, 'name', e.target.value)}
-                              className="w-full bg-transparent border-0 p-0 focus:outline-none text-sm" placeholder="재료명" />
-                          </td>
-                          <td className="px-1.5 text-right font-mono text-gray-400 text-xs">{ing.ratio}</td>
-                          <td className="px-1.5">
-                            <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
-                              className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm" />
-                          </td>
-                          <td className="px-0.5">
-                            <button onClick={() => removeIngredient(ing.id)} className="text-red-300 hover:text-red-500">
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {ingredientsByPhase.map(({ phase, items }, phaseIndex) => {
+                        const phaseMeta = PHASE_META[phase] || PHASE_META.other;
+                        return (
+                          <React.Fragment key={phase}>
+                            {/* 단계 구분선 (2개 이상 단계가 있을 때만 표시) */}
+                            {hasMultiplePhases && (
+                              <tr className={`${phaseMeta.bgColor} ${phaseMeta.borderColor} border-y-2`}>
+                                <td colSpan={5} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs`}>
+                                  <span className="flex items-center gap-1">
+                                    <span>{phaseMeta.icon}</span>
+                                    <span>{phaseMeta.label}</span>
+                                    <span className="text-[10px] font-normal opacity-60">({items.length}개)</span>
+                                  </span>
+                                </td>
+                              </tr>
+                            )}
+                            {/* 해당 단계의 재료들 */}
+                            {items.map(ing => (
+                              <tr key={ing.id} className={`border-b border-gray-100 hover:bg-gray-50 ${dynamicStyles.rowHeight}`}>
+                                <td className="px-1.5">
+                                  <select value={ing.category} onChange={(e) => updateIngredient(ing.id, 'category', e.target.value)}
+                                    className="w-full text-xs border-0 bg-transparent p-0 focus:outline-none appearance-none cursor-pointer">
+                                    {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                  </select>
+                                </td>
+                                <td className="px-1.5">
+                                  <AutocompleteInput
+                                    value={ing.name}
+                                    onChange={(value) => updateIngredient(ing.id, 'name', value)}
+                                    onSelect={(value) => {
+                                      // 재료 선택 시 카테고리도 자동 설정
+                                      const info = findIngredientInfo(value);
+                                      if (info) {
+                                        updateIngredient(ing.id, 'name', value);
+                                        // 카테고리 매핑
+                                        const categoryMap: Record<string, string> = {
+                                          flour: 'flour', liquid: 'liquid', fat: 'wetOther',
+                                          sugar: 'other', egg: 'wetOther', dairy: 'liquid',
+                                          leavening: 'other', salt: 'other', flavoring: 'other',
+                                          nut: 'other', fruit: 'other', chocolate: 'other', other: 'other'
+                                        };
+                                        updateIngredient(ing.id, 'category', categoryMap[info.category] || 'other');
+                                      }
+                                    }}
+                                    placeholder="재료명"
+                                    className="!border-0 !p-0 !ring-0 text-sm bg-transparent"
+                                    maxSuggestions={6}
+                                  />
+                                </td>
+                                <td className="px-1.5 text-right font-mono text-gray-400 text-xs">{ing.ratio}</td>
+                                <td className="px-1.5">
+                                  <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
+                                    className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm" />
+                                </td>
+                                <td className="px-0.5">
+                                  <button onClick={() => removeIngredient(ing.id)} className="text-red-300 hover:text-red-500">
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </React.Fragment>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -1954,47 +2547,11 @@ const AdvancedDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* 사전반죽 */}
-              {usePreferment && (
-                <div className="bg-white rounded shadow-sm border border-amber-200 flex flex-col overflow-hidden min-w-0">
-                  <div className="bg-amber-50 border-b border-amber-200 px-2 py-0.5 flex-shrink-0">
-                    <span className="font-semibold text-amber-700 flex items-center gap-1 text-[11px]">
-                      <Wheat className="w-3 h-3" />사전반죽
-                      <span className="text-[9px] font-normal text-amber-500">({METHOD_LABELS[method.type]})</span>
-                    </span>
-                  </div>
-                  <div className="flex-1 overflow-auto">
-                    <table className="w-full">
-                      <thead className="bg-amber-50 sticky top-0">
-                        <tr className={`text-amber-700 ${dynamicStyles.fontSize}`}>
-                          <th className="px-2 py-1 text-left">분류</th>
-                          <th className="px-2 py-1 text-left">재료</th>
-                          <th className="px-2 py-1 text-right w-16">g</th>
-                        </tr>
-                      </thead>
-                      <tbody className={dynamicStyles.fontSize}>
-                        {prefermentIngredients.map(ing => (
-                          <tr key={ing.id} className={`border-b border-amber-100 ${dynamicStyles.rowHeight}`}>
-                            <td className="px-2 text-amber-600">{CATEGORY_LABELS[ing.category]}</td>
-                            <td className="px-2">{ing.name}</td>
-                            <td className="px-2 text-right font-mono font-medium text-amber-700">{ing.convertedAmount}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="bg-amber-50 border-t border-amber-200 px-2 py-0.5 text-[11px] flex-shrink-0">
-                    <span className="text-amber-700">합계: <b>{Math.round(prefermentTotal)}g</b></span>
-                  </div>
-                </div>
-              )}
-
-              {/* 본반죽/변환 레시피 */}
+              {/* 변환 레시피 (단계별 구분선 포함) */}
               <div className="bg-white rounded shadow-sm border border-blue-200 flex flex-col overflow-hidden min-w-0">
                 <div className="bg-blue-50 border-b border-blue-200 px-2 py-0.5 flex items-center justify-between flex-shrink-0">
                   <span className="font-semibold text-blue-700 flex items-center gap-1 text-[11px]">
-                    <ThermometerSun className="w-3 h-3" />
-                    {usePreferment ? '본반죽' : '변환 레시피'}
+                    <ThermometerSun className="w-3 h-3" />변환 레시피
                   </span>
                   {effectiveMultiplier !== 1 && <span className="text-[9px] bg-blue-200 text-blue-700 px-1 py-0.5 rounded font-medium">×{effectiveMultiplier}</span>}
                 </div>
@@ -2008,21 +2565,38 @@ const AdvancedDashboard: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className={dynamicStyles.fontSize}>
-                      {mainDoughIngredients.map(ing => (
-                        <tr key={ing.id} className={`border-b border-blue-100 ${dynamicStyles.rowHeight}`}>
-                          <td className="px-2 text-blue-600">{CATEGORY_LABELS[ing.category]}</td>
-                          <td className="px-2">{ing.name}</td>
-                          <td className="px-2 text-right font-mono font-medium text-blue-700">{ing.convertedAmount}</td>
-                        </tr>
-                      ))}
+                      {convertedIngredientsByPhase.map(({ phase, items }) => {
+                        const phaseMeta = PHASE_META[phase] || PHASE_META.other;
+                        return (
+                          <React.Fragment key={phase}>
+                            {/* 단계 구분선 (2개 이상 단계가 있을 때만 표시) */}
+                            {convertedHasMultiplePhases && (
+                              <tr className={`${phaseMeta.bgColor} ${phaseMeta.borderColor} border-y-2`}>
+                                <td colSpan={3} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs`}>
+                                  <span className="flex items-center gap-1">
+                                    <span>{phaseMeta.icon}</span>
+                                    <span>{phaseMeta.label}</span>
+                                    <span className="text-[10px] font-normal opacity-60">({items.length}개)</span>
+                                  </span>
+                                </td>
+                              </tr>
+                            )}
+                            {/* 해당 단계의 재료들 */}
+                            {items.map((ing: any) => (
+                              <tr key={ing.id} className={`border-b border-blue-100 ${dynamicStyles.rowHeight}`}>
+                                <td className="px-2 text-blue-600">{CATEGORY_LABELS[ing.category]}</td>
+                                <td className="px-2">{ing.name}</td>
+                                <td className="px-2 text-right font-mono font-medium text-blue-700">{ing.convertedAmount}</td>
+                              </tr>
+                            ))}
+                          </React.Fragment>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
                 <div className="bg-blue-50 border-t border-blue-200 px-2 py-0.5 text-[11px] flex-shrink-0">
-                  <div className="flex justify-between">
-                    <span className="text-blue-700">합계: <b>{Math.round(mainDoughTotal)}g</b></span>
-                    {usePreferment && <span className="text-blue-500 text-[9px]">전체: {Math.round(prefermentTotal + mainDoughTotal)}g</span>}
-                  </div>
+                  <span className="text-blue-700">합계: <b>{Math.round(prefermentTotal + mainDoughTotal)}g</b></span>
                 </div>
               </div>
             </div>
@@ -2197,6 +2771,13 @@ const AdvancedDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 일괄 입력 모달 */}
+      <BulkIngredientInput
+        isOpen={isBulkInputOpen}
+        onClose={() => setIsBulkInputOpen(false)}
+        onImport={handleBulkImport}
+      />
     </div>
   );
 };

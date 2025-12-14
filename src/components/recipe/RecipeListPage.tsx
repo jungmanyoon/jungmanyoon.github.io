@@ -1,10 +1,14 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import RecipeList from './RecipeList'
 import SearchBar from '@components/common/SearchBar'
 import FilterControls from './FilterControls'
+import AdModal from '@components/ads/AdModal'
 import { useRecipeStore, selectFilteredRecipes } from '@stores/useRecipeStore'
 import { useAppStore } from '@stores/useAppStore'
 import { toast } from '@utils/toast'
+
+// 무료 레시피 개수 제한
+const FREE_RECIPE_LIMIT = 10
 
 const RecipeListPage: React.FC = () => {
   const {
@@ -23,6 +27,9 @@ const RecipeListPage: React.FC = () => {
   const filteredRecipes = useRecipeStore(selectFilteredRecipes)
   const availableTags = useRecipeStore(getAvailableTags)
   const { setActiveTab } = useAppStore()
+
+  // 광고 모달 상태
+  const [showAdModal, setShowAdModal] = useState(false)
 
   // 초기 진입 시 빈 경우 또는 출처 정보 없는 경우 샘플 레시피 주입
   useEffect(() => {
@@ -65,7 +72,8 @@ const RecipeListPage: React.FC = () => {
     setTimeout(() => setActiveTab('editor'), 0)
   }, [setCurrentRecipe, setActiveTab])
 
-  const handleNew = useCallback(() => {
+  // 실제 새 레시피 생성 함수
+  const createNewRecipe = useCallback(() => {
     const newRecipe = {
       id: `recipe-${Date.now()}`,
       name: '새 레시피',
@@ -80,8 +88,25 @@ const RecipeListPage: React.FC = () => {
     } as any
     addRecipe(newRecipe)
     setCurrentRecipe(newRecipe)
-    setTimeout(() => setActiveTab('converter'), 0)
+    setTimeout(() => setActiveTab('dashboard'), 0)
   }, [addRecipe, setCurrentRecipe, setActiveTab])
+
+  // 새 레시피 버튼 핸들러 (광고 체크)
+  const handleNew = useCallback(() => {
+    // 무료 레시피 개수 초과 시 광고 모달 표시
+    if (recipes.length >= FREE_RECIPE_LIMIT) {
+      setShowAdModal(true)
+    } else {
+      createNewRecipe()
+    }
+  }, [recipes.length, createNewRecipe])
+
+  // 광고 완료 후 레시피 생성
+  const handleAdComplete = useCallback(() => {
+    setShowAdModal(false)
+    createNewRecipe()
+    toast.success('광고 시청 감사합니다! 새 레시피를 생성합니다.')
+  }, [createNewRecipe])
 
   const handleSearchChange = useCallback((searchQuery: string) => {
     setFilters({ ...filters, searchQuery })
@@ -129,6 +154,13 @@ const RecipeListPage: React.FC = () => {
           onRestore={handleRestore}
         />
       </div>
+
+      {/* 광고 모달 (10개 초과 시) */}
+      <AdModal
+        isOpen={showAdModal}
+        onClose={() => setShowAdModal(false)}
+        onComplete={handleAdComplete}
+      />
     </div>
   )
 }

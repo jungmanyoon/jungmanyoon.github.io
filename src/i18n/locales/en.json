@@ -2210,7 +2210,12 @@
     "message": "Please watch this ad to keep Recipe Book free",
     "info": "Recipes beyond 10 can be created after watching an ad",
     "continue": "Continue",
-    "waitMessage": "Continue in {{seconds}} seconds"
+    "waitMessage": "Continue in {{seconds}} seconds",
+    "thankYouTitle": "Thank you for using Recipe Book",
+    "thankYouMessage": "We support your passionate baking!",
+    "supportMessage": "Recipe Book is a free service. We're happy to be part of your baking journey.",
+    "recipeCountInfo": "You can create and manage unlimited recipes.",
+    "continueCreating": "Create Recipe"
   },
   "advDashboard": {
     "productName": "Product Name",

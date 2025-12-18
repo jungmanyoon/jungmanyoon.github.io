@@ -4,12 +4,14 @@
  */
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { searchIngredients, sortByRelevance } from '@/utils/hangul'
 import { findIngredientInfo } from '@/data/ingredientDatabase'
 import { useSettingsStore } from '@/stores/useSettingsStore'
 
 interface AutocompleteInputProps {
   value: string
+  displayValue?: string  // 편집 중이 아닐 때 표시할 값 (번역된 이름 등)
   onChange: (value: string) => void
   onSelect?: (value: string) => void
   placeholder?: string
@@ -22,19 +24,23 @@ interface AutocompleteInputProps {
 
 export default function AutocompleteInput({
   value,
+  displayValue,
   onChange,
   onSelect,
-  placeholder = '재료명 입력...',
+  placeholder,
   className = '',
   suggestions: customSuggestions,  // 커스텀 목록이 주어지면 그것을 사용
   maxSuggestions = 8,
   disabled = false,
   autoFocus = false
 }: AutocompleteInputProps) {
+  const { t } = useTranslation()
+  const resolvedPlaceholder = placeholder ?? t('components.autocomplete.placeholder')
   // 설정 스토어에서 통합 재료 목록 가져오기 (커스텀 목록이 없을 때만)
   const getAllIngredientNames = useSettingsStore(state => state.getAllIngredientNames)
   const suggestions = customSuggestions ?? getAllIngredientNames()
   const [isOpen, setIsOpen] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const [recentIngredients, setRecentIngredients] = useState<string[]>([])
 
@@ -138,12 +144,14 @@ export default function AutocompleteInput({
   // 포커스 처리
   const handleFocus = useCallback(() => {
     setIsOpen(true)
+    setIsFocused(true)
   }, [])
 
   // 블러 처리 (딜레이로 클릭 이벤트 처리)
   const handleBlur = useCallback(() => {
     setTimeout(() => {
       setIsOpen(false)
+      setIsFocused(false)
       setHighlightedIndex(-1)
     }, 200)
   }, [])
@@ -181,17 +189,20 @@ export default function AutocompleteInput({
     return emojiMap[info.category] || ''
   }
 
+  // 표시할 값: 포커스 중에는 원본값(검색용), 아니면 displayValue 또는 원본값
+  const shownValue = isFocused ? value : (displayValue ?? value)
+
   return (
     <div className="relative">
       <input
         ref={inputRef}
         type="text"
-        value={value}
+        value={shownValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         disabled={disabled}
         autoFocus={autoFocus}
         className={`w-full px-3 py-2 border border-gray-300 rounded-lg
@@ -210,7 +221,7 @@ export default function AutocompleteInput({
         >
           {!value.trim() && recentIngredients.length > 0 && (
             <li className="px-3 py-1 text-xs text-gray-500 bg-gray-50 border-b">
-              최근 사용
+              {t('components.autocomplete.recentlyUsed')}
             </li>
           )}
           {filteredSuggestions.map((item, index) => (
@@ -237,7 +248,7 @@ export default function AutocompleteInput({
       {isOpen && value.trim() && filteredSuggestions.length === 0 && (
         <div className="absolute z-50 w-full mt-1 px-3 py-2 bg-gray-50
           border border-gray-200 rounded-lg text-sm text-gray-500">
-          '{value}'에 해당하는 재료가 없습니다
+          {t('components.autocomplete.noMatch', { value })}
         </div>
       )}
     </div>

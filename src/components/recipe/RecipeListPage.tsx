@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import RecipeList from './RecipeList'
 import SearchBar from '@components/common/SearchBar'
 import FilterControls from './FilterControls'
@@ -11,6 +12,7 @@ import { toast } from '@utils/toast'
 const FREE_RECIPE_LIMIT = 10
 
 const RecipeListPage: React.FC = () => {
+  const { t } = useTranslation()
   const {
     recipes,
     filters,
@@ -36,7 +38,7 @@ const RecipeListPage: React.FC = () => {
     // 레시피가 없으면 샘플 로드
     if (!recipes || recipes.length === 0) {
       resetToSampleRecipes()
-      toast.success('샘플 레시피 10개를 불러왔습니다.')
+      toast.success(t('message.sampleRecipesLoaded'))
       return
     }
 
@@ -48,7 +50,7 @@ const RecipeListPage: React.FC = () => {
       const allWithoutSource = recipes.every(r => !r.source)
       if (allWithoutSource) {
         resetToSampleRecipes()
-        toast.success('새로운 샘플 레시피로 업데이트했습니다! (출처 정보 포함)')
+        toast.success(t('message.sampleRecipesUpdated'))
       }
     }
   }, [])
@@ -76,7 +78,7 @@ const RecipeListPage: React.FC = () => {
   const createNewRecipe = useCallback(() => {
     const newRecipe = {
       id: `recipe-${Date.now()}`,
-      name: '새 레시피',
+      name: t('recipe.newRecipe'),
       description: '',
       category: 'bread',
       method: 'straight',
@@ -89,7 +91,7 @@ const RecipeListPage: React.FC = () => {
     addRecipe(newRecipe)
     setCurrentRecipe(newRecipe)
     setTimeout(() => setActiveTab('dashboard'), 0)
-  }, [addRecipe, setCurrentRecipe, setActiveTab])
+  }, [addRecipe, setCurrentRecipe, setActiveTab, t])
 
   // 새 레시피 버튼 핸들러 (광고 체크)
   const handleNew = useCallback(() => {
@@ -105,8 +107,8 @@ const RecipeListPage: React.FC = () => {
   const handleAdComplete = useCallback(() => {
     setShowAdModal(false)
     createNewRecipe()
-    toast.success('광고 시청 감사합니다! 새 레시피를 생성합니다.')
-  }, [createNewRecipe])
+    toast.success(t('message.adThanks'))
+  }, [createNewRecipe, t])
 
   const handleSearchChange = useCallback((searchQuery: string) => {
     setFilters({ ...filters, searchQuery })
@@ -131,7 +133,7 @@ const RecipeListPage: React.FC = () => {
         <SearchBar
           value={filters.searchQuery || ''}
           onChange={handleSearchChange}
-          placeholder="레시피 검색..."
+          placeholder={t('recipeList.searchPlaceholder')}
         />
         <FilterControls
           filters={filters}

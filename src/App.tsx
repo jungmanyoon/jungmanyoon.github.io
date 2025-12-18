@@ -1,5 +1,9 @@
 import { lazy, Suspense, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@stores/useAppStore'
+
+// i18n 초기화 (앱 시작 시 로드)
+import '@/i18n'
 import Header from '@components/common/Header.jsx'
 import Footer from '@components/common/Footer'
 import PWAStatus from '@components/pwa/PWAStatus.jsx'
@@ -55,13 +59,39 @@ const Help = isDev ? HelpDirect : HelpLazy
 // 유효한 탭 목록
 const VALID_TABS = ['home', 'dashboard', 'workspace', 'recipes', 'editor', 'calculator', 'settings', 'help', 'privacy', 'terms', 'guide', 'contact']
 
+// 페이지별 타이틀 매핑 (SEO 최적화)
+const PAGE_TITLES: Record<string, string> = {
+    home: 'seo.titles.home',
+    dashboard: 'seo.titles.dashboard',
+    workspace: 'seo.titles.dashboard',
+    recipes: 'seo.titles.recipes',
+    editor: 'seo.titles.editor',
+    calculator: 'seo.titles.calculator',
+    settings: 'seo.titles.settings',
+    help: 'seo.titles.help',
+    privacy: 'seo.titles.privacy',
+    terms: 'seo.titles.terms',
+    guide: 'seo.titles.guide',
+    contact: 'seo.titles.contact'
+}
+
+const BASE_TITLE = '레시피북'
+
 // 메인 앱 컴포넌트
 function App() {
+    const { t } = useTranslation()
     const { activeTab, setActiveTab } = useAppStore()
     const { currentRecipe, addRecipe, setCurrentRecipe } = useRecipeStore()
 
     // 로컬 폴더 자동 저장 (레시피/설정 변경 시 자동 동기화)
     useAutoSave()
+
+    // 동적 페이지 타이틀 업데이트 (SEO 최적화)
+    useEffect(() => {
+        const titleKey = PAGE_TITLES[activeTab || 'home']
+        const pageTitle = t(titleKey, { defaultValue: '' })
+        document.title = pageTitle ? `${pageTitle} | ${BASE_TITLE}` : BASE_TITLE
+    }, [activeTab, t])
 
     // 브라우저 히스토리 연동 (뒤로가기/앞으로가기 지원)
     useEffect(() => {

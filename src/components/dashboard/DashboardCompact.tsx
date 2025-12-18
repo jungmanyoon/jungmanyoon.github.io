@@ -17,6 +17,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Scale,
   Layers,
@@ -59,6 +60,8 @@ const METHOD_PRESETS: { id: BreadMethod; name: string; icon: string }[] = [
 const QUANTITY_PRESETS = [0.5, 1, 1.5, 2, 3, 5]
 
 const DashboardCompact: React.FC = () => {
+  const { t } = useTranslation()
+
   // Store
   const {
     sourceRecipe,
@@ -202,7 +205,7 @@ const DashboardCompact: React.FC = () => {
 
         <div className="flex-1 h-10 px-4 flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
           <span className="text-sm font-medium truncate">
-            {sourceRecipe?.name || '레시피 선택'}
+            {sourceRecipe?.name || t('components.dashboardCompact.selectRecipe')}
           </span>
           <span className="ml-2 text-xs text-gray-500">
             ({recipeIndex + 1}/{recipes.length})
@@ -224,7 +227,7 @@ const DashboardCompact: React.FC = () => {
               ? 'bg-green-500 text-white'
               : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
           }`}
-          title="쿠킹모드"
+          title={t('components.dashboardCompact.cookingMode')}
         >
           {isCookingMode ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
         </button>
@@ -237,9 +240,9 @@ const DashboardCompact: React.FC = () => {
           {/* 탭 버튼 */}
           <div className="flex border-b border-gray-200 dark:border-gray-700">
             {[
-              { id: 'pan' as const, icon: Scale, label: '팬' },
-              { id: 'method' as const, icon: Layers, label: '제법' },
-              { id: 'quantity' as const, icon: Hash, label: '수량' },
+              { id: 'pan' as const, icon: Scale, labelKey: 'pan' },
+              { id: 'method' as const, icon: Layers, labelKey: 'method' },
+              { id: 'quantity' as const, icon: Hash, labelKey: 'quantity' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -251,7 +254,7 @@ const DashboardCompact: React.FC = () => {
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
-                {tab.label}
+                {t(`components.dashboardCompact.${tab.labelKey}`)}
               </button>
             ))}
           </div>
@@ -351,16 +354,16 @@ const DashboardCompact: React.FC = () => {
           <div className="flex-1 overflow-y-auto">
             {!sourceRecipe ? (
               <div className="flex items-center justify-center h-full text-gray-400">
-                <p>← 레시피를 선택하세요</p>
+                <p>{t('components.dashboardCompact.selectRecipePrompt')}</p>
               </div>
             ) : (
               <table className="w-full text-xs">
                 <thead className="sticky top-0 bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="text-left py-1.5 px-2 font-medium">재료</th>
-                    <th className="text-right py-1.5 px-2 font-medium w-20">원본</th>
-                    <th className="text-right py-1.5 px-2 font-medium w-20">변환</th>
-                    <th className="text-right py-1.5 px-2 font-medium w-12">차이</th>
+                    <th className="text-left py-1.5 px-2 font-medium">{t('components.dashboardCompact.ingredient')}</th>
+                    <th className="text-right py-1.5 px-2 font-medium w-20">{t('components.dashboardCompact.original')}</th>
+                    <th className="text-right py-1.5 px-2 font-medium w-20">{t('components.dashboardCompact.converted')}</th>
+                    <th className="text-right py-1.5 px-2 font-medium w-12">{t('components.dashboardCompact.difference')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -401,7 +404,7 @@ const DashboardCompact: React.FC = () => {
           }`}
         >
           <RotateCcw className="w-4 h-4" />
-          <span className="text-sm">초기화</span>
+          <span className="text-sm">{t('components.dashboardCompact.reset')}</span>
         </button>
 
         <div className="flex-1" />
@@ -427,21 +430,21 @@ const DashboardCompact: React.FC = () => {
           }`}
         >
           <Save className="w-4 h-4" />
-          <span className="text-sm">저장</span>
+          <span className="text-sm">{t('components.dashboardCompact.save')}</span>
         </button>
       </div>
 
       {/* ===== 단축키 힌트 바 ===== */}
       <div className="flex items-center justify-center gap-4 py-1 text-xs text-gray-400 flex-shrink-0">
-        <span><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">←→</kbd> 레시피</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">1</kbd><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs ml-0.5">2</kbd><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs ml-0.5">3</kbd> 탭</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Space</kbd> 쿠킹모드</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl+S</kbd> 저장</span>
+        <span><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">←→</kbd> {t('components.dashboardCompact.recipeNav')}</span>
+        <span><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">1</kbd><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs ml-0.5">2</kbd><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs ml-0.5">3</kbd> {t('components.dashboardCompact.tabSwitch')}</span>
+        <span><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Space</kbd> {t('components.dashboardCompact.cookingMode')}</span>
+        <span><kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl+S</kbd> {t('components.dashboardCompact.save')}</span>
         <button
           onClick={() => setShowShortcuts(true)}
           className="text-blue-500 hover:underline"
         >
-          <kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">?</kbd> 더보기
+          <kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">?</kbd> {t('components.dashboardCompact.more')}
         </button>
       </div>
 
@@ -451,38 +454,38 @@ const DashboardCompact: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
               <Keyboard className="w-5 h-5" />
-              키보드 단축키
+              {t('components.dashboardCompact.keyboardShortcuts')}
             </h3>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span>레시피 이동</span>
+                <span>{t('components.dashboardCompact.recipeNav')}</span>
                 <span><kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">←</kbd> <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">→</kbd></span>
               </div>
               <div className="flex justify-between">
-                <span>탭 전환 (팬/제법/수량)</span>
+                <span>{t('components.dashboardCompact.tabSwitch')}</span>
                 <span><kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">1</kbd> <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">2</kbd> <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">3</kbd></span>
               </div>
               <div className="flex justify-between">
-                <span>쿠킹모드 시작</span>
+                <span>{t('components.dashboardCompact.startCookingMode')}</span>
                 <span><kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Space</kbd></span>
               </div>
               <div className="flex justify-between">
-                <span>저장</span>
+                <span>{t('components.dashboardCompact.save')}</span>
                 <span><kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Ctrl</kbd> + <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">S</kbd></span>
               </div>
               <div className="flex justify-between">
-                <span>초기화 / 닫기</span>
+                <span>{t('components.dashboardCompact.reset')} / {t('components.dashboardCompact.close')}</span>
                 <span><kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">Esc</kbd></span>
               </div>
             </div>
             <div className="mt-6 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-sm text-blue-800 dark:text-blue-200">
-              💡 밀가루 묻은 손으로도 큰 키보드 키 하나로 조작 가능!
+              {t('components.dashboardCompact.flouryHandsTip')}
             </div>
             <button
               onClick={() => setShowShortcuts(false)}
               className="mt-4 w-full py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             >
-              닫기 (Esc)
+              {t('components.dashboardCompact.closeEsc')}
             </button>
           </div>
         </div>
@@ -504,6 +507,7 @@ const CookingModeOverlay: React.FC<{
   recipe: Recipe
   onClose: () => void
 }> = ({ recipe, onClose }) => {
+  const { t } = useTranslation()
   const [currentStep, setCurrentStep] = useState(0)
   const steps = recipe.steps || []
 
@@ -538,7 +542,7 @@ const CookingModeOverlay: React.FC<{
           onClick={onClose}
           className="px-4 py-2 bg-white/20 rounded-lg text-sm hover:bg-white/30"
         >
-          닫기
+          {t('components.dashboardCompact.close')}
         </button>
       </div>
 
@@ -552,7 +556,7 @@ const CookingModeOverlay: React.FC<{
           ))}
           {recipe.ingredients.length > 6 && (
             <span className="px-2 py-1 text-sm text-white/60">
-              +{recipe.ingredients.length - 6}개
+              {t('components.dashboardCompact.moreItems', { count: recipe.ingredients.length - 6 })}
             </span>
           )}
         </div>
@@ -563,14 +567,14 @@ const CookingModeOverlay: React.FC<{
         {steps.length > 0 ? (
           <>
             <p className="text-white/60 text-sm mb-4">
-              단계 {currentStep + 1} / {steps.length}
+              {t('components.dashboardCompact.step')} {currentStep + 1} / {steps.length}
             </p>
             <p className="text-white text-2xl text-center leading-relaxed max-w-2xl">
               {steps[currentStep]?.instruction || steps[currentStep]}
             </p>
           </>
         ) : (
-          <p className="text-white/60">조리 단계가 없습니다</p>
+          <p className="text-white/60">{t('components.dashboardCompact.noSteps')}</p>
         )}
       </div>
 
@@ -581,23 +585,23 @@ const CookingModeOverlay: React.FC<{
           disabled={currentStep === 0}
           className="flex-1 py-6 bg-white/20 rounded-xl text-white text-lg font-medium disabled:opacity-30 hover:bg-white/30 transition-all"
         >
-          ← 이전
-          <span className="block text-xs opacity-60 mt-1">또는 ← 키</span>
+          {t('components.dashboardCompact.prev')}
+          <span className="block text-xs opacity-60 mt-1">{t('components.dashboardCompact.orKey', { key: '←' })}</span>
         </button>
         <button
           onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
           disabled={currentStep >= steps.length - 1}
           className="flex-1 py-6 bg-blue-500 rounded-xl text-white text-lg font-medium disabled:opacity-30 hover:bg-blue-600 transition-all"
         >
-          다음 →
-          <span className="block text-xs opacity-60 mt-1">또는 → / Enter 키</span>
+          {t('components.dashboardCompact.next')}
+          <span className="block text-xs opacity-60 mt-1">{t('components.dashboardCompact.orKey', { key: '→ / Enter' })}</span>
         </button>
       </div>
 
       {/* 키보드 힌트 */}
       <div className="pb-4 text-center text-white/50 text-sm">
-        <kbd className="px-2 py-1 bg-white/20 rounded">Space</kbd> 또는{' '}
-        <kbd className="px-2 py-1 bg-white/20 rounded">Esc</kbd> 로 쿠킹모드 종료
+        <kbd className="px-2 py-1 bg-white/20 rounded">Space</kbd> / {' '}
+        <kbd className="px-2 py-1 bg-white/20 rounded">Esc</kbd> {t('components.dashboardCompact.exitCookingMode')}
       </div>
     </div>
   )

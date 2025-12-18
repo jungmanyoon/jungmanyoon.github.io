@@ -8,20 +8,21 @@
  */
 
 import React, { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import type { Recipe, Ingredient, IngredientPhase, PhaseType } from '@/types/recipe.types'
 
-// 단계 타입별 메타데이터
-const PHASE_META: Record<PhaseType, { icon: string; color: string; label: string }> = {
-  preferment: { icon: '🧪', color: 'amber', label: '사전반죽' },
-  tangzhong: { icon: '🍜', color: 'pink', label: '탕종' },
-  autolyse: { icon: '⏳', color: 'purple', label: '오토리즈' },
-  main: { icon: '🍞', color: 'blue', label: '본반죽' },
-  topping: { icon: '✨', color: 'orange', label: '토핑' },
-  filling: { icon: '🎂', color: 'rose', label: '충전물' },
-  frosting: { icon: '🍰', color: 'indigo', label: '프로스팅' },
-  glaze: { icon: '💧', color: 'cyan', label: '글레이즈' },
-  other: { icon: '📦', color: 'gray', label: '기타' },
+// 단계 타입별 메타데이터 (라벨은 i18n으로 동적 처리)
+const PHASE_META: Record<PhaseType, { icon: string; color: string; labelKey: string }> = {
+  preferment: { icon: '🧪', color: 'amber', labelKey: 'preferment' },
+  tangzhong: { icon: '🍜', color: 'pink', labelKey: 'tangzhong' },
+  autolyse: { icon: '⏳', color: 'purple', labelKey: 'autolyse' },
+  main: { icon: '🍞', color: 'blue', labelKey: 'main' },
+  topping: { icon: '✨', color: 'orange', labelKey: 'topping' },
+  filling: { icon: '🎂', color: 'rose', labelKey: 'filling' },
+  frosting: { icon: '🍰', color: 'indigo', labelKey: 'frosting' },
+  glaze: { icon: '💧', color: 'cyan', labelKey: 'glaze' },
+  other: { icon: '📦', color: 'gray', labelKey: 'other' },
 }
 
 // 카테고리별 아이콘
@@ -65,6 +66,7 @@ export default function PhaseIngredientsView({
   compact = false,
   className = ''
 }: PhaseIngredientsViewProps) {
+  const { t } = useTranslation()
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set(['main', 'all']))
 
   // phases가 있으면 사용, 없으면 ingredients를 'main' phase로 래핑
@@ -75,13 +77,13 @@ export default function PhaseIngredientsView({
     // phases가 없으면 모든 재료를 'main' phase로
     return [{
       id: 'main',
-      name: '본반죽',
-      nameKo: '본반죽',
+      name: t('components.phaseIngredients.phases.main'),
+      nameKo: t('components.phaseIngredients.phases.main'),
       type: 'main' as PhaseType,
       ingredients: recipe.ingredients,
       order: 0
     }]
-  }, [recipe.phases, recipe.ingredients])
+  }, [recipe.phases, recipe.ingredients, t])
 
   // 밀가루 총량 계산 (베이커스 퍼센트용)
   const totalFlour = useMemo(() => {
@@ -192,10 +194,10 @@ export default function PhaseIngredientsView({
                 )}
                 <span className="text-lg">{meta.icon}</span>
                 <span className={`font-semibold ${getColorClasses(meta.color, 'text')} ${compact ? 'text-xs' : 'text-sm'}`}>
-                  {phase.nameKo || phase.name || meta.label}
+                  {phase.nameKo || phase.name || t(`components.phaseIngredients.phases.${meta.labelKey}`)}
                 </span>
                 <span className="text-xs text-gray-500">
-                  ({phase.ingredients.length}개)
+                  ({t('components.phaseIngredients.ingredientCount', { count: phase.ingredients.length })})
                 </span>
               </div>
 
@@ -224,16 +226,16 @@ export default function PhaseIngredientsView({
                   <thead>
                     <tr className={`text-xs ${getColorClasses(meta.color, 'text')} border-b ${getColorClasses(meta.color, 'border')}`}>
                       <th className="px-3 py-1.5 text-left w-8"></th>
-                      <th className="px-2 py-1.5 text-left">재료</th>
+                      <th className="px-2 py-1.5 text-left">{t('components.phaseIngredients.ingredient')}</th>
                       <th className="px-2 py-1.5 text-right w-14">B%</th>
                       {showConversion && multiplier !== 1 ? (
                         <>
-                          <th className="px-2 py-1.5 text-right w-16">원본</th>
+                          <th className="px-2 py-1.5 text-right w-16">{t('components.phaseIngredients.original')}</th>
                           <th className="px-2 py-1.5 text-center w-6">→</th>
-                          <th className="px-2 py-1.5 text-right w-16">변환</th>
+                          <th className="px-2 py-1.5 text-right w-16">{t('components.phaseIngredients.converted')}</th>
                         </>
                       ) : (
-                        <th className="px-2 py-1.5 text-right w-16">중량</th>
+                        <th className="px-2 py-1.5 text-right w-16">{t('components.phaseIngredients.weight')}</th>
                       )}
                     </tr>
                   </thead>
@@ -255,7 +257,7 @@ export default function PhaseIngredientsView({
                           <td className={`px-2 py-1.5 ${compact ? 'text-xs' : 'text-sm'}`}>
                             {ing.name}
                             {ing.isFlour && (
-                              <span className="ml-1 text-[10px] text-blue-500">(기준)</span>
+                              <span className="ml-1 text-[10px] text-blue-500">({t('components.phaseIngredients.reference')})</span>
                             )}
                           </td>
                           <td className="px-2 py-1.5 text-right text-xs font-mono text-gray-500">
@@ -291,7 +293,7 @@ export default function PhaseIngredientsView({
       <div className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2">
         <div className="flex items-center justify-between">
           <span className="font-semibold text-gray-700">
-            📊 전체 합계
+            📊 {t('components.phaseIngredients.totalSummary')}
           </span>
           <div className="flex items-center gap-3">
             {showConversion && multiplier !== 1 ? (
@@ -308,7 +310,7 @@ export default function PhaseIngredientsView({
         </div>
         {multiplier !== 1 && (
           <div className="text-xs text-gray-500 mt-1">
-            배율: ×{multiplier.toFixed(2)}
+            {t('components.phaseIngredients.multiplier')}: ×{multiplier.toFixed(2)}
           </div>
         )}
       </div>

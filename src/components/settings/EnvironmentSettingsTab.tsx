@@ -6,6 +6,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSettingsStore, calculateFermentationTimeCoefficient } from '@/stores/useSettingsStore'
 import { EnvironmentProfile } from '@/types/settings.types'
 import {
@@ -38,6 +39,7 @@ interface EnvironmentSettingsTabProps {
 }
 
 export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSettingsTabProps) {
+  const { t } = useTranslation()
   const {
     environment,
     setEnvironmentDefaults,
@@ -74,25 +76,27 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
 
     if (coefficient < 1) {
       // 온도가 높으면 빠르게
+      const percent = Math.round((1 - coefficient) * 100)
       return {
         direction: 'faster',
-        percent: Math.round((1 - coefficient) * 100),
-        message: `기준 대비 약 ${Math.round((1 - coefficient) * 100)}% 빠름`
+        percent,
+        message: t('settings.environment.fermentationFaster', { percent })
       }
     } else if (coefficient > 1) {
       // 온도가 낮으면 느리게
+      const percent = Math.round((coefficient - 1) * 100)
       return {
         direction: 'slower',
-        percent: Math.round((coefficient - 1) * 100),
-        message: `기준 대비 약 ${Math.round((coefficient - 1) * 100)}% 느림`
+        percent,
+        message: t('settings.environment.fermentationSlower', { percent })
       }
     }
     return {
       direction: 'normal',
       percent: 0,
-      message: '기준과 동일'
+      message: t('settings.environment.fermentationNormal')
     }
-  }, [currentEnvironment.temperature])
+  }, [currentEnvironment.temperature, t])
 
   // 고도 영향 메시지
   const altitudeImpact = useMemo(() => {
@@ -102,31 +106,42 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
     if (alt >= 2100) {
       return {
         level: 'high',
-        message: '고고도: 밀가루 +4%, 설탕 -4~8%, 이스트 -25%, 오븐 +8~15°C'
+        message: t('settings.environment.altitudeHigh')
       }
     } else if (alt >= 1500) {
       return {
         level: 'medium',
-        message: '중고도: 밀가루 +2~4%, 설탕 -2~4%, 이스트 -20%, 오븐 +5~8°C'
+        message: t('settings.environment.altitudeMedium')
       }
     } else {
       return {
         level: 'low',
-        message: '저고도: 밀가루 +1%, 설탕 -1~2%, 이스트 -8~15%, 오븐 +3~5°C'
+        message: t('settings.environment.altitudeLow')
       }
     }
-  }, [currentEnvironment.altitude])
+  }, [currentEnvironment.altitude, t])
 
   // 습도 영향 메시지
   const humidityImpact = useMemo(() => {
     const hum = currentEnvironment.humidity
     if (hum < 40) {
-      return { level: 'low', message: '건조함: 수분 손실 증가, 발효 중 덮개 필수' }
+      return { level: 'low', message: t('settings.environment.humidityLowWarning') }
     } else if (hum > 70) {
-      return { level: 'high', message: '습함: 굽기 시간 증가, 냉각 시 결로 주의' }
+      return { level: 'high', message: t('settings.environment.humidityHighWarning') }
     }
     return null
-  }, [currentEnvironment.humidity])
+  }, [currentEnvironment.humidity, t])
+
+  // 빌트인 프로필 ID 목록
+  const BUILTIN_PROFILE_IDS = ['spring', 'summer', 'winter']
+
+  // 프로필 표시 이름 가져오기 (빌트인은 번역, 사용자 프로필은 그대로)
+  const getProfileDisplayName = useCallback((profile: EnvironmentProfile) => {
+    if (BUILTIN_PROFILE_IDS.includes(profile.id)) {
+      return t(`settings.environment.profileNames.${profile.id}`)
+    }
+    return profile.name
+  }, [t])
 
   // 프로필 폼 리셋
   const resetProfileForm = useCallback(() => {
@@ -155,7 +170,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
   // 프로필 저장
   const handleSaveProfile = useCallback(() => {
     if (!profileForm.name.trim()) {
-      alert('프로필 이름을 입력해주세요.')
+      alert(t('settings.environment.profileNameRequired'))
       return
     }
 
@@ -175,7 +190,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
       })
     }
     resetProfileForm()
-  }, [profileForm, editingProfileId, updateEnvironmentProfile, addEnvironmentProfile, resetProfileForm])
+  }, [profileForm, editingProfileId, updateEnvironmentProfile, addEnvironmentProfile, resetProfileForm, t])
 
   // 기본값 온도/습도/고도 슬라이더 핸들러
   const handleDefaultChange = useCallback((
@@ -191,10 +206,10 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
       <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-100">
         <h3 className="text-sm font-semibold text-blue-800 mb-3 flex items-center gap-2">
           <Thermometer className="w-4 h-4" />
-          현재 적용 환경
+          {t('settings.environment.currentEnvironment')}
           {activeProfile && (
             <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">
-              {activeProfile.name}
+              {getProfileDisplayName(activeProfile)}
             </span>
           )}
         </h3>
@@ -205,21 +220,21 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             <div className="text-2xl font-bold text-gray-800">
               {currentEnvironment.temperature}°C
             </div>
-            <div className="text-xs text-gray-500">실내 온도</div>
+            <div className="text-xs text-gray-500">{t('settings.environment.temperature')}</div>
           </div>
           <div className="text-center p-3 bg-white/70 rounded-lg">
             <Droplets className="w-5 h-5 mx-auto text-blue-500 mb-1" />
             <div className="text-2xl font-bold text-gray-800">
               {currentEnvironment.humidity}%
             </div>
-            <div className="text-xs text-gray-500">습도</div>
+            <div className="text-xs text-gray-500">{t('settings.environment.humidity')}</div>
           </div>
           <div className="text-center p-3 bg-white/70 rounded-lg">
             <Mountain className="w-5 h-5 mx-auto text-green-600 mb-1" />
             <div className="text-2xl font-bold text-gray-800">
               {currentEnvironment.altitude}m
             </div>
-            <div className="text-xs text-gray-500">고도</div>
+            <div className="text-xs text-gray-500">{t('settings.environment.altitude')}</div>
           </div>
         </div>
 
@@ -227,7 +242,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
         <div className="mt-3 p-2 bg-white/50 rounded flex items-center gap-2">
           <Timer className="w-4 h-4 text-orange-500" />
           <span className="text-sm text-gray-700">
-            발효 시간: {' '}
+            {t('settings.environment.fermentationTime')}: {' '}
             <span className={`font-medium ${
               fermentationImpact.direction === 'faster' ? 'text-orange-600' :
               fermentationImpact.direction === 'slower' ? 'text-blue-600' :
@@ -259,9 +274,9 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
 
       {/* 기본 설정 */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800">기본 환경 설정</h3>
+        <h3 className="text-lg font-semibold text-gray-800">{t('settings.environment.defaultSettings')}</h3>
         <p className="text-sm text-gray-500">
-          프로필을 선택하지 않았을 때 적용되는 기본값입니다.
+          {t('settings.environment.defaultSettingsDesc')}
         </p>
 
         {/* 온도 슬라이더 */}
@@ -269,7 +284,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
               <Thermometer className="w-4 h-4 text-red-500" />
-              실내 온도
+              {t('settings.environment.temperature')}
             </label>
             <span className="text-lg font-mono font-bold text-gray-800">
               {environment.defaults.temperature}°C
@@ -285,9 +300,9 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             className="w-full h-2 bg-gradient-to-r from-blue-300 via-green-300 to-red-300 rounded-lg appearance-none cursor-pointer"
           />
           <div className="flex justify-between text-xs text-gray-400">
-            <span>15°C (겨울)</span>
-            <span>25°C (적정)</span>
-            <span>35°C (여름)</span>
+            <span>{t('settings.environment.tempWinter')}</span>
+            <span>{t('settings.environment.tempOptimal')}</span>
+            <span>{t('settings.environment.tempSummer')}</span>
           </div>
         </div>
 
@@ -296,7 +311,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
               <Droplets className="w-4 h-4 text-blue-500" />
-              습도
+              {t('settings.environment.humidity')}
             </label>
             <span className="text-lg font-mono font-bold text-gray-800">
               {environment.defaults.humidity}%
@@ -312,9 +327,9 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             className="w-full h-2 bg-gradient-to-r from-yellow-200 via-blue-300 to-blue-500 rounded-lg appearance-none cursor-pointer"
           />
           <div className="flex justify-between text-xs text-gray-400">
-            <span>30% (건조)</span>
-            <span>55~65% (적정)</span>
-            <span>80% (습함)</span>
+            <span>{t('settings.environment.humidityDry')}</span>
+            <span>{t('settings.environment.humidityOptimal')}</span>
+            <span>{t('settings.environment.humidityWet')}</span>
           </div>
         </div>
 
@@ -323,7 +338,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
               <Mountain className="w-4 h-4 text-green-600" />
-              고도 (해발)
+              {t('settings.environment.altitudeLabel')}
             </label>
             <span className="text-lg font-mono font-bold text-gray-800">
               {environment.defaults.altitude}m
@@ -339,8 +354,8 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             className="w-full"
           />
           <div className="flex justify-between text-xs text-gray-400">
-            <span>0m (해수면)</span>
-            <span>900m (저고도)</span>
+            <span>{t('settings.environment.seaLevel')}</span>
+            <span>{t('settings.environment.lowAltitude')}</span>
             <span>1500m</span>
             <span>3000m</span>
           </div>
@@ -351,9 +366,9 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">환경 프로필</h3>
+            <h3 className="text-lg font-semibold text-gray-800">{t('settings.environment.profiles')}</h3>
             <p className="text-sm text-gray-500">
-              계절이나 상황에 맞는 프로필을 빠르게 적용하세요.
+              {t('settings.environment.profilesDesc')}
             </p>
           </div>
           <button
@@ -364,7 +379,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             className="flex items-center gap-1 px-3 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            프로필 추가
+            {t('settings.environment.addProfile')}
           </button>
         </div>
 
@@ -373,7 +388,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
           <div className="p-4 border border-cyan-200 bg-cyan-50/50 rounded-lg space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-medium text-gray-800">
-                {editingProfileId ? '프로필 수정' : '새 프로필 추가'}
+                {editingProfileId ? t('settings.environment.editProfile') : t('settings.environment.newProfile')}
               </h4>
               <button onClick={resetProfileForm} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-4 h-4 text-gray-500" />
@@ -382,20 +397,20 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                프로필 이름
+                {t('settings.environment.profileName')}
               </label>
               <input
                 type="text"
                 value={profileForm.name}
                 onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="예: 우리집 겨울, 베이킹 스튜디오"
+                placeholder={t('settings.environment.profileNamePlaceholder')}
                 className="w-full px-3 py-2 text-sm border rounded-lg"
               />
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">온도 (°C)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('settings.environment.temperature')} (°C)</label>
                 <input
                   type="number"
                   value={profileForm.temperature}
@@ -406,7 +421,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">습도 (%)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('settings.environment.humidity')} (%)</label>
                 <input
                   type="number"
                   value={profileForm.humidity}
@@ -417,7 +432,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">고도 (m)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('settings.environment.altitude')} (m)</label>
                 <input
                   type="number"
                   value={profileForm.altitude}
@@ -436,13 +451,13 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                 className="flex items-center gap-1 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors"
               >
                 <Save className="w-4 h-4" />
-                {editingProfileId ? '저장' : '추가'}
+                {editingProfileId ? t('common.save') : t('settings.environment.addProfile')}
               </button>
               <button
                 onClick={resetProfileForm}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                취소
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -460,14 +475,14 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-gray-800">기본값</span>
+              <span className="font-medium text-gray-800">{t('settings.environment.default')}</span>
               {!environment.activeProfileId && (
                 <Check className="w-4 h-4 text-cyan-600" />
               )}
             </div>
             <div className="text-xs text-gray-500 space-y-0.5">
               <div>{environment.defaults.temperature}°C</div>
-              <div>{environment.defaults.humidity}% 습도</div>
+              <div>{environment.defaults.humidity}% {t('settings.environment.humidityUnit')}</div>
               <div>{environment.defaults.altitude}m</div>
             </div>
           </button>
@@ -499,7 +514,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                         profile.id === 'spring' ? 'text-green-500' :
                         'text-gray-500'
                       }`} />
-                      <span className="font-medium text-gray-800">{profile.name}</span>
+                      <span className="font-medium text-gray-800">{getProfileDisplayName(profile)}</span>
                     </div>
                     {isActive && (
                       <Check className="w-4 h-4 text-cyan-600" />
@@ -507,7 +522,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                   </div>
                   <div className="text-xs text-gray-500 space-y-0.5">
                     <div>{profile.temperature}°C</div>
-                    <div>{profile.humidity}% 습도</div>
+                    <div>{profile.humidity}% {t('settings.environment.humidityUnit')}</div>
                     <div>{profile.altitude}m</div>
                   </div>
                 </button>
@@ -527,7 +542,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
-                        if (confirm(`"${profile.name}" 프로필을 삭제하시겠습니까?`)) {
+                        if (confirm(t('settings.environment.deleteProfileConfirm', { name: getProfileDisplayName(profile) }))) {
                           deleteEnvironmentProfile(profile.id)
                         }
                       }}
@@ -547,14 +562,14 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
       <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg">
         <h4 className="font-medium text-amber-800 mb-2 flex items-center gap-2">
           <Mountain className="w-4 h-4" />
-          고도 조정 가이드
+          {t('settings.environment.altitudeGuide')}
         </h4>
         <div className="text-sm text-amber-700 space-y-2">
           <div className="grid grid-cols-4 gap-2 text-xs">
-            <div className="font-medium">고도</div>
-            <div className="font-medium">밀가루</div>
-            <div className="font-medium">설탕</div>
-            <div className="font-medium">이스트</div>
+            <div className="font-medium">{t('settings.environment.altitude')}</div>
+            <div className="font-medium">{t('settings.environment.flour')}</div>
+            <div className="font-medium">{t('settings.environment.sugar')}</div>
+            <div className="font-medium">{t('settings.environment.yeast')}</div>
           </div>
           <div className="grid grid-cols-4 gap-2 text-xs">
             <div>900~1500m</div>

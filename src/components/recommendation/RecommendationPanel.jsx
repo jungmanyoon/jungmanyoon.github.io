@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Sparkles, ThumbsUp, Clock, DollarSign, Heart, Star, TrendingUp } from 'lucide-react'
 import RecommendationEngine from '../../utils/ai/recommendationEngine.js'
+import { useLocalization } from '@/hooks/useLocalization'
 
-const RecommendationPanel = ({ 
-  recipes = [], 
-  currentRecipe = null, 
+const RecommendationPanel = ({
+  recipes = [],
+  currentRecipe = null,
   onRecipeSelect,
-  className = '' 
+  className = ''
 }) => {
+  const { getLocalizedRecipeName } = useLocalization()
   const [recommendationEngine] = useState(() => new RecommendationEngine())
   const [selectedType, setSelectedType] = useState('general')
   const [recommendations, setRecommendations] = useState([])
@@ -187,7 +189,7 @@ const RecommendationPanel = ({
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-gray-900 truncate group-hover:text-purple-700 transition-colors">
-                        {recipe.name || recipe.nameKo}
+                        {getLocalizedRecipeName(recipe)}
                       </h4>
                       
                       {/* 추천 이유 */}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
 import PanSelector from './PanSelector.jsx'
 import IngredientComparisonTable from './IngredientComparisonTable'
@@ -25,6 +26,7 @@ export function PanConversionPanel({
   onConvert,
   onReset
 }: PanConversionPanelProps) {
+  const { t } = useTranslation()
   const [targetPan, setTargetPan] = useState<PanConfig | null>(null)
   const [convertedRecipe, setConvertedRecipe] = useState<ConvertedRecipe | null>(null)
   const [conversionLog, setConversionLog] = useState<string>('')
@@ -46,7 +48,11 @@ export function PanConversionPanel({
     const targetVolume = PanScaling.calculatePanVolume(targetPan)
     const scalingFactor = targetVolume / currentVolume
 
-    const logMessage = `현재부피: ${currentVolume.toFixed(0)}cm³ → 목표부피: ${targetVolume.toFixed(0)}cm³, 배율: ${(scalingFactor * 100).toFixed(0)}%`
+    const logMessage = t('components.panConversionPanel.conversionLog', {
+      current: currentVolume.toFixed(0),
+      target: targetVolume.toFixed(0),
+      scale: (scalingFactor * 100).toFixed(0)
+    })
     setConversionLog(logMessage)
 
     const scaledIngredients = BakersPercentage.scaleRecipe(
@@ -78,16 +84,16 @@ export function PanConversionPanel({
 
       <div className="mt-3 flex gap-2">
         <Button size="small" onClick={handleConversion}>
-          변환 계산
+          {t('components.panConversionPanel.convert')}
         </Button>
         <Button size="small" variant="secondary" onClick={handleResetClick}>
-          초기화
+          {t('components.panConversionPanel.reset')}
         </Button>
       </div>
 
       {conversionLog && (
         <div className="mt-3 p-2 bg-blue-50 rounded">
-          <p className="text-xs font-medium text-blue-700">팬 변환 정보</p>
+          <p className="text-xs font-medium text-blue-700">{t('components.panConversionPanel.panInfo')}</p>
           <p className="text-xs text-blue-600 mt-1">{conversionLog}</p>
         </div>
       )}
@@ -95,7 +101,7 @@ export function PanConversionPanel({
       {convertedRecipe && (
         <div className="mt-4 p-4 bg-bread-50 rounded-lg">
           <h4 className="font-medium text-bread-700 mb-3">
-            변환 결과 ({convertedRecipe.scalingFactor && `${(convertedRecipe.scalingFactor * 100).toFixed(0)}%`})
+            {t('components.panConversionPanel.resultWithScale', { scale: convertedRecipe.scalingFactor ? (convertedRecipe.scalingFactor * 100).toFixed(0) : '' })}
           </h4>
 
           <IngredientComparisonTable
@@ -106,19 +112,19 @@ export function PanConversionPanel({
 
           {convertedRecipe.pan && (
             <div className="mt-3 p-2 bg-gray-50 rounded">
-              <p className="text-xs font-medium text-gray-700">선택된 팬:</p>
+              <p className="text-xs font-medium text-gray-700">{t('components.panConversionPanel.selectedPan')}</p>
               <p className="text-xs text-gray-600 mt-1">
-                타입: {convertedRecipe.pan.type}
+                {t('components.panConversionPanel.type')} {convertedRecipe.pan.type}
               </p>
               {convertedRecipe.pan.dimensions.diameter && (
                 <p className="text-xs text-gray-600">
-                  지름: {convertedRecipe.pan.dimensions.diameter}cm,
-                  높이: {convertedRecipe.pan.dimensions.height}cm
+                  {t('components.panConversionPanel.diameter')} {convertedRecipe.pan.dimensions.diameter}cm,
+                  {t('components.panConversionPanel.height')} {convertedRecipe.pan.dimensions.height}cm
                 </p>
               )}
               {convertedRecipe.pan.dimensions.length && (
                 <p className="text-xs text-gray-600">
-                  크기: {convertedRecipe.pan.dimensions.length}cm × {convertedRecipe.pan.dimensions.width}cm × {convertedRecipe.pan.dimensions.height}cm
+                  {t('components.panConversionPanel.size')} {convertedRecipe.pan.dimensions.length}cm × {convertedRecipe.pan.dimensions.width}cm × {convertedRecipe.pan.dimensions.height}cm
                 </p>
               )}
             </div>

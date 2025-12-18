@@ -56,7 +56,10 @@
       "Bash(git push:*)",
       "Skill(docx)",
       "Bash(powershell -Command \"(Get-Item ''d:\\VisualStudio\\10.레시피\\250708_claude_code\\src\\components\\settings\\IngredientSettingsTab.tsx'').LastWriteTime = Get-Date\")",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(grep:*)",
+      "Bash(done)",
+      "Bash(wc:*)"
     ],
     "deny": []
   }

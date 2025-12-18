@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, memo } from 'react'
+import { useTranslation } from 'react-i18next'
 import Button from '../common/Button'
 import RecipeCard from './RecipeCard'
 import { Recipe } from '@types/recipe.types'
@@ -42,15 +43,21 @@ CategoryTab.displayName = 'CategoryTab'
 
 // RecipeList 컴포넌트 최적화
 const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit, onNew, onRestore }) => {
+  const { t } = useTranslation()
   const [selectedCategory, setSelectedCategory] = useState('all')
-  
+
+  // 카테고리 이름 가져오기
+  const getCategoryName = useCallback((key: string) => {
+    return t(`components.recipeList.categories.${key}`)
+  }, [t])
+
   // 카테고리별로 레시피 그룹화 및 정렬 - useMemo로 최적화
   const categorizedRecipes = useMemo<Record<string, CategoryData>>(() => {
     const categories: Record<string, CategoryData> = {
-      bread: { name: '빵', recipes: [] },
-      cake: { name: '케이크', recipes: [] },
-      cookie: { name: '쿠키', recipes: [] },
-      pastry: { name: '페이스트리', recipes: [] }
+      bread: { name: getCategoryName('bread'), recipes: [] },
+      cake: { name: getCategoryName('cake'), recipes: [] },
+      cookie: { name: getCategoryName('cookie'), recipes: [] },
+      pastry: { name: getCategoryName('pastry'), recipes: [] }
     }
     
     // 카테고리별로 분류
@@ -118,13 +125,13 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
   return (
     <div className="max-w-7xl mx-auto px-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-bread-700">내 레시피</h2>
+        <h2 className="text-xl font-bold text-bread-700">{t('components.recipeList.myRecipes')}</h2>
         <Button
           onClick={handleNewRecipe}
           className="flex items-center gap-2 px-4 py-2"
         >
           <Plus className="w-4 h-4" />
-          새 레시피
+          {t('components.recipeList.newRecipe')}
         </Button>
       </div>
 
@@ -132,7 +139,7 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
       <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
         <CategoryTab
           categoryKey="all"
-          categoryName="전체"
+          categoryName={t('components.recipeList.allCategory')}
           count={categoryCounts.all}
           isSelected={selectedCategory === 'all'}
           onClick={() => handleCategorySelect('all')}
@@ -152,9 +159,9 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
       {displayRecipes.length === 0 ? (
         <div className="text-center py-8 bg-bread-50 rounded-lg">
           <p className="text-gray-600 mb-3 text-sm">
-            {selectedCategory === 'all' 
-              ? '아직 저장된 레시피가 없습니다.'
-              : `${categorizedRecipes[selectedCategory]?.name} 레시피가 없습니다.`}
+            {selectedCategory === 'all'
+              ? t('components.recipeList.noRecipes')
+              : t('components.recipeList.noCategoryRecipes', { category: categorizedRecipes[selectedCategory]?.name })}
           </p>
           <Button
             onClick={handleNewRecipe}
@@ -162,8 +169,8 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
           >
             <Plus className="w-4 h-4" />
             {selectedCategory === 'all'
-              ? '첫 레시피 만들기'
-              : `${categorizedRecipes[selectedCategory]?.name} 레시피 만들기`}
+              ? t('components.recipeList.createFirstRecipe')
+              : t('components.recipeList.createCategoryRecipe', { category: categorizedRecipes[selectedCategory]?.name })}
           </Button>
         </div>
       ) : (

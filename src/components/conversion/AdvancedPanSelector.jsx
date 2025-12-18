@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
 import { COMMON_PANS, PAN_CONVERSION_GUIDE } from '../../constants/pans.js'
 import PanScaling from '../../utils/calculations/panScaling.js'
 import MagicNumbers from '../../utils/calculations/magicNumbers.js'
+import { useLocalization } from '@/hooks/useLocalization'
 
 function AdvancedPanSelector({ recipe, onPanSelect }) {
+  const { t } = useTranslation()
+  const { getLocalizedPanName } = useLocalization()
   const [selectedPans, setSelectedPans] = useState([])
   const [productType, setProductType] = useState('white_bread')
   const [panMaterial, setPanMaterial] = useState('aluminum')
@@ -57,7 +61,7 @@ function AdvancedPanSelector({ recipe, onPanSelect }) {
         fillPercentage: (actualDoughAmount / totalDoughWeight * 100).toFixed(0),
         adjustedTime,
         adjustedTemp,
-        rating: suitability <= 0.1 ? '최적' : suitability <= 0.2 ? '적합' : '가능'
+        rating: suitability <= 0.1 ? 'optimal' : suitability <= 0.2 ? 'suitable' : 'possible'
       }
     })
     .filter(pan => pan.suitability <= 0.5)
@@ -107,69 +111,69 @@ function AdvancedPanSelector({ recipe, onPanSelect }) {
 
   return (
     <div>
-      <h3 className="mb-4">고급 팬 선택기</h3>
-      
+      <h3 className="mb-4">{t('components.advancedPanSelector.title')}</h3>
+
       {/* 제품 정보 설정 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            제품 종류
+            {t('components.advancedPanSelector.productType')}
           </label>
           <select
             value={productType}
             onChange={(e) => setProductType(e.target.value)}
             className="w-full px-3 py-2 border border-bread-300 rounded-md"
           >
-            <optgroup label="빵류">
-              <option value="white_bread">일반 식빵</option>
-              <option value="whole_wheat">통밀빵</option>
-              <option value="brioche">브리오슈</option>
-              <option value="milk_bread">우유식빵</option>
-              <option value="sourdough">사워도우</option>
+            <optgroup label={t('components.advancedPanSelector.productGroups.bread')}>
+              <option value="white_bread">{t('components.advancedPanSelector.products.white_bread')}</option>
+              <option value="whole_wheat">{t('components.advancedPanSelector.products.whole_wheat')}</option>
+              <option value="brioche">{t('components.advancedPanSelector.products.brioche')}</option>
+              <option value="milk_bread">{t('components.advancedPanSelector.products.milk_bread')}</option>
+              <option value="sourdough">{t('components.advancedPanSelector.products.sourdough')}</option>
             </optgroup>
-            <optgroup label="케이크류">
-              <option value="sponge_cake">스펀지 케이크</option>
-              <option value="butter_cake">버터 케이크</option>
-              <option value="pound_cake">파운드 케이크</option>
-              <option value="chiffon_cake">쉬폰 케이크</option>
-              <option value="chocolate_cake">초콜릿 케이크</option>
+            <optgroup label={t('components.advancedPanSelector.productGroups.cake')}>
+              <option value="sponge_cake">{t('components.advancedPanSelector.products.sponge_cake')}</option>
+              <option value="butter_cake">{t('components.advancedPanSelector.products.butter_cake')}</option>
+              <option value="pound_cake">{t('components.advancedPanSelector.products.pound_cake')}</option>
+              <option value="chiffon_cake">{t('components.advancedPanSelector.products.chiffon_cake')}</option>
+              <option value="chocolate_cake">{t('components.advancedPanSelector.products.chocolate_cake')}</option>
             </optgroup>
-            <optgroup label="기타">
-              <option value="muffin">머핀</option>
-              <option value="cupcake">컵케이크</option>
-              <option value="banana_bread">바나나 브레드</option>
+            <optgroup label={t('components.advancedPanSelector.productGroups.other')}>
+              <option value="muffin">{t('components.advancedPanSelector.products.muffin')}</option>
+              <option value="cupcake">{t('components.advancedPanSelector.products.cupcake')}</option>
+              <option value="banana_bread">{t('components.advancedPanSelector.products.banana_bread')}</option>
             </optgroup>
           </select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            팬 재질
+            {t('components.advancedPanSelector.panMaterial')}
           </label>
           <select
             value={panMaterial}
             onChange={(e) => setPanMaterial(e.target.value)}
             className="w-full px-3 py-2 border border-bread-300 rounded-md"
           >
-            <option value="aluminum">알루미늄</option>
-            <option value="dark_metal">어두운 금속</option>
-            <option value="glass">유리</option>
-            <option value="ceramic">세라믹</option>
-            <option value="silicone">실리콘</option>
-            <option value="carbon_steel">탄소강</option>
+            <option value="aluminum">{t('components.advancedPanSelector.materials.aluminum')}</option>
+            <option value="dark_metal">{t('components.advancedPanSelector.materials.dark_metal')}</option>
+            <option value="glass">{t('components.advancedPanSelector.materials.glass')}</option>
+            <option value="ceramic">{t('components.advancedPanSelector.materials.ceramic')}</option>
+            <option value="silicone">{t('components.advancedPanSelector.materials.silicone')}</option>
+            <option value="carbon_steel">{t('components.advancedPanSelector.materials.carbon_steel')}</option>
           </select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            고도 (m)
+            {t('components.advancedPanSelector.altitude')}
           </label>
           <input
             type="number"
             value={altitude}
             onChange={(e) => setAltitude(parseInt(e.target.value) || 0)}
             className="w-full px-3 py-2 border border-bread-300 rounded-md"
-            placeholder="해수면: 0"
+            placeholder={t('components.advancedPanSelector.altitudePlaceholder')}
           />
         </div>
       </div>
@@ -177,20 +181,20 @@ function AdvancedPanSelector({ recipe, onPanSelect }) {
       {/* 매직넘버 정보 */}
       <div className="bg-bread-50 p-4 rounded-lg mb-6">
         <div className="flex justify-between items-center mb-2">
-          <h4 className="font-medium text-bread-700">매직넘버 정보</h4>
-          <Button 
-            size="small" 
+          <h4 className="font-medium text-bread-700">{t('components.advancedPanSelector.magicNumber.title')}</h4>
+          <Button
+            size="small"
             variant="secondary"
-            onClick={() => setCustomMagicNumber(customMagicNumber ? null : 
+            onClick={() => setCustomMagicNumber(customMagicNumber ? null :
               MagicNumbers.DEFAULT_MAGIC_NUMBERS[productType])}
           >
-            {customMagicNumber ? '기본값 사용' : '커스텀 설정'}
+            {customMagicNumber ? t('components.advancedPanSelector.magicNumber.useDefault') : t('components.advancedPanSelector.magicNumber.customSetting')}
           </Button>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-sm text-gray-600">현재 매직넘버:</p>
+            <p className="text-sm text-gray-600">{t('components.advancedPanSelector.magicNumber.currentValue')}</p>
             {customMagicNumber ? (
               <input
                 type="number"
@@ -206,16 +210,16 @@ function AdvancedPanSelector({ recipe, onPanSelect }) {
             )}
           </div>
           <div>
-            <p className="text-sm text-gray-600">조정 요인:</p>
+            <p className="text-sm text-gray-600">{t('components.advancedPanSelector.magicNumber.adjustFactors')}</p>
             <p className="text-sm">
-              재질: ×{MagicNumbers.MATERIAL_ADJUSTMENTS[panMaterial]}<br/>
-              고도: ×{MagicNumbers.getAltitudeAdjustment(altitude).toFixed(2)}
+              {t('components.advancedPanSelector.magicNumber.material')}: ×{MagicNumbers.MATERIAL_ADJUSTMENTS[panMaterial]}<br/>
+              {t('components.advancedPanSelector.magicNumber.altitude')}: ×{MagicNumbers.getAltitudeAdjustment(altitude).toFixed(2)}
             </p>
           </div>
         </div>
-        
+
         <p className="text-xs text-gray-500 mt-2">
-          팬 부피(cm³) ÷ 매직넘버 = 권장 반죽량(g)
+          {t('components.advancedPanSelector.magicNumber.formula')}
         </p>
       </div>
 
@@ -228,34 +232,34 @@ function AdvancedPanSelector({ recipe, onPanSelect }) {
             onChange={(e) => setMultiplePans(e.target.checked)}
             className="mr-2"
           />
-          <span className="text-sm font-medium">여러 개의 팬 사용</span>
+          <span className="text-sm font-medium">{t('components.advancedPanSelector.multiplePans')}</span>
         </label>
       </div>
 
       {/* 팬 추천 */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
-          <h4 className="font-medium text-bread-700">팬 추천</h4>
+          <h4 className="font-medium text-bread-700">{t('components.advancedPanSelector.panRecommendations.title')}</h4>
           <Button
             size="small"
             variant="secondary"
             onClick={() => setShowRecommendations(!showRecommendations)}
           >
-            {showRecommendations ? '추천 숨기기' : '추천 보기'}
+            {showRecommendations ? t('components.advancedPanSelector.panRecommendations.hideRec') : t('components.advancedPanSelector.panRecommendations.showRec')}
           </Button>
         </div>
 
         {showRecommendations && (
           <div className="space-y-3">
             <p className="text-sm text-gray-600">
-              현재 반죽량: {totalDoughWeight.toFixed(0)}g
+              {t('components.advancedPanSelector.panRecommendations.currentDough')}: {totalDoughWeight.toFixed(0)}g
             </p>
-            
+
             {recommendations.map(pan => (
               <div
                 key={pan.id}
-                onClick={() => multiplePans ? 
-                  handleMultiplePanSelect(pan.id) : 
+                onClick={() => multiplePans ?
+                  handleMultiplePanSelect(pan.id) :
                   onPanSelect(pan)}
                 className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                   selectedPans.find(p => p.id === pan.id)
@@ -265,24 +269,24 @@ function AdvancedPanSelector({ recipe, onPanSelect }) {
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h5 className="font-medium">{pan.name}</h5>
+                    <h5 className="font-medium">{getLocalizedPanName(pan)}</h5>
                     <p className="text-sm text-gray-600">
-                      부피: {pan.volume}cm³ • 권장 반죽량: {pan.actualDoughAmount}g
+                      {t('components.advancedPanSelector.panRecommendations.volume')}: {pan.volume}cm³ • {t('components.advancedPanSelector.panRecommendations.recommendedDough')}: {pan.actualDoughAmount}g
                     </p>
                     <p className="text-sm text-gray-500">
-                      충전율: {pan.fillPercentage}% • {pan.rating}
+                      {t('components.advancedPanSelector.panRecommendations.fillRate')}: {pan.fillPercentage}% • {t(`components.advancedPanSelector.panRecommendations.${pan.rating}`)}
                     </p>
                   </div>
                   <div className="text-right text-sm">
                     <p className="font-medium text-bread-600">
-                      {pan.adjustedTemp}°C / {pan.adjustedTime}분
+                      {pan.adjustedTemp}°C / {pan.adjustedTime}{t('units.minute')}
                     </p>
                   </div>
                 </div>
-                
+
                 {multiplePans && selectedPans.find(p => p.id === pan.id) && (
                   <div className="mt-2 flex items-center gap-2">
-                    <label className="text-sm">개수:</label>
+                    <label className="text-sm">{t('components.advancedPanSelector.panRecommendations.count')}:</label>
                     <input
                       type="number"
                       min="1"
@@ -302,22 +306,22 @@ function AdvancedPanSelector({ recipe, onPanSelect }) {
       {/* 다중 팬 분배 결과 */}
       {multiplePans && distribution.length > 0 && (
         <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-medium mb-3">반죽 분배 계획</h4>
+          <h4 className="font-medium mb-3">{t('components.advancedPanSelector.distribution.title')}</h4>
           <div className="space-y-2">
             {distribution.map((pan, idx) => (
               <div key={idx} className="flex justify-between items-center">
                 <span className="text-sm">
-                  {pan.name} × {pan.count}개
+                  {getLocalizedPanName(pan)} × {pan.count}
                 </span>
                 <span className="text-sm font-medium">
-                  팬당 {pan.perPan}g (총 {pan.actualAmount}g)
+                  {t('components.advancedPanSelector.distribution.perPan')} {pan.perPan}g ({t('components.advancedPanSelector.distribution.total')} {pan.actualAmount}g)
                 </span>
               </div>
             ))}
           </div>
           <div className="mt-3 pt-3 border-t">
             <div className="flex justify-between items-center font-medium">
-              <span>총 반죽량:</span>
+              <span>{t('components.advancedPanSelector.distribution.totalDough')}:</span>
               <span>{totalDoughWeight.toFixed(0)}g</span>
             </div>
           </div>
@@ -326,11 +330,11 @@ function AdvancedPanSelector({ recipe, onPanSelect }) {
 
       {/* 대체 가능한 팬 정보 */}
       <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-        <h5 className="font-medium text-blue-800 mb-2">팬 대체 가이드</h5>
+        <h5 className="font-medium text-blue-800 mb-2">{t('components.advancedPanSelector.substitutionGuide.title')}</h5>
         <div className="text-sm text-blue-700 space-y-1">
-          <p>• 8인치 원형 = 8인치 정사각 = 1근 식빵틀</p>
-          <p>• 9인치 원형 = 9인치 정사각</p>
-          <p>• 9×13인치 직사각 = 10인치 원형 = 1/2 시트팬</p>
+          <p>• {t('components.advancedPanSelector.substitutionGuide.line1')}</p>
+          <p>• {t('components.advancedPanSelector.substitutionGuide.line2')}</p>
+          <p>• {t('components.advancedPanSelector.substitutionGuide.line3')}</p>
         </div>
       </div>
     </div>

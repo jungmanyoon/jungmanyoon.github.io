@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Filter, X, ChevronDown } from 'lucide-react'
 import { RecipeFilters, RecipeSortOption } from '@types/store.types'
 import { DifficultyLevel } from '@types/recipe.types'
@@ -22,26 +23,28 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   availableTags = [],
   className = ''
 }) => {
-  const difficultyOptions: { value: DifficultyLevel; label: string }[] = [
-    { value: 'beginner', label: '초급' },
-    { value: 'intermediate', label: '중급' },
-    { value: 'advanced', label: '고급' },
-    { value: 'professional', label: '전문가' }
+  const { t } = useTranslation()
+
+  const difficultyOptions: { value: DifficultyLevel; labelKey: string }[] = [
+    { value: 'beginner', labelKey: 'filter.beginner' },
+    { value: 'intermediate', labelKey: 'filter.intermediate' },
+    { value: 'advanced', labelKey: 'filter.advanced' },
+    { value: 'professional', labelKey: 'filter.expert' }
   ]
 
   const timeRangeOptions = [
-    { value: { min: 0, max: 30 }, label: '30분 이하' },
-    { value: { min: 30, max: 60 }, label: '30-60분' },
-    { value: { min: 60, max: 120 }, label: '1-2시간' },
-    { value: { min: 120, max: 9999 }, label: '2시간 이상' }
+    { value: { min: 0, max: 30 }, labelKey: 'filter.under30min' },
+    { value: { min: 30, max: 60 }, labelKey: 'filter.30to60min' },
+    { value: { min: 60, max: 120 }, labelKey: 'filter.1to2hours' },
+    { value: { min: 120, max: 9999 }, labelKey: 'filter.over2hours' }
   ]
 
-  const sortOptions: { value: RecipeSortOption; label: string }[] = [
-    { value: 'name', label: '이름' },
-    { value: 'createdAt', label: '생성일' },
-    { value: 'updatedAt', label: '수정일' },
-    { value: 'difficulty', label: '난이도' },
-    { value: 'totalTime', label: '총 시간' }
+  const sortOptions: { value: RecipeSortOption; labelKey: string }[] = [
+    { value: 'name', labelKey: 'filter.sortName' },
+    { value: 'createdAt', labelKey: 'filter.sortCreated' },
+    { value: 'updatedAt', labelKey: 'filter.sortModified' },
+    { value: 'difficulty', labelKey: 'filter.sortDifficulty' },
+    { value: 'totalTime', labelKey: 'filter.sortTime' }
   ]
 
   const activeFilterCount = useMemo(() => {
@@ -80,7 +83,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
         {/* Filter Icon and Title */}
         <div className="flex items-center gap-2 text-bread-700 font-medium">
           <Filter className="w-5 h-5" />
-          <span>필터</span>
+          <span>{t('filter.title')}</span>
           {activeFilterCount > 0 && (
             <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-bread-600 rounded-full">
               {activeFilterCount}
@@ -101,7 +104,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 flex items-center gap-2
               "
             >
-              난이도
+              {t('filter.difficulty')}
               <ChevronDown className="w-4 h-4" />
             </button>
             <div className="
@@ -113,7 +116,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               z-10
             ">
               <div className="p-2 space-y-1">
-                {difficultyOptions.map(({ value, label }) => (
+                {difficultyOptions.map(({ value, labelKey }) => (
                   <label
                     key={value}
                     className="
@@ -128,7 +131,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                       onChange={() => handleDifficultyChange(value)}
                       className="w-4 h-4 text-bread-600 border-bread-300 rounded focus:ring-bread-500"
                     />
-                    <span className="text-sm text-bread-700">{label}</span>
+                    <span className="text-sm text-bread-700">{t(labelKey)}</span>
                   </label>
                 ))}
               </div>
@@ -147,7 +150,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 flex items-center gap-2
               "
             >
-              시간
+              {t('filter.time')}
               <ChevronDown className="w-4 h-4" />
             </button>
             <div className="
@@ -169,11 +172,11 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                     ${!filters.timeRange ? 'bg-bread-100 font-medium' : ''}
                   `}
                 >
-                  전체
+                  {t('common.all')}
                 </button>
-                {timeRangeOptions.map(({ value, label }) => (
+                {timeRangeOptions.map(({ value, labelKey }) => (
                   <button
-                    key={label}
+                    key={labelKey}
                     onClick={() => handleTimeRangeChange(value)}
                     className={`
                       w-full text-left px-3 py-2
@@ -188,7 +191,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                       }
                     `}
                   >
-                    {label}
+                    {t(labelKey)}
                   </button>
                 ))}
               </div>
@@ -208,7 +211,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                   flex items-center gap-2
                 "
               >
-                태그
+                {t('filter.tags')}
                 <ChevronDown className="w-4 h-4" />
               </button>
               <div className="
@@ -247,7 +250,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           {/* Sort Control */}
           <div className="ml-auto flex items-center gap-2">
             <label htmlFor="sort-select" className="text-sm text-bread-600">
-              정렬:
+              {t('filter.sortBy')}:
             </label>
             <select
               id="sort-select"
@@ -263,9 +266,9 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 cursor-pointer
               "
             >
-              {sortOptions.map(({ value, label }) => (
+              {sortOptions.map(({ value, labelKey }) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(labelKey)}
                 </option>
               ))}
             </select>
@@ -285,7 +288,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               "
             >
               <X className="w-4 h-4" />
-              필터 초기화
+              {t('filter.resetFilter')}
             </button>
           )}
         </div>
@@ -297,27 +300,33 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           <div className="flex flex-wrap gap-2">
             {filters.difficulty && filters.difficulty.length > 0 && (
               <div className="inline-flex items-center gap-1 px-2 py-1 bg-bread-100 text-bread-700 text-xs rounded">
-                <span className="font-medium">난이도:</span>
+                <span className="font-medium">{t('filter.difficulty')}:</span>
                 <span>
                   {filters.difficulty
-                    .map(d => difficultyOptions.find(opt => opt.value === d)?.label)
+                    .map(d => {
+                      const opt = difficultyOptions.find(opt => opt.value === d)
+                      return opt ? t(opt.labelKey) : d
+                    })
                     .join(', ')}
                 </span>
               </div>
             )}
             {filters.timeRange && (
               <div className="inline-flex items-center gap-1 px-2 py-1 bg-bread-100 text-bread-700 text-xs rounded">
-                <span className="font-medium">시간:</span>
+                <span className="font-medium">{t('filter.time')}:</span>
                 <span>
-                  {timeRangeOptions.find(
-                    opt => opt.value.min === filters.timeRange!.min && opt.value.max === filters.timeRange!.max
-                  )?.label}
+                  {(() => {
+                    const opt = timeRangeOptions.find(
+                      opt => opt.value.min === filters.timeRange!.min && opt.value.max === filters.timeRange!.max
+                    )
+                    return opt ? t(opt.labelKey) : ''
+                  })()}
                 </span>
               </div>
             )}
             {filters.tags && filters.tags.length > 0 && (
               <div className="inline-flex items-center gap-1 px-2 py-1 bg-bread-100 text-bread-700 text-xs rounded">
-                <span className="font-medium">태그:</span>
+                <span className="font-medium">{t('filter.tags')}:</span>
                 <span>{filters.tags.join(', ')}</span>
               </div>
             )}

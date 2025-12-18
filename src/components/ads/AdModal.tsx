@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface AdModalProps {
   isOpen: boolean
@@ -18,6 +19,7 @@ export default function AdModal({
   onComplete,
   countdownSeconds = 5
 }: AdModalProps) {
+  const { t } = useTranslation()
   const [countdown, setCountdown] = useState(countdownSeconds)
   const [canClose, setCanClose] = useState(false)
 
@@ -79,11 +81,11 @@ export default function AdModal({
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="text-white font-medium">무료 서비스 후원</span>
+              <span className="text-white font-medium">{t('adModal.title')}</span>
             </div>
             {!canClose && (
               <span className="bg-white/20 text-white text-sm px-3 py-1 rounded-full">
-                {countdown}초
+                {countdown}{t('adModal.seconds')}
               </span>
             )}
           </div>
@@ -92,7 +94,7 @@ export default function AdModal({
         {/* 광고 영역 */}
         <div className="p-6">
           <p className="text-center text-gray-600 text-sm mb-4">
-            레시피북을 무료로 유지하기 위해 광고를 시청해 주세요
+            {t('adModal.message')}
           </p>
 
           {/* AdSense 광고 슬롯 */}
@@ -109,7 +111,7 @@ export default function AdModal({
 
           {/* 안내 메시지 */}
           <p className="text-center text-gray-400 text-xs mt-4">
-            10개 이후의 레시피는 광고 시청 후 생성할 수 있습니다
+            {t('adModal.info')}
           </p>
         </div>
 
@@ -124,7 +126,7 @@ export default function AdModal({
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
           >
-            {canClose ? '계속하기' : `${countdown}초 후 계속할 수 있습니다`}
+            {canClose ? t('adModal.continue') : t('adModal.waitMessage', { seconds: countdown })}
           </button>
         </div>
       </div>

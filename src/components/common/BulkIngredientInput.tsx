@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X, Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react'
 import { findIngredientInfo } from '@/data/ingredientDatabase'
 
@@ -131,6 +132,7 @@ export default function BulkIngredientInput({
   onClose,
   onImport
 }: BulkIngredientInputProps) {
+  const { t } = useTranslation()
   const [inputText, setInputText] = useState('')
   const [parsedIngredients, setParsedIngredients] = useState<ParsedIngredient[]>([])
   const [isParsed, setIsParsed] = useState(false)
@@ -195,7 +197,7 @@ export default function BulkIngredientInput({
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <h3 className="font-semibold text-lg flex items-center gap-2">
             <FileText className="w-5 h-5 text-amber-600" />
-            배합표 일괄 입력
+            {t('components.bulkInput.title')}
           </h3>
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
             <X className="w-5 h-5" />
@@ -206,24 +208,24 @@ export default function BulkIngredientInput({
         <div className="flex-1 overflow-auto p-4 space-y-4">
           {/* 입력 안내 */}
           <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-            <p className="font-medium mb-1">지원 형식:</p>
+            <p className="font-medium mb-1">{t('components.bulkInput.supportedFormats')}</p>
             <ul className="text-xs space-y-0.5 text-gray-500">
-              <li>• 강력분 500g</li>
-              <li>• 강력분, 500</li>
-              <li>• 강력분{'\t'}500 (탭 구분)</li>
+              <li>• {t('components.bulkInput.formatExample1')}</li>
+              <li>• {t('components.bulkInput.formatExample2')}</li>
+              <li>• {t('components.bulkInput.formatExample3')}</li>
             </ul>
           </div>
 
           {/* 텍스트 입력 영역 */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700">재료 목록</label>
+              <label className="text-sm font-medium text-gray-700">{t('components.bulkInput.ingredientList')}</label>
               <button
                 onClick={handlePaste}
                 className="text-xs flex items-center gap-1 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded"
               >
                 <Upload className="w-3 h-3" />
-                클립보드에서 붙여넣기
+                {t('common.pasteFromClipboard')}
               </button>
             </div>
             <textarea
@@ -232,11 +234,7 @@ export default function BulkIngredientInput({
                 setInputText(e.target.value)
                 setIsParsed(false)
               }}
-              placeholder="강력분 500g
-물 350g
-설탕 50g
-소금 10g
-이스트 5g"
+              placeholder={t('components.bulkInput.placeholder')}
               className="w-full h-40 p-3 border rounded-lg text-sm font-mono resize-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
             />
           </div>
@@ -245,18 +243,18 @@ export default function BulkIngredientInput({
           {isParsed && parsedIngredients.length > 0 && (
             <div className="border rounded-lg overflow-hidden">
               <div className="bg-gray-50 px-3 py-2 border-b flex items-center justify-between">
-                <span className="text-sm font-medium">파싱 결과</span>
+                <span className="text-sm font-medium">{t('components.bulkInput.parseResult')}</span>
                 <div className="flex gap-2 text-xs">
                   {validCount > 0 && (
                     <span className="text-green-600 flex items-center gap-1">
                       <CheckCircle className="w-3 h-3" />
-                      {validCount}개 성공
+                      {t('components.bulkInput.successCount', { count: validCount })}
                     </span>
                   )}
                   {invalidCount > 0 && (
                     <span className="text-red-500 flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" />
-                      {invalidCount}개 실패
+                      {t('components.bulkInput.failCount', { count: invalidCount })}
                     </span>
                   )}
                 </div>
@@ -265,10 +263,10 @@ export default function BulkIngredientInput({
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 sticky top-0">
                     <tr>
-                      <th className="text-left px-3 py-1.5 font-medium">상태</th>
-                      <th className="text-left px-3 py-1.5 font-medium">재료명</th>
-                      <th className="text-right px-3 py-1.5 font-medium">양(g)</th>
-                      <th className="text-left px-3 py-1.5 font-medium">비고</th>
+                      <th className="text-left px-3 py-1.5 font-medium">{t('common.status')}</th>
+                      <th className="text-left px-3 py-1.5 font-medium">{t('components.bulkInput.tableName')}</th>
+                      <th className="text-right px-3 py-1.5 font-medium">{t('components.bulkInput.tableAmount')}</th>
+                      <th className="text-left px-3 py-1.5 font-medium">{t('common.note')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -286,7 +284,7 @@ export default function BulkIngredientInput({
                           {ing.isValid ? ing.amount : '-'}
                         </td>
                         <td className="px-3 py-1.5 text-xs text-gray-500">
-                          {ing.error || (findIngredientInfo(ing.name) ? '✓ 재료 DB 매칭' : '')}
+                          {ing.error || (findIngredientInfo(ing.name) ? t('components.bulkInput.dbMatched') : '')}
                         </td>
                       </tr>
                     ))}
@@ -303,14 +301,14 @@ export default function BulkIngredientInput({
             onClick={handleReset}
             className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"
           >
-            초기화
+            {t('common.reset')}
           </button>
           <div className="flex gap-2">
             <button
               onClick={onClose}
               className="px-4 py-1.5 text-sm border rounded hover:bg-gray-100"
             >
-              취소
+              {t('common.cancel')}
             </button>
             {!isParsed ? (
               <button
@@ -318,7 +316,7 @@ export default function BulkIngredientInput({
                 disabled={!inputText.trim()}
                 className="px-4 py-1.5 text-sm bg-amber-500 text-white rounded hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                파싱하기
+                {t('common.parse')}
               </button>
             ) : (
               <button
@@ -326,7 +324,7 @@ export default function BulkIngredientInput({
                 disabled={validCount === 0}
                 className="px-4 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {validCount}개 재료 가져오기
+                {t('components.bulkInput.importCount', { count: validCount })}
               </button>
             )}
           </div>

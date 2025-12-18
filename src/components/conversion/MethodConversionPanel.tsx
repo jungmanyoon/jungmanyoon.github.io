@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
 import MethodSelector from './MethodSelector.jsx'
 import IngredientComparisonTable from './IngredientComparisonTable'
@@ -31,7 +32,7 @@ export function MethodConversionPanel({
   onConvert,
   onReset
 }: MethodConversionPanelProps) {
-
+  const { t } = useTranslation()
   const [selectedMethod, setSelectedMethod] = useState<string>('sponge')
   const [convertedRecipe, setConvertedRecipe] = useState<ConvertedRecipe | null>(null)
 
@@ -84,37 +85,37 @@ export function MethodConversionPanel({
 
       <div className="mt-3 flex gap-2">
         <Button size="small" onClick={handleConversion}>
-          변환 계산
+          {t('components.methodConversionPanel.convert')}
         </Button>
         <Button size="small" variant="secondary" onClick={handleResetClick}>
-          초기화
+          {t('components.methodConversionPanel.reset')}
         </Button>
       </div>
 
       {convertedRecipe && convertedRecipe.conversionDetails && (
         <div className="mt-4 p-4 bg-bread-50 rounded-lg">
-          <h4 className="font-medium text-bread-700 mb-3">변환 결과</h4>
+          <h4 className="font-medium text-bread-700 mb-3">{t('components.methodConversionPanel.conversionResult')}</h4>
 
           {/* 중종/폴리쉬/비가 */}
           {convertedRecipe.conversionDetails.sponge && (
             <IngredientComparisonTable
               original={recipe.ingredients}
               converted={convertedRecipe.conversionDetails.sponge}
-              title="중종"
+              title={t('components.methodConversionPanel.sponge')}
             />
           )}
           {convertedRecipe.conversionDetails.poolish && (
             <IngredientComparisonTable
               original={recipe.ingredients}
               converted={convertedRecipe.conversionDetails.poolish}
-              title="폴리쉬"
+              title={t('components.methodConversionPanel.poolish')}
             />
           )}
           {convertedRecipe.conversionDetails.biga && (
             <IngredientComparisonTable
               original={recipe.ingredients}
               converted={convertedRecipe.conversionDetails.biga}
-              title="비가"
+              title={t('components.methodConversionPanel.biga')}
             />
           )}
 
@@ -123,7 +124,7 @@ export function MethodConversionPanel({
             <IngredientComparisonTable
               original={recipe.ingredients}
               converted={convertedRecipe.conversionDetails.mainDough}
-              title="본반죽"
+              title={t('components.methodConversionPanel.mainDough')}
             />
           )}
 
@@ -139,16 +140,10 @@ export function MethodConversionPanel({
           {/* 발효 시간 */}
           {convertedRecipe.conversionDetails.fermentationTime && (
             <div className="mt-3 p-2 bg-yellow-50 rounded">
-              <p className="font-medium mb-1 text-sm">발효 시간:</p>
+              <p className="font-medium mb-1 text-sm">{t('components.methodConversionPanel.fermentationTime')}</p>
               {Object.entries(convertedRecipe.conversionDetails.fermentationTime).map(([key, value]) => (
                 <p key={key} className="text-xs">
-                  {key === 'sponge' && '중종 발효: '}
-                  {key === 'poolish' && '폴리쉬 발효: '}
-                  {key === 'biga' && '비가 발효: '}
-                  {key === 'mainDough' && '본반죽 발효: '}
-                  {key === 'cold' && '저온 발효: '}
-                  {key === 'room' && '실온 적응: '}
-                  {key === 'total' && '전체 발효: '}
+                  {t(`components.methodConversionPanel.fermentationLabels.${key}`, { defaultValue: '' })}
                   {value}
                 </p>
               ))}
@@ -158,7 +153,7 @@ export function MethodConversionPanel({
           {/* 만드는 방법 */}
           {convertedRecipe.conversionDetails.instructions && (
             <div className="mt-3">
-              <p className="font-medium mb-1 text-sm">만드는 방법:</p>
+              <p className="font-medium mb-1 text-sm">{t('components.methodConversionPanel.instructions')}</p>
               <ol className="list-decimal list-inside text-xs space-y-1">
                 {convertedRecipe.conversionDetails.instructions.map((instruction, idx) => (
                   <li key={idx}>{instruction}</li>
@@ -171,7 +166,7 @@ export function MethodConversionPanel({
           {convertedRecipe.conversionDetails.notes && (
             <div className="mt-3 p-2 bg-amber-50 border border-amber-200 rounded">
               <p className="text-xs text-amber-800">
-                <strong>참고:</strong> {convertedRecipe.conversionDetails.notes}
+                <strong>{t('components.methodConversionPanel.note')}</strong> {convertedRecipe.conversionDetails.notes}
               </p>
             </div>
           )}

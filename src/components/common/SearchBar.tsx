@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, X } from 'lucide-react'
 
 interface SearchBarProps {
@@ -12,10 +13,12 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChange,
-  placeholder = '레시피 검색...',
+  placeholder,
   debounceMs = 300,
   className = ''
 }) => {
+  const { t } = useTranslation()
+  const resolvedPlaceholder = placeholder ?? t('components.searchBar.placeholder')
   const [localValue, setLocalValue] = useState(value)
 
   // Sync external value changes
@@ -54,8 +57,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
           type="text"
           value={localValue}
           onChange={handleChange}
-          placeholder={placeholder}
-          aria-label="레시피 검색"
+          placeholder={resolvedPlaceholder}
+          aria-label={t('components.searchBar.ariaLabel')}
           className="
             w-full pl-10 pr-10 py-2.5
             border border-bread-200 rounded-lg
@@ -69,7 +72,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {localValue && (
           <button
             onClick={handleClear}
-            aria-label="검색어 지우기"
+            aria-label={t('components.searchBar.clearAriaLabel')}
             className="
               absolute right-3 top-1/2 -translate-y-1/2
               w-5 h-5

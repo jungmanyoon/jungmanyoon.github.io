@@ -6,6 +6,7 @@
  */
 
 import { useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/useSettingsStore'
 import { ProcessLossRates } from '@/types/settings.types'
 import {
@@ -56,50 +57,30 @@ const DEFAULT_LOSS_RATES: Record<string, ProcessLossRates> = {
   }
 }
 
-// 공정 정보
-const PROCESS_STAGES: { key: keyof ProcessLossRates; name: string; icon: string; description: string }[] = [
-  { key: 'mixing', name: '믹싱', icon: '🥣', description: '재료 혼합 시 용기/도구 부착' },
-  { key: 'fermentation', name: '발효', icon: '🍞', description: '발효 중 수분 증발' },
-  { key: 'dividing', name: '분할', icon: '✂️', description: '분할 시 손실 및 밀가루 사용' },
-  { key: 'shaping', name: '성형', icon: '👐', description: '성형 시 손실 및 밀가루 사용' },
-  { key: 'baking', name: '굽기', icon: '🔥', description: '굽기 중 수분 증발' },
-  { key: 'cooling', name: '냉각', icon: '❄️', description: '냉각 중 수분 증발 및 손실' }
+// 공정 정보 (아이콘과 키만 저장, 이름은 번역 사용)
+const PROCESS_STAGES: { key: keyof ProcessLossRates; icon: string }[] = [
+  { key: 'mixing', icon: '🥣' },
+  { key: 'fermentation', icon: '🍞' },
+  { key: 'dividing', icon: '✂️' },
+  { key: 'shaping', icon: '👐' },
+  { key: 'baking', icon: '🔥' },
+  { key: 'cooling', icon: '❄️' }
 ]
 
-// 카테고리 정보
+// 카테고리 정보 (키와 색상만 저장, 이름은 번역 사용)
 const CATEGORIES = [
-  { key: 'bread', name: '빵류', color: 'bg-amber-100 border-amber-300' },
-  { key: 'cake', name: '케이크', color: 'bg-pink-100 border-pink-300' },
-  { key: 'pastry', name: '페이스트리', color: 'bg-blue-100 border-blue-300' },
-  { key: 'cookie', name: '쿠키', color: 'bg-green-100 border-green-300' }
+  { key: 'bread', color: 'bg-amber-100 border-amber-300' },
+  { key: 'cake', color: 'bg-pink-100 border-pink-300' },
+  { key: 'pastry', color: 'bg-blue-100 border-blue-300' },
+  { key: 'cookie', color: 'bg-green-100 border-green-300' }
 ]
 
-// 제품 목록 (손실률 오버라이드 가능)
-const PRODUCTS: Record<string, { name: string; category: string }[]> = {
-  bread: [
-    { name: 'pullman', category: '풀먼식빵' },
-    { name: 'mountain', category: '산형식빵' },
-    { name: 'brioche', category: '브리오슈' },
-    { name: 'baguette', category: '바게트' },
-    { name: 'ciabatta', category: '치아바타' },
-    { name: 'sourdough', category: '사워도우' }
-  ],
-  cake: [
-    { name: 'genoise', category: '제누와즈' },
-    { name: 'chiffon', category: '쉬폰' },
-    { name: 'pound', category: '파운드' },
-    { name: 'brownie', category: '브라우니' },
-    { name: 'cheesecake', category: '치즈케이크' }
-  ],
-  pastry: [
-    { name: 'croissant', category: '크루아상' },
-    { name: 'danish', category: '데니쉬' },
-    { name: 'puff_pastry', category: '퍼프페이스트리' }
-  ],
-  cookie: [
-    { name: 'cookie', category: '쿠키' },
-    { name: 'scone', category: '스콘' }
-  ]
+// 제품 목록 (손실률 오버라이드 가능) - 이름은 키로 저장
+const PRODUCTS: Record<string, string[]> = {
+  bread: ['pullman', 'mountain', 'brioche', 'baguette', 'ciabatta', 'sourdough'],
+  cake: ['genoise', 'chiffon', 'pound', 'brownie', 'cheesecake'],
+  pastry: ['croissant', 'danish', 'puff_pastry'],
+  cookie: ['cookie', 'scone']
 }
 
 interface YieldLossSettingsTabProps {
@@ -107,6 +88,7 @@ interface YieldLossSettingsTabProps {
 }
 
 export default function YieldLossSettingsTab({ className = '' }: YieldLossSettingsTabProps) {
+  const { t } = useTranslation()
   const {
     yieldLoss,
     setCategoryLossOverride,
@@ -188,7 +170,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
           <div key={stage.key} className="relative">
             <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
               <span>{stage.icon}</span>
-              {stage.name}
+              {t(`settings.yieldLoss.stages.${stage.key}.name`)}
               {isOverridden && (
                 <span className="text-orange-500">*</span>
               )}
@@ -214,7 +196,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
               <div className={`text-xs mt-0.5 ${
                 currentValue! > baseValue ? 'text-red-500' : 'text-green-500'
               }`}>
-                기본 {baseValue}%
+                {t('settings.yieldLoss.base')} {baseValue}%
                 {currentValue! > baseValue ? ' ↑' : ' ↓'}
               </div>
             )}
@@ -231,22 +213,22 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
         <div>
           <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <TrendingDown className="w-5 h-5 text-orange-500" />
-            수율 손실률 설정
+            {t('settings.yieldLoss.title')}
           </h3>
           <p className="text-sm text-gray-500 mt-1">
-            공정별 손실률을 카테고리 또는 제품별로 커스터마이징합니다.
+            {t('settings.yieldLoss.titleDesc')}
           </p>
         </div>
         <button
           onClick={() => {
-            if (confirm('모든 손실률 설정을 기본값으로 초기화하시겠습니까?')) {
+            if (confirm(t('settings.yieldLoss.resetConfirm'))) {
               resetToDefaults('yieldLoss')
             }
           }}
           className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
         >
           <RotateCcw className="w-4 h-4" />
-          기본값으로
+          {t('settings.yieldLoss.resetToDefault')}
         </button>
       </div>
 
@@ -256,9 +238,9 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
           <div className="flex items-center gap-3">
             <Settings2 className="w-5 h-5 text-blue-600" />
             <div>
-              <div className="font-medium text-gray-800">환경 조정 활성화</div>
+              <div className="font-medium text-gray-800">{t('settings.yieldLoss.envAdjustment')}</div>
               <div className="text-xs text-gray-500">
-                온도/습도에 따라 굽기 손실률을 자동 조정합니다
+                {t('settings.yieldLoss.envAdjustmentDesc')}
               </div>
             </div>
           </div>
@@ -278,14 +260,14 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
         {yieldLoss.enableEnvironmentAdjustment && (
           <div className="mt-2 text-xs text-blue-600 flex items-center gap-1">
             <Info className="w-3 h-3" />
-            습도 60% / 온도 25°C 기준, 차이에 따라 ±0~3% 조정
+            {t('settings.yieldLoss.envAdjustmentNote')}
           </div>
         )}
       </div>
 
       {/* 카테고리별 설정 */}
       <div className="space-y-3">
-        <h4 className="font-medium text-gray-700">카테고리별 기본 손실률</h4>
+        <h4 className="font-medium text-gray-700">{t('settings.yieldLoss.categorySettings')}</h4>
 
         {CATEGORIES.map(cat => {
           const isExpanded = expandedCategory === cat.key
@@ -302,16 +284,16 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                 className="w-full flex items-center justify-between p-3 text-left"
               >
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-800">{cat.name}</span>
+                  <span className="font-medium text-gray-800">{t(`settings.yieldLoss.categories.${cat.key}`)}</span>
                   {hasOverrides && (
                     <span className="px-1.5 py-0.5 text-xs bg-orange-200 text-orange-700 rounded">
-                      커스텀
+                      {t('settings.yieldLoss.custom')}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-mono">
-                    총 손실률: <span className="font-bold">{totalLoss.toFixed(1)}%</span>
+                    {t('settings.yieldLoss.totalLoss')}: <span className="font-bold">{totalLoss.toFixed(1)}%</span>
                   </span>
                   {isExpanded ? (
                     <ChevronUp className="w-4 h-4" />
@@ -339,7 +321,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                           className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded text-sm hover:bg-green-600"
                         >
                           <Save className="w-4 h-4" />
-                          저장
+                          {t('common.save')}
                         </button>
                         <button
                           onClick={() => {
@@ -348,7 +330,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                           }}
                           className="px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50"
                         >
-                          취소
+                          {t('common.cancel')}
                         </button>
                         {hasOverrides && (
                           <button
@@ -358,7 +340,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                             }}
                             className="px-3 py-1.5 text-red-600 text-sm hover:bg-red-50 rounded"
                           >
-                            기본값으로
+                            {t('settings.yieldLoss.resetToDefault')}
                           </button>
                         )}
                       </div>
@@ -370,7 +352,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                         {PROCESS_STAGES.map(stage => (
                           <div key={stage.key} className="text-center p-2 bg-gray-50 rounded">
                             <div className="text-lg">{stage.icon}</div>
-                            <div className="text-xs text-gray-500">{stage.name}</div>
+                            <div className="text-xs text-gray-500">{t(`settings.yieldLoss.stages.${stage.key}.name`)}</div>
                             <div className="font-mono font-medium">{rates[stage.key]}%</div>
                           </div>
                         ))}
@@ -379,7 +361,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                         onClick={() => startEditingCategory(cat.key)}
                         className="text-sm text-blue-600 hover:text-blue-700"
                       >
-                        손실률 수정 →
+                        {t('settings.yieldLoss.editLoss')}
                       </button>
                     </>
                   )}
@@ -393,35 +375,35 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
       {/* 제품별 오버라이드 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium text-gray-700">제품별 손실률 오버라이드</h4>
+          <h4 className="font-medium text-gray-700">{t('settings.yieldLoss.productOverride')}</h4>
           <select
             value={selectedProductCategory}
             onChange={(e) => setSelectedProductCategory(e.target.value)}
             className="text-sm border rounded px-2 py-1"
           >
             {CATEGORIES.map(cat => (
-              <option key={cat.key} value={cat.key}>{cat.name}</option>
+              <option key={cat.key} value={cat.key}>{t(`settings.yieldLoss.categories.${cat.key}`)}</option>
             ))}
           </select>
         </div>
 
         <div className="space-y-2">
-          {PRODUCTS[selectedProductCategory]?.map(product => {
-            const hasOverride = Boolean(yieldLoss.productOverrides[product.name])
-            const isEditing = editingProduct === product.name
-            const rates = getProductRates(product.name, selectedProductCategory)
+          {PRODUCTS[selectedProductCategory]?.map(productKey => {
+            const hasOverride = Boolean(yieldLoss.productOverrides[productKey])
+            const isEditing = editingProduct === productKey
+            const rates = getProductRates(productKey, selectedProductCategory)
             const totalLoss = calculateTotalLoss(rates)
 
             return (
               <div
-                key={product.name}
+                key={productKey}
                 className={`border rounded-lg p-3 ${
                   hasOverride ? 'bg-orange-50 border-orange-200' : 'bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-800">{product.category}</span>
+                    <span className="font-medium text-gray-800">{t(`settings.yieldLoss.products.${productKey}`)}</span>
                     {hasOverride && (
                       <Check className="w-4 h-4 text-orange-500" />
                     )}
@@ -436,7 +418,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                           onClick={handleSaveProduct}
                           className="px-2 py-1 bg-green-500 text-white rounded text-xs"
                         >
-                          저장
+                          {t('common.save')}
                         </button>
                         <button
                           onClick={() => {
@@ -445,15 +427,15 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                           }}
                           className="px-2 py-1 border rounded text-xs"
                         >
-                          취소
+                          {t('common.cancel')}
                         </button>
                       </div>
                     ) : (
                       <button
-                        onClick={() => startEditingProduct(product.name)}
+                        onClick={() => startEditingProduct(productKey)}
                         className="text-xs text-blue-600 hover:text-blue-700"
                       >
-                        수정
+                        {t('settings.yieldLoss.edit')}
                       </button>
                     )}
                   </div>
@@ -470,12 +452,12 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                     {hasOverride && (
                       <button
                         onClick={() => {
-                          setProductLossOverride(product.name, {})
+                          setProductLossOverride(productKey, {})
                           setEditingProduct(null)
                         }}
                         className="mt-2 text-xs text-red-600 hover:text-red-700"
                       >
-                        오버라이드 제거
+                        {t('settings.yieldLoss.removeOverride')}
                       </button>
                     )}
                   </div>
@@ -490,39 +472,20 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
       <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
         <h4 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
           <Info className="w-4 h-4" />
-          손실률 참고 가이드
+          {t('settings.yieldLoss.guide')}
         </h4>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-          <div>
-            <div className="font-medium text-gray-600 mb-1">🥣 믹싱</div>
-            <div className="text-xs text-gray-500">0.5~2% (도구 부착량)</div>
-          </div>
-          <div>
-            <div className="font-medium text-gray-600 mb-1">🍞 발효</div>
-            <div className="text-xs text-gray-500">0~2% (수분 증발)</div>
-          </div>
-          <div>
-            <div className="font-medium text-gray-600 mb-1">✂️ 분할</div>
-            <div className="text-xs text-gray-500">1~3% (덧밀가루 + 손실)</div>
-          </div>
-          <div>
-            <div className="font-medium text-gray-600 mb-1">👐 성형</div>
-            <div className="text-xs text-gray-500">0.5~2% (덧밀가루)</div>
-          </div>
-          <div>
-            <div className="font-medium text-gray-600 mb-1">🔥 굽기</div>
-            <div className="text-xs text-gray-500">6~15% (수분 증발)</div>
-          </div>
-          <div>
-            <div className="font-medium text-gray-600 mb-1">❄️ 냉각</div>
-            <div className="text-xs text-gray-500">0.5~2% (추가 증발)</div>
-          </div>
+          {PROCESS_STAGES.map(stage => (
+            <div key={stage.key}>
+              <div className="font-medium text-gray-600 mb-1">{stage.icon} {t(`settings.yieldLoss.stages.${stage.key}.name`)}</div>
+              <div className="text-xs text-gray-500">{t(`settings.yieldLoss.stages.${stage.key}.range`)}</div>
+            </div>
+          ))}
         </div>
         <div className="mt-3 text-xs text-gray-500 flex items-start gap-1">
           <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
           <span>
-            손실률은 작업 환경, 숙련도, 재료 상태에 따라 달라질 수 있습니다.
-            실제 경험을 바탕으로 조정하세요.
+            {t('settings.yieldLoss.guideNote')}
           </span>
         </div>
       </div>

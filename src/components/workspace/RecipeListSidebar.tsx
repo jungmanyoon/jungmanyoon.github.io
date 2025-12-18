@@ -8,6 +8,7 @@
  */
 
 import React, { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Recipe } from '@/types/recipe.types'
 import './RecipeListSidebar.css'
 
@@ -22,6 +23,7 @@ export default function RecipeListSidebar({
   selectedId,
   onSelect,
 }: RecipeListSidebarProps) {
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
@@ -50,15 +52,15 @@ export default function RecipeListSidebar({
     <aside className="recipe-list-sidebar">
       {/* 헤더 */}
       <div className="sidebar-header">
-        <h2>레시피 목록</h2>
-        <span className="recipe-count">{filteredRecipes.length}개</span>
+        <h2>{t('components.recipeListSidebar.title')}</h2>
+        <span className="recipe-count">{t('components.recipeListSidebar.count', { count: filteredRecipes.length })}</span>
       </div>
 
       {/* 검색 */}
       <div className="sidebar-search">
         <input
           type="text"
-          placeholder="레시피 검색..."
+          placeholder={t('components.recipeListSidebar.searchPlaceholder')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
@@ -75,7 +77,7 @@ export default function RecipeListSidebar({
             }`}
             onClick={() => setSelectedCategory(cat)}
           >
-            {cat === 'all' ? '전체' : cat}
+            {cat === 'all' ? t('components.recipeListSidebar.allCategory') : cat}
           </button>
         ))}
       </div>
@@ -84,7 +86,7 @@ export default function RecipeListSidebar({
       <div className="sidebar-list">
         {filteredRecipes.length === 0 ? (
           <div className="empty-list">
-            <p>레시피가 없습니다</p>
+            <p>{t('components.recipeListSidebar.noRecipes')}</p>
           </div>
         ) : (
           filteredRecipes.map((recipe) => (
@@ -102,7 +104,7 @@ export default function RecipeListSidebar({
                     <span className="meta-category">{recipe.category}</span>
                   )}
                   {recipe.totalTime && (
-                    <span className="meta-time">{recipe.totalTime}분</span>
+                    <span className="meta-time">{recipe.totalTime}{t('components.recipeListSidebar.timeUnit')}</span>
                   )}
                 </div>
               </div>

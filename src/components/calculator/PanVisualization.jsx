@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * 팬 계산 시각화 컴포넌트
@@ -7,6 +8,7 @@ import { useMemo } from 'react'
  * - 부피 비율 막대 그래프
  */
 export default function PanVisualization({ results }) {
+  const { t } = useTranslation()
   if (!results || !results.pans) return null
 
   // 최대 부피 계산
@@ -24,14 +26,14 @@ export default function PanVisualization({ results }) {
     <div className="space-y-6">
       {/* 팬 크기 비교 */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="font-semibold text-bread-800 mb-4">📏 팬 크기 비교</h3>
+        <h3 className="font-semibold text-bread-800 mb-4">📏 {t('components.panVisualization.panSizeComparison')}</h3>
         <div className="space-y-3">
           {results.pans.map((pan, index) => {
             const widthPercent = (pan.volume / maxVolume) * 100
             return (
               <div key={index}>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="font-medium">팬 #{index + 1}</span>
+                  <span className="font-medium">{t('components.panVisualization.panNumber', { number: index + 1 })}</span>
                   <span className="text-gray-600">
                     {pan.volume.toLocaleString()} cm³
                   </span>
@@ -46,7 +48,7 @@ export default function PanVisualization({ results }) {
                   >
                     {widthPercent > 20 && (
                       <span className="text-white text-xs font-semibold">
-                        {pan.count}개
+                        {t('components.panVisualization.countUnit', { count: pan.count })}
                       </span>
                     )}
                   </div>
@@ -59,7 +61,7 @@ export default function PanVisualization({ results }) {
 
       {/* 반죽 분배 파이 차트 (CSS) */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="font-semibold text-bread-800 mb-4">🥐 반죽 분배</h3>
+        <h3 className="font-semibold text-bread-800 mb-4">🥐 {t('components.panVisualization.doughDistribution')}</h3>
 
         {/* 도넛 차트 */}
         <div className="flex items-center justify-center mb-4">
@@ -104,7 +106,7 @@ export default function PanVisualization({ results }) {
               <div className="text-2xl font-bold text-bread-800">
                 {results.totalDough.toLocaleString()}g
               </div>
-              <div className="text-xs text-gray-600">총 반죽량</div>
+              <div className="text-xs text-gray-600">{t('components.panVisualization.totalDough')}</div>
             </div>
           </div>
         </div>
@@ -120,7 +122,7 @@ export default function PanVisualization({ results }) {
                   style={{ backgroundColor: colors[index % colors.length] }}
                 />
                 <div className="flex-1 text-sm">
-                  <div className="font-medium">팬 #{index + 1}</div>
+                  <div className="font-medium">{t('components.panVisualization.panNumber', { number: index + 1 })}</div>
                   <div className="text-gray-600 text-xs">
                     {pan.totalDough.toLocaleString()}g ({percentage}%)
                   </div>
@@ -133,7 +135,7 @@ export default function PanVisualization({ results }) {
 
       {/* 팬당 반죽량 막대 그래프 */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="font-semibold text-bread-800 mb-4">🍞 팬당 반죽량</h3>
+        <h3 className="font-semibold text-bread-800 mb-4">🍞 {t('components.panVisualization.doughPerPan')}</h3>
         <div className="space-y-3">
           {results.pans.map((pan, index) => {
             const maxDoughPerPan = Math.max(...results.pans.map(p => p.doughPerPan))
@@ -143,12 +145,12 @@ export default function PanVisualization({ results }) {
               <div key={index}>
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span className="font-medium">
-                    팬 #{index + 1}
+                    {t('components.panVisualization.panNumber', { number: index + 1 })}
                     {pan.type === 'rectangle' && ` (${pan.length}×${pan.width}×${pan.height}cm)`}
                     {pan.type === 'round' && ` (Ø${pan.length}×${pan.height}cm)`}
                   </span>
                   <span className="text-gray-600">
-                    {pan.doughPerPan.toLocaleString()}g/팬
+                    {t('components.panVisualization.gramsPerPan', { grams: pan.doughPerPan.toLocaleString() })}
                   </span>
                 </div>
                 <div className="relative h-6 bg-gray-100 rounded overflow-hidden">
@@ -162,7 +164,7 @@ export default function PanVisualization({ results }) {
                   >
                     {widthPercent > 25 && (
                       <span className="text-white text-xs font-semibold">
-                        × {pan.count}개
+                        {t('components.panVisualization.countUnit', { count: pan.count })}
                       </span>
                     )}
                   </div>
@@ -175,41 +177,41 @@ export default function PanVisualization({ results }) {
 
       {/* 통계 요약 */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="font-semibold text-bread-800 mb-4">📊 통계 요약</h3>
+        <h3 className="font-semibold text-bread-800 mb-4">📊 {t('components.panVisualization.statisticsSummary')}</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-3 bg-bread-50 rounded">
             <div className="text-2xl font-bold text-bread-800">
               {results.totalPans}
             </div>
-            <div className="text-xs text-gray-600">총 팬 개수</div>
+            <div className="text-xs text-gray-600">{t('components.panVisualization.totalPanCount')}</div>
           </div>
 
           <div className="text-center p-3 bg-blue-50 rounded">
             <div className="text-2xl font-bold text-blue-800">
               {Math.round(results.totalVolume).toLocaleString()}
             </div>
-            <div className="text-xs text-gray-600">총 부피 (cm³)</div>
+            <div className="text-xs text-gray-600">{t('components.panVisualization.totalVolume')}</div>
           </div>
 
           <div className="text-center p-3 bg-green-50 rounded">
             <div className="text-2xl font-bold text-green-800">
               {Math.round(results.totalDough / results.totalPans)}g
             </div>
-            <div className="text-xs text-gray-600">평균 팬당</div>
+            <div className="text-xs text-gray-600">{t('components.panVisualization.averagePerPan')}</div>
           </div>
 
           <div className="text-center p-3 bg-orange-50 rounded">
             <div className="text-2xl font-bold text-orange-800">
               {results.scalingFactor}x
             </div>
-            <div className="text-xs text-gray-600">레시피 배율</div>
+            <div className="text-xs text-gray-600">{t('components.panVisualization.recipeScaling')}</div>
           </div>
         </div>
       </div>
 
       {/* 3D 팬 시각화 (간단한 CSS 3D) */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="font-semibold text-bread-800 mb-4">📐 3D 팬 미리보기</h3>
+        <h3 className="font-semibold text-bread-800 mb-4">📐 {t('components.panVisualization.preview3D')}</h3>
         <div className="flex flex-wrap gap-6 justify-center">
           {results.pans.slice(0, 3).map((pan, index) => {
             const scale = Math.min(1, 150 / Math.max(pan.length, pan.width))
@@ -219,7 +221,7 @@ export default function PanVisualization({ results }) {
 
             return (
               <div key={index} className="text-center">
-                <div className="mb-2 text-sm font-medium">팬 #{index + 1}</div>
+                <div className="mb-2 text-sm font-medium">{t('components.panVisualization.panNumber', { number: index + 1 })}</div>
                 <div
                   className="relative mx-auto"
                   style={{

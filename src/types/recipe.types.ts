@@ -199,12 +199,15 @@ export interface ProcessStep {
   order: number;
   action?: ProcessAction;
   instruction?: string; // 간단한 텍스트 설명
+  instructionEn?: string; // English instruction
   description?: string; // 상세 설명
+  descriptionEn?: string; // English description
   duration?: TimeRange;
   temperature?: TemperatureRange;
   targetState?: TargetState;
   checkpoints?: QualityCheckpoint[];
   tips?: string;
+  tipsEn?: string;
   warnings?: string[];
 }
 

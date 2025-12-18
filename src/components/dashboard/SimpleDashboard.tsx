@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDashboardStore } from '@/stores/useDashboardStore';
 import { useRecipeStore } from '@/stores/useRecipeStore';
 import { ChevronDown, ChevronRight, BookOpen, Scale, X, Plus, Minus, RotateCcw, Save, Download } from 'lucide-react';
@@ -77,6 +78,8 @@ const INGREDIENT_YIELDS = {
 };
 
 const SimpleDashboard = () => {
+  const { t } = useTranslation();
+
   const {
     sourceRecipe,
     convertedRecipe,
@@ -140,26 +143,32 @@ const SimpleDashboard = () => {
   const convertedFlourTotal = convertedRecipe ? getFlourTotal(convertedRecipe.ingredients) : 0;
 
   // 카테고리별 재료 그룹화
+  const categoryKeys = ['flour', 'liquid', 'fat', 'sugar', 'other'] as const;
+
+  const getCategoryLabel = (key: string) => {
+    return t(`components.simpleDashboard.categories.${key}`);
+  };
+
   const groupIngredients = (ingredients: any[]) => {
     const groups: Record<string, any[]> = {
-      밀가루: [],
-      수분: [],
-      유지: [],
-      당류: [],
-      기타: [],
+      flour: [],
+      liquid: [],
+      fat: [],
+      sugar: [],
+      other: [],
     };
 
     ingredients?.forEach(ing => {
       if (ing.category === 'flour' || ing.isFlour) {
-        groups['밀가루'].push(ing);
+        groups['flour'].push(ing);
       } else if (ing.category === 'liquid') {
-        groups['수분'].push(ing);
+        groups['liquid'].push(ing);
       } else if (ing.category === 'fat') {
-        groups['유지'].push(ing);
+        groups['fat'].push(ing);
       } else if (ing.category === 'sugar') {
-        groups['당류'].push(ing);
+        groups['sugar'].push(ing);
       } else {
-        groups['기타'].push(ing);
+        groups['other'].push(ing);
       }
     });
 
@@ -184,14 +193,14 @@ const SimpleDashboard = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center p-8">
           <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">레시피를 선택해주세요</h2>
-          <p className="text-gray-500 mb-4">상단에서 레시피를 선택하거나 새로운 레시피를 만들어보세요.</p>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">{t('components.simpleDashboard.selectRecipe')}</h2>
+          <p className="text-gray-500 mb-4">{t('components.simpleDashboard.selectRecipeDesc')}</p>
           {recipes.length > 0 && (
             <button
               onClick={() => selectSourceRecipe(recipes[0])}
               className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600"
             >
-              첫 번째 레시피 불러오기
+              {t('components.simpleDashboard.loadFirst')}
             </button>
           )}
         </div>
@@ -207,7 +216,7 @@ const SimpleDashboard = () => {
           <div className="flex items-center justify-between gap-4 flex-wrap">
             {/* 레시피 선택 */}
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-600">레시피:</label>
+              <label className="text-sm font-medium text-gray-600">{t('components.simpleDashboard.recipe')}</label>
               <select
                 value={sourceRecipe?.id || ''}
                 onChange={(e) => {
@@ -224,7 +233,7 @@ const SimpleDashboard = () => {
 
             {/* 배수 조절 */}
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-600">배수:</label>
+              <label className="text-sm font-medium text-gray-600">{t('components.simpleDashboard.multiplier')}</label>
               <div className="flex items-center border rounded-lg overflow-hidden">
                 <button
                   onClick={() => handleMultiplierChange(-0.5)}
@@ -248,7 +257,7 @@ const SimpleDashboard = () => {
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
-              <span className="text-sm text-gray-500">배</span>
+              <span className="text-sm text-gray-500">{t('components.simpleDashboard.times')}</span>
             </div>
 
             {/* 빠른 배수 버튼 */}
@@ -275,7 +284,7 @@ const SimpleDashboard = () => {
                 className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
               >
                 <RotateCcw className="w-4 h-4" />
-                초기화
+                {t('components.simpleDashboard.reset')}
               </button>
               <button
                 onClick={() => setShowSidebar(!showSidebar)}
@@ -286,7 +295,7 @@ const SimpleDashboard = () => {
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
-                참조 데이터
+                {t('components.simpleDashboard.referenceData')}
               </button>
             </div>
           </div>
@@ -305,7 +314,7 @@ const SimpleDashboard = () => {
             {/* 헤더 */}
             <div className="bg-gray-50 border-b px-4 py-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-bold text-lg text-gray-800">📋 원본 레시피</h2>
+                <h2 className="font-bold text-lg text-gray-800">{t('components.simpleDashboard.originalRecipe')}</h2>
                 <span className="text-sm text-gray-500">
                   {sourceRecipe.yield.quantity} {sourceRecipe.yield.unit}
                 </span>
@@ -314,7 +323,7 @@ const SimpleDashboard = () => {
                 <span className="font-medium">{sourceRecipe.name}</span>
                 {sourceRecipe.panConfig && (
                   <span className="ml-2 text-gray-400">
-                    | 팬: {sourceRecipe.panConfig.name}
+                    | {t('components.dashboardCompact.pan')}: {sourceRecipe.panConfig.name}
                   </span>
                 )}
               </div>
@@ -325,10 +334,10 @@ const SimpleDashboard = () => {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 sticky top-0">
                   <tr className="border-b">
-                    <th className="text-left px-4 py-2 font-medium text-gray-600">분류</th>
-                    <th className="text-left px-4 py-2 font-medium text-gray-600">재료</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">비율(%)</th>
-                    <th className="text-right px-4 py-2 font-medium text-gray-600">중량(g)</th>
+                    <th className="text-left px-4 py-2 font-medium text-gray-600">{t('components.simpleDashboard.category')}</th>
+                    <th className="text-left px-4 py-2 font-medium text-gray-600">{t('components.simpleDashboard.ingredient')}</th>
+                    <th className="text-right px-4 py-2 font-medium text-gray-600">{t('components.simpleDashboard.ratio')}</th>
+                    <th className="text-right px-4 py-2 font-medium text-gray-600">{t('components.simpleDashboard.weight')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -342,7 +351,7 @@ const SimpleDashboard = () => {
                                 rowSpan={items.length}
                                 className="px-4 py-2 font-medium text-gray-700 bg-gray-50 border-r"
                               >
-                                {category}
+                                {getCategoryLabel(category)}
                               </td>
                             )}
                             <td className="px-4 py-2 text-gray-800">{ing.name}</td>
@@ -364,18 +373,18 @@ const SimpleDashboard = () => {
             {/* 합계 */}
             <div className="bg-gray-50 border-t px-4 py-3">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">밀가루 합계:</span>
+                <span className="text-gray-600">{t('components.simpleDashboard.flourTotal')}</span>
                 <span className="font-mono font-medium">{sourceFlourTotal}g</span>
               </div>
               <div className="flex justify-between text-sm mt-1">
-                <span className="text-gray-600">총 중량:</span>
+                <span className="text-gray-600">{t('components.simpleDashboard.totalWeight')}</span>
                 <span className="font-mono font-bold text-lg">
                   {conversionSummary?.totalOriginalWeight || 0}g
                 </span>
               </div>
               {conversionSummary && (
                 <div className="flex justify-between text-sm mt-1">
-                  <span className="text-gray-600">수화율:</span>
+                  <span className="text-gray-600">{t('components.simpleDashboard.hydration')}</span>
                   <span className="font-mono">{conversionSummary.hydrationOriginal}%</span>
                 </div>
               )}
@@ -387,7 +396,7 @@ const SimpleDashboard = () => {
             {/* 헤더 */}
             <div className="bg-blue-50 border-b border-blue-200 px-4 py-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-bold text-lg text-blue-800">🔄 변환 레시피</h2>
+                <h2 className="font-bold text-lg text-blue-800">{t('components.simpleDashboard.convertedRecipe')}</h2>
                 {conversionSummary && conversionSummary.scaleFactor !== 1 && (
                   <span className="text-sm font-medium px-2 py-1 bg-blue-200 text-blue-800 rounded-full">
                     ×{conversionSummary.scaleFactor.toFixed(2)}
@@ -411,11 +420,11 @@ const SimpleDashboard = () => {
               <table className="w-full text-sm">
                 <thead className="bg-blue-50 sticky top-0">
                   <tr className="border-b border-blue-200">
-                    <th className="text-left px-4 py-2 font-medium text-blue-700">분류</th>
-                    <th className="text-left px-4 py-2 font-medium text-blue-700">재료</th>
-                    <th className="text-right px-4 py-2 font-medium text-blue-700">비율(%)</th>
-                    <th className="text-right px-4 py-2 font-medium text-blue-700">중량(g)</th>
-                    <th className="text-right px-4 py-2 font-medium text-blue-700">차이</th>
+                    <th className="text-left px-4 py-2 font-medium text-blue-700">{t('components.simpleDashboard.category')}</th>
+                    <th className="text-left px-4 py-2 font-medium text-blue-700">{t('components.simpleDashboard.ingredient')}</th>
+                    <th className="text-right px-4 py-2 font-medium text-blue-700">{t('components.simpleDashboard.ratio')}</th>
+                    <th className="text-right px-4 py-2 font-medium text-blue-700">{t('components.simpleDashboard.weight')}</th>
+                    <th className="text-right px-4 py-2 font-medium text-blue-700">{t('components.simpleDashboard.difference')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -434,7 +443,7 @@ const SimpleDashboard = () => {
                                   rowSpan={items.length}
                                   className="px-4 py-2 font-medium text-blue-700 bg-blue-50 border-r border-blue-200"
                                 >
-                                  {category}
+                                  {getCategoryLabel(category)}
                                 </td>
                               )}
                               <td className="px-4 py-2 text-gray-800">{ing.name}</td>
@@ -463,11 +472,11 @@ const SimpleDashboard = () => {
             {/* 합계 */}
             <div className="bg-blue-50 border-t border-blue-200 px-4 py-3">
               <div className="flex justify-between text-sm">
-                <span className="text-blue-700">밀가루 합계:</span>
+                <span className="text-blue-700">{t('components.simpleDashboard.flourTotal')}</span>
                 <span className="font-mono font-medium">{convertedFlourTotal}g</span>
               </div>
               <div className="flex justify-between text-sm mt-1">
-                <span className="text-blue-700">총 중량:</span>
+                <span className="text-blue-700">{t('components.simpleDashboard.totalWeight')}</span>
                 <span className="font-mono font-bold text-lg text-blue-800">
                   {conversionSummary?.totalConvertedWeight || 0}g
                 </span>
@@ -475,12 +484,12 @@ const SimpleDashboard = () => {
               {conversionSummary && (
                 <>
                   <div className="flex justify-between text-sm mt-1">
-                    <span className="text-blue-700">수화율:</span>
+                    <span className="text-blue-700">{t('components.simpleDashboard.hydration')}</span>
                     <span className="font-mono">{conversionSummary.hydrationConverted}%</span>
                   </div>
                   {conversionSummary.scaleFactor !== 1 && (
                     <div className="mt-2 pt-2 border-t border-blue-200 flex justify-between items-center">
-                      <span className="text-blue-600 text-sm">변환 비율:</span>
+                      <span className="text-blue-600 text-sm">{t('components.simpleDashboard.conversionRatio')}</span>
                       <span className="text-xl font-bold text-blue-700">
                         ×{conversionSummary.scaleFactor.toFixed(2)}
                       </span>
@@ -498,7 +507,7 @@ const SimpleDashboard = () => {
         }`} style={{ top: '64px', height: 'calc(100vh - 64px)' }}>
           {/* 사이드바 헤더 */}
           <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between">
-            <h3 className="font-bold text-gray-800">📊 참조 데이터</h3>
+            <h3 className="font-bold text-gray-800">📊 {t('components.simpleDashboard.referenceData')}</h3>
             <button
               onClick={() => setShowSidebar(false)}
               className="p-1 hover:bg-gray-100 rounded"
@@ -513,7 +522,7 @@ const SimpleDashboard = () => {
               onClick={() => toggleCategory('panSizes')}
               className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50"
             >
-              <span className="font-medium text-gray-700">🍳 팬 사이즈</span>
+              <span className="font-medium text-gray-700">{t('components.simpleDashboard.panSizes')}</span>
               {expandedCategories.panSizes ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
             {expandedCategories.panSizes && (
@@ -544,7 +553,7 @@ const SimpleDashboard = () => {
               onClick={() => toggleCategory('specificVolumes')}
               className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50"
             >
-              <span className="font-medium text-gray-700">📐 비용적 기준</span>
+              <span className="font-medium text-gray-700">{t('components.simpleDashboard.specificVolumes')}</span>
               {expandedCategories.specificVolumes ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
             {expandedCategories.specificVolumes && (
@@ -552,8 +561,8 @@ const SimpleDashboard = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-xs text-gray-500">
-                      <th className="text-left py-1">제품</th>
-                      <th className="text-right py-1">비용적</th>
+                      <th className="text-left py-1">{t('components.simpleDashboard.product')}</th>
+                      <th className="text-right py-1">{t('components.simpleDashboard.specificVolume')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -577,7 +586,7 @@ const SimpleDashboard = () => {
               onClick={() => toggleCategory('preferment')}
               className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50"
             >
-              <span className="font-medium text-gray-700">🥖 사전반죽 비율</span>
+              <span className="font-medium text-gray-700">{t('components.simpleDashboard.prefermentRatios')}</span>
               {expandedCategories.preferment ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
             {expandedCategories.preferment && (
@@ -585,9 +594,9 @@ const SimpleDashboard = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-xs text-gray-500">
-                      <th className="text-left py-1">방식</th>
-                      <th className="text-right py-1">밀가루</th>
-                      <th className="text-right py-1">수분</th>
+                      <th className="text-left py-1">{t('components.simpleDashboard.method')}</th>
+                      <th className="text-right py-1">{t('components.simpleDashboard.flour')}</th>
+                      <th className="text-right py-1">{t('components.simpleDashboard.moisture')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -610,7 +619,7 @@ const SimpleDashboard = () => {
               onClick={() => toggleCategory('yields')}
               className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50"
             >
-              <span className="font-medium text-gray-700">🥚 재료별 수율</span>
+              <span className="font-medium text-gray-700">{t('components.simpleDashboard.ingredientYields')}</span>
               {expandedCategories.yields ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
             {expandedCategories.yields && (
@@ -618,8 +627,8 @@ const SimpleDashboard = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-xs text-gray-500">
-                      <th className="text-left py-1">재료</th>
-                      <th className="text-right py-1">수율</th>
+                      <th className="text-left py-1">{t('components.simpleDashboard.material')}</th>
+                      <th className="text-right py-1">{t('components.simpleDashboard.yield')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -632,8 +641,8 @@ const SimpleDashboard = () => {
                   </tbody>
                 </table>
                 <div className="mt-2 text-xs text-gray-500">
-                  * 수율: 실제 사용 가능한 비율<br/>
-                  * 버터 수율: 수분 함량 기준
+                  {t('components.simpleDashboard.yieldNote')}<br/>
+                  {t('components.simpleDashboard.butterYieldNote')}
                 </div>
               </div>
             )}
@@ -641,13 +650,13 @@ const SimpleDashboard = () => {
 
           {/* 기타 정보 */}
           <div className="px-4 py-4 text-xs text-gray-500">
-            <div className="mb-2">📝 제빵 기준</div>
+            <div className="mb-2">{t('components.simpleDashboard.bakingStandards')}</div>
             <div className="space-y-1">
-              <div>• 계란 비율: 껍질 10%, 노른자 30%, 흰자 60%</div>
-              <div>• 소금: 밀가루의 1.5~2.5%</div>
-              <div>• 식빵 수분비율: 55~68%</div>
-              <div>• 치아바타 수분비율: 68~80%</div>
-              <div>• 바게트 수분비율: 60~70%</div>
+              <div>{t('components.simpleDashboard.eggRatio')}</div>
+              <div>{t('components.simpleDashboard.saltRatio')}</div>
+              <div>{t('components.simpleDashboard.breadHydration')}</div>
+              <div>{t('components.simpleDashboard.ciabattaHydration')}</div>
+              <div>{t('components.simpleDashboard.baguetteHydration')}</div>
             </div>
           </div>
         </div>

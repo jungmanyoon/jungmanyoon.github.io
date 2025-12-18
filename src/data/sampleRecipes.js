@@ -10,16 +10,20 @@ export const sampleRecipes = [
     id: 'bbangjunseo-milk-bread',
     name: '우유 식빵',
     nameKo: '우유 식빵',
+    nameEn: 'Milk Bread',
     description: '부드럽고 촉촉한 기본 우유 식빵. 명장의 손맛이 담긴 레시피',
+    descriptionEn: 'Soft and moist basic milk bread. A recipe with master baker\'s touch',
     category: 'bread',
     difficulty: 'intermediate',
     tags: ['식빵', '우유', '버터', '기본'],
     totalTime: 180,
     source: {
       name: '빵준서',
+      nameEn: 'BbangJunseo',
       type: 'youtube',
       url: 'https://www.youtube.com/@bbangjunseo',
-      author: '박준서 명장'
+      author: '박준서 명장',
+      authorEn: 'Master Baker Park Jun-seo'
     },
     method: {
       method: 'straight',
@@ -89,16 +93,20 @@ export const sampleRecipes = [
     id: 'bbangjunseo-salt-bread',
     name: '소금빵',
     nameKo: '소금빵',
+    nameEn: 'Salt Bread (Shio Pan)',
     description: '바삭한 겉면과 버터 풍미가 특징인 소금빵',
+    descriptionEn: 'Salt bread with crispy exterior and rich butter flavor',
     category: 'bread',
     difficulty: 'intermediate',
     tags: ['소금빵', '시오빵', '버터', '바삭'],
     totalTime: 150,
     source: {
       name: '빵준서',
+      nameEn: 'BbangJunseo',
       type: 'youtube',
       url: 'https://www.youtube.com/@bbangjunseo',
-      author: '박준서 명장'
+      author: '박준서 명장',
+      authorEn: 'Master Baker Park Jun-seo'
     },
     method: {
       method: 'straight',
@@ -169,16 +177,20 @@ export const sampleRecipes = [
     id: 'bbangjunseo-baguette',
     name: '바게트',
     nameKo: '바게트',
+    nameEn: 'Baguette',
     description: '겉은 바삭하고 속은 쫄깃한 정통 프랑스 바게트',
+    descriptionEn: 'Authentic French baguette with crispy crust and chewy interior',
     category: 'bread',
     difficulty: 'advanced',
     tags: ['바게트', '프랑스빵', '하드롤', '리틀'],
     totalTime: 240,
     source: {
       name: '빵준서',
+      nameEn: 'BbangJunseo',
       type: 'youtube',
       url: 'https://www.youtube.com/@bbangjunseo',
-      author: '박준서 명장'
+      author: '박준서 명장',
+      authorEn: 'Master Baker Park Jun-seo'
     },
     method: {
       method: 'poolish',
@@ -249,16 +261,20 @@ export const sampleRecipes = [
     id: 'bbangjunseo-tangzhong-bread',
     name: '탕종 식빵',
     nameKo: '탕종 식빵',
+    nameEn: 'Tangzhong Bread',
     description: '탕종법으로 만든 촉촉하고 부드러운 식빵',
+    descriptionEn: 'Soft and moist bread made with tangzhong (water roux) method',
     category: 'bread',
     difficulty: 'intermediate',
     tags: ['탕종', '식빵', '촉촉', '부드러움'],
     totalTime: 200,
     source: {
       name: '빵준서',
+      nameEn: 'BbangJunseo',
       type: 'youtube',
       url: 'https://www.youtube.com/@bbangjunseo',
-      author: '박준서 명장'
+      author: '박준서 명장',
+      authorEn: 'Master Baker Park Jun-seo'
     },
     method: {
       method: 'tangzhong',  // 탕종법으로 변경
@@ -380,16 +396,20 @@ export const sampleRecipes = [
     id: 'bbangjunseo-brioche',
     name: '브리오슈',
     nameKo: '브리오슈',
+    nameEn: 'Brioche',
     description: '버터가 듬뿍 들어간 고급스러운 프랑스 빵',
+    descriptionEn: 'Rich French bread loaded with butter',
     category: 'bread',
     difficulty: 'advanced',
     tags: ['브리오슈', '버터', '프랑스', '고급'],
     totalTime: 300,
     source: {
       name: '빵준서',
+      nameEn: 'BbangJunseo',
       type: 'youtube',
       url: 'https://www.youtube.com/@bbangjunseo',
-      author: '박준서 명장'
+      author: '박준서 명장',
+      authorEn: 'Master Baker Park Jun-seo'
     },
     method: {
       method: 'straight',
@@ -462,16 +482,20 @@ export const sampleRecipes = [
     id: 'hoyatv-morning-roll',
     name: '모닝빵',
     nameKo: '모닝빵',
+    nameEn: 'Morning Roll',
     description: '부드럽고 폭신한 기본 모닝빵',
+    descriptionEn: 'Soft and fluffy basic morning rolls',
     category: 'bread',
     difficulty: 'beginner',
     tags: ['모닝빵', '부드러움', '기본', '초보'],
     totalTime: 150,
     source: {
       name: '호야TV',
+      nameEn: 'HoyaTV',
       type: 'youtube',
       url: 'https://www.youtube.com/@hoyatv',
-      author: '호야'
+      author: '호야',
+      authorEn: 'Hoya'
     },
     method: {
       method: 'straight',
@@ -541,16 +565,20 @@ export const sampleRecipes = [
     id: 'hoyatv-cream-bread',
     name: '크림빵',
     nameKo: '크림빵',
+    nameEn: 'Cream Bread',
     description: '부드러운 반죽과 달콤한 커스터드 크림이 조화로운 빵',
+    descriptionEn: 'Soft bread filled with sweet custard cream',
     category: 'bread',
     difficulty: 'intermediate',
     tags: ['크림빵', '커스터드', '달콤', '부드러움'],
     totalTime: 180,
     source: {
       name: '호야TV',
+      nameEn: 'HoyaTV',
       type: 'youtube',
       url: 'https://www.youtube.com/@hoyatv',
-      author: '호야'
+      author: '호야',
+      authorEn: 'Hoya'
     },
     method: {
       method: 'straight',
@@ -621,16 +649,20 @@ export const sampleRecipes = [
     id: 'hoyatv-soboro-bread',
     name: '소보로빵',
     nameKo: '소보로빵',
+    nameEn: 'Soboro Bread (Streusel Bread)',
     description: '바삭한 소보로 토핑이 올라간 달콤한 빵',
+    descriptionEn: 'Sweet bread with crispy streusel topping',
     category: 'bread',
     difficulty: 'intermediate',
     tags: ['소보로', '토핑', '달콤', '바삭'],
     totalTime: 160,
     source: {
       name: '호야TV',
+      nameEn: 'HoyaTV',
       type: 'youtube',
       url: 'https://www.youtube.com/@hoyatv',
-      author: '호야'
+      author: '호야',
+      authorEn: 'Hoya'
     },
     method: {
       method: 'straight',
@@ -704,16 +736,20 @@ export const sampleRecipes = [
     id: 'hoyatv-red-bean-bread',
     name: '단팥빵',
     nameKo: '단팥빵',
+    nameEn: 'Red Bean Bread (Anpan)',
     description: '달콤한 팥앙금이 들어간 클래식 단팥빵',
+    descriptionEn: 'Classic bread filled with sweet red bean paste',
     category: 'bread',
     difficulty: 'intermediate',
     tags: ['단팥빵', '팥앙금', '달콤', '클래식'],
     totalTime: 160,
     source: {
       name: '호야TV',
+      nameEn: 'HoyaTV',
       type: 'youtube',
       url: 'https://www.youtube.com/@hoyatv',
-      author: '호야'
+      author: '호야',
+      authorEn: 'Hoya'
     },
     method: {
       method: 'straight',
@@ -784,16 +820,20 @@ export const sampleRecipes = [
     id: 'hoyatv-hotdog-bread',
     name: '핫도그빵',
     nameKo: '핫도그빵',
+    nameEn: 'Hot Dog Bread',
     description: '소시지를 감싼 부드러운 핫도그빵',
+    descriptionEn: 'Soft bread wrapped around sausage',
     category: 'bread',
     difficulty: 'beginner',
     tags: ['핫도그', '소시지', '간식', '부드러움'],
     totalTime: 150,
     source: {
       name: '호야TV',
+      nameEn: 'HoyaTV',
       type: 'youtube',
       url: 'https://www.youtube.com/@hoyatv',
-      author: '호야'
+      author: '호야',
+      authorEn: 'Hoya'
     },
     method: {
       method: 'straight',

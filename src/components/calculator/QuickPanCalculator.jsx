@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { PanScaling } from '@utils/calculations/panScaling'
 import { MagicNumbers } from '@utils/calculations/magicNumbers'
 import { BakersPercentage } from '@utils/calculations/bakersPercentage'
@@ -16,6 +17,7 @@ import PanVisualization from './PanVisualization'
  * - 고급 설정 (재질, 고도)
  */
 export default function QuickPanCalculator() {
+  const { t } = useTranslation()
   const [pans, setPans] = useState([
     {
       id: Date.now(),
@@ -85,13 +87,13 @@ export default function QuickPanCalculator() {
   // 프리셋 저장
   const saveAsPreset = () => {
     if (!presetName.trim()) {
-      alert('프리셋 이름을 입력하세요')
+      alert(t('components.quickPanCalc.alerts.presetNameRequired'))
       return
     }
     addPreset(presetName, pans)
     setPresetName('')
     setShowPresetModal(false)
-    alert('프리셋이 저장되었습니다!')
+    alert(t('components.quickPanCalc.alerts.presetSaved'))
   }
 
   // 프리셋 불러오기
@@ -172,7 +174,7 @@ export default function QuickPanCalculator() {
   // 레시피 자동 변환
   const convertRecipe = () => {
     if (!currentRecipe) {
-      if (confirm('레시피를 선택해주세요. 레시피 목록으로 이동하시겠습니까?')) {
+      if (confirm(t('components.quickPanCalc.alerts.selectRecipe'))) {
         setActiveTab('recipes')
       }
       return
@@ -190,15 +192,15 @@ export default function QuickPanCalculator() {
     const convertedRecipe = {
       ...currentRecipe,
       id: `recipe-${Date.now()}`,
-      name: `${currentRecipe.name} (팬 변환 ${scalingFactor}x)`,
+      name: `${currentRecipe.name} (${t('components.quickPanCalc.actions.convertRecipe')} ${scalingFactor}x)`,
       ingredients: scaledIngredients,
       createdAt: new Date(),
       updatedAt: new Date(),
-      notes: `${currentRecipe.notes || ''}\n\n[팬 계산 변환]\n총 ${results.totalPans}개 팬, ${results.totalDough}g 반죽`
+      notes: `${currentRecipe.notes || ''}\n\n[${t('components.quickPanCalc.actions.convertRecipe')}]\n${t('components.quickPanCalc.copyText.totalPans')}: ${results.totalPans}, ${results.totalDough}g`
     }
 
     // 확인 후 저장
-    if (confirm(`${scalingFactor}배 변환된 레시피를 저장하시겠습니까?`)) {
+    if (confirm(t('components.quickPanCalc.alerts.convertConfirm', { factor: scalingFactor }))) {
       setCurrentRecipe(convertedRecipe)
       setActiveTab('recipes')
     }
@@ -207,21 +209,21 @@ export default function QuickPanCalculator() {
   // 결과 복사
   const copyResults = () => {
     const text = `
-팬 계산 결과
+${t('components.quickPanCalc.copyText.title')}
 ─────────────────
-총 팬 개수: ${results.totalPans}개
-필요 반죽량: ${results.totalDough.toLocaleString()}g
-손실 5% 적용: ${results.wastageAdjusted.toLocaleString()}g
-레시피 배율: ${results.scalingFactor}x
+${t('components.quickPanCalc.copyText.totalPans')}: ${results.totalPans}
+${t('components.quickPanCalc.copyText.requiredDough')}: ${results.totalDough.toLocaleString()}g
+${t('components.quickPanCalc.copyText.withWastage')}: ${results.wastageAdjusted.toLocaleString()}g
+${t('components.quickPanCalc.copyText.scaleFactor')}: ${results.scalingFactor}x
 
-팬별 상세:
+${t('components.quickPanCalc.copyText.details')}:
 ${results.pans.map((pan, i) =>
-  `#${i + 1}: ${pan.doughPerPan}g × ${pan.count}개 = ${pan.totalDough}g (${pan.bakingTemp}°C / ${pan.bakingTime}분)`
+  `#${i + 1}: ${pan.doughPerPan}g × ${pan.count} = ${pan.totalDough}g (${pan.bakingTemp}°C / ${pan.bakingTime}${t('units.minute')})`
 ).join('\n')}
     `.trim()
 
     navigator.clipboard.writeText(text)
-    alert('클립보드에 복사되었습니다!')
+    alert(t('components.quickPanCalc.alerts.resultsCopied'))
   }
 
   // 데이터 내보내기
@@ -248,8 +250,8 @@ ${results.pans.map((pan, i) =>
       <div className="bg-white rounded-lg shadow-sm p-6 print:shadow-none">
         <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-bread-800">🍞 전문가용 팬 계산기</h1>
-            <p className="text-gray-600 mt-1">여러 팬의 반죽량을 정밀하게 계산합니다</p>
+            <h1 className="text-2xl font-bold text-bread-800">🍞 {t('components.quickPanCalc.title')}</h1>
+            <p className="text-gray-600 mt-1">{t('components.quickPanCalc.description')}</p>
           </div>
 
           <div className="flex gap-2 flex-wrap print:hidden">
@@ -257,26 +259,26 @@ ${results.pans.map((pan, i) =>
               onClick={() => setShowPresetModal(true)}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
-              💾 저장
+              💾 {t('components.quickPanCalc.save')}
             </button>
             <button
               onClick={handlePrint}
               className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
             >
-              🖨️ 인쇄
+              🖨️ {t('components.quickPanCalc.print')}
             </button>
             <button
               onClick={exportData}
               className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
             >
-              📥 내보내기
+              📥 {t('components.quickPanCalc.export')}
             </button>
             <button
               onClick={addPan}
               className="bg-bread-600 text-white px-4 py-2 rounded-lg hover:bg-bread-700 transition-colors flex items-center gap-2"
             >
               <span className="text-xl">+</span>
-              팬 추가
+              {t('components.quickPanCalc.addPan')}
             </button>
           </div>
         </div>
@@ -284,7 +286,7 @@ ${results.pans.map((pan, i) =>
         {/* 프리셋 빠른 선택 */}
         {presets.length > 0 && (
           <div className="print:hidden">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">📌 저장된 프리셋</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-2">📌 {t('components.quickPanCalc.savedPresets')}</h3>
             <div className="flex gap-2 flex-wrap">
               {getFavorites().slice(0, 5).map(preset => (
                 <button
@@ -304,7 +306,7 @@ ${results.pans.map((pan, i) =>
                   onClick={() => setShowPresetModal(true)}
                   className="px-3 py-1 rounded-lg text-sm border-2 border-gray-300 hover:border-bread-400"
                 >
-                  +{presets.length - 5} 더보기
+                  +{presets.length - 5} {t('components.quickPanCalc.showMore')}
                 </button>
               )}
             </div>
@@ -316,7 +318,7 @@ ${results.pans.map((pan, i) =>
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="mt-4 text-sm text-bread-600 hover:text-bread-800 print:hidden"
         >
-          {showAdvanced ? '▼' : '▶'} 고급 설정 (재질, 고도 보정)
+          {showAdvanced ? '▼' : '▶'} {t('components.quickPanCalc.advancedSettings')}
         </button>
       </div>
 
@@ -326,21 +328,21 @@ ${results.pans.map((pan, i) =>
           <div key={pan.id} className="bg-white rounded-lg shadow-sm p-6 print:break-inside-avoid">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-lg text-bread-800">
-                팬 #{index + 1}
+                {t('components.quickPanCalc.panNumber', { number: index + 1 })}
               </h3>
               <div className="flex gap-2 print:hidden">
                 <button
                   onClick={() => duplicatePan(pan.id)}
                   className="text-bread-600 hover:text-bread-800 text-sm px-3 py-1 border border-bread-300 rounded"
-                  title="복제"
+                  title={t('components.quickPanCalc.duplicate')}
                 >
-                  복제
+                  {t('components.quickPanCalc.duplicate')}
                 </button>
                 {pans.length > 1 && (
                   <button
                     onClick={() => removePan(pan.id)}
                     className="text-red-600 hover:text-red-800 text-xl px-2"
-                    title="삭제"
+                    title={t('components.quickPanCalc.delete')}
                   >
                     ×
                   </button>
@@ -352,38 +354,38 @@ ${results.pans.map((pan, i) =>
               {/* 팬 형태 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  팬 형태
+                  {t('components.quickPanCalc.panShape')}
                 </label>
                 <select
                   value={pan.type}
                   onChange={(e) => updatePan(pan.id, 'type', e.target.value)}
                   className="input w-full"
                 >
-                  <option value="rectangle">사각형/직사각형</option>
-                  <option value="round">원형</option>
-                  <option value="loaf">식빵틀</option>
+                  <option value="rectangle">{t('components.quickPanCalc.shapes.rectangle')}</option>
+                  <option value="round">{t('components.quickPanCalc.shapes.round')}</option>
+                  <option value="loaf">{t('components.quickPanCalc.shapes.loaf')}</option>
                 </select>
               </div>
 
               {/* 제품 종류 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  제품 종류
+                  {t('components.quickPanCalc.productType')}
                 </label>
                 <select
                   value={pan.productType}
                   onChange={(e) => updatePan(pan.id, 'productType', e.target.value)}
                   className="input w-full"
                 >
-                  <option value="white_bread">일반 식빵</option>
-                  <option value="whole_wheat">통밀빵</option>
-                  <option value="brioche">브리오슈</option>
-                  <option value="milk_bread">우유식빵</option>
-                  <option value="sandwich_loaf">샌드위치 식빵</option>
-                  <option value="sourdough">사워도우</option>
-                  <option value="sponge_cake">스펀지 케이크</option>
-                  <option value="pound_cake">파운드 케이크</option>
-                  <option value="chiffon_cake">쉬폰 케이크</option>
+                  <option value="white_bread">{t('components.quickPanCalc.products.white_bread')}</option>
+                  <option value="whole_wheat">{t('components.quickPanCalc.products.whole_wheat')}</option>
+                  <option value="brioche">{t('components.quickPanCalc.products.brioche')}</option>
+                  <option value="milk_bread">{t('components.quickPanCalc.products.milk_bread')}</option>
+                  <option value="sandwich_loaf">{t('components.quickPanCalc.products.sandwich_loaf')}</option>
+                  <option value="sourdough">{t('components.quickPanCalc.products.sourdough')}</option>
+                  <option value="sponge_cake">{t('components.quickPanCalc.products.sponge_cake')}</option>
+                  <option value="pound_cake">{t('components.quickPanCalc.products.pound_cake')}</option>
+                  <option value="chiffon_cake">{t('components.quickPanCalc.products.chiffon_cake')}</option>
                 </select>
               </div>
 
@@ -392,7 +394,7 @@ ${results.pans.map((pan, i) =>
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      길이 (cm)
+                      {t('components.quickPanCalc.dimensions.length')}
                     </label>
                     <input
                       type="number"
@@ -404,7 +406,7 @@ ${results.pans.map((pan, i) =>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      너비 (cm)
+                      {t('components.quickPanCalc.dimensions.width')}
                     </label>
                     <input
                       type="number"
@@ -420,7 +422,7 @@ ${results.pans.map((pan, i) =>
               {pan.type === 'round' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    지름 (cm)
+                    {t('components.quickPanCalc.dimensions.diameter')}
                   </label>
                   <input
                     type="number"
@@ -434,7 +436,7 @@ ${results.pans.map((pan, i) =>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  높이 (cm)
+                  {t('components.quickPanCalc.dimensions.height')}
                 </label>
                 <input
                   type="number"
@@ -448,7 +450,7 @@ ${results.pans.map((pan, i) =>
               {/* 개수 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  개수
+                  {t('components.quickPanCalc.count')}
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -478,25 +480,25 @@ ${results.pans.map((pan, i) =>
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      팬 재질
+                      {t('components.quickPanCalc.panMaterial')}
                     </label>
                     <select
                       value={pan.material || 'aluminum'}
                       onChange={(e) => updatePan(pan.id, 'material', e.target.value)}
                       className="input w-full"
                     >
-                      <option value="aluminum">알루미늄 (기준)</option>
-                      <option value="dark_metal">어두운 금속 (5% ↓)</option>
-                      <option value="carbon_steel">탄소강 (2% ↓)</option>
-                      <option value="glass">유리 (5% ↑)</option>
-                      <option value="ceramic">세라믹 (8% ↑)</option>
-                      <option value="silicone">실리콘 (10% ↑)</option>
+                      <option value="aluminum">{t('components.quickPanCalc.materials.aluminum')}</option>
+                      <option value="dark_metal">{t('components.quickPanCalc.materials.dark_metal')}</option>
+                      <option value="carbon_steel">{t('components.quickPanCalc.materials.carbon_steel')}</option>
+                      <option value="glass">{t('components.quickPanCalc.materials.glass')}</option>
+                      <option value="ceramic">{t('components.quickPanCalc.materials.ceramic')}</option>
+                      <option value="silicone">{t('components.quickPanCalc.materials.silicone')}</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      고도 (m)
+                      {t('components.quickPanCalc.altitude')}
                     </label>
                     <input
                       type="number"
@@ -516,33 +518,33 @@ ${results.pans.map((pan, i) =>
               <div className="mt-4 p-4 bg-bread-50 rounded-lg border border-bread-200">
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600">부피:</span>
+                    <span className="text-gray-600">{t('components.quickPanCalc.results.volume')}:</span>
                     <div className="font-semibold text-bread-800">
                       {results.pans[index].volume.toLocaleString()} cm³
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-600">팬당 반죽량:</span>
+                    <span className="text-gray-600">{t('components.quickPanCalc.results.doughPerPan')}:</span>
                     <div className="font-semibold text-bread-800">
                       {results.pans[index].doughPerPan.toLocaleString()}g
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-600">총 반죽량:</span>
+                    <span className="text-gray-600">{t('components.quickPanCalc.results.totalDough')}:</span>
                     <div className="font-bold text-bread-900 text-lg">
                       {results.pans[index].totalDough.toLocaleString()}g
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-600">권장 온도:</span>
+                    <span className="text-gray-600">{t('components.quickPanCalc.results.bakingTemp')}:</span>
                     <div className="font-semibold text-orange-600">
                       {results.pans[index].bakingTemp}°C
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-600">권장 시간:</span>
+                    <span className="text-gray-600">{t('components.quickPanCalc.results.bakingTime')}:</span>
                     <div className="font-semibold text-orange-600">
-                      {results.pans[index].bakingTime}분
+                      {results.pans[index].bakingTime}{t('units.minute')}
                     </div>
                   </div>
                 </div>
@@ -555,32 +557,32 @@ ${results.pans.map((pan, i) =>
       {/* 전체 요약 */}
       {results && (
         <div className="bg-gradient-to-br from-bread-100 to-bread-200 rounded-lg shadow-lg p-6 print:shadow-none print:break-inside-avoid">
-          <h2 className="text-xl font-bold text-bread-900 mb-4">📋 총 요약</h2>
+          <h2 className="text-xl font-bold text-bread-900 mb-4">📋 {t('components.quickPanCalc.summary.title')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <div className="bg-white rounded-lg p-4 shadow">
-              <div className="text-sm text-gray-600 mb-1">총 팬 개수</div>
+              <div className="text-sm text-gray-600 mb-1">{t('components.quickPanCalc.summary.totalPans')}</div>
               <div className="text-3xl font-bold text-bread-800">
-                {results.totalPans}개
+                {results.totalPans}
               </div>
             </div>
 
             <div className="bg-white rounded-lg p-4 shadow">
-              <div className="text-sm text-gray-600 mb-1">필요 반죽량</div>
+              <div className="text-sm text-gray-600 mb-1">{t('components.quickPanCalc.summary.requiredDough')}</div>
               <div className="text-3xl font-bold text-bread-800">
                 {results.totalDough.toLocaleString()}g
               </div>
             </div>
 
             <div className="bg-white rounded-lg p-4 shadow">
-              <div className="text-sm text-gray-600 mb-1">손실률 5% 적용</div>
+              <div className="text-sm text-gray-600 mb-1">{t('components.quickPanCalc.summary.withWastage')}</div>
               <div className="text-3xl font-bold text-green-600">
                 {results.wastageAdjusted.toLocaleString()}g
               </div>
             </div>
 
             <div className="bg-white rounded-lg p-4 shadow">
-              <div className="text-sm text-gray-600 mb-1">레시피 배율</div>
+              <div className="text-sm text-gray-600 mb-1">{t('components.quickPanCalc.summary.scaleFactor')}</div>
               <div className="text-3xl font-bold text-blue-600">
                 {results.scalingFactor}x
               </div>
@@ -590,33 +592,33 @@ ${results.pans.map((pan, i) =>
           {/* 기준 레시피 설정 */}
           <div className="bg-white rounded-lg p-4 shadow mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              기준 레시피 총량 (g):
+              {t('components.quickPanCalc.baseRecipe.label')}
             </label>
             <input
               type="number"
               value={baseRecipeWeight}
               onChange={(e) => setBaseRecipeWeight(parseFloat(e.target.value) || 1000)}
               className="input w-full max-w-xs"
-              placeholder="예: 1200"
+              placeholder={t('components.quickPanCalc.baseRecipe.placeholder')}
             />
             <p className="text-xs text-gray-500 mt-1">
-              원래 레시피의 총 반죽량을 입력하면 정확한 배율이 계산됩니다
+              {t('components.quickPanCalc.baseRecipe.hint')}
             </p>
           </div>
 
           {/* 팬별 상세 정보 테이블 */}
           <div className="bg-white rounded-lg p-4 shadow overflow-x-auto print:break-inside-avoid">
-            <h3 className="font-semibold text-bread-800 mb-3">팬별 상세 정보</h3>
+            <h3 className="font-semibold text-bread-800 mb-3">{t('components.quickPanCalc.table.title')}</h3>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-2 px-2">팬</th>
-                  <th className="text-left py-2 px-2">형태</th>
-                  <th className="text-right py-2 px-2">치수</th>
-                  <th className="text-right py-2 px-2">개수</th>
-                  <th className="text-right py-2 px-2">팬당</th>
-                  <th className="text-right py-2 px-2 font-semibold">총량</th>
-                  <th className="text-right py-2 px-2">굽기</th>
+                  <th className="text-left py-2 px-2">{t('components.quickPanCalc.table.pan')}</th>
+                  <th className="text-left py-2 px-2">{t('components.quickPanCalc.table.shape')}</th>
+                  <th className="text-right py-2 px-2">{t('components.quickPanCalc.table.dimensions')}</th>
+                  <th className="text-right py-2 px-2">{t('components.quickPanCalc.table.count')}</th>
+                  <th className="text-right py-2 px-2">{t('components.quickPanCalc.table.perPan')}</th>
+                  <th className="text-right py-2 px-2 font-semibold">{t('components.quickPanCalc.table.total')}</th>
+                  <th className="text-right py-2 px-2">{t('components.quickPanCalc.table.baking')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -624,7 +626,7 @@ ${results.pans.map((pan, i) =>
                   <tr key={pan.id} className="border-b border-gray-100">
                     <td className="py-2 px-2">#{index + 1}</td>
                     <td className="py-2 px-2">
-                      {pan.type === 'rectangle' ? '사각형' : pan.type === 'round' ? '원형' : '식빵틀'}
+                      {t(`components.quickPanCalc.shapes.${pan.type}`)}
                     </td>
                     <td className="py-2 px-2 text-right text-gray-600">
                       {pan.type === 'round'
@@ -632,7 +634,7 @@ ${results.pans.map((pan, i) =>
                         : `${pan.length}×${pan.width}×${pan.height}cm`
                       }
                     </td>
-                    <td className="py-2 px-2 text-right">{pan.count}개</td>
+                    <td className="py-2 px-2 text-right">{pan.count}</td>
                     <td className="py-2 px-2 text-right font-medium">
                       {pan.doughPerPan.toLocaleString()}g
                     </td>
@@ -640,7 +642,7 @@ ${results.pans.map((pan, i) =>
                       {pan.totalDough.toLocaleString()}g
                     </td>
                     <td className="py-2 px-2 text-right text-orange-600">
-                      {pan.bakingTemp}°C/{pan.bakingTime}분
+                      {pan.bakingTemp}°C/{pan.bakingTime}{t('units.minute')}
                     </td>
                   </tr>
                 ))}
@@ -654,19 +656,19 @@ ${results.pans.map((pan, i) =>
               onClick={copyResults}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
             >
-              📋 결과 복사
+              📋 {t('components.quickPanCalc.actions.copyResults')}
             </button>
             <button
               onClick={convertRecipe}
               className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
             >
-              🔄 레시피 변환
+              🔄 {t('components.quickPanCalc.actions.convertRecipe')}
             </button>
             <button
               onClick={() => setShowVisualization(!showVisualization)}
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
             >
-              {showVisualization ? '📊 차트 숨기기' : '📊 차트 보기'}
+              {showVisualization ? `📊 ${t('components.quickPanCalc.actions.hideChart')}` : `📊 ${t('components.quickPanCalc.actions.showChart')}`}
             </button>
           </div>
         </div>
@@ -678,7 +680,7 @@ ${results.pans.map((pan, i) =>
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">프리셋 관리</h2>
+                <h2 className="text-xl font-bold">{t('components.quickPanCalc.preset.title')}</h2>
                 <button
                   onClick={() => setShowPresetModal(false)}
                   className="text-gray-500 hover:text-gray-700 text-2xl"
@@ -689,29 +691,29 @@ ${results.pans.map((pan, i) =>
 
               {/* 현재 구성 저장 */}
               <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                <h3 className="font-semibold mb-2">현재 구성 저장</h3>
+                <h3 className="font-semibold mb-2">{t('components.quickPanCalc.preset.saveCurrentTitle')}</h3>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={presetName}
                     onChange={(e) => setPresetName(e.target.value)}
-                    placeholder="프리셋 이름 (예: 주말 생산용)"
+                    placeholder={t('components.quickPanCalc.preset.namePlaceholder')}
                     className="input flex-1"
                   />
                   <button
                     onClick={saveAsPreset}
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                   >
-                    저장
+                    {t('components.quickPanCalc.preset.save')}
                   </button>
                 </div>
               </div>
 
               {/* 저장된 프리셋 목록 */}
               <div>
-                <h3 className="font-semibold mb-2">저장된 프리셋</h3>
+                <h3 className="font-semibold mb-2">{t('components.quickPanCalc.preset.savedPresetsTitle')}</h3>
                 {presets.length === 0 ? (
-                  <p className="text-gray-500 text-sm">저장된 프리셋이 없습니다</p>
+                  <p className="text-gray-500 text-sm">{t('components.quickPanCalc.preset.noPresets')}</p>
                 ) : (
                   <div className="space-y-2">
                     {presets.map(preset => (
@@ -722,7 +724,7 @@ ${results.pans.map((pan, i) =>
                         <div className="flex-1">
                           <div className="font-medium">{preset.name}</div>
                           <div className="text-sm text-gray-500">
-                            {preset.pans.length}개 팬 • {preset.usageCount}회 사용
+                            {t('components.quickPanCalc.preset.pansCount', { count: preset.pans.length })} • {t('components.quickPanCalc.preset.usageCount', { count: preset.usageCount })}
                           </div>
                         </div>
                         <div className="flex gap-2">
@@ -739,17 +741,17 @@ ${results.pans.map((pan, i) =>
                             }}
                             className="text-blue-600 hover:text-blue-800 text-sm px-3 py-1 border border-blue-300 rounded"
                           >
-                            불러오기
+                            {t('components.quickPanCalc.preset.load')}
                           </button>
                           <button
                             onClick={() => {
-                              if (confirm('이 프리셋을 삭제하시겠습니까?')) {
+                              if (confirm(t('components.quickPanCalc.preset.deleteConfirm'))) {
                                 deletePreset(preset.id)
                               }
                             }}
                             className="text-red-600 hover:text-red-800 text-sm"
                           >
-                            삭제
+                            {t('common.delete')}
                           </button>
                         </div>
                       </div>
@@ -771,15 +773,15 @@ ${results.pans.map((pan, i) =>
 
       {/* 도움말 */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 print:hidden">
-        <h3 className="font-semibold text-blue-900 mb-2">💡 사용 팁</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('components.quickPanCalc.tips.title')}</h3>
         <ul className="text-sm text-blue-800 space-y-1">
-          <li>• 팬 치수는 실제 내부 치수를 측정해서 입력하세요</li>
-          <li>• 제품 종류에 따라 최적의 반죽량이 자동 계산됩니다</li>
-          <li>• 고급 설정에서 팬 재질과 고도를 보정할 수 있습니다</li>
-          <li>• 자주 사용하는 구성은 프리셋으로 저장하세요</li>
-          <li>• 레시피 변환 버튼으로 배율이 적용된 레시피를 자동 생성합니다</li>
-          <li>• 인쇄 버튼으로 작업지시서를 출력할 수 있습니다</li>
-          <li>• 📊 차트 보기 버튼으로 시각화된 통계를 확인하세요</li>
+          <li>• {t('components.quickPanCalc.tips.tip1')}</li>
+          <li>• {t('components.quickPanCalc.tips.tip2')}</li>
+          <li>• {t('components.quickPanCalc.tips.tip3')}</li>
+          <li>• {t('components.quickPanCalc.tips.tip4')}</li>
+          <li>• {t('components.quickPanCalc.tips.tip5')}</li>
+          <li>• {t('components.quickPanCalc.tips.tip6')}</li>
+          <li>• {t('components.quickPanCalc.tips.tip7')}</li>
         </ul>
       </div>
 

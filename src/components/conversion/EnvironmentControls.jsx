@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import Environmental from '../../utils/calculations/environmental.js'
 import Button from '../common/Button.jsx'
 
 function EnvironmentControls({ environment, onChange }) {
+  const { t } = useTranslation()
   const [showPresets, setShowPresets] = useState(false)
   const [adjustmentPreview, setAdjustmentPreview] = useState(null)
   
@@ -56,26 +58,26 @@ function EnvironmentControls({ environment, onChange }) {
 
   return (
     <div>
-      <h3 className="mb-4">환경 설정</h3>
-      
+      <h3 className="mb-4">{t('components.envControls.title')}</h3>
+
       {/* 프리셋 버튼 */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-medium text-bread-700">빠른 설정</h4>
-          <Button 
-            size="small" 
+          <h4 className="font-medium text-bread-700">{t('components.envControls.quickSettings')}</h4>
+          <Button
+            size="small"
             variant="secondary"
             onClick={() => setShowPresets(!showPresets)}
           >
-            {showPresets ? '프리셋 숨기기' : '프리셋 보기'}
+            {showPresets ? t('components.envControls.hidePresets') : t('components.envControls.showPresets')}
           </Button>
         </div>
-        
+
         {showPresets && (
           <div className="space-y-4 p-4 bg-bread-50 rounded-lg">
             {/* 계절 프리셋 */}
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">계절별 설정</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">{t('components.envControls.seasonSettings')}</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {Object.entries(seasonalPresets).map(([season, preset]) => (
                   <Button
@@ -87,18 +89,15 @@ function EnvironmentControls({ environment, onChange }) {
                       updatePreview(preset)
                     }}
                   >
-                    {season === 'spring' && '봄'}
-                    {season === 'summer' && '여름'}
-                    {season === 'fall' && '가을'}
-                    {season === 'winter' && '겨울'}
+                    {t(`components.envControls.seasons.${season}`)}
                   </Button>
                 ))}
               </div>
             </div>
-            
+
             {/* 지역 프리셋 */}
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">지역별 설정</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">{t('components.envControls.regionSettings')}</p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {Object.entries(regionalPresets).map(([region, preset]) => (
                   <Button
@@ -111,7 +110,7 @@ function EnvironmentControls({ environment, onChange }) {
                       updatePreview(envData)
                     }}
                   >
-                    {preset.name}
+                    {t(`components.envControls.regions.${region}`)}
                   </Button>
                 ))}
               </div>
@@ -124,7 +123,7 @@ function EnvironmentControls({ environment, onChange }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            온도 (°C)
+            {t('components.envControls.temperature')} (°C)
           </label>
           <input
             type="number"
@@ -134,16 +133,16 @@ function EnvironmentControls({ environment, onChange }) {
             max="40"
             step="1"
             className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
-            placeholder="온도"
+            placeholder={t('components.envControls.temperature')}
           />
           <p className="text-xs text-gray-500 mt-1">
-            현재: {environment.temp}°C
+            {t('components.envControls.current')}: {environment.temp}°C
           </p>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            습도 (%)
+            {t('components.envControls.humidity')} (%)
           </label>
           <input
             type="number"
@@ -153,16 +152,16 @@ function EnvironmentControls({ environment, onChange }) {
             max="100"
             step="5"
             className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
-            placeholder="습도"
+            placeholder={t('components.envControls.humidity')}
           />
           <p className="text-xs text-gray-500 mt-1">
-            현재: {environment.humidity}%
+            {t('components.envControls.current')}: {environment.humidity}%
           </p>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            고도 (m)
+            {t('components.envControls.altitude')} (m)
           </label>
           <input
             type="number"
@@ -172,10 +171,10 @@ function EnvironmentControls({ environment, onChange }) {
             max="4000"
             step="100"
             className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
-            placeholder="고도"
+            placeholder={t('components.envControls.altitude')}
           />
           <p className="text-xs text-gray-500 mt-1">
-            현재: {environment.altitude}m
+            {t('components.envControls.current')}: {environment.altitude}m
           </p>
         </div>
       </div>
@@ -183,29 +182,25 @@ function EnvironmentControls({ environment, onChange }) {
       {/* 환경 평가 */}
       {evaluation.warnings.length > 0 && (
         <div className={`p-4 rounded-lg mb-6 ${
-          evaluation.overall === 'caution' ? 'bg-yellow-50' : 
+          evaluation.overall === 'caution' ? 'bg-yellow-50' :
           evaluation.overall === 'extreme' ? 'bg-red-50' : 'bg-green-50'
         }`}>
           <h4 className={`font-medium mb-2 ${
-            evaluation.overall === 'caution' ? 'text-yellow-900' : 
+            evaluation.overall === 'caution' ? 'text-yellow-900' :
             evaluation.overall === 'extreme' ? 'text-red-900' : 'text-green-900'
           }`}>
-            환경 평가: {
-              evaluation.overall === 'good' && '양호' ||
-              evaluation.overall === 'caution' && '주의' ||
-              evaluation.overall === 'extreme' && '극한'
-            }
+            {t('components.envControls.evaluation.title')}: {t(`components.envControls.evaluation.${evaluation.overall}`)}
           </h4>
-          
+
           {evaluation.warnings.map((warning, idx) => (
             <p key={idx} className="text-sm text-yellow-800 mb-1">
               ⚠️ {warning}
             </p>
           ))}
-          
+
           {evaluation.recommendations.length > 0 && (
             <div className="mt-3">
-              <p className="text-sm font-medium text-gray-700 mb-1">권장사항:</p>
+              <p className="text-sm font-medium text-gray-700 mb-1">{t('components.envControls.evaluation.recommendations')}:</p>
               {evaluation.recommendations.map((rec, idx) => (
                 <p key={idx} className="text-sm text-gray-600 mb-1">
                   • {rec}
@@ -219,44 +214,44 @@ function EnvironmentControls({ environment, onChange }) {
       {/* 조정 미리보기 */}
       {adjustmentPreview && (
         <div className="p-4 bg-bread-50 rounded-lg mb-6">
-          <h4 className="font-medium text-bread-700 mb-3">환경 보정 미리보기</h4>
+          <h4 className="font-medium text-bread-700 mb-3">{t('components.envControls.preview.title')}</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <p className="text-gray-600">온도 보정:</p>
+              <p className="text-gray-600">{t('components.envControls.preview.tempAdjust')}:</p>
               <p className="font-medium">
-                이스트 {((adjustmentPreview.temp.yeastAdjustment - 1) * 100).toFixed(0)}%
+                {t('components.envControls.preview.yeast')} {((adjustmentPreview.temp.yeastAdjustment - 1) * 100).toFixed(0)}%
               </p>
             </div>
             <div>
-              <p className="text-gray-600">습도 보정:</p>
+              <p className="text-gray-600">{t('components.envControls.preview.humidityAdjust')}:</p>
               <p className="font-medium">
-                밀가루 {((adjustmentPreview.humidity.flourAdjustment - 1) * 100).toFixed(0)}%
+                {t('components.envControls.preview.flour')} {((adjustmentPreview.humidity.flourAdjustment - 1) * 100).toFixed(0)}%
               </p>
             </div>
             <div>
-              <p className="text-gray-600">고도 보정:</p>
+              <p className="text-gray-600">{t('components.envControls.preview.altitudeAdjust')}:</p>
               <p className="font-medium">
-                가스 온도 {adjustmentPreview.altitude.temperatureReduction}°C
+                {t('components.envControls.preview.gasTemp')} {adjustmentPreview.altitude.temperatureReduction}°C
               </p>
             </div>
             <div>
-              <p className="text-gray-600">발효 시간:</p>
+              <p className="text-gray-600">{t('components.envControls.preview.fermentTime')}:</p>
               <p className="font-medium">
-                {adjustmentPreview.fermentationTime}분
+                {adjustmentPreview.fermentationTime}{t('units.minute')}
               </p>
             </div>
           </div>
-          
+
           {environment.altitude > 300 && (
             <div className="mt-3 pt-3 border-t border-bread-200">
-              <p className="text-sm text-gray-700 mb-2">고도의 영향:</p>
+              <p className="text-sm text-gray-700 mb-2">{t('components.envControls.preview.altitudeEffect')}:</p>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600">기압: </span>
+                  <span className="text-gray-600">{t('components.envControls.preview.pressure')}: </span>
                   <span className="font-medium">{adjustmentPreview.pressure.toFixed(1)} kPa</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">끓는점: </span>
+                  <span className="text-gray-600">{t('components.envControls.preview.boilingPoint')}: </span>
                   <span className="font-medium">{adjustmentPreview.boilingPoint.toFixed(1)}°C</span>
                 </div>
               </div>
@@ -268,22 +263,22 @@ function EnvironmentControls({ environment, onChange }) {
       {/* 환경 요인 가이드 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="p-4 bg-gray-50 rounded-lg text-sm">
-          <h5 className="font-medium mb-2">환경 요인 영향</h5>
+          <h5 className="font-medium mb-2">{t('components.envControls.guide.factorTitle')}</h5>
           <ul className="space-y-1 text-gray-700">
-            <li>• 온도 1°C 상승 → 발효 시간 10% 감소</li>
-            <li>• 습도 10% 상승 → 밀가루 2% 감소</li>
-            <li>• 고도 300m 상승 → 가스 온도 2°C 감소</li>
-            <li>• 고도 300m 상승 → 액체 끓는점 2°C 감소</li>
+            <li>• {t('components.envControls.guide.tempRise')}</li>
+            <li>• {t('components.envControls.guide.humidityRise')}</li>
+            <li>• {t('components.envControls.guide.altitudeGas')}</li>
+            <li>• {t('components.envControls.guide.altitudeBoil')}</li>
           </ul>
         </div>
-        
+
         <div className="p-4 bg-yellow-50 rounded-lg text-sm">
-          <h5 className="font-medium mb-2 text-yellow-800">계절별 팁</h5>
+          <h5 className="font-medium mb-2 text-yellow-800">{t('components.envControls.guide.seasonTips')}</h5>
           <ul className="space-y-1 text-yellow-700">
-            <li>• 봄/가을: 표준 레시피 사용</li>
-            <li>• 여름: 차가운 재료, 발효 시간 단축</li>
-            <li>• 겨울: 따뜻한 환경, 발효 시간 연장</li>
-            <li>• 장마철: 밀가루 10% 감소 고려</li>
+            <li>• {t('components.envControls.guide.springFall')}</li>
+            <li>• {t('components.envControls.guide.summer')}</li>
+            <li>• {t('components.envControls.guide.winter')}</li>
+            <li>• {t('components.envControls.guide.rainy')}</li>
           </ul>
         </div>
       </div>

@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useWorkspaceStore } from '@/stores/useWorkspaceStore'
 import { useRecipeStore } from '@/stores/useRecipeStore'
 import RecipeListSidebar from './RecipeListSidebar'
@@ -14,6 +15,7 @@ import RecipeDetailPanel from './RecipeDetailPanel'
 import './RecipeWorkspace.css'
 
 export default function RecipeWorkspace() {
+  const { t } = useTranslation()
   const { selectedRecipeId, selectRecipe } = useWorkspaceStore()
   const recipes = useRecipeStore((state) => state.recipes)
 
@@ -40,8 +42,8 @@ export default function RecipeWorkspace() {
         <div className="workspace-empty">
           <div className="empty-state">
             <div className="empty-icon">📖</div>
-            <h2>레시피를 선택하세요</h2>
-            <p>왼쪽 목록에서 레시피를 클릭하면 상세 정보가 표시됩니다</p>
+            <h2>{t('components.workspace.selectRecipe')}</h2>
+            <p>{t('components.workspace.selectRecipeDesc')}</p>
           </div>
         </div>
       )}

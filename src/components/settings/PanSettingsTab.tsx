@@ -6,7 +6,8 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
-import { useSettingsStore } from '@/stores/useSettingsStore'
+import { useTranslation } from 'react-i18next'
+import { useSettingsStore, DEFAULT_PAN_IDS } from '@/stores/useSettingsStore'
 import { UserPan } from '@/types/settings.types'
 import { PanScalingTS } from '@/utils/calculations/panScaling.ts'
 import {
@@ -24,79 +25,79 @@ import {
   AlertCircle
 } from 'lucide-react'
 
-// 팬 카테고리 목록 (실제 데이터 기준)
+// 팬 카테고리 목록 (value는 데이터 저장용, labelKey는 번역 키)
 const PAN_CATEGORIES = [
-  { value: '케이크팬', label: '케이크팬' },
-  { value: '무스틀', label: '무스틀' },
-  { value: '식빵틀', label: '식빵틀' },
-  { value: '풀먼틀', label: '풀먼틀' },
-  { value: '파운드틀', label: '파운드틀' },
-  { value: '쉬폰틀', label: '쉬폰틀' },
-  { value: '타르트틀', label: '타르트틀' },
-  { value: '머핀틀', label: '머핀틀' },
-  { value: '롤케이크팬', label: '롤케이크팬' },
-  { value: '시트팬', label: '시트팬' },
-  { value: '특수틀', label: '특수틀' },
-  { value: '빵틀', label: '빵틀' }
+  { value: '케이크팬', labelKey: 'cakePan' },
+  { value: '무스틀', labelKey: 'mousseRing' },
+  { value: '식빵틀', labelKey: 'breadPan' },
+  { value: '풀먼틀', labelKey: 'pullmanPan' },
+  { value: '파운드틀', labelKey: 'poundPan' },
+  { value: '쉬폰틀', labelKey: 'chiffonPan' },
+  { value: '타르트틀', labelKey: 'tartPan' },
+  { value: '머핀틀', labelKey: 'muffinPan' },
+  { value: '롤케이크팬', labelKey: 'rollCakePan' },
+  { value: '시트팬', labelKey: 'sheetPan' },
+  { value: '특수틀', labelKey: 'specialPan' },
+  { value: '빵틀', labelKey: 'loafPan' }
 ]
 
-// 팬 타입별 세부 종류 (한글 카테고리 기준)
-const PAN_TYPES: Record<string, { value: string; label: string }[]> = {
+// 팬 타입별 세부 종류 (value는 데이터 저장용, labelKey는 번역 키)
+const PAN_TYPES: Record<string, { value: string; labelKey: string }[]> = {
   '케이크팬': [
-    { value: 'round', label: '원형팬' },
-    { value: 'square', label: '정사각팬' },
-    { value: 'springform', label: '분리형팬' },
-    { value: 'custom', label: '기타' }
+    { value: 'round', labelKey: 'round' },
+    { value: 'square', labelKey: 'square' },
+    { value: 'springform', labelKey: 'springform' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '무스틀': [
-    { value: 'round', label: '무스링' },
-    { value: 'square', label: '사각 무스틀' },
-    { value: 'custom', label: '기타' }
+    { value: 'round', labelKey: 'mousseRing' },
+    { value: 'square', labelKey: 'squareMousse' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '식빵틀': [
-    { value: 'loaf', label: '일반 식빵틀' },
-    { value: 'mini_loaf', label: '미니 식빵틀' },
-    { value: 'custom', label: '기타' }
+    { value: 'loaf', labelKey: 'loaf' },
+    { value: 'mini_loaf', labelKey: 'miniLoaf' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '풀먼틀': [
-    { value: 'square', label: '풀먼틀 (뚜껑형)' },
-    { value: 'custom', label: '기타' }
+    { value: 'square', labelKey: 'pullman' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '파운드틀': [
-    { value: 'loaf', label: '파운드틀' },
-    { value: 'custom', label: '기타' }
+    { value: 'loaf', labelKey: 'pound' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '쉬폰틀': [
-    { value: 'chiffon', label: '쉬폰틀 (중심관 있음)' },
-    { value: 'custom', label: '기타' }
+    { value: 'chiffon', labelKey: 'chiffon' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '타르트틀': [
-    { value: 'round', label: '원형 타르트틀' },
-    { value: 'square', label: '사각 타르트틀' },
-    { value: 'custom', label: '기타' }
+    { value: 'round', labelKey: 'roundTart' },
+    { value: 'square', labelKey: 'squareTart' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '머핀틀': [
-    { value: 'round', label: '일반 머핀틀' },
-    { value: 'mini', label: '미니 머핀틀' },
-    { value: 'custom', label: '기타' }
+    { value: 'round', labelKey: 'muffin' },
+    { value: 'mini', labelKey: 'miniMuffin' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '롤케이크팬': [
-    { value: 'square', label: '롤케이크팬' },
-    { value: 'custom', label: '기타' }
+    { value: 'square', labelKey: 'rollCake' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '시트팬': [
-    { value: 'square', label: '시트팬' },
-    { value: 'custom', label: '기타' }
+    { value: 'square', labelKey: 'sheet' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '특수틀': [
-    { value: 'round', label: '마들렌/구겔호프 등' },
-    { value: 'square', label: '피낭시에 등' },
-    { value: 'custom', label: '기타' }
+    { value: 'round', labelKey: 'madeleine' },
+    { value: 'square', labelKey: 'financier' },
+    { value: 'custom', labelKey: 'custom' }
   ],
   '빵틀': [
-    { value: 'loaf', label: '바게트/특수 빵틀' },
-    { value: 'round', label: '브리오슈틀' },
-    { value: 'custom', label: '기타' }
+    { value: 'loaf', labelKey: 'baguette' },
+    { value: 'round', labelKey: 'brioche' },
+    { value: 'custom', labelKey: 'custom' }
   ]
 }
 
@@ -124,6 +125,7 @@ interface PanSettingsTabProps {
 }
 
 export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) {
+  const { t } = useTranslation()
   const {
     pan,
     addPan,
@@ -131,6 +133,28 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
     deletePan,
     togglePanFavorite
   } = useSettingsStore()
+
+  // 카테고리 라벨 번역 헬퍼
+  const getCategoryLabel = useCallback((categoryValue: string) => {
+    const cat = PAN_CATEGORIES.find(c => c.value === categoryValue)
+    return cat ? t(`settings.pan.categories.${cat.labelKey}`) : categoryValue
+  }, [t])
+
+  // 팬 이름 번역 헬퍼 (기본 팬은 번역, 사용자 팬은 그대로)
+  const getPanDisplayName = useCallback((panItem: UserPan) => {
+    if (DEFAULT_PAN_IDS.includes(panItem.id)) {
+      const translated = t(`settings.pan.panNames.${panItem.id}`, { defaultValue: '' })
+      return translated || panItem.name
+    }
+    return panItem.name
+  }, [t])
+
+  // 타입 라벨 번역 헬퍼
+  const getTypeLabel = useCallback((categoryValue: string, typeValue: string) => {
+    const types = PAN_TYPES[categoryValue] || []
+    const type = types.find(t => t.value === typeValue)
+    return type ? t(`settings.pan.types.${type.labelKey}`) : typeValue
+  }, [t])
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -194,10 +218,10 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
         }
       }
     } catch (e) {
-      console.error('부피 계산 오류:', e)
+      console.error(t('settings.pan.volumeCalcError'), e)
     }
     return null
-  }, [])
+  }, [t])
 
   // 폼 계산된 부피
   const calculatedVolume = useMemo(() => calculateVolume(formData), [formData, calculateVolume])
@@ -234,7 +258,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
   const handleSave = useCallback(() => {
     const volume = calculateVolume(formData)
     if (!volume) {
-      alert('치수를 입력해주세요. 부피를 계산할 수 없습니다.')
+      alert(t('settings.pan.dimensionError'))
       return
     }
 
@@ -256,12 +280,12 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
     }
 
     resetForm()
-  }, [formData, editingId, calculateVolume, updatePan, addPan, resetForm])
+  }, [formData, editingId, calculateVolume, updatePan, addPan, resetForm, t])
 
   // 팬 복제
   const duplicatePan = useCallback((panItem: UserPan) => {
     addPan({
-      name: `${panItem.name} (복사)`,
+      name: `${getPanDisplayName(panItem)} ${t('settings.pan.copyText')}`,
       category: panItem.category,
       type: panItem.type,
       volume: panItem.volume,
@@ -270,7 +294,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
       notes: panItem.notes,
       isFavorite: false
     })
-  }, [addPan])
+  }, [addPan, t, getPanDisplayName])
 
   // 카테고리 변경 시 타입 리셋
   const handleCategoryChange = useCallback((category: string) => {
@@ -303,7 +327,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
           <>
             <div>
               <label className="block text-xs text-gray-500 mb-1">
-                {isChiffon ? '외경' : '지름'} (cm)
+                {isChiffon ? t('settings.pan.outerDiameter') : t('settings.pan.diameter')} (cm)
               </label>
               <input
                 type="number"
@@ -319,7 +343,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             </div>
             {isChiffon && (
               <div>
-                <label className="block text-xs text-gray-500 mb-1">내경 (cm)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.innerDiameter')} (cm)</label>
                 <input
                   type="number"
                   value={dimensions.innerDiameter || ''}
@@ -334,7 +358,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               </div>
             )}
             <div>
-              <label className="block text-xs text-gray-500 mb-1">높이 (cm)</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.height')} (cm)</label>
               <input
                 type="number"
                 value={dimensions.height || ''}
@@ -351,7 +375,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
         ) : (
           <>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">길이 (cm)</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.length')} (cm)</label>
               <input
                 type="number"
                 value={dimensions.length || ''}
@@ -365,7 +389,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">너비 (cm)</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.width')} (cm)</label>
               <input
                 type="number"
                 value={dimensions.width || ''}
@@ -379,7 +403,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">높이 (cm)</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.height')} (cm)</label>
               <input
                 type="number"
                 value={dimensions.height || ''}
@@ -440,7 +464,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
             {/* 팬 이름 */}
             <div className="flex items-center gap-2 min-w-0">
-              <span className="font-medium text-gray-800 truncate">{panItem.name}</span>
+              <span className="font-medium text-gray-800 truncate">{getPanDisplayName(panItem)}</span>
               {panItem.isFavorite && (
                 <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
               )}
@@ -475,7 +499,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               className={`p-1.5 rounded hover:bg-gray-100 ${
                 panItem.isFavorite ? 'text-yellow-500' : 'text-gray-400'
               }`}
-              title="즐겨찾기"
+              title={t('settings.pan.favorites')}
             >
               <Star className={`w-4 h-4 ${panItem.isFavorite ? 'fill-current' : ''}`} />
             </button>
@@ -493,13 +517,13 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             <div className="pt-3 flex flex-wrap items-center gap-3">
               {/* 카테고리 뱃지 */}
               <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
-                {panItem.category}
+                {getCategoryLabel(panItem.category)}
               </span>
 
               {/* 충전율 (있으면) */}
               {panItem.fillRatio && (
                 <span className="text-xs text-gray-500">
-                  충전율: {(panItem.fillRatio * 100).toFixed(0)}%
+                  {t('settings.pan.fillRatio')}: {(panItem.fillRatio * 100).toFixed(0)}%
                 </span>
               )}
 
@@ -519,25 +543,25 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
               >
                 <Edit2 className="w-3 h-3" />
-                편집
+                {t('common.edit')}
               </button>
               <button
                 onClick={() => duplicatePan(panItem)}
                 className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded hover:bg-gray-100"
               >
                 <Copy className="w-3 h-3" />
-                복제
+                {t('settings.pan.duplicate')}
               </button>
               <button
                 onClick={() => {
-                  if (confirm(`"${panItem.name}" 팬을 삭제하시겠습니까?`)) {
+                  if (confirm(t('settings.pan.deleteConfirm', { name: getPanDisplayName(panItem) }))) {
                     deletePan(panItem.id)
                   }
                 }}
                 className="flex items-center gap-1 px-2 py-1 text-xs bg-red-50 text-red-600 rounded hover:bg-red-100"
               >
                 <Trash2 className="w-3 h-3" />
-                삭제
+                {t('common.delete')}
               </button>
             </div>
           </div>
@@ -547,7 +571,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
         {editingId === panItem.id && showForm && (
           <div className="p-4 border-t border-orange-200 bg-orange-50/50">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-medium text-gray-800">팬 정보 수정</h4>
+              <h4 className="font-medium text-gray-800">{t('settings.pan.editPan')}</h4>
               <button onClick={resetForm} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-4 h-4 text-gray-500" />
               </button>
@@ -557,13 +581,13 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               {/* 이름 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  팬 이름 (선택)
+                  {t('settings.pan.nameOptional')}
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="예: 우리집 식빵틀, 엄마 쉬폰팬"
+                  placeholder={t('settings.pan.namePlaceholder')}
                   className="w-full px-3 py-2 text-sm border rounded-lg"
                 />
               </div>
@@ -572,7 +596,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    팬 종류
+                    {t('settings.pan.category')}
                   </label>
                   <select
                     value={formData.category}
@@ -580,13 +604,13 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                     className="w-full px-3 py-2 text-sm border rounded-lg"
                   >
                     {PAN_CATEGORIES.map(cat => (
-                      <option key={cat.value} value={cat.value}>{cat.label}</option>
+                      <option key={cat.value} value={cat.value}>{t(`settings.pan.categories.${cat.labelKey}`)}</option>
                     ))}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    세부 타입
+                    {t('settings.pan.subType')}
                   </label>
                   <select
                     value={formData.type}
@@ -594,7 +618,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                     className="w-full px-3 py-2 text-sm border rounded-lg"
                   >
                     {(PAN_TYPES[formData.category] || PAN_TYPES['케이크팬']).map(type => (
-                      <option key={type.value} value={type.value}>{type.label}</option>
+                      <option key={type.value} value={type.value}>{t(`settings.pan.types.${type.labelKey}`)}</option>
                     ))}
                   </select>
                 </div>
@@ -603,7 +627,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               {/* 치수 입력 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  치수
+                  {t('settings.pan.dimensions')}
                 </label>
                 {renderDimensionInputs()}
               </div>
@@ -613,15 +637,15 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 <Box className="w-5 h-5 text-blue-600" />
                 <div>
                   <div className="text-sm text-blue-700">
-                    계산된 부피: {' '}
+                    {t('settings.pan.calculatedVolume')}: {' '}
                     <span className="font-mono font-bold">
-                      {calculatedVolume ? `${Math.round(calculatedVolume).toLocaleString()} ml` : '치수를 입력하세요'}
+                      {calculatedVolume ? `${Math.round(calculatedVolume).toLocaleString()} ml` : t('settings.pan.enterDimensions')}
                     </span>
                   </div>
                   {!calculatedVolume && (
                     <div className="text-xs text-blue-500 flex items-center gap-1 mt-0.5">
                       <AlertCircle className="w-3 h-3" />
-                      필수 치수를 모두 입력해야 부피가 계산됩니다
+                      {t('settings.pan.dimensionsRequired')}
                     </div>
                   )}
                 </div>
@@ -630,7 +654,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               {/* 충전율 (선택) */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  기본 충전율 (선택)
+                  {t('settings.pan.fillRatioOptional')}
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -654,12 +678,12 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               {/* 메모 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  메모 (선택)
+                  {t('settings.pan.notesOptional')}
                 </label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder="예: 테프론 코팅, 살짝 찌그러짐 있음"
+                  placeholder={t('settings.pan.notesPlaceholder')}
                   rows={2}
                   className="w-full px-3 py-2 text-sm border rounded-lg resize-none"
                 />
@@ -674,7 +698,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                   className="rounded border-gray-300"
                 />
                 <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'}`} />
-                <span className="text-sm text-gray-700">즐겨찾기에 추가</span>
+                <span className="text-sm text-gray-700">{t('settings.pan.addToFavorites')}</span>
               </label>
 
               {/* 저장 버튼 */}
@@ -685,13 +709,13 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                   className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
                   <Save className="w-4 h-4" />
-                  저장
+                  {t('common.save')}
                 </button>
                 <button
                   onClick={resetForm}
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  취소
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -706,9 +730,9 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">내 팬/틀 관리</h3>
+          <h3 className="text-lg font-semibold text-gray-800">{t('settings.pan.title')}</h3>
           <p className="text-sm text-gray-500">
-            보유한 팬을 등록하면 레시피 변환 시 빠르게 선택할 수 있습니다.
+            {t('settings.pan.titleDesc')}
           </p>
         </div>
         <button
@@ -719,7 +743,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
           className="flex items-center gap-1 px-3 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          팬 추가
+          {t('settings.pan.addPan')}
         </button>
       </div>
 
@@ -731,7 +755,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="팬 이름, 종류로 검색..."
+            placeholder={t('settings.pan.searchPlaceholder')}
             className="w-full pl-8 pr-3 py-2 text-sm border rounded-lg"
           />
         </div>
@@ -740,9 +764,9 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
           onChange={(e) => setFilterCategory(e.target.value || null)}
           className="px-3 py-2 text-sm border rounded-lg"
         >
-          <option value="">모든 종류</option>
+          <option value="">{t('settings.pan.allTypes')}</option>
           {PAN_CATEGORIES.map(cat => (
-            <option key={cat.value} value={cat.value}>{cat.label}</option>
+            <option key={cat.value} value={cat.value}>{t(`settings.pan.categories.${cat.labelKey}`)}</option>
           ))}
         </select>
         <button
@@ -754,7 +778,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
           }`}
         >
           <Star className={`w-4 h-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
-          즐겨찾기
+          {t('settings.pan.favorites')}
         </button>
       </div>
 
@@ -763,7 +787,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
         <div className="p-4 border border-orange-200 bg-orange-50/50 rounded-lg">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-medium text-gray-800">
-              {editingId ? '팬 정보 수정' : '새 팬 추가'}
+              {editingId ? t('settings.pan.editPan') : t('settings.pan.newPan')}
             </h4>
             <button onClick={resetForm} className="p-1 hover:bg-gray-100 rounded">
               <X className="w-4 h-4 text-gray-500" />
@@ -774,13 +798,13 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             {/* 이름 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                팬 이름 (선택)
+                {t('settings.pan.nameOptional')}
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="예: 우리집 식빵틀, 엄마 쉬폰팬"
+                placeholder={t('settings.pan.namePlaceholder')}
                 className="w-full px-3 py-2 text-sm border rounded-lg"
               />
             </div>
@@ -789,7 +813,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  팬 종류
+                  {t('settings.pan.category')}
                 </label>
                 <select
                   value={formData.category}
@@ -797,21 +821,21 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                   className="w-full px-3 py-2 text-sm border rounded-lg"
                 >
                   {PAN_CATEGORIES.map(cat => (
-                    <option key={cat.value} value={cat.value}>{cat.label}</option>
+                    <option key={cat.value} value={cat.value}>{t(`settings.pan.categories.${cat.labelKey}`)}</option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  세부 타입
+                  {t('settings.pan.subType')}
                 </label>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
                   className="w-full px-3 py-2 text-sm border rounded-lg"
                 >
-                  {(PAN_TYPES[formData.category] || PAN_TYPES.other).map(type => (
-                    <option key={type.value} value={type.value}>{type.label}</option>
+                  {(PAN_TYPES[formData.category] || PAN_TYPES['케이크팬']).map(type => (
+                    <option key={type.value} value={type.value}>{t(`settings.pan.types.${type.labelKey}`)}</option>
                   ))}
                 </select>
               </div>
@@ -820,7 +844,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             {/* 치수 입력 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                치수
+                {t('settings.pan.dimensions')}
               </label>
               {renderDimensionInputs()}
             </div>
@@ -830,15 +854,15 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               <Box className="w-5 h-5 text-blue-600" />
               <div>
                 <div className="text-sm text-blue-700">
-                  계산된 부피: {' '}
+                  {t('settings.pan.calculatedVolume')}: {' '}
                   <span className="font-mono font-bold">
-                    {calculatedVolume ? `${Math.round(calculatedVolume).toLocaleString()} ml` : '치수를 입력하세요'}
+                    {calculatedVolume ? `${Math.round(calculatedVolume).toLocaleString()} ml` : t('settings.pan.enterDimensions')}
                   </span>
                 </div>
                 {!calculatedVolume && (
                   <div className="text-xs text-blue-500 flex items-center gap-1 mt-0.5">
                     <AlertCircle className="w-3 h-3" />
-                    필수 치수를 모두 입력해야 부피가 계산됩니다
+                    {t('settings.pan.dimensionsRequired')}
                   </div>
                 )}
               </div>
@@ -847,7 +871,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             {/* 충전율 (선택) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                기본 충전율 (선택)
+                {t('settings.pan.fillRatioOptional')}
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -867,19 +891,19 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 </span>
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                팬에 반죽을 채우는 기본 비율 (제품별로 다르게 적용 가능)
+                {t('settings.pan.fillRatioDesc')}
               </p>
             </div>
 
             {/* 메모 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                메모 (선택)
+                {t('settings.pan.notesOptional')}
               </label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="예: 테프론 코팅, 살짝 찌그러짐 있음"
+                placeholder={t('settings.pan.notesPlaceholder')}
                 rows={2}
                 className="w-full px-3 py-2 text-sm border rounded-lg resize-none"
               />
@@ -894,7 +918,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 className="rounded border-gray-300"
               />
               <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'}`} />
-              <span className="text-sm text-gray-700">즐겨찾기에 추가</span>
+              <span className="text-sm text-gray-700">{t('settings.pan.addToFavorites')}</span>
             </label>
 
             {/* 저장 버튼 */}
@@ -905,13 +929,13 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
                 <Save className="w-4 h-4" />
-                {editingId ? '저장' : '추가'}
+                {editingId ? t('common.save') : t('common.add')}
               </button>
               <button
                 onClick={resetForm}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                취소
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -925,17 +949,17 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             {pan.myPans.length === 0 ? (
               <>
                 <Box className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="font-medium">등록된 팬이 없습니다</p>
+                <p className="font-medium">{t('settings.pan.noPans')}</p>
                 <p className="text-sm mt-1">
-                  자주 사용하는 팬을 등록해보세요!
+                  {t('settings.pan.noPansDesc')}
                 </p>
               </>
             ) : (
               <>
                 <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="font-medium">검색 결과가 없습니다</p>
+                <p className="font-medium">{t('settings.pan.noResults')}</p>
                 <p className="text-sm mt-1">
-                  다른 검색어나 필터를 사용해보세요.
+                  {t('settings.pan.noResultsDesc')}
                 </p>
               </>
             )}
@@ -948,9 +972,9 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
       {/* 통계 */}
       {pan.myPans.length > 0 && (
         <div className="text-xs text-gray-400 pt-2 border-t">
-          총 {pan.myPans.length}개 팬 등록됨
+          {t('settings.pan.totalPans', { count: pan.myPans.length })}
           {pan.myPans.filter(p => p.isFavorite).length > 0 && (
-            <> · 즐겨찾기 {pan.myPans.filter(p => p.isFavorite).length}개</>
+            <> · {t('settings.pan.favoritesCount', { count: pan.myPans.filter(p => p.isFavorite).length })}</>
           )}
         </div>
       )}

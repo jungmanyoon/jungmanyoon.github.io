@@ -4,11 +4,13 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/useSettingsStore'
 import { CustomIngredient, IngredientSubstitution, CostOverride, NutritionOverride } from '@/types/settings.types'
-import { INGREDIENT_DATABASE, IngredientInfo } from '@/data/ingredientDatabase'
+import { INGREDIENT_DATABASE, IngredientInfo, PRIMARY_INGREDIENT_NAMES } from '@/data/ingredientDatabase'
 import { nutritionDatabase, NutritionData } from '@/data/nutritionDatabase'
 import { SUBSTITUTION_RULES, SubstitutionRule, getSubstitutionRules } from '@/data/substitutionRules'
+import { findIngredientByKorean, translateBakingNote } from '@/data/ingredientTranslations'
 import {
   Apple,
   Plus,
@@ -24,25 +26,25 @@ import {
   Filter
 } from 'lucide-react'
 
-// 재료 카테고리
-const INGREDIENT_CATEGORIES: { value: IngredientInfo['category']; label: string; icon: string }[] = [
-  { value: 'flour', label: '밀가루류', icon: '🌾' },
-  { value: 'liquid', label: '액체류', icon: '💧' },
-  { value: 'fat', label: '유지류', icon: '🧈' },
-  { value: 'sugar', label: '당류', icon: '🍬' },
-  { value: 'egg', label: '계란류', icon: '🥚' },
-  { value: 'dairy', label: '유제품', icon: '🥛' },
-  { value: 'leavening', label: '팽창제', icon: '🫧' },
-  { value: 'salt', label: '소금', icon: '🧂' },
-  { value: 'flavoring', label: '향료/첨가물', icon: '🍋' },
-  { value: 'nut', label: '견과류', icon: '🥜' },
-  { value: 'fruit', label: '과일', icon: '🍎' },
-  { value: 'chocolate', label: '초콜릿', icon: '🍫' },
-  { value: 'other', label: '기타', icon: '📦' }
+// 재료 카테고리 (키와 아이콘만 정의, 라벨은 번역 사용)
+const INGREDIENT_CATEGORIES: { value: IngredientInfo['category']; icon: string }[] = [
+  { value: 'flour', icon: '🌾' },
+  { value: 'liquid', icon: '💧' },
+  { value: 'fat', icon: '🧈' },
+  { value: 'sugar', icon: '🍬' },
+  { value: 'egg', icon: '🥚' },
+  { value: 'dairy', icon: '🥛' },
+  { value: 'leavening', icon: '🫧' },
+  { value: 'salt', icon: '🧂' },
+  { value: 'flavoring', icon: '🍋' },
+  { value: 'nut', icon: '🥜' },
+  { value: 'fruit', icon: '🍎' },
+  { value: 'chocolate', icon: '🍫' },
+  { value: 'other', icon: '📦' }
 ]
 
 const getCategoryInfo = (category: string) =>
-  INGREDIENT_CATEGORIES.find(c => c.value === category) || { value: 'other', label: '기타', icon: '📦' }
+  INGREDIENT_CATEGORIES.find(c => c.value === category) || { value: 'other', icon: '📦' }
 
 interface IngredientSettingsTabProps {
   className?: string
@@ -64,6 +66,52 @@ interface UnifiedIngredient {
 }
 
 export default function IngredientSettingsTab({ className = '' }: IngredientSettingsTabProps) {
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language === 'en' ? 'en' : 'ko'
+
+  // 재료명 번역 헬퍼 함수 (기본 DB 재료 + 번역 데이터베이스 모두 검색)
+  const getIngredientDisplayName = useCallback((name: string): string => {
+    // 1. i18n 번역 시도 (PRIMARY_INGREDIENT_NAMES)
+    if (PRIMARY_INGREDIENT_NAMES.includes(name)) {
+      const translated = t(`settings.ingredient.ingredientNames.${name}`, { defaultValue: '' })
+      if (translated) return translated
+    }
+
+    // 2. 영어 모드: ingredientTranslations 데이터베이스 검색
+    if (currentLang === 'en') {
+      const translationData = findIngredientByKorean(name)
+      if (translationData) {
+        return translationData.en
+      }
+    }
+
+    return name
+  }, [t, currentLang])
+
+  // 재료 별칭을 현재 언어에 맞게 가져오기
+  const getIngredientAlias = useCallback((name: string, aliases?: string[]): string | null => {
+    // Try to find in translation database first
+    const translationData = findIngredientByKorean(name)
+    if (translationData?.aliases) {
+      const langAliases = currentLang === 'en' ? translationData.aliases.en : translationData.aliases.ko
+      if (langAliases && langAliases.length > 0) {
+        return langAliases[0]
+      }
+    }
+    // Fallback: filter aliases from database based on language
+    if (aliases && aliases.length > 0) {
+      const isEnglish = (str: string) => /^[a-zA-Z\s]+$/.test(str)
+      if (currentLang === 'en') {
+        const englishAlias = aliases.find(a => isEnglish(a))
+        return englishAlias || null
+      } else {
+        const koreanAlias = aliases.find(a => !isEnglish(a))
+        return koreanAlias || null
+      }
+    }
+    return null
+  }, [currentLang])
+
   const {
     ingredient,
     addCustomIngredient,
@@ -284,7 +332,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
   // 커스텀 재료 저장
   const handleSaveCustom = useCallback(() => {
     if (!customForm.name.trim()) {
-      alert('재료 이름을 입력해주세요.')
+      alert(t('settings.ingredient.alerts.nameRequired'))
       return
     }
     addCustomIngredient(customForm)
@@ -296,12 +344,12 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       isFlour: false
     })
     setShowCustomForm(false)
-  }, [customForm, addCustomIngredient])
+  }, [customForm, addCustomIngredient, t])
 
   // 대체재료 저장
   const handleSaveSubstitution = useCallback(() => {
     if (!subForm.original.trim() || !subForm.substitute.trim()) {
-      alert('대체 재료를 입력해주세요.')
+      alert(t('settings.ingredient.alerts.substituteRequired'))
       return
     }
     addSubstitution(subForm)
@@ -312,7 +360,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       notes: ''
     })
     setShowSubForm(null)
-  }, [subForm, addSubstitution])
+  }, [subForm, addSubstitution, t])
 
   // 행 확장 토글
   const toggleRowExpand = useCallback((name: string) => {
@@ -364,13 +412,13 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
         <div>
           <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <Apple className="w-5 h-5 text-green-500" />
-            재료 데이터베이스
+            {t('settings.ingredient.title')}
             <span className="text-sm font-normal text-gray-500">
-              ({INGREDIENT_DATABASE.length}개 + 커스텀 {ingredient.customIngredients.length}개)
+              ({t('settings.ingredient.databaseCount', { dbCount: INGREDIENT_DATABASE.length, customCount: ingredient.customIngredients.length })})
             </span>
           </h3>
           <p className="text-sm text-gray-500 mt-1">
-            재료별 수분함량, 원가, 영양정보, 대체재료를 통합 관리합니다.
+            {t('settings.ingredient.titleDesc')}
           </p>
         </div>
         <button
@@ -378,7 +426,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
           className="flex items-center gap-1 px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm"
         >
           <Plus className="w-4 h-4" />
-          재료 추가
+          {t('settings.ingredient.addIngredient')}
         </button>
       </div>
 
@@ -386,7 +434,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       {showCustomForm && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="font-medium text-gray-800">새 재료 추가</h4>
+            <h4 className="font-medium text-gray-800">{t('settings.ingredient.newIngredient')}</h4>
             <button onClick={() => setShowCustomForm(false)} className="p-1 hover:bg-white rounded">
               <X className="w-4 h-4 text-gray-500" />
             </button>
@@ -396,7 +444,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
               type="text"
               value={customForm.name}
               onChange={(e) => setCustomForm(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="재료 이름"
+              placeholder={t('settings.ingredient.ingredientName')}
               className="px-3 py-2 text-sm border rounded-lg"
             />
             <select
@@ -409,7 +457,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
             >
               {INGREDIENT_CATEGORIES.map(cat => (
                 <option key={cat.value} value={cat.value}>
-                  {cat.icon} {cat.label}
+                  {cat.icon} {t(`settings.ingredient.categories.${cat.value}`)}
                 </option>
               ))}
             </select>
@@ -420,7 +468,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                 ...prev,
                 moisture: parseFloat(e.target.value) || undefined
               }))}
-              placeholder="수분함량 (%)"
+              placeholder={t('settings.ingredient.moisturePercent')}
               className="px-3 py-2 text-sm border rounded-lg"
               min="0"
               max="100"
@@ -431,13 +479,13 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                 className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm"
               >
                 <Save className="w-4 h-4" />
-                저장
+                {t('settings.ingredient.buttons.save')}
               </button>
               <button
                 onClick={() => setShowCustomForm(false)}
                 className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
               >
-                취소
+                {t('settings.ingredient.buttons.cancel')}
               </button>
             </div>
           </div>
@@ -452,7 +500,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="재료 검색... (이름, 별칭)"
+            placeholder={t('settings.ingredient.searchPlaceholder')}
             className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm"
           />
         </div>
@@ -461,10 +509,10 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
           onChange={(e) => setCategoryFilter(e.target.value)}
           className="px-3 py-2 border rounded-lg text-sm"
         >
-          <option value="all">전체 카테고리</option>
+          <option value="all">{t('settings.ingredient.allCategories')}</option>
           {INGREDIENT_CATEGORIES.map(cat => (
             <option key={cat.value} value={cat.value}>
-              {cat.icon} {cat.label}
+              {cat.icon} {t(`settings.ingredient.categories.${cat.value}`)}
             </option>
           ))}
         </select>
@@ -477,7 +525,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
           }`}
         >
           <Filter className="w-4 h-4" />
-          수정됨 ({modifiedCount})
+          {t('settings.ingredient.modified')} ({modifiedCount})
         </button>
       </div>
 
@@ -488,21 +536,21 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-3 py-2 text-left font-medium text-gray-600 w-10"></th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600 min-w-[140px]">재료명</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600 w-24">카테고리</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 min-w-[140px]">{t('settings.ingredient.table.name')}</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 w-24">{t('settings.ingredient.table.category')}</th>
                 <th className="px-3 py-2 text-center font-medium text-gray-600 w-20">
-                  <span className="flex items-center justify-center gap-1">💧 수분</span>
+                  <span className="flex items-center justify-center gap-1">💧 {t('settings.ingredient.table.moisture')}</span>
                 </th>
                 <th className="px-3 py-2 text-center font-medium text-gray-600 w-28">
-                  <span className="flex items-center justify-center gap-1">💰 원가</span>
+                  <span className="flex items-center justify-center gap-1">💰 {t('settings.ingredient.table.cost')}</span>
                 </th>
                 <th className="px-3 py-2 text-center font-medium text-gray-600 w-24">
-                  <span className="flex items-center justify-center gap-1">🔥 열량</span>
+                  <span className="flex items-center justify-center gap-1">🔥 {t('settings.ingredient.table.calories')}</span>
                 </th>
                 <th className="px-3 py-2 text-center font-medium text-gray-600 w-20">
-                  <span className="flex items-center justify-center gap-1">🔄 대체</span>
+                  <span className="flex items-center justify-center gap-1">🔄 {t('settings.ingredient.table.substitutes')}</span>
                 </th>
-                <th className="px-3 py-2 text-center font-medium text-gray-600 w-16">편집</th>
+                <th className="px-3 py-2 text-center font-medium text-gray-600 w-16">{t('settings.ingredient.table.edit')}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -541,24 +589,27 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                       <div className="flex items-center gap-2">
                         <span>{catInfo.icon}</span>
                         <div>
-                          <span className="font-medium text-gray-800">{ing.name}</span>
+                          <span className="font-medium text-gray-800">{getIngredientDisplayName(ing.name)}</span>
                           {ing.isCustom && (
                             <span className="ml-1 px-1 py-0.5 bg-green-100 text-green-700 text-xs rounded">
-                              커스텀
+                              {t('settings.ingredient.custom')}
                             </span>
                           )}
-                          {ing.originalData?.aliases && ing.originalData.aliases.length > 0 && (
-                            <div className="text-xs text-gray-400 truncate max-w-[120px]">
-                              {ing.originalData.aliases[0]}
-                            </div>
-                          )}
+                          {(() => {
+                            const alias = getIngredientAlias(ing.name, ing.originalData?.aliases)
+                            return alias && (
+                              <div className="text-xs text-gray-400 truncate max-w-[120px]">
+                                {alias}
+                              </div>
+                            )
+                          })()}
                         </div>
                       </div>
                     </td>
 
                     {/* 카테고리 */}
                     <td className="px-3 py-2 text-gray-600">
-                      <span className="text-xs">{catInfo.label}</span>
+                      <span className="text-xs">{t(`settings.ingredient.categories.${ing.category}`)}</span>
                     </td>
 
                     {/* 수분함량 */}
@@ -618,11 +669,11 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           className="w-16 px-2 py-1 text-center border rounded text-xs font-mono"
                         />
                       ) : ing.nutrition?.calories ? (
-                        <span className="text-xs font-mono text-purple-600" title="사용자 정의">
+                        <span className="text-xs font-mono text-purple-600" title={t('settings.ingredient.userDefined')}>
                           {ing.nutrition.calories}
                         </span>
                       ) : ing.defaultNutrition?.calories ? (
-                        <span className="text-xs font-mono text-gray-600" title={`기본값 (USDA): 단백질 ${ing.defaultNutrition.protein}g, 탄수화물 ${ing.defaultNutrition.carbohydrates}g, 지방 ${ing.defaultNutrition.fat}g`}>
+                        <span className="text-xs font-mono text-gray-600" title={t('settings.ingredient.defaultTooltip', { protein: ing.defaultNutrition.protein, carbs: ing.defaultNutrition.carbohydrates, fat: ing.defaultNutrition.fat })}>
                           {ing.defaultNutrition.calories}
                         </span>
                       ) : (
@@ -643,9 +694,9 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                                   ? 'bg-orange-100 text-orange-700'
                                   : 'bg-blue-100 text-blue-700'
                               }`}
-                              title={`기본 ${ing.defaultSubstitutions.length}개, 사용자 ${ing.substitutions.length}개`}
+                              title={t('settings.ingredient.subsTooltip', { defaultCount: ing.defaultSubstitutions.length, userCount: ing.substitutions.length })}
                             >
-                              {totalSubs}개
+                              {t('settings.ingredient.subsCount', { count: totalSubs })}
                             </button>
                           )
                         }
@@ -670,14 +721,14 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           <button
                             onClick={handleSaveEdit}
                             className="p-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            title="저장"
+                            title={t('settings.ingredient.buttons.save')}
                           >
                             <Save className="w-3 h-3" />
                           </button>
                           <button
                             onClick={handleCancelEdit}
                             className="p-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-                            title="취소"
+                            title={t('settings.ingredient.buttons.cancel')}
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -687,7 +738,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           <button
                             onClick={() => handleStartEdit(ing.name)}
                             className="p-1 text-gray-500 hover:bg-gray-200 rounded"
-                            title="편집"
+                            title={t('settings.ingredient.buttons.edit')}
                           >
                             <Edit3 className="w-3 h-3" />
                           </button>
@@ -695,7 +746,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                             <button
                               onClick={() => handleResetIngredient(ing.name)}
                               className="p-1 text-amber-500 hover:bg-amber-100 rounded"
-                              title="초기화"
+                              title={t('settings.ingredient.buttons.reset')}
                             >
                               <RefreshCw className="w-3 h-3" />
                             </button>
@@ -703,13 +754,13 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           {ing.isCustom && (
                             <button
                               onClick={() => {
-                                if (confirm(`"${ing.name}" 재료를 삭제하시겠습니까?`)) {
+                                if (confirm(t('settings.ingredient.alerts.deleteConfirm', { name: getIngredientDisplayName(ing.name) }))) {
                                   const custom = ingredient.customIngredients.find(c => c.name === ing.name)
                                   if (custom) deleteCustomIngredient(custom.id)
                                 }
                               }}
                               className="p-1 text-red-500 hover:bg-red-100 rounded"
-                              title="삭제"
+                              title={t('settings.ingredient.buttons.delete')}
                             >
                               <Trash2 className="w-3 h-3" />
                             </button>
@@ -727,15 +778,15 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           {/* 기본 대체규칙 */}
                           {ing.defaultSubstitutions.length > 0 && (
                             <div className="flex flex-wrap gap-2 items-center">
-                              <span className="text-xs text-blue-600 font-medium mr-2">📚 기본:</span>
+                              <span className="text-xs text-blue-600 font-medium mr-2">📚 {t('settings.ingredient.defaultRules')}</span>
                               {ing.defaultSubstitutions.map((rule, idx) => (
                                 <div
                                   key={`default-${idx}`}
                                   className="flex items-center gap-1 px-2 py-1 bg-blue-50 border border-blue-200 rounded text-xs"
-                                  title={rule.notes || ''}
+                                  title={currentLang === 'en' ? translateBakingNote(rule.notes || '', 'en') : (rule.notes || '')}
                                 >
                                   <ArrowRight className="w-3 h-3 text-blue-400" />
-                                  <span className="font-medium text-blue-700">{rule.substitute}</span>
+                                  <span className="font-medium text-blue-700">{getIngredientDisplayName(rule.substitute)}</span>
                                   <span className="text-blue-500 font-mono">×{rule.ratio}</span>
                                   {rule.qualityImpact && rule.qualityImpact !== 'none' && (
                                     <span className={`px-1 py-0.5 rounded text-[10px] ${
@@ -743,8 +794,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                                       rule.qualityImpact === 'moderate' ? 'bg-yellow-100 text-yellow-600' :
                                       'bg-red-100 text-red-600'
                                     }`}>
-                                      {rule.qualityImpact === 'minor' ? '약간' :
-                                       rule.qualityImpact === 'moderate' ? '중간' : '큰'} 영향
+                                      {t(`settings.ingredient.qualityImpact.${rule.qualityImpact}`)} {t('settings.ingredient.impact')}
                                     </span>
                                   )}
                                 </div>
@@ -756,19 +806,19 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           <div className="flex flex-wrap gap-2 items-center">
                             {ing.substitutions.length > 0 && (
                               <>
-                                <span className="text-xs text-orange-600 font-medium mr-2">✏️ 사용자:</span>
+                                <span className="text-xs text-orange-600 font-medium mr-2">✏️ {t('settings.ingredient.userRules')}</span>
                                 {ing.substitutions.map(sub => (
                                   <div
                                     key={sub.id}
                                     className="flex items-center gap-1 px-2 py-1 bg-white border border-orange-200 rounded text-xs"
                                   >
                                     <ArrowRight className="w-3 h-3 text-gray-400" />
-                                    <span className="font-medium text-orange-700">{sub.substitute}</span>
+                                    <span className="font-medium text-orange-700">{getIngredientDisplayName(sub.substitute)}</span>
                                     <span className="text-gray-500 font-mono">×{sub.ratio}</span>
-                                    {sub.notes && <span className="text-gray-400 italic">({sub.notes})</span>}
+                                    {sub.notes && <span className="text-gray-400 italic">({currentLang === 'en' ? translateBakingNote(sub.notes, 'en') : sub.notes})</span>}
                                     <button
                                       onClick={() => {
-                                        if (confirm('이 대체규칙을 삭제하시겠습니까?')) {
+                                        if (confirm(t('settings.ingredient.alerts.deleteSubConfirm'))) {
                                           deleteSubstitution(sub.id)
                                         }
                                       }}
@@ -787,7 +837,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                               }}
                               className="px-2 py-1 text-orange-600 hover:bg-orange-100 rounded text-xs"
                             >
-                              + 추가
+                              {t('settings.ingredient.addSub')}
                             </button>
                           </div>
                         </div>
@@ -808,7 +858,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
           <div className="bg-white rounded-lg shadow-xl p-4 w-96 space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-medium text-gray-800">
-                🔄 {showSubForm} 대체재료 추가
+                🔄 {t('settings.ingredient.substitution.title', { name: getIngredientDisplayName(showSubForm) })}
               </h4>
               <button onClick={() => setShowSubForm(null)} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-4 h-4 text-gray-500" />
@@ -817,19 +867,19 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
 
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-700">{showSubForm}</span>
+                <span className="font-medium text-gray-700">{getIngredientDisplayName(showSubForm)}</span>
                 <ArrowRight className="w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   value={subForm.substitute}
                   onChange={(e) => setSubForm(prev => ({ ...prev, substitute: e.target.value }))}
-                  placeholder="대체 재료"
+                  placeholder={t('settings.ingredient.substitution.substitute')}
                   className="flex-1 px-3 py-2 text-sm border rounded-lg"
                 />
               </div>
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-xs text-gray-500 mb-1">변환 비율</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('settings.ingredient.substitution.ratio')}</label>
                   <input
                     type="number"
                     value={subForm.ratio}
@@ -841,12 +891,12 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-xs text-gray-500 mb-1">메모 (선택)</label>
+                  <label className="block text-xs text-gray-500 mb-1">{t('settings.ingredient.substitution.notes')}</label>
                   <input
                     type="text"
                     value={subForm.notes || ''}
                     onChange={(e) => setSubForm(prev => ({ ...prev, notes: e.target.value }))}
-                    placeholder="예: 수분 차이"
+                    placeholder={t('settings.ingredient.substitution.notesPlaceholder')}
                     className="w-full px-3 py-2 text-sm border rounded-lg"
                   />
                 </div>
@@ -859,13 +909,13 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                 className="flex-1 flex items-center justify-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
               >
                 <Save className="w-4 h-4" />
-                저장
+                {t('settings.ingredient.buttons.save')}
               </button>
               <button
                 onClick={() => setShowSubForm(null)}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
-                취소
+                {t('settings.ingredient.buttons.cancel')}
               </button>
             </div>
           </div>
@@ -876,18 +926,18 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       {filteredIngredients.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <p>검색 결과가 없습니다.</p>
+          <p>{t('settings.ingredient.noResults')}</p>
         </div>
       )}
 
       {/* 하단 안내 */}
       <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-        <p className="font-medium mb-1">💡 사용 팁</p>
+        <p className="font-medium mb-1">💡 {t('settings.ingredient.tips.title')}</p>
         <ul className="space-y-0.5">
-          <li>• <span className="font-medium">편집</span>: 각 행의 연필 아이콘을 클릭하여 수분함량, 원가, 열량을 수정</li>
-          <li>• <span className="font-medium">대체재료</span>: 대체 열의 숫자를 클릭하면 등록된 대체재료 확인</li>
-          <li>• <span className="font-medium">수정됨 필터</span>: 변경된 재료만 필터링하여 관리</li>
-          <li>• <span className="font-medium">초기화</span>: 노란색 행의 🔄 버튼으로 기본값 복원</li>
+          <li>• {t('settings.ingredient.tips.edit')}</li>
+          <li>• {t('settings.ingredient.tips.subs')}</li>
+          <li>• {t('settings.ingredient.tips.filter')}</li>
+          <li>• {t('settings.ingredient.tips.reset')}</li>
         </ul>
       </div>
     </div>

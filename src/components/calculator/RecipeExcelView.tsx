@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ExcelRow {
     id: string;
@@ -13,19 +14,20 @@ import { useRecipeStore } from '@stores/useRecipeStore';
 import { useAppStore } from '@stores/useAppStore';
 
 export default function RecipeExcelView() {
+    const { t } = useTranslation();
     const { addRecipe, setCurrentRecipe } = useRecipeStore();
     const { setActiveTab } = useAppStore();
 
-    const [recipeName, setRecipeName] = useState('새로운 레시피');
+    const [recipeName, setRecipeName] = useState(t('components.recipeExcelView.defaults.recipeName'));
     const [totalDoughWeight, setTotalDoughWeight] = useState<number>(1000);
     const [baseFlourWeight, setBaseFlourWeight] = useState<number>(0);
 
     // Initial rows
     const [rows, setRows] = useState<ExcelRow[]>([
-        { id: '1', name: '강력분', percentage: 100, weight: 0, isFlour: true, note: '' },
-        { id: '2', name: '물', percentage: 70, weight: 0, isFlour: false, note: '' },
-        { id: '3', name: '소금', percentage: 2, weight: 0, isFlour: false, note: '' },
-        { id: '4', name: '이스트', percentage: 1, weight: 0, isFlour: false, note: '' },
+        { id: '1', name: t('components.recipeExcelView.defaults.breadFlour'), percentage: 100, weight: 0, isFlour: true, note: '' },
+        { id: '2', name: t('components.recipeExcelView.defaults.water'), percentage: 70, weight: 0, isFlour: false, note: '' },
+        { id: '3', name: t('components.recipeExcelView.defaults.salt'), percentage: 2, weight: 0, isFlour: false, note: '' },
+        { id: '4', name: t('components.recipeExcelView.defaults.yeast'), percentage: 1, weight: 0, isFlour: false, note: '' },
     ]);
 
     // Effect to update weights when Base Flour Weight changes
@@ -106,7 +108,7 @@ export default function RecipeExcelView() {
 
     const handleSave = () => {
         if (!recipeName.trim()) {
-            alert('레시피 이름을 입력해주세요.');
+            alert(t('components.recipeExcelView.alerts.nameRequired'));
             return;
         }
 
@@ -116,7 +118,7 @@ export default function RecipeExcelView() {
             category: 'bread', // Default
             type: 'yeast', // Default
             difficulty: 'intermediate',
-            yield: { quantity: 1, unit: '개' },
+            yield: { quantity: 1, unit: 'pcs' },
             servings: 1,
             prepTime: 60,
             bakingTime: 30,
@@ -137,7 +139,7 @@ export default function RecipeExcelView() {
                 temperature: { bulk: { min: 27, max: 27, unit: 'C' }, final: { min: 27, max: 27, unit: 'C' } }
             },
             ovenSettings: { temperature: 180, mode: 'convection', preheating: true },
-            panConfig: { id: 'default', name: '기본 팬', type: 'loaf', dimensions: { height: 0 }, volume: 0, material: 'aluminum', fillRatio: 0.7 },
+            panConfig: { id: 'default', name: t('components.recipeExcelView.defaults.defaultPan'), type: 'loaf', dimensions: { height: 0 }, volume: 0, material: 'aluminum', fillRatio: 0.7 },
             steps: [],
             tags: [],
             createdAt: new Date(),
@@ -155,8 +157,8 @@ export default function RecipeExcelView() {
         <div className="max-w-6xl mx-auto p-6 bg-white rounded-xl shadow-sm">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">📊 스마트 레시피 계산기</h1>
-                    <p className="text-gray-500 text-sm">엑셀처럼 자유롭게 레시피를 설계하세요</p>
+                    <h1 className="text-2xl font-bold text-gray-800">📊 {t('components.recipeExcelView.title')}</h1>
+                    <p className="text-gray-500 text-sm">{t('components.recipeExcelView.description')}</p>
                 </div>
                 <div className="flex gap-4 items-center">
                     <input
@@ -164,20 +166,20 @@ export default function RecipeExcelView() {
                         value={recipeName}
                         onChange={(e) => setRecipeName(e.target.value)}
                         className="border-b border-gray-300 focus:border-blue-500 px-2 py-1 outline-none text-gray-700"
-                        placeholder="레시피 이름"
+                        placeholder={t('components.recipeExcelView.recipeName')}
                     />
                     <button
                         onClick={handleSave}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                     >
-                        💾 레시피로 저장
+                        💾 {t('components.recipeExcelView.saveAsRecipe')}
                     </button>
                 </div>
             </div>
 
             <div className="flex justify-end mb-4">
                 <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg">
-                    <span className="text-sm font-medium text-blue-700">총 반죽 무게:</span>
+                    <span className="text-sm font-medium text-blue-700">{t('components.recipeExcelView.totalDoughWeight')}:</span>
                     <input
                         type="number"
                         value={Math.round(currentTotalWeight)}
@@ -192,12 +194,12 @@ export default function RecipeExcelView() {
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-200">
                         <tr>
-                            <th className="py-3 px-4 w-12 text-center">#</th>
-                            <th className="py-3 px-4">재료명</th>
-                            <th className="py-3 px-4 w-32 text-right">비율 (%)</th>
-                            <th className="py-3 px-4 w-32 text-right">무게 (g)</th>
-                            <th className="py-3 px-4 w-24 text-center">밀가루</th>
-                            <th className="py-3 px-4">비고</th>
+                            <th className="py-3 px-4 w-12 text-center">{t('components.recipeExcelView.table.number')}</th>
+                            <th className="py-3 px-4">{t('components.recipeExcelView.table.ingredient')}</th>
+                            <th className="py-3 px-4 w-32 text-right">{t('components.recipeExcelView.table.percentage')}</th>
+                            <th className="py-3 px-4 w-32 text-right">{t('components.recipeExcelView.table.weight')}</th>
+                            <th className="py-3 px-4 w-24 text-center">{t('components.recipeExcelView.table.isFlour')}</th>
+                            <th className="py-3 px-4">{t('components.recipeExcelView.table.note')}</th>
                             <th className="py-3 px-4 w-12"></th>
                         </tr>
                     </thead>
@@ -211,7 +213,7 @@ export default function RecipeExcelView() {
                                         value={row.name}
                                         onChange={(e) => setRows(rows.map(r => r.id === row.id ? { ...r, name: e.target.value } : r))}
                                         className="w-full bg-transparent focus:outline-none font-medium text-gray-800"
-                                        placeholder="재료명 입력"
+                                        placeholder={t('components.recipeExcelView.placeholders.ingredientName')}
                                     />
                                 </td>
                                 <td className="py-2 px-4 text-right">
@@ -248,7 +250,7 @@ export default function RecipeExcelView() {
                                         value={row.note}
                                         onChange={(e) => setRows(rows.map(r => r.id === row.id ? { ...r, note: e.target.value } : r))}
                                         className="w-full bg-transparent focus:outline-none text-gray-500"
-                                        placeholder="메모"
+                                        placeholder={t('components.recipeExcelView.placeholders.memo')}
                                     />
                                 </td>
                                 <td className="py-2 px-4 text-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -264,7 +266,7 @@ export default function RecipeExcelView() {
 
                         {/* Total Row */}
                         <tr className="bg-gray-50 font-bold border-t-2 border-gray-200">
-                            <td colSpan={2} className="py-3 px-4 text-right text-gray-600">합계</td>
+                            <td colSpan={2} className="py-3 px-4 text-right text-gray-600">{t('components.recipeExcelView.table.total')}</td>
                             <td className="py-3 px-4 text-right text-blue-600">{totalPercentage.toFixed(1)}%</td>
                             <td className="py-3 px-4 text-right text-blue-600">{currentTotalWeight.toFixed(1)}g</td>
                             <td colSpan={3}></td>
@@ -278,7 +280,7 @@ export default function RecipeExcelView() {
                     onClick={addRow}
                     className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
                 >
-                    + 재료 추가
+                    + {t('components.recipeExcelView.addIngredient')}
                 </button>
             </div>
         </div>

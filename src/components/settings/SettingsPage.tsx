@@ -6,6 +6,7 @@
  */
 
 import { useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/useSettingsStore'
 import PanSettingsTab from './PanSettingsTab'
 import ProductSettingsTab from './ProductSettingsTab'
@@ -15,6 +16,7 @@ import YieldLossSettingsTab from './YieldLossSettingsTab'
 import IngredientSettingsTab from './IngredientSettingsTab'
 import AdvancedSettingsTab from './AdvancedSettingsTab'
 import StorageSettingsTab from './StorageSettingsTab'
+import LocaleSettingsTab from './LocaleSettingsTab'
 import {
   Settings,
   Box,
@@ -31,82 +33,92 @@ import {
   AlertTriangle,
   ChevronLeft,
   Scale,
-  HardDrive
+  HardDrive,
+  Globe
 } from 'lucide-react'
 
-// 탭 정의
+// 탭 정의 (번역 키 사용)
 const TABS = [
   {
+    id: 'locale',
+    nameKey: 'settingsTabs.locale',
+    icon: Globe,
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-50',
+    borderColor: 'border-indigo-200',
+    descKey: 'settingsTabs.localeDesc'
+  },
+  {
     id: 'storage',
-    name: '저장소',
+    nameKey: 'settingsTabs.storage',
     icon: HardDrive,
     color: 'text-purple-500',
     bgColor: 'bg-purple-50',
     borderColor: 'border-purple-200',
-    description: '데이터 저장 위치 설정'
+    descKey: 'settingsTabs.storageDesc'
   },
   {
     id: 'pan',
-    name: '팬/틀',
+    nameKey: 'settingsTabs.pan',
     icon: Box,
     color: 'text-orange-500',
     bgColor: 'bg-orange-50',
     borderColor: 'border-orange-200',
-    description: '보유한 팬 등록 및 관리'
+    descKey: 'settingsTabs.panDesc'
   },
   {
     id: 'product',
-    name: '제품 비용적',
+    nameKey: 'settingsTabs.product',
     icon: Scale,
     color: 'text-amber-500',
     bgColor: 'bg-amber-50',
     borderColor: 'border-amber-200',
-    description: '빵/케이크 비용적 설정'
+    descKey: 'settingsTabs.productDesc'
   },
   {
     id: 'environment',
-    name: '환경',
+    nameKey: 'settingsTabs.environment',
     icon: Thermometer,
     color: 'text-blue-500',
     bgColor: 'bg-blue-50',
     borderColor: 'border-blue-200',
-    description: '온도, 습도, 고도 설정'
+    descKey: 'settingsTabs.environmentDesc'
   },
   {
     id: 'method',
-    name: '제법',
+    nameKey: 'settingsTabs.method',
     icon: FlaskConical,
     color: 'text-amber-500',
     bgColor: 'bg-amber-50',
     borderColor: 'border-amber-200',
-    description: '중종법, 폴리쉬, 비가, 르방 등'
+    descKey: 'settingsTabs.methodDesc'
   },
   {
     id: 'yieldLoss',
-    name: '수율',
+    nameKey: 'settingsTabs.yieldLoss',
     icon: TrendingDown,
     color: 'text-red-500',
     bgColor: 'bg-red-50',
     borderColor: 'border-red-200',
-    description: '공정별 손실률 설정'
+    descKey: 'settingsTabs.yieldLossDesc'
   },
   {
     id: 'ingredient',
-    name: '재료',
+    nameKey: 'settingsTabs.ingredient',
     icon: Apple,
     color: 'text-green-500',
     bgColor: 'bg-green-50',
     borderColor: 'border-green-200',
-    description: '커스텀 재료 및 대체재'
+    descKey: 'settingsTabs.ingredientDesc'
   },
   {
     id: 'advanced',
-    name: '고급',
+    nameKey: 'settingsTabs.advanced',
     icon: Cog,
     color: 'text-gray-500',
     bgColor: 'bg-gray-50',
     borderColor: 'border-gray-200',
-    description: '믹서, 단위, 정밀도'
+    descKey: 'settingsTabs.advancedDesc'
   }
 ]
 
@@ -119,8 +131,9 @@ interface SettingsPageProps {
 export default function SettingsPage({
   className = '',
   onClose,
-  initialTab = 'storage'
+  initialTab = 'locale'
 }: SettingsPageProps) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(initialTab)
   const [showExportModal, setShowExportModal] = useState(false)
   const [showImportModal, setShowImportModal] = useState(false)
@@ -151,7 +164,7 @@ export default function SettingsPage({
     setImportSuccess(false)
 
     if (!importData.trim()) {
-      setImportError('데이터를 입력해주세요.')
+      setImportError(t('settings.modal.enterData'))
       return
     }
 
@@ -164,9 +177,9 @@ export default function SettingsPage({
         setImportSuccess(false)
       }, 1500)
     } else {
-      setImportError('잘못된 형식의 데이터입니다.')
+      setImportError(t('settings.modal.invalidFormat'))
     }
-  }, [importData, importSettings])
+  }, [importData, importSettings, t])
 
   // 파일로 가져오기
   const handleFileImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,16 +196,18 @@ export default function SettingsPage({
 
   // 초기화 처리
   const handleResetAll = useCallback(() => {
-    if (confirm('모든 설정을 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
-      if (confirm('정말로 초기화하시겠습니까?')) {
+    if (confirm(t('settings.modal.resetConfirm'))) {
+      if (confirm(t('settings.modal.resetConfirm2'))) {
         resetAllSettings()
       }
     }
-  }, [resetAllSettings])
+  }, [resetAllSettings, t])
 
   // 탭 콘텐츠 렌더링
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'locale':
+        return <LocaleSettingsTab />
       case 'storage':
         return <StorageSettingsTab />
       case 'pan':
@@ -231,7 +246,7 @@ export default function SettingsPage({
               )}
               <div className="flex items-center gap-2">
                 <Settings className="w-6 h-6 text-gray-600" />
-                <h1 className="text-xl font-bold text-gray-800">설정</h1>
+                <h1 className="text-xl font-bold text-gray-800">{t('settings.title')}</h1>
               </div>
             </div>
 
@@ -241,21 +256,21 @@ export default function SettingsPage({
                 className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <Download className="w-4 h-4" />
-                내보내기
+                {t('common.export')}
               </button>
               <button
                 onClick={() => setShowImportModal(true)}
                 className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <Upload className="w-4 h-4" />
-                가져오기
+                {t('common.import')}
               </button>
               <button
                 onClick={handleResetAll}
                 className="flex items-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
-                초기화
+                {t('common.reset')}
               </button>
             </div>
           </div>
@@ -284,10 +299,10 @@ export default function SettingsPage({
                     <Icon className={`w-5 h-5 ${isActive ? tab.color : 'text-gray-400'}`} />
                     <div>
                       <div className={`font-medium ${isActive ? 'text-gray-800' : 'text-gray-600'}`}>
-                        {tab.name}
+                        {t(tab.nameKey)}
                       </div>
                       <div className="text-xs text-gray-500 truncate">
-                        {tab.description}
+                        {t(tab.descKey)}
                       </div>
                     </div>
                   </button>
@@ -310,7 +325,7 @@ export default function SettingsPage({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">설정 내보내기</h3>
+              <h3 className="text-lg font-semibold">{t('settings.modal.exportTitle')}</h3>
               <button
                 onClick={() => setShowExportModal(false)}
                 className="p-1 hover:bg-gray-100 rounded"
@@ -319,22 +334,21 @@ export default function SettingsPage({
               </button>
             </div>
             <p className="text-sm text-gray-600 mb-4">
-              현재 설정을 JSON 파일로 저장합니다.
-              다른 기기에서 가져오기를 통해 복원할 수 있습니다.
+              {t('settings.modal.exportDesc')}
             </p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowExportModal(false)}
                 className="px-4 py-2 border rounded-lg hover:bg-gray-50"
               >
-                취소
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleExport}
                 className="flex items-center gap-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
                 <Download className="w-4 h-4" />
-                다운로드
+                {t('common.download')}
               </button>
             </div>
           </div>
@@ -346,7 +360,7 @@ export default function SettingsPage({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">설정 가져오기</h3>
+              <h3 className="text-lg font-semibold">{t('settings.modal.importTitle')}</h3>
               <button
                 onClick={() => {
                   setShowImportModal(false)
@@ -363,13 +377,13 @@ export default function SettingsPage({
             {importSuccess ? (
               <div className="flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-lg">
                 <Check className="w-5 h-5" />
-                설정을 성공적으로 가져왔습니다!
+                {t('settings.modal.importSuccess')}
               </div>
             ) : (
               <>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    파일 선택
+                    {t('settings.modal.selectFile')}
                   </label>
                   <input
                     type="file"
@@ -381,7 +395,7 @@ export default function SettingsPage({
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    또는 직접 붙여넣기
+                    {t('settings.modal.orPaste')}
                   </label>
                   <textarea
                     value={importData}
@@ -408,7 +422,7 @@ export default function SettingsPage({
                     }}
                     className="px-4 py-2 border rounded-lg hover:bg-gray-50"
                   >
-                    취소
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={handleImport}
@@ -416,7 +430,7 @@ export default function SettingsPage({
                     className="flex items-center gap-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     <Upload className="w-4 h-4" />
-                    가져오기
+                    {t('common.import')}
                   </button>
                 </div>
               </>

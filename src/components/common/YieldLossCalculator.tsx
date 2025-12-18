@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   calculateYieldLoss,
   calculateRequiredInput,
@@ -37,59 +38,59 @@ interface YieldLossCalculatorProps {
   className?: string
 }
 
-// 제품 카테고리 옵션
-const CATEGORY_OPTIONS: { value: ProductCategory; label: string }[] = [
-  { value: 'bread', label: '빵류' },
-  { value: 'cake', label: '케이크' },
-  { value: 'pastry', label: '페이스트리' },
-  { value: 'cookie', label: '쿠키' },
-  { value: 'other', label: '기타' }
+// 제품 카테고리 옵션 (keys for translation)
+const CATEGORY_KEYS: { value: ProductCategory; key: string }[] = [
+  { value: 'bread', key: 'bread' },
+  { value: 'cake', key: 'cake' },
+  { value: 'pastry', key: 'pastry' },
+  { value: 'cookie', key: 'cookie' },
+  { value: 'other', key: 'other' }
 ]
 
-// 세부 제품 타입 옵션
-const PRODUCT_TYPE_OPTIONS: Record<ProductCategory, { value: string; label: string }[]> = {
+// 세부 제품 타입 옵션 (keys for translation)
+const PRODUCT_TYPE_KEYS: Record<ProductCategory, { value: string; key: string }[]> = {
   bread: [
-    { value: '', label: '일반 빵' },
-    { value: 'pullman', label: '풀먼식빵' },
-    { value: 'mountain', label: '산형식빵' },
-    { value: 'brioche', label: '브리오슈' },
-    { value: 'baguette', label: '바게트' },
-    { value: 'ciabatta', label: '치아바타' },
-    { value: 'sourdough', label: '사워도우' }
+    { value: '', key: 'general_bread' },
+    { value: 'pullman', key: 'pullman' },
+    { value: 'mountain', key: 'mountain' },
+    { value: 'brioche', key: 'brioche' },
+    { value: 'baguette', key: 'baguette' },
+    { value: 'ciabatta', key: 'ciabatta' },
+    { value: 'sourdough', key: 'sourdough' }
   ],
   cake: [
-    { value: '', label: '일반 케이크' },
-    { value: 'genoise', label: '제누와즈' },
-    { value: 'chiffon', label: '쉬폰' },
-    { value: 'pound', label: '파운드' },
-    { value: 'brownie', label: '브라우니' },
-    { value: 'cheesecake', label: '치즈케이크' }
+    { value: '', key: 'general_cake' },
+    { value: 'genoise', key: 'genoise' },
+    { value: 'chiffon', key: 'chiffon' },
+    { value: 'pound', key: 'pound' },
+    { value: 'brownie', key: 'brownie' },
+    { value: 'cheesecake', key: 'cheesecake' }
   ],
   pastry: [
-    { value: '', label: '일반 페이스트리' },
-    { value: 'croissant', label: '크루아상' },
-    { value: 'danish', label: '데니쉬' },
-    { value: 'puff_pastry', label: '퍼프페이스트리' }
+    { value: '', key: 'general_pastry' },
+    { value: 'croissant', key: 'croissant' },
+    { value: 'danish', key: 'danish' },
+    { value: 'puff_pastry', key: 'puff_pastry' }
   ],
   cookie: [
-    { value: '', label: '일반 쿠키' },
-    { value: 'cookie', label: '쿠키' },
-    { value: 'scone', label: '스콘' }
+    { value: '', key: 'general_cookie' },
+    { value: 'cookie', key: 'cookie' },
+    { value: 'scone', key: 'scone' }
   ],
   other: [
-    { value: '', label: '기타' },
-    { value: 'tart', label: '타르트' }
+    { value: '', key: 'general_other' },
+    { value: 'tart', key: 'tart' }
   ]
 }
 
-// 공정 정보
-const STAGE_INFO: { key: keyof ProcessStageSelection; name: string; icon: string }[] = [
-  { key: 'mixing', name: '믹싱', icon: '🥣' },
-  { key: 'fermentation', name: '발효', icon: '🍞' },
-  { key: 'dividing', name: '분할', icon: '✂️' },
-  { key: 'shaping', name: '성형', icon: '👐' },
-  { key: 'baking', name: '굽기', icon: '🔥' },
-  { key: 'cooling', name: '냉각', icon: '❄️' }
+// 공정 정보 (keys for translation)
+const STAGE_KEYS: { key: keyof ProcessStageSelection; translationKey: string; icon: string }[] = [
+  { key: 'mixing', translationKey: 'mixing', icon: '🥣' },
+  { key: 'fermentation', translationKey: 'fermentation', icon: '🍞' },
+  { key: 'dividing', translationKey: 'dividing', icon: '✂️' },
+  { key: 'shaping', translationKey: 'shaping', icon: '👐' },
+  { key: 'baking', translationKey: 'baking', icon: '🔥' },
+  { key: 'cooling', translationKey: 'cooling', icon: '❄️' }
 ]
 
 export default function YieldLossCalculator({
@@ -102,6 +103,7 @@ export default function YieldLossCalculator({
   compact = false,
   className = ''
 }: YieldLossCalculatorProps) {
+  const { t } = useTranslation()
   // 내부 상태 (외부 prop이 없을 때 사용)
   const [internalInputWeight, setInternalInputWeight] = useState(1000)
   const [internalCategory, setInternalCategory] = useState<ProductCategory>('bread')
@@ -185,12 +187,12 @@ export default function YieldLossCalculator({
       <div className={`flex items-center gap-2 text-sm ${className}`}>
         <TrendingDown className="w-4 h-4 text-orange-500" />
         <span>
-          예상 산출: <b className="text-blue-600">{result.outputWeight.toLocaleString()}g</b>
+          {t('components.yieldLoss.expectedOutput')}: <b className="text-blue-600">{result.outputWeight.toLocaleString()}g</b>
           <span className={`ml-1 ${getLossColor(result.totalLossPercent)}`}>
             (-{result.totalLossPercent}%)
           </span>
           {selectedCount < 6 && (
-            <span className="ml-1 text-gray-400 text-xs">({selectedCount}개 공정)</span>
+            <span className="ml-1 text-gray-400 text-xs">({selectedCount}{t('components.yieldLoss.processes')})</span>
           )}
         </span>
       </div>
@@ -203,20 +205,20 @@ export default function YieldLossCalculator({
       <div className="flex items-center justify-between p-3 border-b bg-gradient-to-r from-orange-50 to-amber-50">
         <div className="flex items-center gap-2">
           <TrendingDown className="w-5 h-5 text-orange-600" />
-          <h3 className="font-semibold text-gray-800">수율 손실 예측</h3>
+          <h3 className="font-semibold text-gray-800">{t('components.yieldLoss.title')}</h3>
         </div>
         <div className="flex gap-1">
           <button
             onClick={() => setMode('forward')}
             className={`px-2 py-1 text-xs rounded ${mode === 'forward' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600'}`}
           >
-            투입→산출
+            {t('components.yieldLoss.inputToOutput')}
           </button>
           <button
             onClick={() => setMode('reverse')}
             className={`px-2 py-1 text-xs rounded ${mode === 'reverse' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600'}`}
           >
-            산출→투입
+            {t('components.yieldLoss.outputToInput')}
           </button>
         </div>
       </div>
@@ -227,7 +229,7 @@ export default function YieldLossCalculator({
         {!externalCategory && (
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">제품 종류</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.productType')}</label>
               <select
                 value={internalCategory}
                 onChange={(e) => {
@@ -236,20 +238,20 @@ export default function YieldLossCalculator({
                 }}
                 className="w-full px-2 py-1.5 text-sm border rounded"
               >
-                {CATEGORY_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                {CATEGORY_KEYS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{t(`components.yieldLoss.categories.${opt.key}`)}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">세부 제품</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.detailProduct')}</label>
               <select
                 value={internalProductType}
                 onChange={(e) => setInternalProductType(e.target.value)}
                 className="w-full px-2 py-1.5 text-sm border rounded"
               >
-                {PRODUCT_TYPE_OPTIONS[internalCategory].map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                {PRODUCT_TYPE_KEYS[internalCategory].map(opt => (
+                  <option key={opt.value} value={opt.value}>{t(`components.yieldLoss.products.${opt.key}`)}</option>
                 ))}
               </select>
             </div>
@@ -263,31 +265,31 @@ export default function YieldLossCalculator({
             className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-800 mb-2"
           >
             {showStageSelection ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            <span className="font-medium">공정 선택</span>
-            <span className="text-gray-400">({selectedCount}/6개 선택)</span>
+            <span className="font-medium">{t('components.yieldLoss.processSelection')}</span>
+            <span className="text-gray-400">({selectedCount}/6 {t('components.yieldLoss.selectedProcesses')})</span>
           </button>
 
           {showStageSelection && (
             <div className="p-2 bg-gray-50 rounded space-y-2">
               <div className="flex justify-between items-center mb-1">
-                <span className="text-xs text-gray-500">계산에 포함할 공정을 선택하세요</span>
+                <span className="text-xs text-gray-500">{t('components.yieldLoss.selectProcessesForCalc')}</span>
                 <div className="flex gap-1">
                   <button
                     onClick={() => handleSelectAll(true)}
                     className="px-2 py-0.5 text-xs bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
                   >
-                    전체선택
+                    {t('components.yieldLoss.selectAll')}
                   </button>
                   <button
                     onClick={() => handleSelectAll(false)}
                     className="px-2 py-0.5 text-xs bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                   >
-                    전체해제
+                    {t('components.yieldLoss.deselectAll')}
                   </button>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-1">
-                {STAGE_INFO.map(stage => (
+                {STAGE_KEYS.map(stage => (
                   <button
                     key={stage.key}
                     onClick={() => handleStageToggle(stage.key)}
@@ -298,7 +300,7 @@ export default function YieldLossCalculator({
                     }`}
                   >
                     <span>{stage.icon}</span>
-                    <span>{stage.name}</span>
+                    <span>{t(`components.yieldLoss.stages.${stage.translationKey}`)}</span>
                     {stageSelection[stage.key] && (
                       <Check className="w-3 h-3 ml-auto" />
                     )}
@@ -308,7 +310,7 @@ export default function YieldLossCalculator({
               {selectedCount < 6 && (
                 <div className="text-xs text-orange-600 flex items-center gap-1">
                   <AlertTriangle className="w-3 h-3" />
-                  {6 - selectedCount}개 공정이 제외됨 - 해당 단계까지의 중량이 표시됩니다
+                  {t('components.yieldLoss.processesExcluded', { count: 6 - selectedCount })}
                 </div>
               )}
             </div>
@@ -321,7 +323,7 @@ export default function YieldLossCalculator({
             <>
               {/* 투입→산출 모드 */}
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">투입 중량 (g)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.inputWeight')} (g)</label>
                 <input
                   type="number"
                   value={externalInputWeight ?? internalInputWeight}
@@ -335,8 +337,8 @@ export default function YieldLossCalculator({
               </div>
               <div className="flex-1">
                 <label className="block text-xs text-gray-500 mb-1">
-                  예상 산출 (g)
-                  {selectedCount < 6 && <span className="text-orange-500 ml-1">*{selectedCount}개 공정</span>}
+                  {t('components.yieldLoss.expectedOutput')} (g)
+                  {selectedCount < 6 && <span className="text-orange-500 ml-1">*{selectedCount}{t('components.yieldLoss.processes')}</span>}
                 </label>
                 <div className="px-2 py-1.5 text-sm bg-blue-50 border border-blue-200 rounded text-right font-mono font-semibold text-blue-700">
                   {result?.outputWeight.toLocaleString() ?? '-'}
@@ -347,7 +349,7 @@ export default function YieldLossCalculator({
             <>
               {/* 산출→투입 모드 (역산) */}
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">목표 산출 (g)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.targetOutput')} (g)</label>
                 <input
                   type="number"
                   value={targetOutput}
@@ -359,7 +361,7 @@ export default function YieldLossCalculator({
                 <span className="text-gray-400">←</span>
               </div>
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">필요 투입 (g)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.requiredInput')} (g)</label>
                 <div className="px-2 py-1.5 text-sm bg-green-50 border border-green-200 rounded text-right font-mono font-semibold text-green-700">
                   {requiredInput.toLocaleString()}
                 </div>
@@ -373,12 +375,12 @@ export default function YieldLossCalculator({
           <div className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded">
             <div className="flex items-center gap-2">
               <Scale className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">수율</span>
+              <span className="text-sm text-gray-600">{t('components.yieldLoss.yield')}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-lg font-bold text-blue-600">{result.yieldPercent}%</span>
               <span className={`text-sm ${getLossColor(result.totalLossPercent)}`}>
-                (손실 {result.totalLossPercent}% / {result.totalLossWeight.toLocaleString()}g)
+                ({t('components.yieldLoss.loss')} {result.totalLossPercent}% / {result.totalLossWeight.toLocaleString()}g)
               </span>
             </div>
           </div>
@@ -391,7 +393,7 @@ export default function YieldLossCalculator({
             className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
           >
             {showEnvironment ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            환경 설정 (습도/온도)
+            {t('components.yieldLoss.envSettings')}
           </button>
         )}
 
@@ -399,7 +401,7 @@ export default function YieldLossCalculator({
         {showEnvironment && !externalEnvironment && (
           <div className="grid grid-cols-2 gap-2 p-2 bg-gray-50 rounded">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">습도 (%)</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.humidity')} (%)</label>
               <input
                 type="number"
                 value={humidity}
@@ -410,7 +412,7 @@ export default function YieldLossCalculator({
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">실온 (°C)</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.roomTemp')} (°C)</label>
               <input
                 type="number"
                 value={temperature}
@@ -423,7 +425,7 @@ export default function YieldLossCalculator({
             {(humidity !== 60 || temperature !== 25) && (
               <div className="col-span-2 flex items-start gap-1 text-xs text-orange-600">
                 <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                <span>환경 조건이 기준(습도60%, 온도25°C)과 다르면 굽기 손실이 조정됩니다.</span>
+                <span>{t('components.yieldLoss.envNote')}</span>
               </div>
             )}
           </div>
@@ -436,14 +438,14 @@ export default function YieldLossCalculator({
             className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
           >
             {showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            공정별 손실 상세
+            {t('components.yieldLoss.processDetails')}
           </button>
         )}
 
         {/* 공정별 손실 상세 */}
         {showDetails && mode === 'forward' && result && (
           <div className="space-y-2">
-            <div className="text-xs text-gray-500 mb-2">공정별 손실 내역 (선택된 공정만)</div>
+            <div className="text-xs text-gray-500 mb-2">{t('components.yieldLoss.processDetailsDesc')}</div>
             {result.processLosses.map((loss, idx) => (
               <div key={idx} className="flex items-center text-sm">
                 <div className="w-12 text-gray-600">{loss.stage}</div>
@@ -468,7 +470,7 @@ export default function YieldLossCalculator({
           <div className="p-2 bg-blue-50 rounded text-xs">
             <div className="flex items-center gap-1 text-blue-700 font-medium mb-1">
               <Info className="w-3 h-3" />
-              손실 최소화 팁
+              {t('components.yieldLoss.minimizeLossTips')}
             </div>
             <ul className="list-disc list-inside text-blue-600 space-y-0.5">
               {result.tips.slice(0, 3).map((tip, idx) => (

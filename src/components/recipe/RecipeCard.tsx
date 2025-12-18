@@ -1,7 +1,9 @@
 import React, { memo, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Recipe, BreadMethod, SourceType } from '@types/recipe.types'
 import { Pencil, Youtube, BookOpen, Globe, User, GraduationCap } from 'lucide-react'
 import { toast } from '@utils/toast'
+import { useLocalization } from '@/hooks/useLocalization'
 
 interface RecipeCardProps {
   recipe: Recipe
@@ -23,28 +25,28 @@ const CATEGORY_ICONS: Record<string, string> = {
   savory: '🥖'
 } as const
 
-// 제법 이름 매핑 상수로 분리
-const METHOD_NAMES: Record<BreadMethod, string> = {
-  straight: '스트레이트',
-  sponge: '중종법',
-  poolish: '폴리쉬',
-  biga: '비가',
-  tangzhong: '탕종법',
-  autolyse: '오토리즈',
-  overnight: '저온숙성',
-  'no-time': '노타임',
-  sourdough: '사워도우'
+// 제법 키 매핑 (i18n 키로 변환)
+const METHOD_KEYS: Record<BreadMethod, string> = {
+  straight: 'method.straight',
+  sponge: 'method.sponge',
+  poolish: 'method.poolish',
+  biga: 'method.biga',
+  tangzhong: 'method.tangzhong',
+  autolyse: 'method.autolyse',
+  overnight: 'method.retard',
+  'no-time': 'method.straight',
+  sourdough: 'productType.sourdough'
 } as const
 
-// 카테고리 이름 매핑
-const CATEGORY_NAMES: Record<string, string> = {
-  bread: '빵',
-  cake: '케이크',
-  cookie: '쿠키',
-  pastry: '페이스트리',
-  dessert: '디저트',
-  confectionery: '제과',
-  savory: '세이보리'
+// 카테고리 키 매핑 (i18n 키로 변환)
+const CATEGORY_KEYS: Record<string, string> = {
+  bread: 'dashboard.bread',
+  cake: 'dashboard.cake',
+  cookie: 'productType.cookie',
+  pastry: 'productType.danish',
+  dessert: 'dashboard.cake',
+  confectionery: 'dashboard.cake',
+  savory: 'dashboard.bread'
 } as const
 
 // 출처 타입별 아이콘 및 색상
@@ -67,6 +69,9 @@ const RecipeCard = memo<RecipeCardProps>(({
   onRestore,
   compact = false
 }) => {
+  const { t } = useTranslation()
+  const { getLocalizedSourceName, getLocalizedRecipeName } = useLocalization()
+
   // 카테고리 아이콘 메모이제이션
   const categoryIcon = useMemo(() =>
     CATEGORY_ICONS[recipe.category] || '🍞',
@@ -78,31 +83,33 @@ const RecipeCard = memo<RecipeCardProps>(({
     // method가 객체인 경우 (새 저장 형식)
     if (typeof recipe.method === 'object' && recipe.method !== null) {
       const methodType = (recipe.method as any).method || (recipe.method as any).type;
-      return METHOD_NAMES[methodType as BreadMethod] || methodType || '스트레이트';
+      const key = METHOD_KEYS[methodType as BreadMethod] || 'method.straight';
+      return t(key);
     }
     // method가 문자열인 경우 (기존 형식)
-    return METHOD_NAMES[recipe.method as BreadMethod] || recipe.method || '스트레이트';
-  }, [recipe.method])
+    const key = METHOD_KEYS[recipe.method as BreadMethod] || 'method.straight';
+    return t(key);
+  }, [recipe.method, t])
 
   // 카테고리 이름 메모이제이션
-  const categoryName = useMemo(() =>
-    CATEGORY_NAMES[recipe.category] || recipe.category,
-    [recipe.category]
-  )
+  const categoryName = useMemo(() => {
+    const key = CATEGORY_KEYS[recipe.category] || 'dashboard.bread';
+    return t(key);
+  }, [recipe.category, t])
 
   // 출처 정보 메모이제이션
   const sourceInfo = useMemo(() => {
     if (!recipe.source) return null
     const config = SOURCE_CONFIG[recipe.source.type] || SOURCE_CONFIG.other
     return {
-      name: recipe.source.name,
+      name: getLocalizedSourceName(recipe.source),
       type: recipe.source.type,
       url: recipe.source.url,
       Icon: config.icon,
       color: config.color,
       bgColor: config.bgColor
     }
-  }, [recipe.source])
+  }, [recipe.source, getLocalizedSourceName])
 
   // 재료 개수 메모이제이션
   const ingredientCount = useMemo(() =>
@@ -116,16 +123,16 @@ const RecipeCard = memo<RecipeCardProps>(({
     const recipeToRestore = recipe
 
     onDelete()
-    toast.success('레시피가 삭제되었습니다', {
+    toast.success(t('message.recipeDeleted'), {
       duration: 5000,
       action: onRestore ? {
-        label: '되돌리기',
+        label: t('message.undo'),
         onClick: () => {
           onRestore(recipeToRestore)
         }
       } : undefined
     })
-  }, [recipe, onDelete, onRestore])
+  }, [recipe, onDelete, onRestore, t])
 
   // 수정 핸들러 최적화
   const handleEdit = useCallback((e: React.MouseEvent) => {
@@ -162,7 +169,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             </span>
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-sm text-bread-700 truncate">
-                {recipe.name}
+                {getLocalizedRecipeName(recipe)}
               </h3>
               {sourceInfo && (
                 <div className={`flex items-center gap-1 mt-0.5 ${sourceInfo.color}`}>
@@ -177,7 +184,7 @@ const RecipeCard = memo<RecipeCardProps>(({
               <button
                 onClick={handleEdit}
                 className="text-gray-400 hover:text-bread-600 transition-colors p-1"
-                aria-label="레시피 수정"
+                aria-label={t('recipeList.editRecipe')}
                 type="button"
               >
                 <Pencil size={14} />
@@ -186,7 +193,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             <button
               onClick={handleDelete}
               className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none"
-              aria-label="레시피 삭제"
+              aria-label={t('recipeList.deleteRecipe')}
               type="button"
             >
               ×
@@ -196,7 +203,7 @@ const RecipeCard = memo<RecipeCardProps>(({
 
         <div className="flex justify-between items-center text-xs text-gray-600">
           <span>{methodName}</span>
-          <span>재료 {ingredientCount}개</span>
+          <span>{t('recipeList.ingredientCount', { count: ingredientCount })}</span>
         </div>
       </div>
     )
@@ -219,7 +226,7 @@ const RecipeCard = memo<RecipeCardProps>(({
       <div className="flex justify-between items-start mb-2">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-bread-700">
-            {recipe.name}
+            {getLocalizedRecipeName(recipe)}
           </h3>
           {sourceInfo && (
             <div className={`flex items-center gap-1 mt-1 ${sourceInfo.color}`}>
@@ -233,7 +240,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             <button
               onClick={handleEdit}
               className="text-gray-400 hover:text-bread-600 transition-colors p-1"
-              aria-label="레시피 수정"
+              aria-label={t('recipeList.editRecipe')}
               type="button"
             >
               <Pencil size={16} />
@@ -242,7 +249,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           <button
             onClick={handleDelete}
             className="text-gray-400 hover:text-red-500 transition-colors"
-            aria-label="레시피 삭제"
+            aria-label={t('recipeList.deleteRecipe')}
             type="button"
           >
             ×
@@ -272,12 +279,12 @@ const RecipeCard = memo<RecipeCardProps>(({
       )}
 
       <div className="text-xs text-gray-500 space-y-1">
-        <p>재료: {ingredientCount}개</p>
+        <p>{t('recipeList.ingredients')}: {ingredientCount}</p>
         {recipe.totalTime && (
-          <p>소요시간: {recipe.totalTime}분</p>
+          <p>{t('recipeList.totalTime')}: {recipe.totalTime}{t('recipeList.minutes')}</p>
         )}
         {recipe.difficulty && (
-          <p>난이도: {recipe.difficulty}</p>
+          <p>{t('recipeList.difficulty')}: {recipe.difficulty}</p>
         )}
       </div>
     </div>

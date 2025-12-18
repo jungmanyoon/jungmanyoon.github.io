@@ -8,6 +8,7 @@
  */
 
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Recipe } from '@/types/recipe.types'
 import { useWorkspaceStore } from '@/stores/useWorkspaceStore'
 import { PAN_PRESETS } from '@/utils/calculations/realtimeCalculator'
@@ -20,6 +21,7 @@ interface RecipeDetailPanelProps {
 }
 
 export default function RecipeDetailPanel({ recipe }: RecipeDetailPanelProps) {
+  const { t } = useTranslation()
   const {
     selectedPanConfig,
     selectedMethod,
@@ -62,7 +64,7 @@ export default function RecipeDetailPanel({ recipe }: RecipeDetailPanelProps) {
           <div className="recipe-controls">
             {/* 팬 선택 */}
             <div className="control-group">
-              <label htmlFor="pan-select">팬 크기</label>
+              <label htmlFor="pan-select">{t('components.recipeDetail.panSize')}</label>
               <select
                 id="pan-select"
                 className="control-select"
@@ -73,7 +75,7 @@ export default function RecipeDetailPanel({ recipe }: RecipeDetailPanelProps) {
                 }
                 onChange={handlePanChange}
               >
-                <option value="">원본 크기</option>
+                <option value="">{t('components.recipeDetail.originalSize')}</option>
                 {Object.entries(PAN_PRESETS).map(([key, pan]) => (
                   <option key={key} value={key}>
                     {pan.name}
@@ -84,24 +86,24 @@ export default function RecipeDetailPanel({ recipe }: RecipeDetailPanelProps) {
 
             {/* 제법 선택 */}
             <div className="control-group">
-              <label htmlFor="method-select">제법</label>
+              <label htmlFor="method-select">{t('components.recipeDetail.method')}</label>
               <select
                 id="method-select"
                 className="control-select"
                 value={selectedMethod}
                 onChange={handleMethodChange}
               >
-                <option value="straight">직반죽</option>
-                <option value="sponge">스펀지법</option>
-                <option value="poolish">폴리시법</option>
-                <option value="biga">비가법</option>
-                <option value="overnight">냉장 숙성</option>
+                <option value="straight">{t('components.recipeDetail.methods.straight')}</option>
+                <option value="sponge">{t('components.recipeDetail.methods.sponge')}</option>
+                <option value="poolish">{t('components.recipeDetail.methods.poolish')}</option>
+                <option value="biga">{t('components.recipeDetail.methods.biga')}</option>
+                <option value="overnight">{t('components.recipeDetail.methods.overnight')}</option>
               </select>
             </div>
 
             {/* 배수 조정 */}
             <div className="control-group">
-              <label>배수</label>
+              <label>{t('components.recipeDetail.multiplier')}</label>
               <div className="batch-buttons">
                 {[1, 2, 3, 5].map((n) => (
                   <button
@@ -119,34 +121,34 @@ export default function RecipeDetailPanel({ recipe }: RecipeDetailPanelProps) {
 
             {/* 퍼센트 모드 */}
             <div className="control-group">
-              <label>표시 방식</label>
+              <label>{t('components.recipeDetail.displayMode')}</label>
               <div className="mode-buttons">
                 <button
                   className={`mode-button ${
                     calculationMode === 'bakers' ? 'active' : ''
                   }`}
                   onClick={() => handleCalculationModeChange('bakers')}
-                  title="베이커스 퍼센트 (밀가루 = 100%)"
+                  title={t('components.recipeDetail.bakersPercentTitle')}
                 >
-                  베이커스%
+                  {t('components.recipeDetail.bakersPercent')}
                 </button>
                 <button
                   className={`mode-button ${
                     calculationMode === 'weight' ? 'active' : ''
                   }`}
                   onClick={() => handleCalculationModeChange('weight')}
-                  title="중량 퍼센트 (총 반죽량 = 100%)"
+                  title={t('components.recipeDetail.weightPercentTitle')}
                 >
-                  중량%
+                  {t('components.recipeDetail.weightPercent')}
                 </button>
                 <button
                   className={`mode-button ${
                     calculationMode === 'recipe' ? 'active' : ''
                   }`}
                   onClick={() => handleCalculationModeChange('recipe')}
-                  title="레시피 퍼센트 (원본 비율)"
+                  title={t('components.recipeDetail.recipePercentTitle')}
                 >
-                  레시피%
+                  {t('components.recipeDetail.recipePercent')}
                 </button>
               </div>
             </div>
@@ -155,7 +157,7 @@ export default function RecipeDetailPanel({ recipe }: RecipeDetailPanelProps) {
 
         {/* 총 반죽량 표시 */}
         <div className="total-weight-display">
-          <span className="total-label">총 반죽량</span>
+          <span className="total-label">{t('components.recipeDetail.totalDough')}</span>
           <span className="total-value">{totalDoughWeight}g</span>
         </div>
       </header>
@@ -177,7 +179,7 @@ export default function RecipeDetailPanel({ recipe }: RecipeDetailPanelProps) {
       {/* 푸터: 메타 정보 */}
       <footer className="recipe-footer">
         <div className="meta-item">
-          <span className="meta-label">난이도:</span>
+          <span className="meta-label">{t('components.recipeDetail.difficulty')}</span>
           <span className="meta-value">
             {'★'.repeat(recipe.difficulty || 1)}
             {'☆'.repeat(5 - (recipe.difficulty || 1))}
@@ -185,13 +187,13 @@ export default function RecipeDetailPanel({ recipe }: RecipeDetailPanelProps) {
         </div>
         {recipe.totalTime && (
           <div className="meta-item">
-            <span className="meta-label">총 소요시간:</span>
-            <span className="meta-value">{recipe.totalTime}분</span>
+            <span className="meta-label">{t('components.recipeDetail.totalTime')}</span>
+            <span className="meta-value">{recipe.totalTime}{t('components.recipeListSidebar.timeUnit')}</span>
           </div>
         )}
         {recipe.category && (
           <div className="meta-item">
-            <span className="meta-label">카테고리:</span>
+            <span className="meta-label">{t('components.recipeDetail.category')}</span>
             <span className="meta-value">{recipe.category}</span>
           </div>
         )}

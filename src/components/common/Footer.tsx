@@ -3,9 +3,11 @@
  * 개인정보처리방침, 이용약관, 가이드, 문의 링크 포함
  */
 
+import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@stores/useAppStore'
 
 export default function Footer() {
+  const { t } = useTranslation()
   const { setActiveTab } = useAppStore()
 
   const handleNavigation = (tab: string) => {
@@ -20,27 +22,26 @@ export default function Footer() {
           {/* 서비스 정보 */}
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-white font-bold text-lg mb-3">
-              레시피북
+              {t('footer.appName')}
             </h3>
             <p className="text-sm text-gray-400 mb-4">
-              제과제빵 전문가와 홈베이커를 위한 무료 레시피 변환 도구입니다.
-              베이커스 퍼센트, DDT 계산, 팬 크기 조정 등 복잡한 계산을 쉽게 처리하세요.
+              {t('footer.description')}
             </p>
             <p className="text-xs text-gray-500">
-              © 2024 레시피북. All rights reserved.
+              {t('footer.copyright')}
             </p>
           </div>
 
           {/* 빠른 링크 */}
           <div>
-            <h4 className="text-white font-semibold mb-3">바로가기</h4>
+            <h4 className="text-white font-semibold mb-3">{t('footer.quickLinks')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <button
                   onClick={() => handleNavigation('dashboard')}
                   className="hover:text-white transition-colors"
                 >
-                  대시보드
+                  {t('nav.dashboard')}
                 </button>
               </li>
               <li>
@@ -48,7 +49,7 @@ export default function Footer() {
                   onClick={() => handleNavigation('recipes')}
                   className="hover:text-white transition-colors"
                 >
-                  레시피 목록
+                  {t('footer.recipeList')}
                 </button>
               </li>
               <li>
@@ -56,7 +57,7 @@ export default function Footer() {
                   onClick={() => handleNavigation('calculator')}
                   className="hover:text-white transition-colors"
                 >
-                  DDT 계산기
+                  {t('footer.ddtCalc')}
                 </button>
               </li>
               <li>
@@ -64,7 +65,7 @@ export default function Footer() {
                   onClick={() => handleNavigation('guide')}
                   className="hover:text-white transition-colors"
                 >
-                  사용 가이드
+                  {t('footer.userGuide')}
                 </button>
               </li>
             </ul>
@@ -72,14 +73,14 @@ export default function Footer() {
 
           {/* 법적 정보 */}
           <div>
-            <h4 className="text-white font-semibold mb-3">정보</h4>
+            <h4 className="text-white font-semibold mb-3">{t('footer.info')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <button
                   onClick={() => handleNavigation('privacy')}
                   className="hover:text-white transition-colors"
                 >
-                  개인정보처리방침
+                  {t('footer.privacy')}
                 </button>
               </li>
               <li>
@@ -87,7 +88,7 @@ export default function Footer() {
                   onClick={() => handleNavigation('terms')}
                   className="hover:text-white transition-colors"
                 >
-                  이용약관
+                  {t('footer.terms')}
                 </button>
               </li>
               <li>
@@ -95,7 +96,7 @@ export default function Footer() {
                   onClick={() => handleNavigation('contact')}
                   className="hover:text-white transition-colors"
                 >
-                  문의하기
+                  {t('footer.contact')}
                 </button>
               </li>
               <li>
@@ -118,8 +119,7 @@ export default function Footer() {
         {/* 면책 조항 */}
         <div className="border-t border-gray-700 mt-8 pt-6">
           <p className="text-xs text-gray-500 text-center">
-            ⚠️ 본 서비스는 무료로 제공되며, 계산 결과의 정확성을 보장하지 않습니다.
-            상업적 용도로 사용 시 직접 검증하시기 바랍니다.
+            ⚠️ {t('footer.disclaimer')}
           </p>
         </div>
       </div>

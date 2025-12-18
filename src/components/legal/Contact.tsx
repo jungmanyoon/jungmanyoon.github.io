@@ -3,13 +3,17 @@
  * AdSense 심사 권장 - 신뢰도 향상
  */
 
+import { useTranslation } from 'react-i18next'
+
 interface ContactProps {
   onBack?: () => void
 }
 
 export default function Contact({ onBack }: ContactProps) {
+  const { t } = useTranslation()
+
   const handleEmailClick = () => {
-    window.location.href = 'mailto:jmyoon0702@gmail.com?subject=[레시피북] 문의드립니다'
+    window.location.href = 'mailto:jmyoon0702@gmail.com?subject=[Recipe Book] Inquiry'
   }
 
   const handleGithubClick = () => {
@@ -27,17 +31,17 @@ export default function Contact({ onBack }: ContactProps) {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            돌아가기
+            {t('legal.back')}
           </button>
         )}
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">문의하기</h1>
-        <p className="text-gray-500 mb-8">궁금한 점이나 제안이 있으시면 연락해 주세요</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('legal.contact.title')}</h1>
+        <p className="text-gray-500 mb-8">{t('legal.contact.subtitle')}</p>
 
         <div className="space-y-8">
           {/* 문의 방법 */}
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">연락 방법</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('legal.contact.methods')}</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {/* 이메일 */}
               <div
@@ -51,12 +55,12 @@ export default function Contact({ onBack }: ContactProps) {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900">이메일</h3>
+                    <h3 className="font-medium text-gray-900">{t('legal.contact.email')}</h3>
                     <p className="text-bread-600">jmyoon0702@gmail.com</p>
                   </div>
                 </div>
                 <p className="mt-3 text-sm text-gray-500">
-                  기능 제안, 버그 신고, 일반 문의 등 모든 문의를 환영합니다.
+                  {t('legal.contact.emailDesc')}
                 </p>
               </div>
 
@@ -72,12 +76,12 @@ export default function Contact({ onBack }: ContactProps) {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900">GitHub</h3>
-                    <p className="text-gray-600">이슈 & 기여</p>
+                    <h3 className="font-medium text-gray-900">{t('legal.contact.github')}</h3>
+                    <p className="text-gray-600">{t('legal.contact.githubSubtitle')}</p>
                   </div>
                 </div>
                 <p className="mt-3 text-sm text-gray-500">
-                  버그 리포트, 기능 요청, 코드 기여를 환영합니다.
+                  {t('legal.contact.githubDesc')}
                 </p>
               </div>
             </div>
@@ -85,73 +89,65 @@ export default function Contact({ onBack }: ContactProps) {
 
           {/* FAQ */}
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">자주 묻는 질문</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('legal.contact.faq')}</h2>
             <div className="space-y-4">
               <details className="group border rounded-lg">
                 <summary className="p-4 cursor-pointer list-none flex justify-between items-center hover:bg-gray-50">
-                  <span className="font-medium text-gray-700">저장한 레시피가 사라졌어요</span>
+                  <span className="font-medium text-gray-700">{t('legal.contact.faq1q')}</span>
                   <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
                 <div className="px-4 pb-4 text-gray-600">
-                  <p>레시피는 브라우저의 로컬 저장소에 저장됩니다. 브라우저 데이터를 삭제하거나
-                  시크릿 모드를 사용하면 데이터가 유지되지 않습니다. 중요한 레시피는
-                  '내보내기' 기능으로 백업해 두세요.</p>
+                  <p>{t('legal.contact.faq1a')}</p>
                 </div>
               </details>
 
               <details className="group border rounded-lg">
                 <summary className="p-4 cursor-pointer list-none flex justify-between items-center hover:bg-gray-50">
-                  <span className="font-medium text-gray-700">다른 기기에서 레시피를 사용하고 싶어요</span>
+                  <span className="font-medium text-gray-700">{t('legal.contact.faq2q')}</span>
                   <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
                 <div className="px-4 pb-4 text-gray-600">
-                  <p>현재 기기에서 레시피를 '내보내기'한 후, 다른 기기에서 '가져오기'를
-                  사용하면 됩니다. JSON 파일 형식으로 저장되어 쉽게 공유할 수 있습니다.</p>
+                  <p>{t('legal.contact.faq2a')}</p>
                 </div>
               </details>
 
               <details className="group border rounded-lg">
                 <summary className="p-4 cursor-pointer list-none flex justify-between items-center hover:bg-gray-50">
-                  <span className="font-medium text-gray-700">계산 결과가 정확한가요?</span>
+                  <span className="font-medium text-gray-700">{t('legal.contact.faq3q')}</span>
                   <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
                 <div className="px-4 pb-4 text-gray-600">
-                  <p>본 서비스의 계산은 전문 제빵 공식을 기반으로 하지만, 참고용입니다.
-                  실제 베이킹 시에는 오븐 특성, 재료 상태 등에 따라 조정이 필요할 수 있습니다.
-                  상업적 용도로 사용 시에는 반드시 직접 검증하세요.</p>
+                  <p>{t('legal.contact.faq3a')}</p>
                 </div>
               </details>
 
               <details className="group border rounded-lg">
                 <summary className="p-4 cursor-pointer list-none flex justify-between items-center hover:bg-gray-50">
-                  <span className="font-medium text-gray-700">앱을 오프라인에서도 사용할 수 있나요?</span>
+                  <span className="font-medium text-gray-700">{t('legal.contact.faq4q')}</span>
                   <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
                 <div className="px-4 pb-4 text-gray-600">
-                  <p>네! 이 앱은 PWA(Progressive Web App)로 제작되어 한 번 방문 후에는
-                  오프라인에서도 사용할 수 있습니다. 모바일에서는 '홈 화면에 추가'를 통해
-                  앱처럼 사용할 수 있습니다.</p>
+                  <p>{t('legal.contact.faq4a')}</p>
                 </div>
               </details>
 
               <details className="group border rounded-lg">
                 <summary className="p-4 cursor-pointer list-none flex justify-between items-center hover:bg-gray-50">
-                  <span className="font-medium text-gray-700">서비스는 무료인가요?</span>
+                  <span className="font-medium text-gray-700">{t('legal.contact.faq5q')}</span>
                   <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
                 <div className="px-4 pb-4 text-gray-600">
-                  <p>네, 모든 기능을 무료로 사용할 수 있습니다. 서비스 운영을 위해
-                  광고가 표시될 수 있습니다.</p>
+                  <p>{t('legal.contact.faq5a')}</p>
                 </div>
               </details>
             </div>
@@ -159,27 +155,26 @@ export default function Contact({ onBack }: ContactProps) {
 
           {/* 피드백 요청 */}
           <section className="bg-gradient-to-r from-bread-50 to-amber-50 p-6 rounded-lg">
-            <h2 className="text-xl font-semibold text-bread-800 mb-3">여러분의 의견을 기다립니다</h2>
+            <h2 className="text-xl font-semibold text-bread-800 mb-3">{t('legal.contact.feedbackTitle')}</h2>
             <p className="text-gray-700 mb-4">
-              레시피북은 사용자 피드백을 바탕으로 계속 발전하고 있습니다.
-              새로운 기능 아이디어, 개선 제안, 또는 버그 발견 시 언제든지 연락해 주세요.
+              {t('legal.contact.feedbackDesc')}
             </p>
             <button
               onClick={handleEmailClick}
               className="px-6 py-2 bg-bread-600 text-white rounded-lg hover:bg-bread-700 transition-colors"
             >
-              피드백 보내기
+              {t('legal.contact.sendFeedback')}
             </button>
           </section>
 
           {/* 서비스 정보 */}
           <section className="border-t pt-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">서비스 정보</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">{t('legal.contact.serviceInfo')}</h2>
             <div className="text-sm text-gray-600 space-y-1">
-              <p><strong>서비스명:</strong> 레시피북 - 제과제빵 레시피 변환기</p>
-              <p><strong>버전:</strong> 1.0.0</p>
-              <p><strong>개발:</strong> 개인 프로젝트 (취미)</p>
-              <p><strong>기술 스택:</strong> React, TypeScript, Tailwind CSS, PWA</p>
+              <p><strong>{t('legal.contact.serviceName')}:</strong> {t('legal.contact.serviceNameValue')}</p>
+              <p><strong>{t('legal.contact.version')}:</strong> 1.0.0</p>
+              <p><strong>{t('legal.contact.development')}:</strong> {t('legal.contact.developmentValue')}</p>
+              <p><strong>{t('legal.contact.techStack')}:</strong> React, TypeScript, Tailwind CSS, PWA</p>
             </div>
           </section>
         </div>

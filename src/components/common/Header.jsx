@@ -1,21 +1,22 @@
 import React from 'react'
-
+import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@stores/useAppStore'
 
 function Header() {
+  const { t } = useTranslation()
   const { activeTab, setActiveTab } = useAppStore()
 
-  // 네비게이션 탭 - 깔끔하게 정리
+  // 네비게이션 탭 - 번역 키 사용
   const navTabs = [
-    { id: 'home', label: '🏠 홈', title: '홈' },
-    { id: 'dashboard', label: '⚖️ 변환기', title: '레시피 변환 대시보드' },
-    { id: 'recipes', label: '📖 레시피', title: '레시피 목록' },
-    { id: 'calculator', label: '🌡️ DDT', title: 'DDT 계산기' },
+    { id: 'home', labelKey: 'nav.home', icon: '🏠' },
+    { id: 'dashboard', labelKey: 'nav.converter', icon: '⚖️' },
+    { id: 'recipes', labelKey: 'nav.recipes', icon: '📖' },
+    { id: 'calculator', labelKey: 'nav.ddt', icon: '🌡️' },
   ]
 
   const utilTabs = [
-    { id: 'settings', label: '⚙️', title: '설정' },
-    { id: 'help', label: '❓', title: '도움말' },
+    { id: 'settings', labelKey: 'nav.settings', icon: '⚙️' },
+    { id: 'help', labelKey: 'nav.help', icon: '❓' },
   ]
 
   return (
@@ -28,7 +29,7 @@ function Header() {
             className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
           >
             <span className="text-xl">🍞</span>
-            <h1 className="text-lg font-bold text-white">레시피북</h1>
+            <h1 className="text-lg font-bold text-white">{t('app.name')}</h1>
           </button>
 
           {/* Navigation */}
@@ -43,10 +44,10 @@ function Header() {
                     ? 'bg-white/20 text-white'
                     : 'text-white/80 hover:bg-white/10 hover:text-white'
                 }`}
-                aria-label={tab.title}
-                title={tab.title}
+                aria-label={t(tab.labelKey)}
+                title={t(tab.labelKey)}
               >
-                {tab.label}
+                {tab.icon} {t(tab.labelKey)}
               </button>
             ))}
 
@@ -63,10 +64,10 @@ function Header() {
                     ? 'bg-white/20'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 }`}
-                aria-label={tab.title}
-                title={tab.title}
+                aria-label={t(tab.labelKey)}
+                title={t(tab.labelKey)}
               >
-                {tab.label}
+                {tab.icon}
               </button>
             ))}
           </nav>

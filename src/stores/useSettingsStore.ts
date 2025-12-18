@@ -133,6 +133,9 @@ const DEFAULT_USER_PANS: UserPan[] = [
   { id: 'brioche-12', name: '브리오슈틀 (12cm)', category: '빵틀', type: 'round', dimensions: { diameter: 12, height: 6 }, volume: 679, notes: '브리오슈 아 테트', isFavorite: false, createdAt: new Date(), updatedAt: new Date() },
 ]
 
+// 기본 팬 ID 목록 (번역용)
+export const DEFAULT_PAN_IDS = DEFAULT_USER_PANS.map(p => p.id)
+
 const DEFAULT_PAN_SETTINGS: PanSettings = {
   myPans: DEFAULT_USER_PANS,
   fillRatioOverrides: {},

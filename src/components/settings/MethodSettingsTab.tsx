@@ -6,6 +6,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/useSettingsStore'
 import { MethodConfig } from '@/types/settings.types'
 import {
@@ -21,52 +22,43 @@ import {
   Beaker
 } from 'lucide-react'
 
-// 제법 아이콘 및 색상
-const METHOD_META: Record<string, { icon: string; color: string; description: string }> = {
+// 제법 아이콘 및 색상 (description은 번역 키로 대체)
+const METHOD_META: Record<string, { icon: string; color: string }> = {
   straight: {
     icon: '🥖',
-    color: 'bg-gray-100 text-gray-700 border-gray-300',
-    description: '모든 재료를 한 번에 믹싱하는 기본 방식'
+    color: 'bg-gray-100 text-gray-700 border-gray-300'
   },
   sponge: {
     icon: '🧪',
-    color: 'bg-amber-100 text-amber-700 border-amber-300',
-    description: '밀가루 60%로 중종 반죽 후 본반죽'
+    color: 'bg-amber-100 text-amber-700 border-amber-300'
   },
   poolish: {
     icon: '🫧',
-    color: 'bg-blue-100 text-blue-700 border-blue-300',
-    description: '밀가루:물 = 1:1 비율의 액종 (프랑스식)'
+    color: 'bg-blue-100 text-blue-700 border-blue-300'
   },
   biga: {
     icon: '🇮🇹',
-    color: 'bg-green-100 text-green-700 border-green-300',
-    description: '단단한 사전반죽 (이탈리아식)'
+    color: 'bg-green-100 text-green-700 border-green-300'
   },
   tangzhong: {
     icon: '🍜',
-    color: 'bg-pink-100 text-pink-700 border-pink-300',
-    description: '밀가루:물 = 1:5 비율로 호화시킨 탕종 사용'
+    color: 'bg-pink-100 text-pink-700 border-pink-300'
   },
   levain: {
     icon: '🌾',
-    color: 'bg-orange-100 text-orange-700 border-orange-300',
-    description: '천연 발효종 사용 (사워도우)'
+    color: 'bg-orange-100 text-orange-700 border-orange-300'
   },
   coldFerment: {
     icon: '❄️',
-    color: 'bg-cyan-100 text-cyan-700 border-cyan-300',
-    description: '냉장고에서 12~72시간 발효'
+    color: 'bg-cyan-100 text-cyan-700 border-cyan-300'
   },
   retard: {
     icon: '🌙',
-    color: 'bg-indigo-100 text-indigo-700 border-indigo-300',
-    description: '성형 후 냉장 숙성'
+    color: 'bg-indigo-100 text-indigo-700 border-indigo-300'
   },
   autolyse: {
     icon: '💧',
-    color: 'bg-purple-100 text-purple-700 border-purple-300',
-    description: '밀가루+물 휴지 후 나머지 투입'
+    color: 'bg-purple-100 text-purple-700 border-purple-300'
   }
 }
 
@@ -75,6 +67,7 @@ interface MethodSettingsTabProps {
 }
 
 export default function MethodSettingsTab({ className = '' }: MethodSettingsTabProps) {
+  const { t } = useTranslation()
   const {
     method,
     updateMethod,
@@ -147,14 +140,14 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
           <div className="flex items-center gap-3">
             <span className="text-2xl">{meta.icon}</span>
             <div>
-              <div className="font-semibold">{m.nameKo}</div>
+              <div className="font-semibold">{t(`settings.method.methods.${m.id}.name`)}</div>
               <div className="text-xs opacity-75">{m.name}</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {m.flourRatio > 0 && (
               <span className="text-xs px-2 py-0.5 bg-white/50 rounded">
-                사전반죽 {(m.flourRatio * 100).toFixed(0)}%
+                {t('settings.method.preferment')} {(m.flourRatio * 100).toFixed(0)}%
               </span>
             )}
             {isExpanded ? (
@@ -168,7 +161,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
         {/* 상세 정보 */}
         {isExpanded && (
           <div className="p-4 bg-white border-t space-y-4">
-            <p className="text-sm text-gray-600 italic">{meta.description}</p>
+            <p className="text-sm text-gray-600 italic">{t(`settings.method.methods.${m.id}.desc`)}</p>
 
             {isEditing ? (
               // 편집 모드
@@ -178,7 +171,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs text-gray-500 mb-1">
-                        밀가루 비율 (사전반죽)
+                        {t('settings.method.flourRatio')}
                       </label>
                       <div className="flex items-center gap-2">
                         <input
@@ -198,7 +191,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                     </div>
                     <div>
                       <label className="block text-xs text-gray-500 mb-1">
-                        수분 비율 (베이커스%)
+                        {t('settings.method.waterRatio')}
                       </label>
                       <div className="flex items-center gap-2">
                         <input
@@ -222,7 +215,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                 {/* 이스트 조정 */}
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">
-                    이스트 조정 계수
+                    {t('settings.method.yeastAdjust')}
                   </label>
                   <div className="flex items-center gap-2">
                     <input
@@ -243,8 +236,8 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                   </div>
                   <p className="text-xs text-gray-400 mt-1">
                     {(editForm.yeastAdjustment || 1) === 0
-                      ? '이스트 없음 (천연발효종 사용)'
-                      : `원래 양의 ${((editForm.yeastAdjustment || 1) * 100).toFixed(0)}% 사용`
+                      ? t('settings.method.yeastNone')
+                      : t('settings.method.yeastAmount', { percent: ((editForm.yeastAdjustment || 1) * 100).toFixed(0) })
                     }
                   </p>
                 </div>
@@ -253,7 +246,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">
-                      사전반죽 시간 (시간)
+                      {t('settings.method.prefermentTime')}
                     </label>
                     <div className="flex items-center gap-2">
                       <input
@@ -289,7 +282,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">
-                      사전반죽 온도 (°C)
+                      {t('settings.method.prefermentTemp')}
                     </label>
                     <div className="flex items-center gap-2">
                       <input
@@ -328,13 +321,13 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                     className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
                   >
                     <Save className="w-4 h-4" />
-                    저장
+                    {t('common.save')}
                   </button>
                   <button
                     onClick={handleCancel}
                     className="px-3 py-1.5 border border-gray-300 rounded hover:bg-gray-50 text-sm"
                   >
-                    취소
+                    {t('common.cancel')}
                   </button>
                 </div>
               </div>
@@ -344,28 +337,28 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                   {m.flourRatio > 0 && (
                     <div className="p-2 bg-gray-50 rounded">
-                      <div className="text-xs text-gray-500">밀가루</div>
+                      <div className="text-xs text-gray-500">{t('settings.method.flour')}</div>
                       <div className="font-mono font-medium">{(m.flourRatio * 100).toFixed(0)}%</div>
                     </div>
                   )}
                   {m.waterRatio > 0 && (
                     <div className="p-2 bg-gray-50 rounded">
-                      <div className="text-xs text-gray-500">수분</div>
+                      <div className="text-xs text-gray-500">{t('settings.method.water')}</div>
                       <div className="font-mono font-medium">{(m.waterRatio * 100).toFixed(0)}%</div>
                     </div>
                   )}
                   <div className="p-2 bg-gray-50 rounded">
-                    <div className="text-xs text-gray-500">이스트</div>
+                    <div className="text-xs text-gray-500">{t('settings.method.yeast')}</div>
                     <div className="font-mono font-medium">
                       {m.yeastAdjustment === 0
-                        ? '없음'
+                        ? t('settings.method.none')
                         : `${(m.yeastAdjustment * 100).toFixed(0)}%`
                       }
                     </div>
                   </div>
                   {(m.prefermentTime.min > 0 || m.prefermentTime.max > 0) && (
                     <div className="p-2 bg-gray-50 rounded">
-                      <div className="text-xs text-gray-500">발효 시간</div>
+                      <div className="text-xs text-gray-500">{t('settings.method.fermentationTime')}</div>
                       <div className="font-mono font-medium">
                         {m.prefermentTime.min}~{m.prefermentTime.max}h
                       </div>
@@ -376,7 +369,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                 {(m.prefermentTemp.min > 0 || m.prefermentTemp.max > 0) && (
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Thermometer className="w-4 h-4 text-gray-400" />
-                    발효 온도: {m.prefermentTemp.min}~{m.prefermentTemp.max}°C
+                    {t('settings.method.fermentationTemp')}: {m.prefermentTemp.min}~{m.prefermentTemp.max}°C
                   </div>
                 )}
 
@@ -384,7 +377,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                   onClick={() => startEditing(m.id)}
                   className="text-sm text-blue-600 hover:text-blue-700"
                 >
-                  설정 수정 →
+                  {t('settings.method.editSettings')}
                 </button>
               </div>
             )}
@@ -400,10 +393,10 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
       <div>
         <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
           <FlaskConical className="w-5 h-5 text-orange-500" />
-          제법 설정
+          {t('settings.method.title')}
         </h3>
         <p className="text-sm text-gray-500 mt-1">
-          각 제법의 이스트 양, 발효 시간, 온도 설정을 커스터마이징합니다.
+          {t('settings.method.titleDesc')}
         </p>
       </div>
 
@@ -411,14 +404,14 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
       <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg">
         <h4 className="font-medium text-amber-800 mb-3 flex items-center gap-2">
           <Beaker className="w-4 h-4" />
-          이스트 변환 비율
+          {t('settings.method.yeastConversion')}
         </h4>
         <p className="text-xs text-amber-600 mb-3">
-          생이스트 기준 (1.0)으로 다른 이스트 종류의 변환 비율을 설정합니다.
+          {t('settings.method.yeastConversionDesc')}
         </p>
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs text-gray-500 mb-1">생이스트</label>
+            <label className="block text-xs text-gray-500 mb-1">{t('settings.method.freshYeast')}</label>
             <input
               type="number"
               value={method.yeastConversion.fresh}
@@ -430,7 +423,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">액티브 드라이</label>
+            <label className="block text-xs text-gray-500 mb-1">{t('settings.method.activeDry')}</label>
             <input
               type="number"
               value={method.yeastConversion.activeDry}
@@ -442,7 +435,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">인스턴트</label>
+            <label className="block text-xs text-gray-500 mb-1">{t('settings.method.instant')}</label>
             <input
               type="number"
               value={method.yeastConversion.instant}
@@ -456,7 +449,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
         </div>
         <div className="mt-3 text-xs text-amber-600">
           <Info className="w-3 h-3 inline mr-1" />
-          예: 생이스트 10g = 인스턴트 {(10 * method.yeastConversion.instant).toFixed(1)}g
+          {t('settings.method.yeastExample', { value: (10 * method.yeastConversion.instant).toFixed(1) })}
         </div>
       </div>
 
@@ -464,12 +457,12 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
       <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
         <h4 className="font-medium text-blue-800 mb-3 flex items-center gap-2">
           <Clock className="w-4 h-4" />
-          발효 시간 계산 기준
+          {t('settings.method.fermentationBase')}
         </h4>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              기준 온도 (°C)
+              {t('settings.method.baseTemp')}
             </label>
             <input
               type="number"
@@ -480,12 +473,12 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
               className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-white"
             />
             <p className="text-xs text-gray-400 mt-1">
-              이 온도 기준으로 발효 시간이 조정됩니다
+              {t('settings.method.baseTempDesc')}
             </p>
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">
-              기준 소금 비율 (%)
+              {t('settings.method.baseSalt')}
             </label>
             <input
               type="number"
@@ -497,7 +490,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
               className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-white"
             />
             <p className="text-xs text-gray-400 mt-1">
-              소금이 더 많으면 발효가 느려집니다
+              {t('settings.method.baseSaltDesc')}
             </p>
           </div>
         </div>
@@ -506,17 +499,17 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
       {/* 제법 목록 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium text-gray-700">제법별 설정</h4>
+          <h4 className="font-medium text-gray-700">{t('settings.method.methodSettings')}</h4>
           <button
             onClick={() => {
-              if (confirm('모든 제법 설정을 기본값으로 초기화하시겠습니까?')) {
+              if (confirm(t('settings.method.resetConfirm'))) {
                 resetToDefaults('method')
               }
             }}
             className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
           >
             <RotateCcw className="w-4 h-4" />
-            기본값으로
+            {t('settings.method.resetToDefault')}
           </button>
         </div>
 
@@ -525,15 +518,15 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
 
       {/* 발효 공식 설명 */}
       <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
-        <h4 className="font-medium text-gray-700 mb-2">발효 시간 계산 공식</h4>
+        <h4 className="font-medium text-gray-700 mb-2">{t('settings.method.formulaTitle')}</h4>
         <div className="space-y-1 text-xs font-mono">
-          <div>온도 계수 = 2^((실제온도 - 기준온도) / 10)</div>
-          <div>소금 계수 = 1 / (1 - (소금% - 기준소금%) × 0.15)</div>
-          <div>조정된 시간 = 기본시간 / 온도계수 × 소금계수</div>
+          <div>{t('settings.method.formulaTempCoef')}</div>
+          <div>{t('settings.method.formulaSaltCoef')}</div>
+          <div>{t('settings.method.formulaAdjustedTime')}</div>
         </div>
         <div className="mt-2 text-xs text-gray-500">
           <AlertCircle className="w-3 h-3 inline mr-1" />
-          온도가 10°C 오르면 발효 속도가 약 2배 빨라집니다.
+          {t('settings.method.formulaNote')}
         </div>
       </div>
     </div>

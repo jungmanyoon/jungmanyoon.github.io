@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import Input from '../common/Input.jsx'
 import Button from '../common/Button.jsx'
 import IngredientTable from './IngredientTable.jsx'
 import { toast } from '@utils/toast'
 
 function RecipeEditor({ recipe, onSave, onCancel }) {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -39,12 +41,12 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
   const handleSave = () => {
     // 유효성 검사
     if (!formData.name || formData.name.trim() === '') {
-      toast.warning('레시피 이름을 입력해주세요.')
+      toast.warning(t('components.recipeEditor.toast.nameRequired'))
       return
     }
 
     if (!formData.ingredients || formData.ingredients.length === 0) {
-      toast.warning('재료를 하나 이상 입력해주세요.')
+      toast.warning(t('components.recipeEditor.toast.ingredientRequired'))
       return
     }
 
@@ -55,7 +57,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
     )
 
     if (validIngredients.length === 0) {
-      toast.warning('유효한 재료를 입력해주세요.')
+      toast.warning(t('components.recipeEditor.toast.validIngredientRequired'))
       return
     }
 
@@ -66,14 +68,14 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
       updatedAt: new Date().toISOString()
     }
     onSave(recipeToSave)
-    toast.success('레시피가 저장되었습니다')
+    toast.success(t('components.recipeEditor.toast.saved'))
   }
   
   const handleCancel = () => {
-    toast.warning('작성 중인 내용이 사라집니다. 계속하시겠습니까?', {
+    toast.warning(t('components.recipeEditor.toast.unsavedWarning'), {
       duration: 5000,
       action: {
-        label: '계속',
+        label: t('components.recipeEditor.toast.continue'),
         onClick: () => {
           onCancel()
         }
@@ -84,68 +86,68 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="card mb-3">
-        <h2 className="text-base font-semibold mb-2">레시피 정보</h2>
-        
+        <h2 className="text-base font-semibold mb-2">{t('components.recipeEditor.recipeInfo')}</h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label="레시피 이름"
+            label={t('components.recipeEditor.recipeName')}
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            placeholder="예: 우유 식빵"
+            placeholder={t('components.recipeEditor.recipeNamePlaceholder')}
             required
           />
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              카테고리
+              {t('components.recipeEditor.category')}
             </label>
             <select
               value={formData.category}
               onChange={(e) => handleInputChange('category', e.target.value)}
               className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
             >
-              <option value="bread">빵</option>
-              <option value="cake">케이크</option>
-              <option value="cookie">쿠키</option>
-              <option value="pastry">페이스트리</option>
+              <option value="bread">{t('components.recipeEditor.categories.bread')}</option>
+              <option value="cake">{t('components.recipeEditor.categories.cake')}</option>
+              <option value="cookie">{t('components.recipeEditor.categories.cookie')}</option>
+              <option value="pastry">{t('components.recipeEditor.categories.pastry')}</option>
             </select>
           </div>
         </div>
 
         <div className="mt-3">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            제법
+            {t('components.recipeEditor.method')}
           </label>
           <select
             value={formData.method}
             onChange={(e) => handleInputChange('method', e.target.value)}
             className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
           >
-            <option value="straight">스트레이트법</option>
-            <option value="sponge">중종법</option>
-            <option value="poolish">폴리쉬법</option>
-            <option value="biga">비가법</option>
-            <option value="coldFermentation">저온숙성법</option>
-            <option value="noTime">노타임법</option>
+            <option value="straight">{t('components.recipeEditor.methods.straight')}</option>
+            <option value="sponge">{t('components.recipeEditor.methods.sponge')}</option>
+            <option value="poolish">{t('components.recipeEditor.methods.poolish')}</option>
+            <option value="biga">{t('components.recipeEditor.methods.biga')}</option>
+            <option value="coldFermentation">{t('components.recipeEditor.methods.coldFermentation')}</option>
+            <option value="noTime">{t('components.recipeEditor.methods.noTime')}</option>
           </select>
         </div>
 
         <div className="mt-3">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            설명
+            {t('components.recipeEditor.description')}
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
             rows={2}
             className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
-            placeholder="레시피에 대한 간단한 설명을 입력하세요"
+            placeholder={t('components.recipeEditor.descriptionPlaceholder')}
           />
         </div>
       </div>
 
       <div className="card mb-3">
-        <h3 className="text-base font-semibold mb-2">재료</h3>
+        <h3 className="text-base font-semibold mb-2">{t('components.recipeEditor.ingredients')}</h3>
         <IngredientTable
           ingredients={formData.ingredients}
           onChange={handleIngredientsChange}
@@ -153,7 +155,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
       </div>
 
       <div className="card mb-3">
-        <h3 className="text-base font-semibold mb-2">만드는 방법</h3>
+        <h3 className="text-base font-semibold mb-2">{t('components.recipeEditor.instructions')}</h3>
         <div className="space-y-2">
           {formData.instructions.map((instruction, index) => (
             <div key={index} className="flex gap-2">
@@ -175,7 +177,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
                   handleInputChange('instructions', newInstructions)
                 }}
               >
-                삭제
+                {t('common.delete')}
               </Button>
             </div>
           ))}
@@ -186,25 +188,25 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
               handleInputChange('instructions', [...formData.instructions, ''])
             }}
           >
-            + 단계 추가
+            {t('components.recipeEditor.addStep')}
           </Button>
         </div>
       </div>
 
       <div className="card mb-3">
-        <h3 className="text-base font-semibold mb-2">참고사항</h3>
+        <h3 className="text-base font-semibold mb-2">{t('components.recipeEditor.notes')}</h3>
         <textarea
           value={formData.notes}
           onChange={(e) => handleInputChange('notes', e.target.value)}
           rows={3}
           className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
-          placeholder="특별한 팁이나 주의사항을 입력하세요"
+          placeholder={t('components.recipeEditor.notesPlaceholder')}
         />
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button size="small" variant="secondary" onClick={handleCancel}>취소</Button>
-        <Button size="small" onClick={handleSave}>저장</Button>
+        <Button size="small" variant="secondary" onClick={handleCancel}>{t('common.cancel')}</Button>
+        <Button size="small" onClick={handleSave}>{t('common.save')}</Button>
       </div>
     </div>
   )

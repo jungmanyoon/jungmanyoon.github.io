@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDashboardStore } from '../../stores/useDashboardStore';
 import { COMMON_PANS, PAN_TYPES } from '../../constants/pans';
 import { METHODS } from '../../constants/methods';
 import { Box, ChevronDown, Scale, ChefHat, BookOpen } from 'lucide-react';
+import { useLocalization } from '@/hooks/useLocalization';
+
 interface TopControlBarProps {
   onOpenReference: () => void;
 }
 
 const TopControlBar = ({ onOpenReference }: TopControlBarProps) => {
+  const { t } = useTranslation();
+  const { getLocalizedPanName } = useLocalization();
   const {
     conversionConfig,
     updatePanConfig,
@@ -20,8 +25,8 @@ const TopControlBar = ({ onOpenReference }: TopControlBarProps) => {
   const [isMethodOpen, setIsMethodOpen] = useState(false);
 
   // Helper to get current pan name
-  const currentPanName = conversionConfig.targetPan?.name || '팬 선택';
-  const currentMethodName = conversionConfig.targetMethod ? METHODS[conversionConfig.targetMethod]?.name : '제법 선택';
+  const currentPanName = conversionConfig.targetPan ? getLocalizedPanName(conversionConfig.targetPan) : t('common.selectPan', '팬 선택');
+  const currentMethodName = conversionConfig.targetMethod ? METHODS[conversionConfig.targetMethod]?.name : t('common.selectMethod', '제법 선택');
 
   const handlePanSelect = (panId: string) => {
     const pan = COMMON_PANS[panId];
@@ -71,7 +76,7 @@ const TopControlBar = ({ onOpenReference }: TopControlBarProps) => {
                       onClick={() => handlePanSelect(id)}
                       className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 rounded-md flex flex-col"
                     >
-                      <span className="font-medium text-gray-900">{pan.name}</span>
+                      <span className="font-medium text-gray-900">{getLocalizedPanName(pan)}</span>
                       <span className="text-xs text-gray-500">{pan.dimensions.diameter ? `Ø${pan.dimensions.diameter}cm` : `${pan.dimensions.width}x${pan.dimensions.length}cm`}</span>
                     </button>
                   ))}

@@ -4,6 +4,7 @@
  */
 
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Undo2,
   Redo2,
@@ -26,6 +27,8 @@ const ActionBar: React.FC<ActionBarProps> = ({
   onReset,
   onExport,
 }) => {
+  const { t } = useTranslation()
+
   // 클립보드에 복사
   const handleCopy = async () => {
     try {
@@ -48,14 +51,14 @@ const ActionBar: React.FC<ActionBarProps> = ({
         <div className="flex items-center gap-2">
           <ActionButton
             icon={Undo2}
-            label="실행취소"
+            label={t('actionBar.undo')}
             shortcut="Ctrl+Z"
             onClick={onUndo}
             disabled={!canUndo}
           />
           <ActionButton
             icon={Redo2}
-            label="다시실행"
+            label={t('actionBar.redo')}
             shortcut="Ctrl+Shift+Z"
             onClick={onRedo}
             disabled={!canRedo}
@@ -63,7 +66,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
           <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-2" />
           <ActionButton
             icon={RotateCcw}
-            label="초기화"
+            label={t('actionBar.reset')}
             onClick={onReset}
             disabled={!hasChanges}
             variant="secondary"
@@ -75,11 +78,11 @@ const ActionBar: React.FC<ActionBarProps> = ({
           {hasChanges ? (
             <span className="flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-400">
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-              변경사항 있음
+              {t('actionBar.hasChanges')}
             </span>
           ) : (
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              변경사항 없음
+              {t('actionBar.noChanges')}
             </span>
           )}
         </div>
@@ -88,20 +91,20 @@ const ActionBar: React.FC<ActionBarProps> = ({
         <div className="flex items-center gap-2">
           <ActionButton
             icon={Copy}
-            label="복사"
+            label={t('actionBar.copy')}
             onClick={handleCopy}
             disabled={!hasChanges}
             variant="secondary"
           />
           <ActionButton
             icon={Printer}
-            label="인쇄"
+            label={t('actionBar.print')}
             onClick={handlePrint}
             variant="secondary"
           />
           <ActionButton
             icon={Download}
-            label="내보내기"
+            label={t('actionBar.export')}
             onClick={onExport}
             disabled={!hasChanges}
             variant="secondary"
@@ -120,8 +123,8 @@ const ActionBar: React.FC<ActionBarProps> = ({
             `}
           >
             <Save className="w-4 h-4" />
-            <span className="hidden sm:inline">새 레시피로 저장</span>
-            <span className="sm:hidden">저장</span>
+            <span className="hidden sm:inline">{t('actionBar.saveAsNew')}</span>
+            <span className="sm:hidden">{t('actionBar.save')}</span>
           </button>
         </div>
       </div>

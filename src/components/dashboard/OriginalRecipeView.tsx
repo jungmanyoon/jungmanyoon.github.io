@@ -1,12 +1,26 @@
-import React from 'react';
-import { Recipe } from '../../types/recipe.types';
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Recipe, ProcessStep } from '../../types/recipe.types';
 import { Clock, Thermometer, Users } from 'lucide-react';
+import { translateProcessStep } from '@/data/processStepTranslations';
 
 interface OriginalRecipeViewProps {
     recipe: Recipe;
 }
 
 const OriginalRecipeView: React.FC<OriginalRecipeViewProps> = ({ recipe }) => {
+    const { i18n } = useTranslation();
+    const currentLang = i18n.language === 'en' ? 'en' : 'ko';
+
+    // 공정 단계 번역 헬퍼
+    const getLocalizedInstruction = useCallback((step: ProcessStep): string => {
+        if (currentLang === 'en') {
+            if (step.instructionEn) return step.instructionEn;
+            const instruction = step.instruction || step.description || '';
+            return translateProcessStep(instruction, 'en');
+        }
+        return step.instruction || step.description || `Step ${step.order}`;
+    }, [currentLang]);
     return (
         <div className="space-y-6">
             {/* Basic Info */}
@@ -67,7 +81,7 @@ const OriginalRecipeView: React.FC<OriginalRecipeViewProps> = ({ recipe }) => {
                 <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
                     {recipe.steps.map((step) => (
                         <li key={step.id} className="pl-1">
-                            {step.instruction || step.description}
+                            {getLocalizedInstruction(step)}
                         </li>
                     ))}
                 </ol>

@@ -8,6 +8,7 @@
  */
 
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Ingredient } from '@/types/recipe.types'
 import {
   calculateBakersPercentage,
@@ -25,6 +26,7 @@ export default function IngredientPanel({
   ingredients,
   calculationMode,
 }: IngredientPanelProps) {
+  const { t } = useTranslation()
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set())
 
   // 퍼센트 계산
@@ -69,8 +71,8 @@ export default function IngredientPanel({
   return (
     <div className="ingredient-panel">
       <div className="panel-header">
-        <h2 className="panel-title">재료</h2>
-        <span className="ingredient-count">{ingredients.length}개</span>
+        <h2 className="panel-title">{t('components.ingredientPanel.title')}</h2>
+        <span className="ingredient-count">{t('components.ingredientPanel.count', { count: ingredients.length })}</span>
       </div>
 
       <div className="ingredient-list">
@@ -96,7 +98,7 @@ export default function IngredientPanel({
 
               <div className="ingredient-info">
                 <span className="ingredient-name">
-                  {ingredient.name || '재료'}
+                  {ingredient.name || t('components.ingredientPanel.defaultName')}
                 </span>
                 <div className="ingredient-amounts">
                   <span className="ingredient-weight">
@@ -119,12 +121,12 @@ export default function IngredientPanel({
       <div className="panel-footer">
         <div className="mode-explanation">
           {calculationMode === 'bakers' && (
-            <p>베이커스 퍼센트: 밀가루 = 100%</p>
+            <p>{t('components.ingredientPanel.bakersExplain')}</p>
           )}
           {calculationMode === 'weight' && (
-            <p>중량 퍼센트: 총 반죽량 = 100%</p>
+            <p>{t('components.ingredientPanel.weightExplain')}</p>
           )}
-          {calculationMode === 'recipe' && <p>레시피 퍼센트: 원본 비율</p>}
+          {calculationMode === 'recipe' && <p>{t('components.ingredientPanel.recipeExplain')}</p>}
         </div>
       </div>
     </div>

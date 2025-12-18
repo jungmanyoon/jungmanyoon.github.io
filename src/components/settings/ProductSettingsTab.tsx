@@ -6,6 +6,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/useSettingsStore'
 import { ProductVolumeSettings } from '@/types/settings.types'
 import {
@@ -68,18 +69,34 @@ const DEFAULT_CAKE_VOLUMES: Record<string, number> = {
 }
 
 // 제품 카테고리
-const PRODUCT_CATEGORIES: { value: ProductVolumeSettings['customProducts'][0]['category']; label: string; icon: string }[] = [
-  { value: 'bread', label: '빵류', icon: '🍞' },
-  { value: 'cake', label: '케이크류', icon: '🎂' },
-  { value: 'pastry', label: '페이스트리', icon: '🥐' },
-  { value: 'other', label: '기타', icon: '🧁' }
+const PRODUCT_CATEGORIES: { value: ProductVolumeSettings['customProducts'][0]['category']; icon: string }[] = [
+  { value: 'bread', icon: '🍞' },
+  { value: 'cake', icon: '🎂' },
+  { value: 'pastry', icon: '🥐' },
+  { value: 'other', icon: '🧁' }
 ]
 
 interface ProductSettingsTabProps {
   className?: string
 }
 
+// 모든 기본 제품 이름 목록 (번역 키로 사용)
+const ALL_DEFAULT_PRODUCTS = [
+  ...Object.keys(DEFAULT_BREAD_VOLUMES),
+  ...Object.keys(DEFAULT_CAKE_VOLUMES)
+]
+
 export default function ProductSettingsTab({ className = '' }: ProductSettingsTabProps) {
+  const { t } = useTranslation()
+
+  // 제품 표시 이름 가져오기 (기본 제품은 번역, 사용자 제품은 그대로)
+  const getProductDisplayName = useCallback((name: string) => {
+    if (ALL_DEFAULT_PRODUCTS.includes(name)) {
+      const translated = t(`settings.product.productNames.${name}`, { defaultValue: '' })
+      return translated || name
+    }
+    return name
+  }, [t])
   const {
     product,
     setVolumeOverride,
@@ -127,11 +144,11 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
   // 커스텀 제품 저장
   const handleSaveCustom = useCallback(() => {
     if (!customForm.name.trim()) {
-      alert('제품 이름을 입력해주세요.')
+      alert(t('settings.product.alerts.nameRequired'))
       return
     }
     if (customForm.specificVolume <= 0) {
-      alert('비용적은 0보다 커야 합니다.')
+      alert(t('settings.product.alerts.volumeRequired'))
       return
     }
 
@@ -148,7 +165,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
       category: 'bread'
     })
     setShowCustomForm(false)
-  }, [customForm, addCustomProduct])
+  }, [customForm, addCustomProduct, t])
 
   // 현재 값 가져오기 (오버라이드 또는 기본값)
   const getBreadVolume = useCallback((name: string): number => {
@@ -173,10 +190,10 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
         <div>
           <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <Scale className="w-5 h-5 text-amber-500" />
-            제품 비용적 설정
+            {t('settings.product.title')}
           </h3>
           <p className="text-sm text-gray-500 mt-1">
-            제품별 비용적(Specific Volume)을 설정하여 팬 크기 변환 정확도를 높입니다.
+            {t('settings.product.titleDesc')}
           </p>
         </div>
       </div>
@@ -186,14 +203,12 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
         <div className="flex items-start gap-2 text-sm text-amber-700">
           <Info className="w-4 h-4 mt-0.5" />
           <div>
-            <p className="font-medium">비용적(Specific Volume)이란?</p>
+            <p className="font-medium">{t('settings.product.info.title')}</p>
             <p className="text-xs mt-1">
-              비용적은 제품 1g당 차지하는 부피(cm³/g)를 의미합니다.
-              값이 높을수록 가볍고 푹신한 제품, 낮을수록 조밀한 제품입니다.
+              {t('settings.product.info.desc')}
             </p>
             <p className="text-xs mt-1 text-amber-600">
-              <strong>⚠️ 틀에 반죽을 채워 굽는 제품만 해당</strong> -
-              바게트, 치아바타, 베이글, 크루아상 등 틀 없이 굽는 빵은 비용적이 필요 없습니다.
+              <strong>⚠️ {t('settings.product.info.warning')}</strong>
             </p>
           </div>
         </div>
@@ -211,7 +226,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
         >
           <span className="flex items-center gap-1">
             <Wheat className="w-4 h-4" />
-            빵류 ({Object.keys(DEFAULT_BREAD_VOLUMES).length})
+            {t('settings.product.tabs.bread')} ({Object.keys(DEFAULT_BREAD_VOLUMES).length})
           </span>
         </button>
         <button
@@ -224,7 +239,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
         >
           <span className="flex items-center gap-1">
             <Cake className="w-4 h-4" />
-            케이크류 ({Object.keys(DEFAULT_CAKE_VOLUMES).length})
+            {t('settings.product.tabs.cake')} ({Object.keys(DEFAULT_CAKE_VOLUMES).length})
           </span>
         </button>
         <button
@@ -235,7 +250,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
-          커스텀 제품 ({product.customProducts.length})
+          {t('settings.product.tabs.custom')} ({product.customProducts.length})
         </button>
       </div>
 
@@ -248,7 +263,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="빵 종류 검색..."
+              placeholder={t('settings.product.search.bread')}
               className="w-full pl-10 pr-4 py-2 border rounded-lg"
             />
           </div>
@@ -258,7 +273,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
             <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-amber-800">
-                  수정된 비용적 ({Object.keys(product.breadVolumes).length}개)
+                  {t('settings.product.modifiedCount', { count: Object.keys(product.breadVolumes).length })}
                 </span>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -269,9 +284,9 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                       key={name}
                       className="inline-flex items-center gap-1 px-2 py-1 bg-white rounded text-xs"
                     >
-                      {name}: {volume} cm³/g
+                      {getProductDisplayName(name)}: {volume} cm³/g
                       {original !== undefined && (
-                        <span className="text-gray-400">(기본 {original})</span>
+                        <span className="text-gray-400">({t('settings.product.default')} {original})</span>
                       )}
                     </span>
                   )
@@ -295,9 +310,9 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                 >
                   <div className="flex items-center gap-2">
                     <span>🍞</span>
-                    <span className="text-sm font-medium text-gray-800">{name}</span>
+                    <span className="text-sm font-medium text-gray-800">{getProductDisplayName(name)}</span>
                     {modified && (
-                      <span className="px-1.5 py-0.5 bg-amber-200 text-amber-700 text-xs rounded">수정됨</span>
+                      <span className="px-1.5 py-0.5 bg-amber-200 text-amber-700 text-xs rounded">{t('settings.product.modified')}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -322,7 +337,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                           handleVolumeUpdate('bread', name, defaultVolume)
                         }}
                         className="p-1 text-amber-500 hover:bg-amber-100 rounded"
-                        title="기본값으로"
+                        title={t('settings.product.resetToDefault')}
                       >
                         <RefreshCw className="w-3 h-3" />
                       </button>
@@ -344,7 +359,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="케이크 종류 검색..."
+              placeholder={t('settings.product.search.cake')}
               className="w-full pl-10 pr-4 py-2 border rounded-lg"
             />
           </div>
@@ -354,7 +369,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
             <div className="p-3 bg-pink-50 border border-pink-100 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-pink-800">
-                  수정된 비용적 ({Object.keys(product.cakeVolumes).length}개)
+                  {t('settings.product.modifiedCount', { count: Object.keys(product.cakeVolumes).length })}
                 </span>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -365,9 +380,9 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                       key={name}
                       className="inline-flex items-center gap-1 px-2 py-1 bg-white rounded text-xs"
                     >
-                      {name}: {volume} cm³/g
+                      {getProductDisplayName(name)}: {volume} cm³/g
                       {original !== undefined && (
-                        <span className="text-gray-400">(기본 {original})</span>
+                        <span className="text-gray-400">({t('settings.product.default')} {original})</span>
                       )}
                     </span>
                   )
@@ -391,9 +406,9 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                 >
                   <div className="flex items-center gap-2">
                     <span>🎂</span>
-                    <span className="text-sm font-medium text-gray-800">{name}</span>
+                    <span className="text-sm font-medium text-gray-800">{getProductDisplayName(name)}</span>
                     {modified && (
-                      <span className="px-1.5 py-0.5 bg-pink-200 text-pink-700 text-xs rounded">수정됨</span>
+                      <span className="px-1.5 py-0.5 bg-pink-200 text-pink-700 text-xs rounded">{t('settings.product.modified')}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -415,7 +430,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                           handleVolumeUpdate('cake', name, defaultVolume)
                         }}
                         className="p-1 text-pink-500 hover:bg-pink-100 rounded"
-                        title="기본값으로"
+                        title={t('settings.product.resetToDefault')}
                       >
                         <RefreshCw className="w-3 h-3" />
                       </button>
@@ -433,14 +448,14 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <p className="text-sm text-gray-600">
-              기본 목록에 없는 제품을 직접 추가하세요.
+              {t('settings.product.custom.desc')}
             </p>
             <button
               onClick={() => setShowCustomForm(true)}
               className="flex items-center gap-1 px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm"
             >
               <Plus className="w-4 h-4" />
-              제품 추가
+              {t('settings.product.custom.addProduct')}
             </button>
           </div>
 
@@ -448,7 +463,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
           {showCustomForm && (
             <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium text-gray-800">새 제품 추가</h4>
+                <h4 className="font-medium text-gray-800">{t('settings.product.custom.newProduct')}</h4>
                 <button onClick={() => setShowCustomForm(false)} className="p-1 hover:bg-white rounded">
                   <X className="w-4 h-4 text-gray-500" />
                 </button>
@@ -457,19 +472,19 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    제품 이름 *
+                    {t('settings.product.custom.productName')} *
                   </label>
                   <input
                     type="text"
                     value={customForm.name}
                     onChange={(e) => setCustomForm(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="예: 호두파이"
+                    placeholder={t('settings.product.custom.productNamePlaceholder')}
                     className="w-full px-3 py-2 text-sm border rounded-lg"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    카테고리
+                    {t('settings.product.custom.category')}
                   </label>
                   <select
                     value={customForm.category}
@@ -481,14 +496,14 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                   >
                     {PRODUCT_CATEGORIES.map(cat => (
                       <option key={cat.value} value={cat.value}>
-                        {cat.icon} {cat.label}
+                        {cat.icon} {t(`settings.product.categories.${cat.value}`)}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    비용적 (cm³/g)
+                    {t('settings.product.custom.specificVolume')}
                   </label>
                   <input
                     type="number"
@@ -511,13 +526,13 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                   className="flex items-center gap-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
                 >
                   <Save className="w-4 h-4" />
-                  저장
+                  {t('common.save')}
                 </button>
                 <button
                   onClick={() => setShowCustomForm(false)}
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
-                  취소
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -538,13 +553,13 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                       <div>
                         <div className="font-medium text-gray-800">{prod.name}</div>
                         <div className="text-xs text-gray-500">
-                          {catInfo?.label} · 비용적 {prod.specificVolume} cm³/g
+                          {t(`settings.product.categories.${prod.category}`)} · {t('settings.product.custom.volumeLabel')} {prod.specificVolume} cm³/g
                         </div>
                       </div>
                     </div>
                     <button
                       onClick={() => {
-                        if (confirm(`"${prod.name}" 제품을 삭제하시겠습니까?`)) {
+                        if (confirm(t('settings.product.alerts.deleteConfirm', { name: prod.name }))) {
                           deleteCustomProduct(prod.id)
                         }
                       }}
@@ -559,7 +574,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
           ) : (
             <div className="text-center p-8 text-gray-500 border border-dashed rounded-lg">
               <Scale className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p>추가된 커스텀 제품이 없습니다.</p>
+              <p>{t('settings.product.custom.emptyState')}</p>
             </div>
           )}
 
@@ -568,12 +583,12 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
             <div className="flex items-start gap-2">
               <Info className="w-4 h-4 mt-0.5" />
               <div>
-                <p className="font-medium">비용적 참고값 (cm³/g)</p>
+                <p className="font-medium">{t('settings.product.help.title')}</p>
                 <ul className="text-xs mt-1 space-y-0.5">
-                  <li>조밀한 제품 (브라우니, 치즈케이크): 1.2~1.8</li>
-                  <li>중간 제품 (파운드케이크, 스펀지): 1.8~3.0</li>
-                  <li>가벼운 제품 (식빵, 롤케이크): 3.0~4.5</li>
-                  <li>매우 가벼운 제품 (쉬폰, 크루아상): 4.5~5.5</li>
+                  <li>{t('settings.product.help.dense')}</li>
+                  <li>{t('settings.product.help.medium')}</li>
+                  <li>{t('settings.product.help.light')}</li>
+                  <li>{t('settings.product.help.veryLight')}</li>
                 </ul>
               </div>
             </div>

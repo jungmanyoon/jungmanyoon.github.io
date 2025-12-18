@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react'
+import { useTranslation } from 'react-i18next'
 import Button from '../common/Button'
 import Input from '../common/Input'
 import { DDTCalculator as DDTCalc, MixerType } from '@utils/calculations/ddtCalculator'
@@ -59,53 +60,54 @@ const ResultDisplay = memo<{
   iceAmount: number
   waterAmount: number
   predictedTemp: number | null
-}>(({ waterTemp, useIce, iceAmount, waterAmount, predictedTemp }) => {
+  t: (key: string) => string
+}>(({ waterTemp, useIce, iceAmount, waterAmount, predictedTemp, t }) => {
   if (!waterTemp) return null
 
   return (
     <div className="bg-bread-50 rounded-lg p-4 space-y-3">
-      <h4 className="font-semibold text-bread-700">계산 결과</h4>
-      
+      <h4 className="font-semibold text-bread-700">{t('ddt.calculationResult')}</h4>
+
       <div className="space-y-2">
         <div className="flex justify-between">
-          <span className="text-sm text-gray-600">필요한 물 온도:</span>
+          <span className="text-sm text-gray-600">{t('ddt.requiredWaterTemp')}:</span>
           <span className="font-semibold text-bread-700">
             {waterTemp.toFixed(1)}°C
           </span>
         </div>
-        
+
         {useIce && (
           <>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">얼음:</span>
+              <span className="text-sm text-gray-600">{t('ddt.ice')}:</span>
               <span className="font-semibold">{iceAmount}g</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">찬물:</span>
+              <span className="text-sm text-gray-600">{t('ddt.coldWater')}:</span>
               <span className="font-semibold">{waterAmount}g</span>
             </div>
           </>
         )}
-        
+
         {predictedTemp && (
           <div className="flex justify-between pt-2 border-t border-bread-200">
-            <span className="text-sm text-gray-600">예상 반죽 온도:</span>
+            <span className="text-sm text-gray-600">{t('ddt.labels.predictedTemp')}:</span>
             <span className="font-semibold text-bread-700">
               {predictedTemp.toFixed(1)}°C
             </span>
           </div>
         )}
       </div>
-      
+
       {waterTemp < 5 && (
         <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700">
-          💡 물 온도가 매우 낮습니다. 냉장 보관된 물을 사용하세요.
+          💡 {t('ddt.needsCooling')}
         </div>
       )}
-      
+
       {waterTemp > 35 && (
         <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded text-sm text-orange-700">
-          ⚠️ 물 온도가 높습니다. 이스트 활성에 영향을 줄 수 있습니다.
+          ⚠️ {t('ddt.warnings.tooHot')}
         </div>
       )}
     </div>
@@ -116,6 +118,7 @@ ResultDisplay.displayName = 'ResultDisplay'
 
 // DDTCalculator 메인 컴포넌트 최적화
 const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }) => {
+  const { t } = useTranslation()
   const { ddtCalculation, updateDDT } = useCalculatorStore()
   const { addToHistory } = useAppStore()
   
@@ -285,86 +288,86 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
 
   // 선택 옵션들 - useMemo 최적화
   const seasonOptions = useMemo(() => [
-    { value: 'spring', label: '봄' },
-    { value: 'summer', label: '여름' },
-    { value: 'fall', label: '가을' },
-    { value: 'winter', label: '겨울' }
-  ], [])
+    { value: 'spring', label: t('ddt.seasons.spring') },
+    { value: 'summer', label: t('ddt.seasons.summer') },
+    { value: 'fall', label: t('ddt.seasons.fall') },
+    { value: 'winter', label: t('ddt.seasons.winter') }
+  ], [t])
 
   const breadOptions = useMemo(() => [
-    { value: 'lean', label: '린 도우 (바게트, 치아바타)' },
-    { value: 'enriched', label: '리치 도우 (식빵, 브리오슈)' },
-    { value: 'sourdough', label: '사워도우' },
-    { value: 'pizza', label: '피자 도우' },
-    { value: 'croissant', label: '크루아상' }
-  ], [])
+    { value: 'lean', label: t('ddt.breadTypes.lean') },
+    { value: 'enriched', label: t('ddt.breadTypes.enriched') },
+    { value: 'sourdough', label: t('ddt.breadTypes.sourdough') },
+    { value: 'pizza', label: t('ddt.breadTypes.pizza') },
+    { value: 'croissant', label: t('ddt.breadTypes.croissant') }
+  ], [t])
 
   const mixerOptions = useMemo(() => [
-    { value: 'hand', label: '손반죽' },
-    { value: 'stand', label: '스탠드 믹서' },
-    { value: 'spiral', label: '스파이럴 믹서' },
-    { value: 'planetary', label: '플래니터리 믹서' },
-    { value: 'intensive', label: '고속 믹서' }
-  ], [])
+    { value: 'hand', label: t('ddt.mixerTypes.hand') },
+    { value: 'stand', label: t('ddt.mixerTypes.stand') },
+    { value: 'spiral', label: t('ddt.mixerTypes.spiral') },
+    { value: 'planetary', label: t('ddt.mixerTypes.planetary') },
+    { value: 'intensive', label: t('ddt.mixerTypes.intensive') }
+  ], [t])
 
   return (
     <div className="card">
       <h3 className="mb-4 text-lg font-semibold text-bread-700">
-        DDT (목표 반죽 온도) 계산기
+        {t('ddt.title')}
       </h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 왼쪽: 입력 필드 */}
         <div className="space-y-4">
           <SelectField
-            label="계절"
+            label={t('ddt.labels.season')}
             value={season}
             onChange={(value) => setSeason(value as Season)}
             options={seasonOptions}
           />
-          
+
           <SelectField
-            label="빵 종류"
+            label={t('ddt.labels.breadType')}
             value={breadType}
             onChange={(value) => setBreadType(value as BreadType)}
             options={breadOptions}
           />
-          
+
           <Input
-            label="목표 반죽 온도 (°C)"
+            label={`${t('ddt.labels.ddtValue')} (°C)`}
             type="number"
             value={localData.targetTemp}
             onValueChange={(value) => handleInputChange('targetTemp', Number(value))}
             min={20}
             max={30}
             step={0.5}
-            placeholder="목표 반죽 온도"
+            placeholder={t('ddt.labels.ddtValue')}
           />
-          
+
           <Input
-            label="밀가루 온도 (°C)"
+            label={`${t('ddt.labels.flourTemp')} (°C)`}
             type="number"
             value={localData.flourTemp}
             onValueChange={(value) => handleInputChange('flourTemp', Number(value))}
             min={-10}
             max={40}
             step={0.5}
-            placeholder="밀가루 온도"
+            placeholder={t('ddt.labels.flourTemp')}
           />
-          
+
           <Input
-            label="실온 (°C)"
+            label={`${t('ddt.labels.roomTemp')} (°C)`}
             type="number"
             value={localData.roomTemp}
             onValueChange={(value) => handleInputChange('roomTemp', Number(value))}
             min={-10}
             max={40}
             step={0.5}
-            placeholder="실온"
+            placeholder={t('ddt.labels.roomTemp')}
           />
-          
+
           <SelectField
-            label="믹서 종류"
+            label={t('ddt.labels.mixerType')}
             value={localData.mixerType}
             onChange={(value) => handleInputChange('mixerType', value)}
             options={mixerOptions}
@@ -373,7 +376,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
           {/* Friction Factor with Auto-Recommendation */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              마찰계수 (Friction Factor)
+              {t('ddt.labels.mixerFriction')}
             </label>
             <div className="flex gap-2">
               <Input
@@ -383,7 +386,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
                 min={0}
                 max={50}
                 step={1}
-                placeholder="마찰계수"
+                placeholder={t('ddt.labels.mixerFriction')}
                 disabled={useAutoFriction}
               />
               <Button
@@ -396,12 +399,12 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
                 }}
                 className="whitespace-nowrap"
               >
-                {useAutoFriction ? '수동' : 'Auto'}
+                {useAutoFriction ? t('ddt.labels.manual') : 'Auto'}
               </Button>
             </div>
             {useAutoFriction && (
               <p className="mt-1 text-xs text-bread-600">
-                권장값: {recommendedFriction}°C (믹싱시간 {localData.mixingTime}분, 수화율 {doughHydration.toFixed(0)}%)
+                {t('ddt.labels.recommendedValue')}: {recommendedFriction}°C ({t('ddt.labels.mixingTime')} {localData.mixingTime}{t('ddt.labels.minutes')}, {t('ddt.labels.hydration')} {doughHydration.toFixed(0)}%)
               </p>
             )}
           </div>
@@ -421,25 +424,25 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
               className="rounded border-bread-300 text-bread-600 focus:ring-bread-500"
             />
             <label htmlFor="use-preferment" className="text-sm text-gray-700">
-              프리퍼먼트 사용
+              {t('ddt.labels.usePreferment')}
             </label>
           </div>
-          
+
           {localData.prefermentTemp !== null && (
             <Input
-              label="프리퍼먼트 온도 (°C)"
+              label={`${t('ddt.labels.prefermentTemp')} (°C)`}
               type="number"
               value={localData.prefermentTemp}
               onValueChange={(value) => handleInputChange('prefermentTemp', Number(value))}
               min={0}
               max={40}
               step={0.5}
-              placeholder="프리퍼먼트 온도"
+              placeholder={t('ddt.labels.prefermentTemp')}
             />
           )}
-          
+
           <Button onClick={handleCalculate} variant="primary" fullWidth>
-            물 온도 계산
+            {t('ddt.labels.calculate')}
           </Button>
         </div>
         
@@ -451,17 +454,18 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
             iceAmount={localData.iceAmount}
             waterAmount={localData.waterAmount}
             predictedTemp={predictedTemp}
+            t={t}
           />
-          
+
           {/* 마찰계수 참고 정보 */}
           <div className="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
-            <p className="font-semibold mb-1">마찰계수 참고:</p>
+            <p className="font-semibold mb-1">{t('ddt.frictionReference.title')}:</p>
             <ul className="space-y-0.5">
-              <li>• 손반죽: 0°C</li>
-              <li>• 스탠드 믹서: 24°C</li>
-              <li>• 스파이럴 믹서: 22°C</li>
-              <li>• 플래니터리 믹서: 26°C</li>
-              <li>• 고속 믹서: 30°C</li>
+              <li>• {t('ddt.mixerTypes.hand')}: 0°C</li>
+              <li>• {t('ddt.mixerTypes.stand')}: 24°C</li>
+              <li>• {t('ddt.mixerTypes.spiral')}: 22°C</li>
+              <li>• {t('ddt.mixerTypes.planetary')}: 26°C</li>
+              <li>• {t('ddt.mixerTypes.intensive')}: 30°C</li>
             </ul>
           </div>
         </div>

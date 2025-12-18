@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
 import AdvancedPanSelector from './AdvancedPanSelector.jsx'
 import DDTCalculator from './DDTCalculator.tsx'
@@ -17,6 +18,7 @@ interface ConversionConsoleProps {
 type ConversionType = 'method' | 'pan' | 'advanced-pan' | 'ddt' | 'environment'
 
 function ConversionConsole({ recipe, onUpdate, onBack }: ConversionConsoleProps) {
+  const { t } = useTranslation()
   const [conversionType, setConversionType] = useState<ConversionType>('method')
   const [convertedRecipe, setConvertedRecipe] = useState<any>(null)
   const [lastConversionType, setLastConversionType] = useState<ConversionType | null>(null)
@@ -25,7 +27,7 @@ function ConversionConsole({ recipe, onUpdate, onBack }: ConversionConsoleProps)
     return (
       <div className="text-center py-8">
         <p className="text-gray-500">
-          레시피가 선택되지 않았습니다. 좌측 상단의 레시피 탭에서 카드를 클릭하세요.
+          {t('components.conversionConsole.noRecipeSelected')}
         </p>
       </div>
     )
@@ -54,18 +56,7 @@ function ConversionConsole({ recipe, onUpdate, onBack }: ConversionConsoleProps)
 
   const getMethodName = (method: string | { method: string }) => {
     const methodKey = typeof method === 'string' ? method : method.method;
-
-    const methodNames: Record<string, string> = {
-      straight: '스트레이트법',
-      sponge: '중종법',
-      poolish: '폴리쉬법',
-      biga: '비가법',
-      coldFermentation: '저온숙성법',
-      noTime: '노타임법',
-      overnight: '저온숙성법',
-      sourdough: '사워도우'
-    }
-    return methodNames[methodKey] || methodKey
+    return t(`components.conversionConsole.methodNames.${methodKey}`, { defaultValue: methodKey })
   }
 
   const renderConversionPanel = () => {
@@ -112,15 +103,15 @@ function ConversionConsole({ recipe, onUpdate, onBack }: ConversionConsoleProps)
     <div className="max-w-6xl mx-auto">
       <div className="mb-2">
         <Button variant="secondary" size="small" onClick={onBack}>
-          ← 레시피로 돌아가기
+          {t('components.conversionConsole.backToRecipe')}
         </Button>
       </div>
 
       <div className="card mb-3">
-        <h2 className="text-base font-semibold mb-2">레시피 변환: {recipe.name}</h2>
+        <h2 className="text-base font-semibold mb-2">{t('components.conversionConsole.recipeConversion')} {recipe.name}</h2>
 
         {/* 탭 버튼 */}
-        <div className="flex gap-2 mb-3 flex-wrap" role="tablist" aria-label="변환 유형 선택">
+        <div className="flex gap-2 mb-3 flex-wrap" role="tablist" aria-label={t('components.conversionConsole.selectConversionType')}>
           {(['method', 'pan', 'advanced-pan', 'ddt', 'environment'] as const).map((type) => (
             <button
               key={type}
@@ -133,11 +124,11 @@ function ConversionConsole({ recipe, onUpdate, onBack }: ConversionConsoleProps)
                 : 'bg-bread-200 text-bread-700 hover:bg-bread-300'
                 }`}
             >
-              {type === 'method' && '제법 변환'}
-              {type === 'pan' && '팬 크기 조정'}
-              {type === 'advanced-pan' && '고급 팬 선택'}
-              {type === 'ddt' && 'DDT 계산'}
-              {type === 'environment' && '환경 보정'}
+              {type === 'method' && t('components.conversionConsole.tabs.method')}
+              {type === 'pan' && t('components.conversionConsole.tabs.pan')}
+              {type === 'advanced-pan' && t('components.conversionConsole.tabs.advancedPan')}
+              {type === 'ddt' && t('components.conversionConsole.tabs.ddt')}
+              {type === 'environment' && t('components.conversionConsole.tabs.environment')}
             </button>
           ))}
         </div>
@@ -152,10 +143,10 @@ function ConversionConsole({ recipe, onUpdate, onBack }: ConversionConsoleProps)
         <div className="card border-2 border-gray-200">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg">📋</span>
-            <h3 className="text-base font-medium">원본 레시피: {recipe.name}</h3>
+            <h3 className="text-base font-medium">{t('components.conversionConsole.originalRecipe')} {recipe.name}</h3>
           </div>
           <p className="text-xs text-gray-600 mb-2">
-            제법: {getMethodName(recipe.method)}
+            {t('components.conversionConsole.method')} {getMethodName(recipe.method)}
           </p>
           <IngredientComparisonTable
             original={recipe.ingredients}
@@ -168,12 +159,12 @@ function ConversionConsole({ recipe, onUpdate, onBack }: ConversionConsoleProps)
           <div className="card border-2 border-bread-300">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">🔄</span>
-              <h3 className="text-base font-medium">변환된 레시피: {recipe.name}</h3>
+              <h3 className="text-base font-medium">{t('components.conversionConsole.convertedRecipe')} {recipe.name}</h3>
             </div>
             <p className="text-xs text-gray-600 mb-2">
-              {lastConversionType === 'method' && `제법: ${getMethodName(convertedRecipe.method)}`}
-              {lastConversionType === 'pan' && `팬 크기 조정: ${convertedRecipe.scalingFactor ? `${(convertedRecipe.scalingFactor * 100).toFixed(0)}%` : ''}`}
-              {lastConversionType === 'environment' && '환경 보정 적용'}
+              {lastConversionType === 'method' && `${t('components.conversionConsole.method')} ${getMethodName(convertedRecipe.method)}`}
+              {lastConversionType === 'pan' && `${t('components.conversionConsole.panScaling')} ${convertedRecipe.scalingFactor ? `${(convertedRecipe.scalingFactor * 100).toFixed(0)}%` : ''}`}
+              {lastConversionType === 'environment' && t('components.conversionConsole.environmentApplied')}
             </p>
             <IngredientComparisonTable
               original={recipe.ingredients}
@@ -185,8 +176,8 @@ function ConversionConsole({ recipe, onUpdate, onBack }: ConversionConsoleProps)
           <div className="card border-2 border-dashed border-gray-300">
             <div className="text-center py-8">
               <span className="text-4xl mb-3 block">🔄</span>
-              <p className="text-gray-500 text-sm">변환할 제법을 선택하고</p>
-              <p className="text-gray-500 text-sm">"변환 계산" 버튼을 클릭하세요</p>
+              <p className="text-gray-500 text-sm">{t('components.conversionConsole.emptyState.line1')}</p>
+              <p className="text-gray-500 text-sm">{t('components.conversionConsole.emptyState.line2')}</p>
             </div>
           </div>
         )}
@@ -196,7 +187,7 @@ function ConversionConsole({ recipe, onUpdate, onBack }: ConversionConsoleProps)
       {convertedRecipe && lastConversionType !== 'ddt' && lastConversionType !== 'advanced-pan' && (
         <div className="mt-3 text-center">
           <Button size="small" onClick={applyConversion}>
-            새 레시피로 저장
+            {t('components.conversionConsole.saveAsNew')}
           </Button>
         </div>
       )}

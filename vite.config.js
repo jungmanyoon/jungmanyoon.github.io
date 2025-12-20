@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 
 export default defineConfig({
+  base: '/baking-converter/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -50,7 +51,7 @@ export default defineConfig({
         background_color: '#FFF8DC',
         display: 'standalone',
         orientation: 'portrait-primary',
-        start_url: '/',
+        start_url: '/baking-converter/',
         lang: 'ko-KR',
         categories: ['food', 'lifestyle', 'productivity'],
         icons: [
@@ -72,19 +73,19 @@ export default defineConfig({
             name: "새 레시피",
             short_name: "새 레시피",
             description: "새로운 레시피를 만듭니다",
-            url: "/?shortcut=new-recipe",
+            url: "/baking-converter/?shortcut=new-recipe",
             icons: [{ src: "/icon.svg", sizes: "any" }]
           },
           {
             name: "레시피 목록",
             short_name: "목록",
             description: "저장된 레시피 목록을 봅니다",
-            url: "/?shortcut=recipe-list",
+            url: "/baking-converter/?shortcut=recipe-list",
             icons: [{ src: "/icon.svg", sizes: "any" }]
           }
         ],
         share_target: {
-          action: "/share-recipe",
+          action: "/baking-converter/share-recipe",
           method: "POST",
           enctype: "multipart/form-data",
           params: {

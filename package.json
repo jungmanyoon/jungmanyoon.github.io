@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "무료 제과제빵 레시피 변환 웹 애플리케이션",
   "type": "module",
+  "homepage": "https://jungmanyoon.github.io/baking-converter",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -15,7 +16,9 @@
     "e2e:ui": "playwright test --ui",
     "e2e:install": "playwright install",
     "cleanup": "node scripts/cleanup.js",
-    "screenshot-server": "node server/screenshot-server.cjs"
+    "screenshot-server": "node server/screenshot-server.cjs",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -42,6 +45,7 @@
     "@vitest/ui": "^1.6.1",
     "autoprefixer": "^10.4.16",
     "docx": "^9.5.1",
+    "gh-pages": "^6.3.0",
     "jsdom": "^23.2.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",

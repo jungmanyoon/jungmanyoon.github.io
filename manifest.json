@@ -1,0 +1,32 @@
+{
+  "name": "레시피북 - 제과제빵 레시피 변환기",
+  "short_name": "레시피북",
+  "description": "무료 제과제빵 레시피 변환 웹 애플리케이션",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#8B4513",
+  "background_color": "#FFF8DC",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["food", "lifestyle", "productivity"],
+  "lang": "ko-KR"
+}

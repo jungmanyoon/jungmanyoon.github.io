@@ -181,7 +181,7 @@ function App() {
     }
 
     const isFullWidth = activeTab === 'dashboard' || activeTab === 'workspace' || activeTab === 'home' || !activeTab;
-    const showFooter = ['home', 'privacy', 'terms', 'guide', 'contact', 'help'].includes(activeTab || 'home');
+    const showFooter = ['privacy', 'terms', 'guide', 'contact', 'help'].includes(activeTab || '');
 
     // 개발환경: Suspense 불필요 (직접 import 사용)
     // 프로덕션: Suspense 필요 (lazy loading 사용)

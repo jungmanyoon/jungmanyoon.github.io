@@ -7,7 +7,7 @@
  * - 주요 기능 바로가기
  */
 
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRecipeStore } from '@/stores/useRecipeStore'
 import { useAppStore } from '@/stores/useAppStore'
@@ -94,7 +94,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 flex flex-col">
+    <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 flex flex-col h-full">
       {/* 히어로 섹션 - 컴팩트 */}
       <div className="bg-gradient-to-r from-amber-600 to-orange-500 text-white">
         <div className="container mx-auto px-4 py-5">

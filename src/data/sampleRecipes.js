@@ -899,6 +899,805 @@ export const sampleRecipes = [
     ],
     createdAt: new Date(),
     updatedAt: new Date()
+  },
+
+  // ===== 제과 레시피 (10개) =====
+  // 자도르 (J'adore) 레시피 3개
+  {
+    id: 'jadore-strawberry-cream-cake',
+    name: '딸기생크림 케이크',
+    nameKo: '딸기생크림 케이크',
+    nameEn: 'Strawberry Cream Cake',
+    productType: 'pastry',
+    description: '부드러운 제누와즈 스펀지와 생크림, 신선한 딸기의 완벽한 조화',
+    descriptionEn: 'Perfect harmony of soft genoise sponge, whipped cream and fresh strawberries',
+    category: 'cake',
+    difficulty: 'intermediate',
+    tags: ['케이크', '딸기', '생크림', '제누와즈', '스펀지'],
+    totalTime: 150,
+    source: {
+      name: '자도르',
+      nameEn: 'J\'adore',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@jadore',
+      author: '자도르',
+      authorEn: 'J\'adore'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 170,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'pan',
+        category: '원형틀',
+        type: '1호 (지름 15cm)',
+        quantity: 1,
+        panWeight: 400,
+        divisionCount: 1,
+        divisionWeight: 400,
+        unitCount: 1,
+        unitWeight: 400
+      },
+      pans: [{
+        mode: 'pan',
+        category: '원형틀',
+        type: '1호 (지름 15cm)',
+        quantity: 1,
+        panWeight: 400,
+        divisionCount: 1,
+        divisionWeight: 400,
+        unitCount: 1,
+        unitWeight: 400
+      }]
+    },
+    yield: { quantity: 1, unit: '호' },
+    ingredients: [
+      // 제누와즈 스펀지
+      { id: 'ing-1', name: '계란', amount: 150, unit: 'g', category: 'egg', phase: 'main' },
+      { id: 'ing-2', name: '설탕', amount: 100, unit: 'g', category: 'sugar', phase: 'main' },
+      { id: 'ing-3', name: '박력분', amount: 100, unit: 'g', category: 'flour', isFlour: true, phase: 'main' },
+      { id: 'ing-4', name: '우유', amount: 30, unit: 'g', category: 'liquid', phase: 'main' },
+      { id: 'ing-5', name: '버터', amount: 20, unit: 'g', category: 'fat', phase: 'main' },
+      // 생크림
+      { id: 'ing-6', name: '생크림', amount: 300, unit: 'g', category: 'liquid', phase: 'frosting' },
+      { id: 'ing-7', name: '설탕 (생크림용)', amount: 30, unit: 'g', category: 'sugar', phase: 'frosting' },
+      // 시럽
+      { id: 'ing-8', name: '물', amount: 50, unit: 'g', category: 'liquid', phase: 'other' },
+      { id: 'ing-9', name: '설탕 (시럽용)', amount: 25, unit: 'g', category: 'sugar', phase: 'other' },
+      // 토핑
+      { id: 'ing-10', name: '딸기', amount: 200, unit: 'g', category: 'fruit', phase: 'topping' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '계란과 설탕을 중탕으로 40도까지 데운 후 핸드믹서로 흰색 거품이 날 때까지 휘핑' },
+      { id: 'step-2', order: 2, instruction: '박력분을 체에 쳐서 넣고 주걱으로 가볍게 섞기' },
+      { id: 'step-3', order: 3, instruction: '녹인 버터와 우유를 섞어 반죽에 넣고 골고루 섞기' },
+      { id: 'step-4', order: 4, instruction: '틀에 부어 170도 오븐에서 30분 굽기' },
+      { id: 'step-5', order: 5, instruction: '시럽 재료를 끓여 식히기' },
+      { id: 'step-6', order: 6, instruction: '생크림과 설탕을 8-9할 정도로 휘핑' },
+      { id: 'step-7', order: 7, instruction: '식은 시트를 3등분하여 시럽 바르고 크림과 딸기로 샌딩' },
+      { id: 'step-8', order: 8, instruction: '크림으로 표면 마무리하고 딸기 장식' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'jadore-basque-cheesecake',
+    name: '바스크 치즈케이크',
+    nameKo: '바스크 치즈케이크',
+    nameEn: 'Basque Cheesecake',
+    productType: 'pastry',
+    description: '겉은 바삭 속은 촉촉한 스페인 바스크 지방의 대표 디저트',
+    descriptionEn: 'Crispy outside, creamy inside - signature dessert from Basque region of Spain',
+    category: 'cake',
+    difficulty: 'beginner',
+    tags: ['치즈케이크', '바스크', '간단', '4가지재료'],
+    totalTime: 90,
+    source: {
+      name: '자도르',
+      nameEn: 'J\'adore',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@jadore',
+      author: '자도르',
+      authorEn: 'J\'adore'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 230,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'pan',
+        category: '원형틀',
+        type: '2호 (지름 18cm)',
+        quantity: 1,
+        panWeight: 600,
+        divisionCount: 1,
+        divisionWeight: 600,
+        unitCount: 1,
+        unitWeight: 600
+      },
+      pans: [{
+        mode: 'pan',
+        category: '원형틀',
+        type: '2호 (지름 18cm)',
+        quantity: 1,
+        panWeight: 600,
+        divisionCount: 1,
+        divisionWeight: 600,
+        unitCount: 1,
+        unitWeight: 600
+      }]
+    },
+    yield: { quantity: 1, unit: '호' },
+    ingredients: [
+      { id: 'ing-1', name: '크림치즈', amount: 400, unit: 'g', category: 'dairy' },
+      { id: 'ing-2', name: '설탕', amount: 130, unit: 'g', category: 'sugar' },
+      { id: 'ing-3', name: '계란', amount: 200, unit: 'g', category: 'egg' },
+      { id: 'ing-4', name: '생크림', amount: 200, unit: 'g', category: 'liquid' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '크림치즈를 부드럽게 풀어주기' },
+      { id: 'step-2', order: 2, instruction: '설탕을 넣고 잘 섞기' },
+      { id: 'step-3', order: 3, instruction: '계란을 조금씩 나눠 넣으며 섞기' },
+      { id: 'step-4', order: 4, instruction: '생크림을 넣고 골고루 섞기' },
+      { id: 'step-5', order: 5, instruction: '유산지를 깐 틀에 붓기' },
+      { id: 'step-6', order: 6, instruction: '230도 오븐에서 25-30분 윗면이 갈색이 될 때까지 굽기' },
+      { id: 'step-7', order: 7, instruction: '완전히 식힌 후 냉장고에서 하루 숙성' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'jadore-yogurt-roll-cake',
+    name: '요거트 롤케이크',
+    nameKo: '요거트 롤케이크',
+    nameEn: 'Yogurt Roll Cake',
+    productType: 'pastry',
+    description: '상큼한 요거트 크림과 부드러운 시트의 조화로운 롤케이크',
+    descriptionEn: 'Refreshing yogurt cream and soft sponge roll cake',
+    category: 'cake',
+    difficulty: 'intermediate',
+    tags: ['롤케이크', '요거트', '상큼', '과일'],
+    totalTime: 120,
+    source: {
+      name: '자도르',
+      nameEn: 'J\'adore',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@jadore',
+      author: '자도르',
+      authorEn: 'J\'adore'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 180,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'pan',
+        category: '사각틀',
+        type: '롤케이크틀 (30×40cm)',
+        quantity: 1,
+        panWeight: 500,
+        divisionCount: 1,
+        divisionWeight: 500,
+        unitCount: 1,
+        unitWeight: 500
+      },
+      pans: [{
+        mode: 'pan',
+        category: '사각틀',
+        type: '롤케이크틀 (30×40cm)',
+        quantity: 1,
+        panWeight: 500,
+        divisionCount: 1,
+        divisionWeight: 500,
+        unitCount: 1,
+        unitWeight: 500
+      }]
+    },
+    yield: { quantity: 1, unit: '개' },
+    ingredients: [
+      // 시트
+      { id: 'ing-1', name: '계란', amount: 120, unit: 'g', category: 'egg', phase: 'main' },
+      { id: 'ing-2', name: '설탕', amount: 70, unit: 'g', category: 'sugar', phase: 'main' },
+      { id: 'ing-3', name: '박력분', amount: 70, unit: 'g', category: 'flour', isFlour: true, phase: 'main' },
+      { id: 'ing-4', name: '우유', amount: 20, unit: 'g', category: 'liquid', phase: 'main' },
+      { id: 'ing-5', name: '식용유', amount: 20, unit: 'g', category: 'fat', phase: 'main' },
+      // 요거트 크림
+      { id: 'ing-6', name: '생크림', amount: 200, unit: 'g', category: 'liquid', phase: 'filling' },
+      { id: 'ing-7', name: '플레인 요거트', amount: 100, unit: 'g', category: 'dairy', phase: 'filling' },
+      { id: 'ing-8', name: '설탕 (크림용)', amount: 20, unit: 'g', category: 'sugar', phase: 'filling' },
+      { id: 'ing-9', name: '딸기', amount: 150, unit: 'g', category: 'fruit', phase: 'filling' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '계란과 설탕을 휘핑하여 리본 상태로 만들기' },
+      { id: 'step-2', order: 2, instruction: '박력분 체쳐 넣고 가볍게 섞기' },
+      { id: 'step-3', order: 3, instruction: '우유와 식용유 섞어 반죽에 넣기' },
+      { id: 'step-4', order: 4, instruction: '팬에 부어 180도에서 12-15분 굽기' },
+      { id: 'step-5', order: 5, instruction: '생크림, 요거트, 설탕을 함께 휘핑' },
+      { id: 'step-6', order: 6, instruction: '식은 시트에 요거트 크림 바르고 딸기 올리기' },
+      { id: 'step-7', order: 7, instruction: '돌돌 말아서 냉장고에서 30분 굳히기' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 쿠킹트리 (Cooking Tree) 레시피 2개
+  {
+    id: 'cookingtree-lemon-meringue-pie',
+    name: '레몬 머랭 파이',
+    nameKo: '레몬 머랭 파이',
+    nameEn: 'Lemon Meringue Pie',
+    productType: 'pastry',
+    description: '상큼한 레몬 커드와 달콤한 머랭의 완벽한 조화',
+    descriptionEn: 'Perfect balance of tangy lemon curd and sweet meringue',
+    category: 'pie',
+    difficulty: 'advanced',
+    tags: ['파이', '레몬', '머랭', '타르트'],
+    totalTime: 180,
+    source: {
+      name: '쿠킹트리',
+      nameEn: 'Cooking Tree',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@cookingtree',
+      author: '쿠킹트리',
+      authorEn: 'Cooking Tree'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 180,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'pan',
+        category: '타르트틀',
+        type: '타르트링 (지름 18cm)',
+        quantity: 1,
+        panWeight: 450,
+        divisionCount: 1,
+        divisionWeight: 450,
+        unitCount: 1,
+        unitWeight: 450
+      },
+      pans: [{
+        mode: 'pan',
+        category: '타르트틀',
+        type: '타르트링 (지름 18cm)',
+        quantity: 1,
+        panWeight: 450,
+        divisionCount: 1,
+        divisionWeight: 450,
+        unitCount: 1,
+        unitWeight: 450
+      }]
+    },
+    yield: { quantity: 1, unit: '개' },
+    ingredients: [
+      // 파이 크러스트
+      { id: 'ing-1', name: '박력분', amount: 150, unit: 'g', category: 'flour', isFlour: true, phase: 'main' },
+      { id: 'ing-2', name: '버터', amount: 100, unit: 'g', category: 'fat', phase: 'main' },
+      { id: 'ing-3', name: '설탕', amount: 30, unit: 'g', category: 'sugar', phase: 'main' },
+      { id: 'ing-4', name: '계란노른자', amount: 20, unit: 'g', category: 'egg', phase: 'main' },
+      { id: 'ing-5', name: '소금', amount: 1, unit: 'g', category: 'salt', phase: 'main' },
+      // 레몬 커드
+      { id: 'ing-6', name: '레몬즙', amount: 100, unit: 'g', category: 'liquid', phase: 'filling' },
+      { id: 'ing-7', name: '설탕 (커드용)', amount: 100, unit: 'g', category: 'sugar', phase: 'filling' },
+      { id: 'ing-8', name: '계란', amount: 100, unit: 'g', category: 'egg', phase: 'filling' },
+      { id: 'ing-9', name: '버터 (커드용)', amount: 50, unit: 'g', category: 'fat', phase: 'filling' },
+      // 머랭
+      { id: 'ing-10', name: '계란흰자', amount: 60, unit: 'g', category: 'egg', phase: 'topping' },
+      { id: 'ing-11', name: '설탕 (머랭용)', amount: 60, unit: 'g', category: 'sugar', phase: 'topping' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '차가운 버터와 박력분을 모래알 크기로 비비기' },
+      { id: 'step-2', order: 2, instruction: '설탕, 노른자, 소금 넣고 반죽하여 냉장 휴지' },
+      { id: 'step-3', order: 3, instruction: '밀어서 타르트 틀에 깔고 180도에서 20분 굽기' },
+      { id: 'step-4', order: 4, instruction: '레몬즙, 설탕, 계란 섞어 중탕으로 걸쭉하게 만들기' },
+      { id: 'step-5', order: 5, instruction: '버터 넣고 섞어 레몬 커드 완성' },
+      { id: 'step-6', order: 6, instruction: '구운 타르트에 레몬 커드 채우기' },
+      { id: 'step-7', order: 7, instruction: '흰자와 설탕으로 머랭 만들어 올리기' },
+      { id: 'step-8', order: 8, instruction: '토치로 표면 갈색내거나 200도 오븐에서 5분' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'cookingtree-brownie-cake',
+    name: '브라우니 케이크',
+    nameKo: '브라우니 케이크',
+    nameEn: 'Brownie Cake',
+    productType: 'pastry',
+    description: '진한 초콜릿 맛과 촉촉한 식감의 클래식 브라우니',
+    descriptionEn: 'Classic brownie with rich chocolate flavor and moist texture',
+    category: 'cake',
+    difficulty: 'beginner',
+    tags: ['브라우니', '초콜릿', '간단', '촉촉'],
+    totalTime: 60,
+    source: {
+      name: '쿠킹트리',
+      nameEn: 'Cooking Tree',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@cookingtree',
+      author: '쿠킹트리',
+      authorEn: 'Cooking Tree'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 170,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'pan',
+        category: '사각틀',
+        type: '사각틀 (18×18cm)',
+        quantity: 1,
+        panWeight: 400,
+        divisionCount: 1,
+        divisionWeight: 400,
+        unitCount: 1,
+        unitWeight: 400
+      },
+      pans: [{
+        mode: 'pan',
+        category: '사각틀',
+        type: '사각틀 (18×18cm)',
+        quantity: 1,
+        panWeight: 400,
+        divisionCount: 1,
+        divisionWeight: 400,
+        unitCount: 1,
+        unitWeight: 400
+      }]
+    },
+    yield: { quantity: 1, unit: '개' },
+    ingredients: [
+      { id: 'ing-1', name: '다크초콜릿', amount: 150, unit: 'g', category: 'chocolate' },
+      { id: 'ing-2', name: '버터', amount: 100, unit: 'g', category: 'fat' },
+      { id: 'ing-3', name: '계란', amount: 100, unit: 'g', category: 'egg' },
+      { id: 'ing-4', name: '설탕', amount: 100, unit: 'g', category: 'sugar' },
+      { id: 'ing-5', name: '박력분', amount: 60, unit: 'g', category: 'flour', isFlour: true },
+      { id: 'ing-6', name: '코코아가루', amount: 20, unit: 'g', category: 'chocolate' },
+      { id: 'ing-7', name: '호두', amount: 50, unit: 'g', category: 'nuts' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '초콜릿과 버터를 중탕으로 녹이기' },
+      { id: 'step-2', order: 2, instruction: '계란과 설탕을 잘 섞기' },
+      { id: 'step-3', order: 3, instruction: '초콜릿 버터 혼합물에 계란 섞기' },
+      { id: 'step-4', order: 4, instruction: '박력분과 코코아가루 체쳐 넣기' },
+      { id: 'step-5', order: 5, instruction: '호두 넣고 가볍게 섞기' },
+      { id: 'step-6', order: 6, instruction: '틀에 부어 170도에서 25-30분 굽기' },
+      { id: 'step-7', order: 7, instruction: '완전히 식힌 후 자르기' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 빵준서 스타일 레시피 2개
+  {
+    id: 'bbangjunseo-pound-cake',
+    name: '클래식 파운드 케이크',
+    nameKo: '클래식 파운드 케이크',
+    nameEn: 'Classic Pound Cake',
+    productType: 'pastry',
+    description: '버터 향이 진하고 촉촉한 기본 파운드 케이크',
+    descriptionEn: 'Rich butter flavor and moist classic pound cake',
+    category: 'cake',
+    difficulty: 'beginner',
+    tags: ['파운드케이크', '버터', '기본', '클래식'],
+    totalTime: 90,
+    source: {
+      name: '빵준서',
+      nameEn: 'BbangJunseo',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@bbangjunseo',
+      author: '박준서 명장',
+      authorEn: 'Master Baker Park Jun-seo'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 170,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'pan',
+        category: '파운드틀',
+        type: '파운드케이크틀 (18×8×7cm)',
+        quantity: 1,
+        panWeight: 450,
+        divisionCount: 1,
+        divisionWeight: 450,
+        unitCount: 1,
+        unitWeight: 450
+      },
+      pans: [{
+        mode: 'pan',
+        category: '파운드틀',
+        type: '파운드케이크틀 (18×8×7cm)',
+        quantity: 1,
+        panWeight: 450,
+        divisionCount: 1,
+        divisionWeight: 450,
+        unitCount: 1,
+        unitWeight: 450
+      }]
+    },
+    yield: { quantity: 1, unit: '개' },
+    ingredients: [
+      { id: 'ing-1', name: '버터', amount: 125, unit: 'g', category: 'fat' },
+      { id: 'ing-2', name: '설탕', amount: 125, unit: 'g', category: 'sugar' },
+      { id: 'ing-3', name: '계란', amount: 125, unit: 'g', category: 'egg' },
+      { id: 'ing-4', name: '박력분', amount: 125, unit: 'g', category: 'flour', isFlour: true },
+      { id: 'ing-5', name: '베이킹파우더', amount: 3, unit: 'g', category: 'leavening' },
+      { id: 'ing-6', name: '바닐라 익스트랙', amount: 3, unit: 'g', category: 'flavor' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '실온 버터를 크림화하기' },
+      { id: 'step-2', order: 2, instruction: '설탕을 3번 나눠 넣으며 부드럽게 섞기' },
+      { id: 'step-3', order: 3, instruction: '계란을 조금씩 넣으며 분리되지 않게 섞기' },
+      { id: 'step-4', order: 4, instruction: '박력분과 베이킹파우더 체쳐 넣고 가볍게 섞기' },
+      { id: 'step-5', order: 5, instruction: '바닐라 익스트랙 넣기' },
+      { id: 'step-6', order: 6, instruction: '틀에 부어 170도에서 40-45분 굽기' },
+      { id: 'step-7', order: 7, instruction: '완전히 식힌 후 슬라이스' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'bbangjunseo-madeleine',
+    name: '마들렌',
+    nameKo: '마들렌',
+    nameEn: 'Madeleine',
+    productType: 'pastry',
+    description: '조개 모양의 프랑스 전통 작은 케이크',
+    descriptionEn: 'Shell-shaped traditional French small cakes',
+    category: 'cookie',
+    difficulty: 'intermediate',
+    tags: ['마들렌', '프랑스', '버터', '레몬'],
+    totalTime: 150,
+    source: {
+      name: '빵준서',
+      nameEn: 'BbangJunseo',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@bbangjunseo',
+      author: '박준서 명장',
+      authorEn: 'Master Baker Park Jun-seo'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 180,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'count',
+        category: '마들렌틀',
+        type: '마들렌 몰드',
+        quantity: 12,
+        panWeight: 25,
+        divisionCount: 1,
+        divisionWeight: 25,
+        unitCount: 12,
+        unitWeight: 25
+      },
+      pans: [{
+        mode: 'count',
+        category: '마들렌틀',
+        type: '마들렌 몰드',
+        quantity: 12,
+        panWeight: 25,
+        divisionCount: 1,
+        divisionWeight: 25,
+        unitCount: 12,
+        unitWeight: 25
+      }]
+    },
+    yield: { quantity: 12, unit: '개' },
+    ingredients: [
+      { id: 'ing-1', name: '계란', amount: 100, unit: 'g', category: 'egg' },
+      { id: 'ing-2', name: '설탕', amount: 80, unit: 'g', category: 'sugar' },
+      { id: 'ing-3', name: '꿀', amount: 10, unit: 'g', category: 'sweetener' },
+      { id: 'ing-4', name: '박력분', amount: 100, unit: 'g', category: 'flour', isFlour: true },
+      { id: 'ing-5', name: '베이킹파우더', amount: 2, unit: 'g', category: 'leavening' },
+      { id: 'ing-6', name: '버터', amount: 100, unit: 'g', category: 'fat' },
+      { id: 'ing-7', name: '레몬 제스트', amount: 3, unit: 'g', category: 'flavor' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '계란, 설탕, 꿀을 섞어 거품내기' },
+      { id: 'step-2', order: 2, instruction: '박력분과 베이킹파우더 체쳐 넣고 섞기' },
+      { id: 'step-3', order: 3, instruction: '녹인 버터와 레몬 제스트 넣고 섞기' },
+      { id: 'step-4', order: 4, instruction: '냉장고에서 1-2시간 휴지' },
+      { id: 'step-5', order: 5, instruction: '마들렌 틀에 80% 채우기' },
+      { id: 'step-6', order: 6, instruction: '180도에서 10-12분 굽기' },
+      { id: 'step-7', order: 7, instruction: '완전히 식혀서 밀폐 보관' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 호야TV 스타일 레시피 3개
+  {
+    id: 'hoyatv-vanilla-chiffon-cake',
+    name: '바닐라 시폰 케이크',
+    nameKo: '바닐라 시폰 케이크',
+    nameEn: 'Vanilla Chiffon Cake',
+    productType: 'pastry',
+    description: '구름처럼 가볍고 부드러운 시폰 케이크',
+    descriptionEn: 'Cloud-like light and fluffy chiffon cake',
+    category: 'cake',
+    difficulty: 'intermediate',
+    tags: ['시폰케이크', '바닐라', '부드러운', '가벼운'],
+    totalTime: 90,
+    source: {
+      name: '호야TV',
+      nameEn: 'Hoya TV',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@hoyatv',
+      author: '호야',
+      authorEn: 'Hoya'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 170,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'pan',
+        category: '시폰틀',
+        type: '시폰 케이크틀 (지름 17cm)',
+        quantity: 1,
+        panWeight: 350,
+        divisionCount: 1,
+        divisionWeight: 350,
+        unitCount: 1,
+        unitWeight: 350
+      },
+      pans: [{
+        mode: 'pan',
+        category: '시폰틀',
+        type: '시폰 케이크틀 (지름 17cm)',
+        quantity: 1,
+        panWeight: 350,
+        divisionCount: 1,
+        divisionWeight: 350,
+        unitCount: 1,
+        unitWeight: 350
+      }]
+    },
+    yield: { quantity: 1, unit: '개' },
+    ingredients: [
+      { id: 'ing-1', name: '계란노른자', amount: 60, unit: 'g', category: 'egg' },
+      { id: 'ing-2', name: '설탕 (노른자용)', amount: 20, unit: 'g', category: 'sugar' },
+      { id: 'ing-3', name: '식용유', amount: 40, unit: 'g', category: 'fat' },
+      { id: 'ing-4', name: '물', amount: 50, unit: 'g', category: 'liquid' },
+      { id: 'ing-5', name: '박력분', amount: 80, unit: 'g', category: 'flour', isFlour: true },
+      { id: 'ing-6', name: '바닐라 익스트랙', amount: 3, unit: 'g', category: 'flavor' },
+      { id: 'ing-7', name: '계란흰자', amount: 120, unit: 'g', category: 'egg' },
+      { id: 'ing-8', name: '설탕 (흰자용)', amount: 60, unit: 'g', category: 'sugar' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '노른자와 설탕 섞고 식용유, 물 넣기' },
+      { id: 'step-2', order: 2, instruction: '박력분 체쳐 넣고 바닐라 넣어 반죽' },
+      { id: 'step-3', order: 3, instruction: '흰자를 단단한 머랭으로 만들기' },
+      { id: 'step-4', order: 4, instruction: '머랭을 3번 나눠 반죽에 섞기' },
+      { id: 'step-5', order: 5, instruction: '시폰 틀에 부어 바닥을 쳐서 기포 제거' },
+      { id: 'step-6', order: 6, instruction: '170도에서 35-40분 굽기' },
+      { id: 'step-7', order: 7, instruction: '거꾸로 뒤집어 완전히 식히기' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'hoyatv-greentea-roll-cake',
+    name: '녹차 롤케이크',
+    nameKo: '녹차 롤케이크',
+    nameEn: 'Green Tea Roll Cake',
+    productType: 'pastry',
+    description: '은은한 녹차 향과 부드러운 크림의 롤케이크',
+    descriptionEn: 'Subtle green tea flavor with soft cream roll cake',
+    category: 'cake',
+    difficulty: 'intermediate',
+    tags: ['롤케이크', '녹차', '크림', '말차'],
+    totalTime: 100,
+    source: {
+      name: '호야TV',
+      nameEn: 'Hoya TV',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@hoyatv',
+      author: '호야',
+      authorEn: 'Hoya'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 180,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'pan',
+        category: '사각틀',
+        type: '롤케이크틀 (30×40cm)',
+        quantity: 1,
+        panWeight: 500,
+        divisionCount: 1,
+        divisionWeight: 500,
+        unitCount: 1,
+        unitWeight: 500
+      },
+      pans: [{
+        mode: 'pan',
+        category: '사각틀',
+        type: '롤케이크틀 (30×40cm)',
+        quantity: 1,
+        panWeight: 500,
+        divisionCount: 1,
+        divisionWeight: 500,
+        unitCount: 1,
+        unitWeight: 500
+      }]
+    },
+    yield: { quantity: 1, unit: '개' },
+    ingredients: [
+      // 시트
+      { id: 'ing-1', name: '계란', amount: 120, unit: 'g', category: 'egg', phase: 'main' },
+      { id: 'ing-2', name: '설탕', amount: 70, unit: 'g', category: 'sugar', phase: 'main' },
+      { id: 'ing-3', name: '박력분', amount: 65, unit: 'g', category: 'flour', isFlour: true, phase: 'main' },
+      { id: 'ing-4', name: '녹차가루', amount: 8, unit: 'g', category: 'flavor', phase: 'main' },
+      { id: 'ing-5', name: '우유', amount: 20, unit: 'g', category: 'liquid', phase: 'main' },
+      { id: 'ing-6', name: '식용유', amount: 20, unit: 'g', category: 'fat', phase: 'main' },
+      // 크림
+      { id: 'ing-7', name: '생크림', amount: 200, unit: 'g', category: 'liquid', phase: 'filling' },
+      { id: 'ing-8', name: '설탕 (크림용)', amount: 20, unit: 'g', category: 'sugar', phase: 'filling' },
+      { id: 'ing-9', name: '녹차가루 (크림용)', amount: 3, unit: 'g', category: 'flavor', phase: 'filling' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '계란과 설탕 휘핑하여 리본 상태로' },
+      { id: 'step-2', order: 2, instruction: '박력분과 녹차가루 체쳐 섞기' },
+      { id: 'step-3', order: 3, instruction: '우유와 식용유 섞어 반죽에 넣기' },
+      { id: 'step-4', order: 4, instruction: '팬에 부어 180도에서 12-15분 굽기' },
+      { id: 'step-5', order: 5, instruction: '생크림, 설탕, 녹차가루로 크림 휘핑' },
+      { id: 'step-6', order: 6, instruction: '식은 시트에 크림 바르고 말기' },
+      { id: 'step-7', order: 7, instruction: '냉장고에서 30분 굳히기' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'hoyatv-butter-cookies',
+    name: '버터쿠키',
+    nameKo: '버터쿠키',
+    nameEn: 'Butter Cookies',
+    productType: 'pastry',
+    description: '바삭하고 고소한 클래식 버터쿠키',
+    descriptionEn: 'Crispy and savory classic butter cookies',
+    category: 'cookie',
+    difficulty: 'beginner',
+    tags: ['쿠키', '버터', '간단', '바삭'],
+    totalTime: 60,
+    source: {
+      name: '호야TV',
+      nameEn: 'Hoya TV',
+      type: 'youtube',
+      url: 'https://www.youtube.com/@hoyatv',
+      author: '호야',
+      authorEn: 'Hoya'
+    },
+    method: {
+      method: 'straight',
+      prefermentRatio: 0,
+      fermentationTime: null
+    },
+    ovenSettings: {
+      temperature: 170,
+      mode: 'conventional',
+      preheating: true,
+      deck: 'middle'
+    },
+    panConfig: {
+      originalPan: {
+        mode: 'count',
+        category: '쿠키팬',
+        type: '베이킹 팬',
+        quantity: 30,
+        panWeight: 15,
+        divisionCount: 1,
+        divisionWeight: 15,
+        unitCount: 30,
+        unitWeight: 15
+      },
+      pans: [{
+        mode: 'count',
+        category: '쿠키팬',
+        type: '베이킹 팬',
+        quantity: 30,
+        panWeight: 15,
+        divisionCount: 1,
+        divisionWeight: 15,
+        unitCount: 30,
+        unitWeight: 15
+      }]
+    },
+    yield: { quantity: 30, unit: '개' },
+    ingredients: [
+      { id: 'ing-1', name: '버터', amount: 150, unit: 'g', category: 'fat' },
+      { id: 'ing-2', name: '슈가파우더', amount: 70, unit: 'g', category: 'sugar' },
+      { id: 'ing-3', name: '소금', amount: 1, unit: 'g', category: 'salt' },
+      { id: 'ing-4', name: '계란노른자', amount: 20, unit: 'g', category: 'egg' },
+      { id: 'ing-5', name: '박력분', amount: 200, unit: 'g', category: 'flour', isFlour: true },
+      { id: 'ing-6', name: '바닐라 익스트랙', amount: 3, unit: 'g', category: 'flavor' }
+    ],
+    steps: [
+      { id: 'step-1', order: 1, instruction: '실온 버터를 크림화하기' },
+      { id: 'step-2', order: 2, instruction: '슈가파우더와 소금 넣고 섞기' },
+      { id: 'step-3', order: 3, instruction: '노른자와 바닐라 넣고 섞기' },
+      { id: 'step-4', order: 4, instruction: '박력분 체쳐 넣고 가볍게 섞기' },
+      { id: 'step-5', order: 5, instruction: '짤주머니에 넣어 원하는 모양으로 짜기' },
+      { id: 'step-6', order: 6, instruction: '170도에서 12-15분 굽기' },
+      { id: 'step-7', order: 7, instruction: '완전히 식혀서 밀폐 보관' }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
   }
 ]
 

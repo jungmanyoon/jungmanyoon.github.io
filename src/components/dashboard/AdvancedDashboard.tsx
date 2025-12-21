@@ -564,8 +564,8 @@ const AdvancedDashboard: React.FC = () => {
             amount: parseFloat(ing.amount) || 0,
             note: ing.note || '',
             moistureContent: ing.moistureContent,
-            phase: 'main',  // 기본값: 본반죽
-            phaseOrder: 0,
+            phase: ing.phase || 'main',  // 저장된 phase 값 로드, 없으면 기본값: 본반죽
+            phaseOrder: ing.phaseOrder || 0,
           });
         });
       }
@@ -1032,6 +1032,27 @@ const AdvancedDashboard: React.FC = () => {
     }));
   }, [originalPan.mode, convertedProduct]);
 
+  // 제품 타입 변경 시 원제품/변경제품을 해당 카테고리 기본값으로 재설정
+  useEffect(() => {
+    if (productType === 'bread') {
+      const breadProducts = Object.keys(BREAD_SPECIFIC_VOLUMES);
+      if (!breadProducts.includes(originalProduct)) {
+        setOriginalProduct(breadProducts[0] || '산형식빵');
+      }
+      if (!breadProducts.includes(convertedProduct)) {
+        setConvertedProduct(breadProducts[0] || '산형식빵');
+      }
+    } else {
+      const pastryProducts = Object.keys(CAKE_BATTER_SPECIFIC_GRAVITY);
+      if (!pastryProducts.includes(originalProduct)) {
+        setOriginalProduct(pastryProducts[0] || '파운드케이크');
+      }
+      if (!pastryProducts.includes(convertedProduct)) {
+        setConvertedProduct(pastryProducts[0] || '파운드케이크');
+      }
+    }
+  }, [productType]);
+
   const convertedTotal = useMemo(() => Math.round(totalWeight * effectiveMultiplier), [totalWeight, effectiveMultiplier]);
 
   // 손실률 계산
@@ -1224,6 +1245,12 @@ const AdvancedDashboard: React.FC = () => {
     return foundPhase?.phase || 'straight';
   }, [ingredients]);
 
+  // 레시피에 여러 단계가 있는지 확인 (제빵, 제과 모두 포함)
+  const hasMultipleIngredientPhases = useMemo(() => {
+    const phases = new Set(ingredients.map(ing => ing.phase || 'main'));
+    return phases.size > 1 || (phases.size === 1 && !phases.has('main'));
+  }, [ingredients]);
+
   // 원본 제법과 선택 제법이 같은지 확인
   const isSameMethod = originalMethodType === method.type ||
     (originalMethodType === 'straight' && method.type === 'straight');
@@ -1239,6 +1266,25 @@ const AdvancedDashboard: React.FC = () => {
     const categoryOrder: Record<string, number> = {
       flour: 0, liquid: 1, wetOther: 2, other: 3
     };
+
+    // ★ 우선순위 1: 여러 단계가 있고 사전반죽 미사용 시 → 원본 단계 유지 (제빵/제과 모두)
+    if (hasMultipleIngredientPhases && !usePreferment) {
+      const grouped = convertedIngredients.reduce((acc, ing) => {
+        const phase = ing.phase || 'main';
+        if (!acc[phase]) acc[phase] = [];
+        acc[phase].push(ing);
+        return acc;
+      }, {} as Record<string, typeof convertedIngredients>);
+
+      return Object.entries(grouped)
+        .sort(([a], [b]) => (phaseOrder[a] ?? 50) - (phaseOrder[b] ?? 50))
+        .map(([phase, items]) => ({
+          phase,
+          items: items.sort((a, b) =>
+            (categoryOrder[a.category] ?? 99) - (categoryOrder[b.category] ?? 99)
+          )
+        }));
+    }
 
     // 스트레이트법: 모든 재료를 합산하여 'main' 하나로 통합
     if (!usePreferment || method.type === 'straight') {
@@ -1343,7 +1389,7 @@ const AdvancedDashboard: React.FC = () => {
     }
 
     return result;
-  }, [convertedIngredients, prefermentIngredients, mainDoughIngredients, usePreferment, method.type, isSameMethod, originalMethodType]);
+  }, [convertedIngredients, prefermentIngredients, mainDoughIngredients, usePreferment, method.type, isSameMethod, originalMethodType, hasMultipleIngredientPhases]);
 
   // 변환 재료에 단계가 2개 이상인지
   const convertedHasMultiplePhases = convertedIngredientsByPhase.length > 1;
@@ -1516,6 +1562,7 @@ const AdvancedDashboard: React.FC = () => {
       isFlour: ing.category === 'flour',
       note: ing.note || '',  // 메모 저장
       moistureContent: ing.moistureContent,  // 수분 함량 저장
+      phase: ing.phase || 'main',  // 공정 단계 저장
     }));
 
     // 저장할 공정 데이터 (로드 형식과 일치하도록)
@@ -2312,19 +2359,27 @@ const AdvancedDashboard: React.FC = () => {
             </div>
           </CollapsibleSection>
 
-          {/* 비용적/비중 설정 */}
-          <CollapsibleSection title={t('advDashboard.specificVolume')} icon={<Scale className="w-4 h-4" />} defaultOpen={false} onReset={resetSpecificVolume}>
+          {/* 비용적/비중 설정 - 제빵: 비용적, 제과: 비중 */}
+          <CollapsibleSection
+            title={productType === 'bread' ? t('advDashboard.specificVolume') : t('advDashboard.specificGravity')}
+            icon={<Scale className="w-4 h-4" />}
+            defaultOpen={false}
+            onReset={resetSpecificVolume}
+          >
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-gray-500 block mb-1">{t('advDashboard.originalProduct')}</label>
                 <select value={originalProduct} onChange={(e) => setOriginalProduct(e.target.value)}
                   className="w-full text-xs border rounded px-2 py-1">
-                  {Object.keys(SPECIFIC_VOLUMES).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)}
+                  {productType === 'bread'
+                    ? Object.keys(BREAD_SPECIFIC_VOLUMES).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)
+                    : Object.keys(CAKE_BATTER_SPECIFIC_GRAVITY).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)
+                  }
                 </select>
                 <div className="text-xs text-gray-400 mt-1">
-                  {isPastryProduct(originalProduct)
-                    ? `비중: ${CAKE_BATTER_SPECIFIC_GRAVITY[originalProduct]}`
-                    : `비용적: ${SPECIFIC_VOLUMES[originalProduct]} cm³/g`
+                  {productType === 'bread'
+                    ? `비용적: ${BREAD_SPECIFIC_VOLUMES[originalProduct] || SPECIFIC_VOLUMES[originalProduct]} cm³/g`
+                    : `비중: ${CAKE_BATTER_SPECIFIC_GRAVITY[originalProduct]}`
                   }
                 </div>
               </div>
@@ -2332,12 +2387,15 @@ const AdvancedDashboard: React.FC = () => {
                 <label className="text-xs text-gray-500 block mb-1">{t('advDashboard.convertedProduct')}</label>
                 <select value={convertedProduct} onChange={(e) => setConvertedProduct(e.target.value)}
                   className="w-full text-xs border rounded px-2 py-1">
-                  {Object.keys(SPECIFIC_VOLUMES).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)}
+                  {productType === 'bread'
+                    ? Object.keys(BREAD_SPECIFIC_VOLUMES).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)
+                    : Object.keys(CAKE_BATTER_SPECIFIC_GRAVITY).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)
+                  }
                 </select>
                 <div className="text-xs text-gray-400 mt-1">
-                  {isPastryProduct(convertedProduct)
-                    ? `비중: ${CAKE_BATTER_SPECIFIC_GRAVITY[convertedProduct]}`
-                    : `비용적: ${SPECIFIC_VOLUMES[convertedProduct]} cm³/g`
+                  {productType === 'bread'
+                    ? `비용적: ${BREAD_SPECIFIC_VOLUMES[convertedProduct] || SPECIFIC_VOLUMES[convertedProduct]} cm³/g`
+                    : `비중: ${CAKE_BATTER_SPECIFIC_GRAVITY[convertedProduct]}`
                   }
                 </div>
               </div>
@@ -2598,6 +2656,7 @@ const AdvancedDashboard: React.FC = () => {
                       <tr className={`text-gray-500 ${dynamicStyles.fontSize}`}>
                         <th className="px-1.5 py-1 text-left w-16">{t('advDashboard.category')}</th>
                         <th className="px-1.5 py-1 text-left">{t('advDashboard.ingredients')}</th>
+                        <th className="px-1.5 py-1 text-left w-20">{t('advDashboard.process')}</th>
                         <th className="px-1.5 py-1 text-right w-10">{t('advDashboard.tableHeaderPercent')}</th>
                         <th className="px-1.5 py-1 text-right w-14">{t('advDashboard.tableHeaderGram')}</th>
                         <th className="w-5"></th>
@@ -2621,51 +2680,73 @@ const AdvancedDashboard: React.FC = () => {
                               </tr>
                             )}
                             {/* 해당 단계의 재료들 */}
-                            {items.map(ing => (
-                              <tr key={ing.id} className={`border-b border-gray-100 hover:bg-gray-50 ${dynamicStyles.rowHeight}`}>
-                                <td className="px-1.5">
-                                  <select value={ing.category} onChange={(e) => updateIngredient(ing.id, 'category', e.target.value)}
-                                    className="w-full text-xs border-0 bg-transparent p-0 focus:outline-none appearance-none cursor-pointer">
-                                    {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                                  </select>
-                                </td>
-                                <td className="px-1.5">
-                                  <AutocompleteInput
-                                    value={ing.name}
-                                    displayValue={translateIngredient(ing.name)}
-                                    onChange={(value) => updateIngredient(ing.id, 'name', value)}
-                                    onSelect={(value) => {
-                                      // 재료 선택 시 카테고리도 자동 설정
-                                      const info = findIngredientInfo(value);
-                                      if (info) {
-                                        updateIngredient(ing.id, 'name', value);
-                                        // 카테고리 매핑
-                                        const categoryMap: Record<string, string> = {
-                                          flour: 'flour', liquid: 'liquid', fat: 'wetOther',
-                                          sugar: 'other', egg: 'wetOther', dairy: 'liquid',
-                                          leavening: 'other', salt: 'other', flavoring: 'other',
-                                          nut: 'other', fruit: 'other', chocolate: 'other', other: 'other'
-                                        };
-                                        updateIngredient(ing.id, 'category', categoryMap[info.category] || 'other');
-                                      }
-                                    }}
-                                    placeholder={t('advDashboard.name')}
-                                    className="!border-0 !p-0 !ring-0 text-sm bg-transparent"
-                                    maxSuggestions={6}
-                                  />
-                                </td>
-                                <td className="px-1.5 text-right font-mono text-gray-400 text-xs">{ing.ratio}</td>
-                                <td className="px-1.5">
-                                  <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
-                                    className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm" />
-                                </td>
-                                <td className="px-0.5">
-                                  <button onClick={() => removeIngredient(ing.id)} className="text-red-300 hover:text-red-500">
-                                    <X className="w-3.5 h-3.5" />
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
+                            {items.map(ing => {
+                              // 제품 타입에 따라 사용 가능한 phase 목록 결정
+                              const availablePhases = productType === 'bread'
+                                ? ['main', 'preferment', 'tangzhong', 'autolyse', 'topping', 'other']
+                                : ['main', 'filling', 'frosting', 'topping', 'glaze', 'other'];
+
+                              return (
+                                <tr key={ing.id} className={`border-b border-gray-100 hover:bg-gray-50 ${dynamicStyles.rowHeight}`}>
+                                  <td className="px-1.5">
+                                    <select value={ing.category} onChange={(e) => updateIngredient(ing.id, 'category', e.target.value)}
+                                      className="w-full text-xs border-0 bg-transparent p-0 focus:outline-none appearance-none cursor-pointer">
+                                      {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                    </select>
+                                  </td>
+                                  <td className="px-1.5">
+                                    <AutocompleteInput
+                                      value={ing.name}
+                                      onChange={(value) => updateIngredient(ing.id, 'name', value)}
+                                      onSelect={(value) => {
+                                        // 재료 선택 시 카테고리도 자동 설정
+                                        const info = findIngredientInfo(value);
+                                        if (info) {
+                                          updateIngredient(ing.id, 'name', value);
+                                          // 카테고리 매핑
+                                          const categoryMap: Record<string, string> = {
+                                            flour: 'flour', liquid: 'liquid', fat: 'wetOther',
+                                            sugar: 'other', egg: 'wetOther', dairy: 'liquid',
+                                            leavening: 'other', salt: 'other', flavoring: 'other',
+                                            nut: 'other', fruit: 'other', chocolate: 'other', other: 'other'
+                                          };
+                                          updateIngredient(ing.id, 'category', categoryMap[info.category] || 'other');
+                                        }
+                                      }}
+                                      placeholder={t('advDashboard.name')}
+                                      className="!border-0 !p-0 !ring-0 text-sm bg-transparent"
+                                      maxSuggestions={6}
+                                    />
+                                  </td>
+                                  <td className="px-1.5">
+                                    <select
+                                      value={ing.phase || 'main'}
+                                      onChange={(e) => updateIngredient(ing.id, 'phase', e.target.value)}
+                                      className="w-full text-xs border-0 bg-transparent p-0 focus:outline-none appearance-none cursor-pointer"
+                                    >
+                                      {availablePhases.map(phaseKey => {
+                                        const meta = PHASE_META[phaseKey];
+                                        return (
+                                          <option key={phaseKey} value={phaseKey}>
+                                            {meta.icon} {t(meta.labelKey)}
+                                          </option>
+                                        );
+                                      })}
+                                    </select>
+                                  </td>
+                                  <td className="px-1.5 text-right font-mono text-gray-400 text-xs">{ing.ratio}</td>
+                                  <td className="px-1.5">
+                                    <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
+                                      className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm" />
+                                  </td>
+                                  <td className="px-0.5">
+                                    <button onClick={() => removeIngredient(ing.id)} className="text-red-300 hover:text-red-500">
+                                      <X className="w-3.5 h-3.5" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
                           </React.Fragment>
                         );
                       })}
@@ -2757,14 +2838,15 @@ const AdvancedDashboard: React.FC = () => {
               <div className="flex gap-1.5 flex-wrap items-start">
                 {processes.map((proc, idx) => {
                   const itemSize = getProcessItemSize(proc.id);
+                  const displayText = editingProcessId === proc.id ? proc.description : translateProcessStep(proc.description || '');
                   return (
                   <div
                     key={proc.id}
                     className="flex items-center gap-1 bg-gray-50 border rounded px-1.5 py-1 text-xs group hover:bg-gray-100 relative"
-                    style={{ minWidth: itemSize.width || 120 }}
+                    style={{ minWidth: itemSize.width || 200, maxWidth: '100%' }}
                   >
                     {/* 순서 변경 버튼 */}
-                    <div className="flex flex-col opacity-0 group-hover:opacity-100">
+                    <div className="flex flex-col opacity-0 group-hover:opacity-100 flex-shrink-0">
                       <button
                         onClick={() => moveProcess(proc.id, 'up')}
                         className="text-gray-400 hover:text-gray-600 -mb-0.5"
@@ -2782,16 +2864,25 @@ const AdvancedDashboard: React.FC = () => {
                         <ChevronDown className="w-3 h-3" />
                       </button>
                     </div>
-                    <span className="text-gray-400 font-mono text-[11px] w-4">{idx + 1}.</span>
-                    <input
-                      type="text"
-                      value={editingProcessId === proc.id ? proc.description : translateProcessStep(proc.description || '')}
-                      onChange={(e) => updateProcess(proc.id, 'description', e.target.value)}
-                      onFocus={() => setEditingProcessId(proc.id)}
-                      onBlur={() => setEditingProcessId(null)}
-                      className="bg-transparent border-0 p-0 focus:outline-none text-xs flex-1 min-w-0"
-                      placeholder={t('advDashboard.processPlaceholder')}
-                    />
+                    <span className="text-gray-400 font-mono text-[11px] w-4 flex-shrink-0">{idx + 1}.</span>
+                    {editingProcessId === proc.id ? (
+                      <textarea
+                        value={displayText}
+                        onChange={(e) => updateProcess(proc.id, 'description', e.target.value)}
+                        onBlur={() => setEditingProcessId(null)}
+                        autoFocus
+                        className="bg-transparent border-0 p-0 focus:outline-none text-xs flex-1 min-w-0 resize-none leading-relaxed"
+                        placeholder={t('advDashboard.processPlaceholder')}
+                        rows={3}
+                      />
+                    ) : (
+                      <div
+                        onClick={() => setEditingProcessId(proc.id)}
+                        className="flex-1 min-w-0 cursor-text leading-relaxed whitespace-pre-wrap"
+                      >
+                        {displayText || <span className="text-gray-400">{t('advDashboard.processPlaceholder')}</span>}
+                      </div>
+                    )}
                     {/* 시간: 값이 있을 때 뱃지 표시 + 삭제 버튼 */}
                     {proc.time ? (
                       <div className="flex items-center gap-0.5 text-[11px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded group/time">

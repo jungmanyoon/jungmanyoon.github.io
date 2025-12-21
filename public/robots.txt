@@ -1,11 +1,11 @@
 # Robots.txt for 레시피북 - 제과제빵 레시피 변환기
-# https://jungmanyoon.github.io/baking-converter/
+# https://jungmanyoon.github.io/
 
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://jungmanyoon.github.io/baking-converter/sitemap.xml
+Sitemap: https://jungmanyoon.github.io/sitemap.xml
 
 # Crawl-delay for polite crawling
 Crawl-delay: 1

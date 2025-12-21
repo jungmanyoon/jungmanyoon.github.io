@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "무료 제과제빵 레시피 변환 웹 애플리케이션",
   "type": "module",
-  "homepage": "https://jungmanyoon.github.io/baking-converter",
+  "homepage": "https://jungmanyoon.github.io",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -152,7 +152,7 @@ export const useRecipeStore = create<RecipeStore>()(
       }),
       {
         name: 'recipe-store',
-        version: 2,
+        version: 3,
         partialize: (state) => ({
           recipes: state.recipes,
           filters: state.filters,
@@ -167,6 +167,22 @@ export const useRecipeStore = create<RecipeStore>()(
               draftRecipe: persistedState.draftRecipe || null
             }
           }
+
+          // v2 -> v3: 제과 샘플 레시피 자동 추가
+          if (version === 2) {
+            const existingRecipes = persistedState.recipes || []
+            const hasPastryRecipes = existingRecipes.some((r: any) => r.productType === 'pastry')
+
+            // 제과 레시피가 없으면 sampleRecipes에서 제과만 추가
+            if (!hasPastryRecipes) {
+              const pastryRecipes = sampleRecipes.filter((r: any) => r.productType === 'pastry')
+              return {
+                ...persistedState,
+                recipes: [...existingRecipes, ...pastryRecipes]
+              }
+            }
+          }
+
           return persistedState
         }
       }

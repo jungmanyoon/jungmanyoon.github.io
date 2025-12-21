@@ -121,6 +121,7 @@ export const useRecipeStore = create<RecipeStore>()(
           if (state.filters.timeRange) count++
           if (state.filters.tags && state.filters.tags.length > 0) count++
           if (state.filters.category && state.filters.category.length > 0) count++
+          if (state.filters.productType && state.filters.productType.length > 0) count++  // 🆕 제품 타입 필터 카운트
           return count
         },
 
@@ -170,8 +171,15 @@ export const selectFilteredRecipes = (state: RecipeStore) => {
 
   // 카테고리 필터
   if (state.filters.category && state.filters.category.length > 0) {
-    filtered = filtered.filter(r => 
+    filtered = filtered.filter(r =>
       state.filters.category!.includes(r.category)
+    )
+  }
+
+  // 제품 타입 필터 (제빵/제과)
+  if (state.filters.productType && state.filters.productType.length > 0) {
+    filtered = filtered.filter(r =>
+      state.filters.productType!.includes((r as any).productType || 'bread')
     )
   }
 

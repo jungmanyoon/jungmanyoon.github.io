@@ -101,6 +101,7 @@ export interface RecipeStore {
 export interface RecipeFilters {
   category?: string[];
   difficulty?: string[];
+  productType?: ('bread' | 'pastry')[];  // 🆕 제품 타입 필터 (제빵/제과)
   searchQuery?: string;
   tags?: string[];
   timeRange?: {

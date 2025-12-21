@@ -47,13 +47,28 @@ const FilterControls: React.FC<FilterControlsProps> = ({
     { value: 'totalTime', labelKey: 'filter.sortTime' }
   ]
 
+  const productTypeOptions = [
+    { value: 'bread' as const, labelKey: 'advDashboard.productTypeBread' },
+    { value: 'pastry' as const, labelKey: 'advDashboard.productTypePastry' }
+  ]
+
   const activeFilterCount = useMemo(() => {
     let count = 0
     if (filters.difficulty && filters.difficulty.length > 0) count++
+    if (filters.productType && filters.productType.length > 0) count++  // 🆕 제품 타입 필터 카운트
     if (filters.timeRange) count++
     if (filters.tags && filters.tags.length > 0) count++
     return count
   }, [filters])
+
+  const handleProductTypeChange = (productType: 'bread' | 'pastry') => {
+    const currentTypes = filters.productType || []
+    const newTypes = currentTypes.includes(productType)
+      ? currentTypes.filter(t => t !== productType)
+      : [...currentTypes, productType]
+
+    onFilterChange({ ...filters, productType: newTypes })
+  }
 
   const handleDifficultyChange = (difficulty: DifficultyLevel) => {
     const currentDifficulties = filters.difficulty || []
@@ -129,6 +144,52 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                       type="checkbox"
                       checked={filters.difficulty?.includes(value) || false}
                       onChange={() => handleDifficultyChange(value)}
+                      className="w-4 h-4 text-bread-600 border-bread-300 rounded focus:ring-bread-500"
+                    />
+                    <span className="text-sm text-bread-700">{t(labelKey)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Product Type Filter - 제품 타입 (제빵/제과) */}
+          <div className="relative group">
+            <button
+              className="
+                px-3 py-2
+                border border-bread-200 rounded-lg
+                bg-white hover:bg-bread-50
+                text-bread-700 text-sm
+                transition-colors duration-200
+                flex items-center gap-2
+              "
+            >
+              {t('advDashboard.productType')}
+              <ChevronDown className="w-4 h-4" />
+            </button>
+            <div className="
+              absolute top-full left-0 mt-1
+              w-48
+              bg-white border border-bread-200 rounded-lg shadow-lg
+              opacity-0 invisible group-hover:opacity-100 group-hover:visible
+              transition-all duration-200
+              z-10
+            ">
+              <div className="p-2 space-y-1">
+                {productTypeOptions.map(({ value, labelKey }) => (
+                  <label
+                    key={value}
+                    className="
+                      flex items-center gap-2 px-3 py-2
+                      hover:bg-bread-50 rounded cursor-pointer
+                      transition-colors duration-150
+                    "
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.productType?.includes(value) || false}
+                      onChange={() => handleProductTypeChange(value)}
                       className="w-4 h-4 text-bread-600 border-bread-300 rounded focus:ring-bread-500"
                     />
                     <span className="text-sm text-bread-700">{t(labelKey)}</span>

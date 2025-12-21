@@ -2219,6 +2219,9 @@
   },
   "advDashboard": {
     "productName": "제품명",
+    "productType": "제품 타입",
+    "productTypeBread": "🍞 제빵",
+    "productTypePastry": "🍰 제과",
     "sourceType": "출처 유형",
     "sourceName": "출처명",
     "sourceNamePlaceholder": "출처 이름 (예: 빵준서, 호야TV)",

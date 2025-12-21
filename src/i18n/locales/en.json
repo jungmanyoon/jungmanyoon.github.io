@@ -2219,6 +2219,9 @@
   },
   "advDashboard": {
     "productName": "Product Name",
+    "productType": "Product Type",
+    "productTypeBread": "🍞 Bread",
+    "productTypePastry": "🍰 Pastry",
     "sourceType": "Source Type",
     "sourceName": "Source Name",
     "sourceNamePlaceholder": "Source name (e.g., channel, blog)",

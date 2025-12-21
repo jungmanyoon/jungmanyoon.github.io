@@ -128,6 +128,7 @@ export interface Recipe {
   id: string;
   name: string;
   nameKo?: string; // 한글명
+  productType: 'bread' | 'pastry'; // 🆕 제품 타입 (제빵/제과 구분)
   category: RecipeCategory;
   type: RecipeType;
   difficulty: DifficultyLevel;

@@ -113,14 +113,31 @@ const BREAD_SPECIFIC_VOLUMES: Record<string, number> = {
   '바게트': 5.5,        // 크러스트 비율 높음, 에어리
 };
 
-// 제과용 비용적 - 나중에 제과 화면에서 사용 (학술 논문 기준)
+// 제과용 반죽 비중 (Specific Gravity) - 국내 제과제빵 기준
+// 반죽 비중 = 반죽 무게 ÷ 물 무게 (같은 컵 사용), 낮을수록 공기 많음
+const CAKE_BATTER_SPECIFIC_GRAVITY: Record<string, number> = {
+  '파운드케이크': 0.83,     // 대한제과협회: 0.80-0.85 범위 중간값
+  '레이어케이크': 0.83,     // 반죽형 케이크: 0.80-0.85
+  '스펀지케이크': 0.55,     // 버터 스펀지(제누와즈): 0.50-0.60
+  '시폰케이크': 0.45,       // 시폰/롤케이크: 0.40-0.50
+  '엔젤푸드케이크': 0.40,   // 가장 가벼운 반죽 (추정)
+  '무스케이크': 0.90,       // 무거운 반죽 (추정)
+};
+
+// 제과용 구운 후 비용적 (cm³/g) - 팬 계산용
+// 반죽 비중 → 구운 후 비용적 변환 (대략적 추정)
 const CAKE_SPECIFIC_VOLUMES: Record<string, number> = {
-  '파운드케이크': 1.8,      // 조밀함 (1.5~2.0)
-  '레이어케이크': 2.8,      // 중간
-  '엔젤푸드케이크': 4.5,    // 달걀흰자, 가벼움
-  '스펀지케이크': 2.4,      // 제누아즈 (2.3~2.5, KCI 논문 기준)
-  '시폰케이크': 3.5,        // 식용유 사용, 가벼움 (3.0~4.0)
-  '무스케이크': 1.8,        // 매우 조밀
+  '파운드케이크': 2.5,      // ScienceDirect 2025: 2.1-2.8 범위
+  '레이어케이크': 2.5,      // 에멀전 케이크: 2.2-2.3
+  '스펀지케이크': 2.3,      // 반죽비중 0.55 기준 추정
+  '시폰케이크': 3.2,        // 반죽비중 0.45 기준 추정
+  '엔젤푸드케이크': 4.5,    // 가장 가벼운 케이크
+  '무스케이크': 1.8,        // 매우 조밀함
+};
+
+// 제과 제품 판별 헬퍼 함수
+const isPastryProduct = (productName: string): boolean => {
+  return Object.keys(CAKE_BATTER_SPECIFIC_GRAVITY).includes(productName);
 };
 
 // 현재 화면은 제빵용 - 동적 비용적은 컴포넌트 내부에서 useMemo로 생성됨
@@ -266,6 +283,7 @@ const AdvancedDashboard: React.FC = () => {
     // 기본값을 복사하고 설정 스토어의 오버라이드 적용
     return {
       ...BREAD_SPECIFIC_VOLUMES,
+      ...CAKE_SPECIFIC_VOLUMES,  // 🆕 제과 비용적 추가
       ...productSettings.breadVolumes,
       // 커스텀 제품 추가
       ...productSettings.customProducts
@@ -357,6 +375,7 @@ const AdvancedDashboard: React.FC = () => {
 
   // 제품 정보
   const [productName, setProductName] = useState(t('advDashboard.defaultRecipeName'));
+  const [productType, setProductType] = useState<'bread' | 'pastry'>('bread');
 
   // 출처 정보
   const [source, setSource] = useState<{
@@ -460,6 +479,9 @@ const AdvancedDashboard: React.FC = () => {
 
       // 레시피 이름 로드
       setProductName(currentRecipe.name || t('advDashboard.defaultRecipeName'));
+
+      // 제품 타입 로드 (기본값: bread)
+      setProductType((currentRecipe as any).productType || 'bread');
 
       // 출처 정보 로드
       if (currentRecipe.source) {
@@ -871,6 +893,11 @@ const AdvancedDashboard: React.FC = () => {
       main: 10, topping: 20, filling: 21, frosting: 22, glaze: 23, other: 99
     };
 
+    // 카테고리 순서 정의 (밀가루 → 수분 → 유지 → 기타)
+    const categoryOrder: Record<string, number> = {
+      flour: 0, liquid: 1, wetOther: 2, other: 3
+    };
+
     // 재료를 단계별로 그룹화
     const grouped = ingredients.reduce((acc, ing) => {
       const phase = ing.phase || 'main';
@@ -881,10 +908,15 @@ const AdvancedDashboard: React.FC = () => {
       return acc;
     }, {} as Record<string, IngredientEntry[]>);
 
-    // 단계 순서대로 정렬하여 배열로 변환
+    // 단계 순서대로 정렬하여 배열로 변환 (각 단계 내에서 카테고리별 정렬)
     const sortedPhases = Object.entries(grouped)
       .sort(([a], [b]) => (phaseOrder[a] ?? 50) - (phaseOrder[b] ?? 50))
-      .map(([phase, items]) => ({ phase, items }));
+      .map(([phase, items]) => ({
+        phase,
+        items: items.sort((a, b) =>
+          (categoryOrder[a.category] ?? 99) - (categoryOrder[b.category] ?? 99)
+        )
+      }));
 
     return sortedPhases;
   }, [ingredients]);
@@ -1018,32 +1050,31 @@ const AdvancedDashboard: React.FC = () => {
   );
 
   // 사전반죽 재료
-  // 핵심: 총 밀가루를 합산 후 단일 항목으로 생성 (중복 방지)
+  // 핵심: 각 밀가루를 개별적으로 처리하여 비율대로 분배
   const prefermentIngredients = useMemo(() => {
     if (!usePreferment || method.type === 'straight') return [];
     const result: any[] = [];
 
-    // 1. 전체 밀가루 총량 계산 (모든 밀가루 합산)
-    const totalFlour = ingredients
-      .filter(i => i.category === 'flour')
-      .reduce((sum, ing) => sum + ing.amount, 0);
+    // 1. 각 밀가루를 개별적으로 처리 (강력분, 옥수수전분 등 각각)
+    const flourItems = ingredients.filter(i => i.category === 'flour');
 
-    if (totalFlour === 0) return [];
+    if (flourItems.length === 0) return [];
 
-    // 2. 사전반죽 밀가루 = 총 밀가루 × flourRatio (단일 항목)
-    const prefermentFlourAmount = Math.round(totalFlour * method.flourRatio * effectiveMultiplier * 10) / 10;
-    if (prefermentFlourAmount > 0) {
-      // 첫 번째 밀가루의 이름 사용 (보통 강력분)
-      const firstFlour = ingredients.find(i => i.category === 'flour');
-      result.push({
-        id: 'pref-flour',
-        name: firstFlour?.name || '강력분',
-        category: 'flour',
-        convertedAmount: prefermentFlourAmount,
-      });
-    }
+    // 2. 각 밀가루에 flourRatio 적용하여 사전반죽 밀가루 생성
+    flourItems.forEach(flour => {
+      const prefermentFlourAmount = Math.round(flour.amount * method.flourRatio * effectiveMultiplier * 10) / 10;
+      if (prefermentFlourAmount > 0) {
+        result.push({
+          id: `pref-${flour.id}`,
+          name: flour.name,
+          category: 'flour',
+          convertedAmount: prefermentFlourAmount,
+        });
+      }
+    });
 
     // 3. 사전반죽 수분 = 사전반죽 밀가루(배수적용전) × waterRatio (단일 항목)
+    const totalFlour = flourItems.reduce((sum, flour) => sum + flour.amount, 0);
     const prefermentFlourBase = totalFlour * method.flourRatio;
     const prefermentWaterAmount = Math.round(prefermentFlourBase * method.waterRatio * effectiveMultiplier * 10) / 10;
     if (prefermentWaterAmount > 0) {
@@ -1108,18 +1139,21 @@ const AdvancedDashboard: React.FC = () => {
     // 사전반죽에 들어간 이스트
     const prefermentYeast = adjustedTotalYeast * prefermentYeastRatio;
 
-    // 3. 본반죽 밀가루 (총량 - 사전반죽) = 단일 항목
-    const mainFlourAmount = Math.round((totalFlour - prefermentFlour) * 10) / 10;
-    if (mainFlourAmount > 0) {
-      const firstFlour = ingredients.find(i => i.category === 'flour');
-      result.push({
-        id: 'main-flour',
-        name: firstFlour?.name || '강력분',
-        category: 'flour',
-        amount: mainFlourAmount,
-        convertedAmount: Math.round(mainFlourAmount * effectiveMultiplier * 10) / 10,
-      });
-    }
+    // 3. 본반죽 밀가루 - 각 밀가루를 개별적으로 처리 (강력분, 옥수수전분 등)
+    const flourItems = ingredients.filter(i => i.category === 'flour');
+    flourItems.forEach(flour => {
+      const prefermentAmount = flour.amount * method.flourRatio;
+      const mainFlourAmount = Math.round((flour.amount - prefermentAmount) * 10) / 10;
+      if (mainFlourAmount > 0) {
+        result.push({
+          id: `main-${flour.id}`,
+          name: flour.name,
+          category: 'flour',
+          amount: mainFlourAmount,
+          convertedAmount: Math.round(mainFlourAmount * effectiveMultiplier * 10) / 10,
+        });
+      }
+    });
 
     // 4. 본반죽 물 (총량 - 사전반죽) = 단일 항목
     const mainWaterAmount = Math.round((totalWater - Math.min(totalWater, prefermentWater)) * 10) / 10;
@@ -1201,23 +1235,27 @@ const AdvancedDashboard: React.FC = () => {
       main: 10, topping: 20, filling: 21, frosting: 22, glaze: 23, other: 99
     };
 
+    // 카테고리 순서 정의 (밀가루 → 수분 → 유지 → 기타)
+    const categoryOrder: Record<string, number> = {
+      flour: 0, liquid: 1, wetOther: 2, other: 3
+    };
+
     // 스트레이트법: 모든 재료를 합산하여 'main' 하나로 통합
     if (!usePreferment || method.type === 'straight') {
       const combinedItems: any[] = [];
 
-      // 밀가루 합산
-      const totalFlour = convertedIngredients
-        .filter(i => i.category === 'flour')
-        .reduce((sum, ing) => sum + ing.convertedAmount, 0);
-      if (totalFlour > 0) {
-        const firstFlour = convertedIngredients.find(i => i.category === 'flour');
-        combinedItems.push({
-          id: 'straight-flour',
-          name: firstFlour?.name || '강력분',
-          category: 'flour',
-          convertedAmount: Math.round(totalFlour * 10) / 10,
-        });
-      }
+      // 밀가루 개별 표시 (합산하지 않음 - 강력분, 옥수수전분 등 각각 표시)
+      const flourItems = convertedIngredients.filter(i => i.category === 'flour');
+      flourItems.forEach(flour => {
+        if (flour.convertedAmount > 0) {
+          combinedItems.push({
+            id: `straight-${flour.id}`,
+            name: flour.name,
+            category: 'flour',
+            convertedAmount: Math.round(flour.convertedAmount * 10) / 10,
+          });
+        }
+      });
 
       // 수분 합산 (물 / 우유 / 기타 각각)
       const liquidNames = [...new Set(convertedIngredients.filter(i => i.category === 'liquid').map(i => i.name))];
@@ -1252,6 +1290,11 @@ const AdvancedDashboard: React.FC = () => {
         }
       });
 
+      // 카테고리별로 정렬
+      combinedItems.sort((a, b) =>
+        (categoryOrder[a.category] ?? 99) - (categoryOrder[b.category] ?? 99)
+      );
+
       return [{ phase: 'main', items: combinedItems }];
     }
 
@@ -1267,24 +1310,35 @@ const AdvancedDashboard: React.FC = () => {
 
       return Object.entries(grouped)
         .sort(([a], [b]) => (phaseOrder[a] ?? 50) - (phaseOrder[b] ?? 50))
-        .map(([phase, items]) => ({ phase, items }));
+        .map(([phase, items]) => ({
+          phase,
+          items: items.sort((a, b) =>
+            (categoryOrder[a.category] ?? 99) - (categoryOrder[b.category] ?? 99)
+          )
+        }));
     }
 
     // 제법이 다를 때: prefermentIngredients + mainDoughIngredients 사용
     const result: { phase: string; items: any[] }[] = [];
 
     if (prefermentIngredients.length > 0) {
+      const sortedPreferment = [...prefermentIngredients].sort((a, b) =>
+        (categoryOrder[a.category] ?? 99) - (categoryOrder[b.category] ?? 99)
+      );
       result.push({
         phase: method.type,
-        items: prefermentIngredients.map(ing => ({ ...ing, phase: method.type }))
+        items: sortedPreferment.map(ing => ({ ...ing, phase: method.type }))
       });
     }
 
     const mainItems = mainDoughIngredients.filter(ing => (ing.convertedAmount || 0) > 0);
     if (mainItems.length > 0) {
+      const sortedMain = mainItems.sort((a, b) =>
+        (categoryOrder[a.category] ?? 99) - (categoryOrder[b.category] ?? 99)
+      );
       result.push({
         phase: 'main',
-        items: mainItems.map(ing => ({ ...ing, phase: 'main' }))
+        items: sortedMain.map(ing => ({ ...ing, phase: 'main' }))
       });
     }
 
@@ -1492,6 +1546,7 @@ const AdvancedDashboard: React.FC = () => {
     const recipeData = {
       name: productName || t('advDashboard.defaultRecipeName'),
       nameKo: productName,
+      productType: productType,  // 🆕 제품 타입 (제빵/제과)
       category: 'bread' as const,
       difficulty: 'intermediate' as const,
       servings: pans.reduce((s, p) => s + p.quantity, 0),
@@ -1795,7 +1850,7 @@ const AdvancedDashboard: React.FC = () => {
   const addIngredient = useCallback(() => {
     const newOrder = Math.max(...ingredients.map(i => i.order), 0) + 1;
     setIngredients(prev => [...prev, {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,  // ✅ 고유 ID 보장 (타임스탬프 + 랜덤)
       order: newOrder, category: 'other', subCategory: '기타',
       name: '', ratio: 0, amount: 0, note: '',
     }]);
@@ -1886,6 +1941,31 @@ const AdvancedDashboard: React.FC = () => {
             className="text-lg font-bold w-36 border-b border-transparent hover:border-gray-300 focus:border-amber-500 focus:outline-none"
             placeholder={t('advDashboard.productName')}
           />
+          {/* 제품 타입 선택 */}
+          <div className="flex items-center gap-1 border-l pl-3">
+            <button
+              onClick={() => setProductType('bread')}
+              className={`px-3 py-1 text-xs rounded-l ${
+                productType === 'bread'
+                  ? 'bg-amber-500 text-white font-medium'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={t('advDashboard.productTypeBread')}
+            >
+              {t('advDashboard.productTypeBread')}
+            </button>
+            <button
+              onClick={() => setProductType('pastry')}
+              className={`px-3 py-1 text-xs rounded-r ${
+                productType === 'pastry'
+                  ? 'bg-amber-500 text-white font-medium'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={t('advDashboard.productTypePastry')}
+            >
+              {t('advDashboard.productTypePastry')}
+            </button>
+          </div>
           <div className="flex items-center gap-1 text-xs border-l pl-3">
             <select
               value={source.type}
@@ -2232,7 +2312,7 @@ const AdvancedDashboard: React.FC = () => {
             </div>
           </CollapsibleSection>
 
-          {/* 비용적 설정 */}
+          {/* 비용적/비중 설정 */}
           <CollapsibleSection title={t('advDashboard.specificVolume')} icon={<Scale className="w-4 h-4" />} defaultOpen={false} onReset={resetSpecificVolume}>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -2241,7 +2321,12 @@ const AdvancedDashboard: React.FC = () => {
                   className="w-full text-xs border rounded px-2 py-1">
                   {Object.keys(SPECIFIC_VOLUMES).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)}
                 </select>
-                <div className="text-xs text-gray-400 mt-1">{SPECIFIC_VOLUMES[originalProduct]} cm³/g</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {isPastryProduct(originalProduct)
+                    ? `비중: ${CAKE_BATTER_SPECIFIC_GRAVITY[originalProduct]}`
+                    : `비용적: ${SPECIFIC_VOLUMES[originalProduct]} cm³/g`
+                  }
+                </div>
               </div>
               <div>
                 <label className="text-xs text-gray-500 block mb-1">{t('advDashboard.convertedProduct')}</label>
@@ -2249,40 +2334,47 @@ const AdvancedDashboard: React.FC = () => {
                   className="w-full text-xs border rounded px-2 py-1">
                   {Object.keys(SPECIFIC_VOLUMES).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)}
                 </select>
-                <div className="text-xs text-gray-400 mt-1">{SPECIFIC_VOLUMES[convertedProduct]} cm³/g</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {isPastryProduct(convertedProduct)
+                    ? `비중: ${CAKE_BATTER_SPECIFIC_GRAVITY[convertedProduct]}`
+                    : `비용적: ${SPECIFIC_VOLUMES[convertedProduct]} cm³/g`
+                  }
+                </div>
               </div>
             </div>
           </CollapsibleSection>
 
-          {/* 수율 손실 예측 */}
-          <CollapsibleSection
-            title={t('advDashboard.yieldPrediction')}
-            icon={<TrendingDown className="w-4 h-4" />}
-            defaultOpen={false}
-            badge={`${Math.round((1 - 0.19) * totalWeight)}g ${t('advDashboard.expectedYield')}`}
-          >
-            <YieldLossCalculator
-              inputWeight={totalWeight}
-              category={originalProduct === '쉬폰케이크' || originalProduct === '제누와즈' || originalProduct === '파운드케이크' ? 'cake'
-                : originalProduct === '크루아상' || originalProduct === '데니쉬' ? 'pastry'
-                : originalProduct === '쿠키' ? 'cookie'
-                : 'bread'}
-              productType={
-                originalProduct === '풀먼식빵' ? 'pullman'
-                : originalProduct === '산형식빵' ? 'mountain'
-                : originalProduct === '브리오슈' ? 'brioche'
-                : originalProduct === '제누와즈' ? 'genoise'
-                : originalProduct === '쉬폰케이크' ? 'chiffon'
-                : originalProduct === '파운드케이크' ? 'pound'
-                : originalProduct === '크루아상' ? 'croissant'
-                : undefined
-              }
-              stageSelection={yieldStageSelection}
-              onStageSelectionChange={setYieldStageSelection}
-              compact={false}
-              className="border-0 shadow-none"
-            />
-          </CollapsibleSection>
+          {/* 수율 손실 예측 - 제빵 전용 */}
+          {productType === 'bread' && (
+            <CollapsibleSection
+              title={t('advDashboard.yieldPrediction')}
+              icon={<TrendingDown className="w-4 h-4" />}
+              defaultOpen={false}
+              badge={`${Math.round((1 - 0.19) * totalWeight)}g ${t('advDashboard.expectedYield')}`}
+            >
+              <YieldLossCalculator
+                inputWeight={totalWeight}
+                category={originalProduct === '쉬폰케이크' || originalProduct === '제누와즈' || originalProduct === '파운드케이크' ? 'cake'
+                  : originalProduct === '크루아상' || originalProduct === '데니쉬' ? 'pastry'
+                  : originalProduct === '쿠키' ? 'cookie'
+                  : 'bread'}
+                productType={
+                  originalProduct === '풀먼식빵' ? 'pullman'
+                  : originalProduct === '산형식빵' ? 'mountain'
+                  : originalProduct === '브리오슈' ? 'brioche'
+                  : originalProduct === '제누와즈' ? 'genoise'
+                  : originalProduct === '쉬폰케이크' ? 'chiffon'
+                  : originalProduct === '파운드케이크' ? 'pound'
+                  : originalProduct === '크루아상' ? 'croissant'
+                  : undefined
+                }
+                stageSelection={yieldStageSelection}
+                onStageSelectionChange={setYieldStageSelection}
+                compact={false}
+                className="border-0 shadow-none"
+              />
+            </CollapsibleSection>
+          )}
 
           {/* 오븐 설정 */}
           <CollapsibleSection
@@ -2413,54 +2505,56 @@ const AdvancedDashboard: React.FC = () => {
             </div>
           </CollapsibleSection>
 
-          {/* 제법/사전반죽 */}
-          <CollapsibleSection
-            title={t('advDashboard.method')}
-            icon={<Wheat className="w-4 h-4" />}
-            badge={t(METHOD_KEYS[method.type])}
-            badgeColor={method.type === 'straight' ? 'bg-gray-100 text-gray-600' : 'bg-amber-100 text-amber-700'}
-          >
-            <div className="space-y-2">
-              <div className="grid grid-cols-5 gap-1">
-                {Object.entries(METHOD_KEYS).map(([key, labelKey]) => (
-                  <button key={key} onClick={() => handleMethodChange(key)}
-                    className={`px-1.5 py-1 text-xs rounded ${method.type === key ? 'bg-amber-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-                    {t(labelKey)}
-                  </button>
-                ))}
+          {/* 제법/사전반죽 - 제빵 전용 */}
+          {productType === 'bread' && (
+            <CollapsibleSection
+              title={t('advDashboard.method')}
+              icon={<Wheat className="w-4 h-4" />}
+              badge={t(METHOD_KEYS[method.type])}
+              badgeColor={method.type === 'straight' ? 'bg-gray-100 text-gray-600' : 'bg-amber-100 text-amber-700'}
+            >
+              <div className="space-y-2">
+                <div className="grid grid-cols-5 gap-1">
+                  {Object.entries(METHOD_KEYS).map(([key, labelKey]) => (
+                    <button key={key} onClick={() => handleMethodChange(key)}
+                      className={`px-1.5 py-1 text-xs rounded ${method.type === key ? 'bg-amber-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+                      {t(labelKey)}
+                    </button>
+                  ))}
+                </div>
+                {/* 저온발효/저온숙성: 이스트 조정 정보 표시 */}
+                {(method.type === 'coldFerment' || method.type === 'retard') && (
+                  <div className="bg-blue-50 rounded p-2">
+                    <div className="text-xs font-medium text-blue-700 mb-1">
+                      {method.type === 'coldFerment' ? `❄️ ${t('advDashboard.coldFerment')}` : `🌙 ${t('advDashboard.coldRetard')}`}
+                    </div>
+                    <div className="text-xs text-blue-600">
+                      {method.type === 'coldFerment'
+                        ? t('advDashboard.coldFermentDesc', { percent: Math.round(method.yeastAdjustment * 100) })
+                        : t('advDashboard.coldRetardDesc')
+                      }
+                    </div>
+                  </div>
+                )}
+                {/* 사전반죽이 있는 제법만 비율 조정 표시 (coldFerment/retard 제외) */}
+                {method.type !== 'straight' && method.type !== 'coldFerment' && method.type !== 'retard' && (
+                  <div className="bg-amber-50 rounded p-2">
+                    <div className="text-xs font-medium text-amber-700 mb-1.5">{t('advDashboard.prefermentRatio')}</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div><label className="text-xs text-gray-500">{t('advDashboard.flourPercent')}</label>
+                        <input type="number" value={Math.round(method.flourRatio * 100)}
+                          onChange={(e) => setMethod({ ...method, flourRatio: (parseFloat(e.target.value) || 0) / 100 })}
+                          className="w-full text-xs border rounded px-1.5 py-1 text-center" step="10" /></div>
+                      <div><label className="text-xs text-gray-500">{t('advDashboard.waterPercent')}</label>
+                        <input type="number" value={Math.round(method.waterRatio * 100)}
+                          onChange={(e) => setMethod({ ...method, waterRatio: (parseFloat(e.target.value) || 0) / 100 })}
+                          className="w-full text-xs border rounded px-1.5 py-1 text-center" step="10" /></div>
+                    </div>
+                  </div>
+                )}
               </div>
-              {/* 저온발효/저온숙성: 이스트 조정 정보 표시 */}
-              {(method.type === 'coldFerment' || method.type === 'retard') && (
-                <div className="bg-blue-50 rounded p-2">
-                  <div className="text-xs font-medium text-blue-700 mb-1">
-                    {method.type === 'coldFerment' ? `❄️ ${t('advDashboard.coldFerment')}` : `🌙 ${t('advDashboard.coldRetard')}`}
-                  </div>
-                  <div className="text-xs text-blue-600">
-                    {method.type === 'coldFerment'
-                      ? t('advDashboard.coldFermentDesc', { percent: Math.round(method.yeastAdjustment * 100) })
-                      : t('advDashboard.coldRetardDesc')
-                    }
-                  </div>
-                </div>
-              )}
-              {/* 사전반죽이 있는 제법만 비율 조정 표시 (coldFerment/retard 제외) */}
-              {method.type !== 'straight' && method.type !== 'coldFerment' && method.type !== 'retard' && (
-                <div className="bg-amber-50 rounded p-2">
-                  <div className="text-xs font-medium text-amber-700 mb-1.5">{t('advDashboard.prefermentRatio')}</div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div><label className="text-xs text-gray-500">{t('advDashboard.flourPercent')}</label>
-                      <input type="number" value={Math.round(method.flourRatio * 100)}
-                        onChange={(e) => setMethod({ ...method, flourRatio: (parseFloat(e.target.value) || 0) / 100 })}
-                        className="w-full text-xs border rounded px-1.5 py-1 text-center" step="10" /></div>
-                    <div><label className="text-xs text-gray-500">{t('advDashboard.waterPercent')}</label>
-                      <input type="number" value={Math.round(method.waterRatio * 100)}
-                        onChange={(e) => setMethod({ ...method, waterRatio: (parseFloat(e.target.value) || 0) / 100 })}
-                        className="w-full text-xs border rounded px-1.5 py-1 text-center" step="10" /></div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CollapsibleSection>
+            </CollapsibleSection>
+          )}
 
           {/* 레이아웃 초기화 버튼 */}
           <div className="p-2 border-t">

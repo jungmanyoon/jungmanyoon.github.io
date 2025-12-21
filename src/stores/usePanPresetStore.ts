@@ -19,6 +19,7 @@ export interface PanConfig {
 export interface PanPreset {
   id: string
   name: string
+  productType: 'bread' | 'pastry'  // 🆕 제품 타입 (제빵/제과)
   pans: PanConfig[]
   createdAt: Date
   updatedAt: Date
@@ -32,7 +33,7 @@ interface PanPresetStore {
   presets: PanPreset[]
 
   // 프리셋 관리
-  addPreset: (name: string, pans: PanConfig[], notes?: string) => void
+  addPreset: (name: string, pans: PanConfig[], productType: 'bread' | 'pastry', notes?: string) => void
   updatePreset: (id: string, updates: Partial<PanPreset>) => void
   deletePreset: (id: string) => void
   duplicatePreset: (id: string) => void
@@ -48,6 +49,7 @@ interface PanPresetStore {
   getFavorites: () => PanPreset[]
   getRecentlyUsed: (limit?: number) => PanPreset[]
   searchPresets: (query: string) => PanPreset[]
+  getPresetsByProductType: (productType: 'bread' | 'pastry') => PanPreset[]  // 🆕 제품 타입별 필터링
 
   // 태그 관리
   addTag: (id: string, tag: string) => void
@@ -65,10 +67,11 @@ export const usePanPresetStore = create<PanPresetStore>()(
     (set, get) => ({
       presets: [],
 
-      addPreset: (name, pans, notes) => {
+      addPreset: (name, pans, productType, notes) => {
         const newPreset: PanPreset = {
           id: `preset-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           name,
+          productType,  // 🆕 제품 타입 저장
           pans: pans.map(pan => ({
             ...pan,
             id: pan.id || `pan-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -108,6 +111,7 @@ export const usePanPresetStore = create<PanPresetStore>()(
           get().addPreset(
             `${preset.name} (복사)`,
             preset.pans,
+            preset.productType,  // 🆕 제품 타입 유지
             preset.notes
           )
         }
@@ -154,6 +158,10 @@ export const usePanPresetStore = create<PanPresetStore>()(
           preset.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
           preset.notes?.toLowerCase().includes(lowerQuery)
         )
+      },
+
+      getPresetsByProductType: (productType) => {
+        return get().presets.filter(preset => preset.productType === productType)
       },
 
       addTag: (id, tag) => {

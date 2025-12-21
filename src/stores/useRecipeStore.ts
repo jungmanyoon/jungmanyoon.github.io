@@ -160,30 +160,24 @@ export const useRecipeStore = create<RecipeStore>()(
           draftRecipe: state.draftRecipe  // 작성 중인 레시피 자동 저장
         }),
         migrate: (persistedState: any, version: number) => {
+          let state = { ...persistedState }
+
           // v1 -> v2: draftRecipe 필드 추가
           if (version === 0 || version === 1) {
-            return {
-              ...persistedState,
-              draftRecipe: persistedState.draftRecipe || null
-            }
+            state.draftRecipe = state.draftRecipe || null
           }
 
           // v2 -> v3: 제과 샘플 레시피 자동 추가
-          if (version === 2) {
-            const existingRecipes = persistedState.recipes || []
-            const hasPastryRecipes = existingRecipes.some((r: any) => r.productType === 'pastry')
+          // version 3인 경우에도 제과 레시피가 없으면 추가
+          const existingRecipes = state.recipes || []
+          const hasPastryRecipes = existingRecipes.some((r: any) => r.productType === 'pastry')
 
-            // 제과 레시피가 없으면 sampleRecipes에서 제과만 추가
-            if (!hasPastryRecipes) {
-              const pastryRecipes = sampleRecipes.filter((r: any) => r.productType === 'pastry')
-              return {
-                ...persistedState,
-                recipes: [...existingRecipes, ...pastryRecipes]
-              }
-            }
+          if (!hasPastryRecipes) {
+            const pastryRecipes = sampleRecipes.filter((r: any) => r.productType === 'pastry')
+            state.recipes = [...existingRecipes, ...pastryRecipes]
           }
 
-          return persistedState
+          return state
         }
       }
     ),

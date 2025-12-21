@@ -152,11 +152,23 @@ export const useRecipeStore = create<RecipeStore>()(
       }),
       {
         name: 'recipe-store',
+        version: 2,
         partialize: (state) => ({
           recipes: state.recipes,
           filters: state.filters,
-          sortBy: state.sortBy
-        })
+          sortBy: state.sortBy,
+          draftRecipe: state.draftRecipe  // 작성 중인 레시피 자동 저장
+        }),
+        migrate: (persistedState: any, version: number) => {
+          // v1 -> v2: draftRecipe 필드 추가
+          if (version === 0 || version === 1) {
+            return {
+              ...persistedState,
+              draftRecipe: persistedState.draftRecipe || null
+            }
+          }
+          return persistedState
+        }
       }
     ),
     {

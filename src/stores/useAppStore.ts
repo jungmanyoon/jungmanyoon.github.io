@@ -139,10 +139,22 @@ export const useAppStore = create<AppStore>()(
       }),
       {
         name: 'app-store',
+        version: 2,
         partialize: (state) => ({
           userPreferences: state.userPreferences,
           history: state.history
-        })
+        }),
+        migrate: (persistedState: any, version: number) => {
+          // v1 -> v2: 기존 데이터 구조 유지 (향후 마이그레이션 준비)
+          if (version === 0 || version === 1) {
+            return {
+              ...persistedState,
+              userPreferences: persistedState.userPreferences || initialPreferences,
+              history: persistedState.history || []
+            }
+          }
+          return persistedState
+        }
       }
     ),
     {

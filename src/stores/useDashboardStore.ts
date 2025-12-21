@@ -309,12 +309,28 @@ export const useDashboardStore = create<DashboardStore>()(
       }),
       {
         name: 'dashboard-store',
+        version: 2,
         partialize: (state) => ({
           selectorPanelState: state.selectorPanelState,
           toolsPanelState: state.toolsPanelState,
           isPreviewEnabled: state.isPreviewEnabled,
           activeToolTab: state.activeToolTab,
+          history: state.history,  // 변환 히스토리 저장 추가
         }),
+        migrate: (persistedState: any, version: number) => {
+          // v1 -> v2: history 저장 추가
+          if (version === 0 || version === 1) {
+            return {
+              ...persistedState,
+              selectorPanelState: persistedState.selectorPanelState || 'expanded',
+              toolsPanelState: persistedState.toolsPanelState || 'expanded',
+              isPreviewEnabled: persistedState.isPreviewEnabled !== undefined ? persistedState.isPreviewEnabled : true,
+              activeToolTab: persistedState.activeToolTab || 'pan',
+              history: persistedState.history || []
+            }
+          }
+          return persistedState
+        }
       }
     ),
     { name: 'DashboardStore' }

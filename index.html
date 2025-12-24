@@ -83,36 +83,293 @@
         "inLanguage": ["ko", "en"]
     }
     </script>
-  <script type="module" crossorigin src="/assets/js/index-Ckm79zKC.js"></script>
+  <script type="module" crossorigin src="/assets/js/index-k6Url9Mi.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-DzzPhVLl.css">
 <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
 <body>
-    <div id="root"></div>
+    <!-- SEO: 정적 콘텐츠 (React 마운트 전 Google 크롤러가 볼 수 있음) -->
+    <div id="root">
+        <div id="static-content" style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            <!-- 헤더 -->
+            <header style="background: linear-gradient(135deg, #d97706, #ea580c); color: white; padding: 40px 20px; border-radius: 12px; margin-bottom: 30px; text-align: center;">
+                <h1 style="font-size: 2.5rem; margin: 0 0 10px 0;">🍞 레시피북</h1>
+                <p style="font-size: 1.2rem; margin: 0; opacity: 0.9;">제과제빵 전문가를 위한 무료 레시피 변환 도구</p>
+            </header>
 
-    <!-- SEO: 검색엔진을 위한 정적 콘텐츠 (JavaScript 로딩 전 표시) -->
+            <!-- 소개 섹션 -->
+            <section style="background: #fffbeb; padding: 30px; border-radius: 12px; margin-bottom: 30px;">
+                <h2 style="color: #92400e; margin-top: 0;">레시피북 소개</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8; color: #78350f;">
+                    레시피북은 전문 제빵사, 제과사, 그리고 홈베이커를 위한 <strong>무료 온라인 레시피 변환 도구</strong>입니다.
+                    복잡한 베이커스 퍼센트 계산, DDT(반죽 목표 온도) 계산, 팬 크기별 레시피 스케일링을 자동으로 처리하여
+                    베이킹 작업을 더욱 효율적으로 만들어 드립니다. 별도의 설치 없이 웹 브라우저에서 바로 사용할 수 있으며,
+                    모든 기능이 완전히 무료로 제공됩니다.
+                </p>
+            </section>
+
+            <!-- 주요 기능 -->
+            <section style="margin-bottom: 30px;">
+                <h2 style="color: #92400e; border-bottom: 2px solid #fbbf24; padding-bottom: 10px;">주요 기능</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h3 style="color: #d97706; margin-top: 0;">📊 베이커스 퍼센트 계산</h3>
+                        <p style="color: #666; line-height: 1.7;">
+                            모든 재료를 밀가루 중량 대비 백분율로 자동 변환합니다. 베이커스 퍼센트는 제빵 업계의 표준 레시피 표기법으로,
+                            어떤 양의 빵을 만들든 일관된 결과를 얻을 수 있게 해줍니다. 레시피북은 그램, 온스, 파운드 등
+                            다양한 단위를 지원하며 자동으로 변환해 드립니다.
+                        </p>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h3 style="color: #d97706; margin-top: 0;">🌡️ DDT 계산기</h3>
+                        <p style="color: #666; line-height: 1.7;">
+                            DDT(Desired Dough Temperature, 목표 반죽 온도)는 발효에 매우 중요합니다.
+                            레시피북의 DDT 계산기는 실내 온도, 밀가루 온도, 마찰 계수를 고려하여
+                            최적의 물 온도를 자동으로 계산합니다. 일정한 반죽 온도를 유지하면
+                            발효 시간을 예측할 수 있고, 더 일관된 빵을 만들 수 있습니다.
+                        </p>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h3 style="color: #d97706; margin-top: 0;">📐 팬 크기 스케일링</h3>
+                        <p style="color: #666; line-height: 1.7;">
+                            다양한 팬 크기에 맞춰 레시피를 자동으로 조정합니다. 식빵틀, 파운드케이크 틀,
+                            원형 케이크 팬, 정사각 팬 등 다양한 형태와 크기를 지원합니다.
+                            비용적(제빵)과 비중(제과)을 고려한 정확한 계산으로
+                            팬 크기가 달라도 완벽한 결과물을 만들 수 있습니다.
+                        </p>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h3 style="color: #d97706; margin-top: 0;">🔄 제법 변환</h3>
+                        <p style="color: #666; line-height: 1.7;">
+                            직접법(스트레이트법), 스펀지법, 폴리시(Poolish), 비가(Biga), 오버나이트법,
+                            사워도우 등 다양한 제빵 제법 간 변환을 지원합니다.
+                            각 제법의 특성을 고려하여 발효종 비율, 수화율, 발효 시간 등을
+                            자동으로 조정해 드립니다.
+                        </p>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h3 style="color: #d97706; margin-top: 0;">🌤️ 환경 보정</h3>
+                        <p style="color: #666; line-height: 1.7;">
+                            온도, 습도, 고도에 따라 레시피를 자동으로 보정합니다.
+                            여름철 고온다습한 환경이나 고지대에서 베이킹할 때도
+                            최적의 결과를 얻을 수 있도록 수분량, 발효 시간, 오븐 온도 등을
+                            환경에 맞게 조정해 드립니다.
+                        </p>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h3 style="color: #d97706; margin-top: 0;">💾 레시피 저장</h3>
+                        <p style="color: #666; line-height: 1.7;">
+                            변환한 레시피를 저장하고 관리할 수 있습니다.
+                            카테고리별 분류, 검색, 즐겨찾기 기능을 제공하며,
+                            JSON 형식으로 내보내기/가져오기가 가능해
+                            다른 기기에서도 레시피를 사용할 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 사용 가이드 -->
+            <section style="background: #fef3c7; padding: 30px; border-radius: 12px; margin-bottom: 30px;">
+                <h2 style="color: #92400e; margin-top: 0;">사용 가이드</h2>
+
+                <h3 style="color: #b45309;">1. 레시피 입력하기</h3>
+                <p style="color: #78350f; line-height: 1.7;">
+                    대시보드에서 '새 레시피' 버튼을 클릭하거나, 기존 레시피를 불러옵니다.
+                    레시피 이름, 카테고리(빵/케이크/페이스트리 등), 난이도를 선택하고,
+                    재료를 하나씩 추가합니다. 각 재료의 이름과 양(그램)을 입력하면
+                    베이커스 퍼센트가 자동으로 계산됩니다.
+                </p>
+
+                <h3 style="color: #b45309;">2. 레시피 변환하기</h3>
+                <p style="color: #78350f; line-height: 1.7;">
+                    원하는 변환 옵션을 선택합니다. 총 반죽량 변경, 팬 크기 변경, 제법 변환 등
+                    다양한 변환이 가능합니다. '변환' 버튼을 클릭하면 모든 재료가
+                    새로운 비율에 맞게 자동으로 조정됩니다.
+                </p>
+
+                <h3 style="color: #b45309;">3. DDT 계산하기</h3>
+                <p style="color: #78350f; line-height: 1.7;">
+                    DDT 계산기 탭에서 목표 반죽 온도, 현재 실내 온도, 밀가루 온도를 입력합니다.
+                    믹서 사용 여부와 믹싱 시간에 따른 마찰 계수를 선택하면
+                    필요한 물 온도가 자동으로 계산됩니다.
+                </p>
+
+                <h3 style="color: #b45309;">4. 레시피 저장 및 공유</h3>
+                <p style="color: #78350f; line-height: 1.7;">
+                    변환된 레시피를 저장하고 언제든지 다시 불러올 수 있습니다.
+                    JSON 파일로 내보내기하여 다른 사람과 공유하거나,
+                    다른 기기에서 가져오기할 수 있습니다.
+                </p>
+            </section>
+
+            <!-- 베이킹 팁 -->
+            <section style="margin-bottom: 30px;">
+                <h2 style="color: #92400e; border-bottom: 2px solid #fbbf24; padding-bottom: 10px;">베이킹 팁</h2>
+
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 20px;">
+                    <h3 style="color: #d97706; margin-top: 0;">베이커스 퍼센트란?</h3>
+                    <p style="color: #666; line-height: 1.7;">
+                        베이커스 퍼센트(Baker's Percentage)는 제빵에서 사용하는 표준 레시피 표기법입니다.
+                        밀가루의 양을 100%로 기준 삼고, 다른 모든 재료를 밀가루 대비 백분율로 표시합니다.
+                        예를 들어, 밀가루 1000g에 물 650g을 사용하면 수화율은 65%입니다.
+                        이 방식의 장점은 레시피를 어떤 양으로 스케일링해도 재료 비율이 일정하게 유지된다는 것입니다.
+                        전 세계 제빵사들이 이 방식을 사용하므로, 해외 레시피도 쉽게 이해하고 적용할 수 있습니다.
+                    </p>
+                </div>
+
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 20px;">
+                    <h3 style="color: #d97706; margin-top: 0;">DDT의 중요성</h3>
+                    <p style="color: #666; line-height: 1.7;">
+                        DDT(Desired Dough Temperature)는 반죽을 완성했을 때의 목표 온도입니다.
+                        일반적으로 24-27°C가 이상적이며, 이 온도에서 효모가 가장 활발하게 활동합니다.
+                        반죽 온도가 너무 높으면 과발효되고, 너무 낮으면 발효가 느려집니다.
+                        물 온도를 조절하여 DDT를 맞추면 계절이나 환경에 관계없이 일정한 발효 시간을 유지할 수 있습니다.
+                        레시피북의 DDT 계산기는 실내 온도, 밀가루 온도, 믹싱 마찰열을 모두 고려하여
+                        최적의 물 온도를 계산해 드립니다.
+                    </p>
+                </div>
+
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 20px;">
+                    <h3 style="color: #d97706; margin-top: 0;">다양한 제법의 특징</h3>
+                    <p style="color: #666; line-height: 1.7;">
+                        <strong>직접법(스트레이트법):</strong> 모든 재료를 한 번에 믹싱하는 가장 기본적인 방법입니다.
+                        작업 시간이 짧지만 풍미가 단순할 수 있습니다.<br><br>
+                        <strong>스펀지법:</strong> 밀가루, 물, 효모로 먼저 스펀지를 만들어 발효시킨 후 나머지 재료를 넣습니다.
+                        풍미가 깊고 부드러운 식감을 얻을 수 있습니다.<br><br>
+                        <strong>폴리시(Poolish):</strong> 밀가루와 물을 1:1 비율로 섞어 만드는 액종입니다.
+                        프랑스 바게트에 많이 사용되며, 크러스트가 바삭해집니다.<br><br>
+                        <strong>비가(Biga):</strong> 이탈리아 전통 발효종으로, 수화율이 낮은 것이 특징입니다.
+                        치아바타 등 이탈리아 빵에 사용되며, 큰 기공과 쫄깃한 식감을 만듭니다.<br><br>
+                        <strong>사워도우:</strong> 천연 효모와 유산균으로 발효시키는 방법입니다.
+                        특유의 신맛과 복합적인 풍미가 특징이며, 소화가 잘 되고 영양가가 높습니다.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 지원 제품 목록 -->
+            <section style="background: #f0fdf4; padding: 30px; border-radius: 12px; margin-bottom: 30px;">
+                <h2 style="color: #166534; margin-top: 0;">지원하는 제품 유형</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <div>
+                        <h3 style="color: #15803d; font-size: 1.1rem;">🍞 제빵 (Bread)</h3>
+                        <ul style="color: #166534; line-height: 1.8;">
+                            <li>산형식빵, 풀먼식빵</li>
+                            <li>바게트, 캄파뉴</li>
+                            <li>치아바타, 포카치아</li>
+                            <li>브리오슈, 크루아상</li>
+                            <li>베이글, 프레첼</li>
+                            <li>호밀빵, 통밀빵</li>
+                            <li>단팥빵, 소보로빵</li>
+                            <li>모닝빵, 버터롤</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #15803d; font-size: 1.1rem;">🎂 제과 (Pastry)</h3>
+                        <ul style="color: #166534; line-height: 1.8;">
+                            <li>스펀지케이크, 시폰케이크</li>
+                            <li>파운드케이크, 버터케이크</li>
+                            <li>치즈케이크, 무스케이크</li>
+                            <li>롤케이크, 쉬폰롤</li>
+                            <li>마카롱, 다쿠아즈</li>
+                            <li>타르트, 파이</li>
+                            <li>쿠키, 비스킷</li>
+                            <li>슈크림, 에클레어</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section style="margin-bottom: 30px;">
+                <h2 style="color: #92400e; border-bottom: 2px solid #fbbf24; padding-bottom: 10px;">자주 묻는 질문</h2>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #fbbf24;">
+                    <h4 style="color: #92400e; margin: 0 0 10px 0;">Q: 레시피북은 무료인가요?</h4>
+                    <p style="color: #666; margin: 0; line-height: 1.6;">
+                        네, 레시피북의 모든 기능은 완전히 무료입니다. 회원가입이나 로그인 없이 바로 사용할 수 있습니다.
+                    </p>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #fbbf24;">
+                    <h4 style="color: #92400e; margin: 0 0 10px 0;">Q: 오프라인에서도 사용할 수 있나요?</h4>
+                    <p style="color: #666; margin: 0; line-height: 1.6;">
+                        네, 레시피북은 PWA(Progressive Web App)로 제작되어 처음 방문 후에는 오프라인에서도 사용할 수 있습니다.
+                        모바일 기기에서는 홈 화면에 추가하여 앱처럼 사용할 수 있습니다.
+                    </p>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #fbbf24;">
+                    <h4 style="color: #92400e; margin: 0 0 10px 0;">Q: 저장한 레시피는 어디에 보관되나요?</h4>
+                    <p style="color: #666; margin: 0; line-height: 1.6;">
+                        레시피는 브라우저의 로컬 저장소에 저장됩니다. 서버에 전송되지 않아 개인정보가 안전하게 보호됩니다.
+                        다른 기기에서 사용하려면 JSON 파일로 내보내기 후 가져오기하면 됩니다.
+                    </p>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #fbbf24;">
+                    <h4 style="color: #92400e; margin: 0 0 10px 0;">Q: 영어로도 사용할 수 있나요?</h4>
+                    <p style="color: #666; margin: 0; line-height: 1.6;">
+                        네, 레시피북은 한국어와 영어를 지원합니다. 설정에서 언어를 변경할 수 있습니다.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 푸터 -->
+            <footer style="background: #1f2937; color: #9ca3af; padding: 30px; border-radius: 12px; text-align: center;">
+                <p style="margin: 0 0 10px 0;">© 2024 레시피북. 모든 제과제빵인을 위한 무료 도구입니다.</p>
+                <p style="margin: 0; font-size: 0.9rem;">문의: jmyoon0702@gmail.com</p>
+            </footer>
+
+            <!-- 로딩 표시 -->
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <p>애플리케이션을 불러오는 중입니다...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEO: JavaScript 비활성화 시 표시되는 콘텐츠 -->
     <noscript>
-        <div style="max-width: 800px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
-            <h1>레시피북 - 제과제빵 레시피 변환기</h1>
-            <p>무료 제과제빵 레시피 변환 웹 애플리케이션입니다.</p>
-
-            <h2>주요 기능</h2>
-            <ul>
-                <li><strong>베이커스 퍼센트 계산</strong> - 모든 재료를 밀가루 대비 백분율로 자동 변환</li>
-                <li><strong>DDT 계산기</strong> - 목표 반죽 온도를 위한 물 온도 자동 계산</li>
-                <li><strong>팬 크기 조정</strong> - 다양한 팬 크기에 맞춰 레시피 자동 스케일링</li>
-                <li><strong>제법 변환</strong> - 직접법, 스펀지법, 폴리시, 비가, 오버나이트 등</li>
-                <li><strong>환경 보정</strong> - 온도, 습도, 고도에 따른 레시피 자동 보정</li>
-            </ul>
-
-            <h2>사용 대상</h2>
-            <p>전문 제빵사, 제과사, 홈베이커, 베이킹 입문자 등 모든 분들이 무료로 사용할 수 있습니다.</p>
-
-            <p>이 애플리케이션을 사용하려면 JavaScript를 활성화해 주세요.</p>
-
-            <h2>문의</h2>
-            <p>이메일: jmyoon0702@gmail.com</p>
+        <style>
+            #static-content { display: block !important; }
+        </style>
+        <div style="max-width: 800px; margin: 40px auto; padding: 20px; font-family: sans-serif; background: #fef3c7; border-radius: 12px;">
+            <h2 style="color: #92400e;">JavaScript가 비활성화되어 있습니다</h2>
+            <p style="color: #78350f; line-height: 1.7;">
+                레시피북의 모든 기능을 사용하려면 JavaScript를 활성화해 주세요.
+                위의 정적 콘텐츠에서 레시피북의 기능과 사용법에 대한 정보를 확인하실 수 있습니다.
+            </p>
+            <p style="color: #78350f;">
+                <strong>JavaScript 활성화 방법:</strong><br>
+                Chrome: 설정 → 개인정보 및 보안 → 사이트 설정 → JavaScript → 허용<br>
+                Firefox: about:config → javascript.enabled → true<br>
+                Safari: 환경설정 → 보안 → JavaScript 활성화
+            </p>
         </div>
     </noscript>
 
+
+    <!-- React 마운트 후 정적 콘텐츠 숨김 -->
+    <script>
+        // React가 마운트되면 정적 콘텐츠를 숨김
+        window.addEventListener('DOMContentLoaded', function() {
+            var checkReact = setInterval(function() {
+                var root = document.getElementById('root');
+                if (root && root.children.length > 0 && !root.querySelector('#static-content')) {
+                    // React가 마운트됨
+                    clearInterval(checkReact);
+                } else if (root && root.querySelector('#static-content')) {
+                    // 아직 정적 콘텐츠가 있음 - React가 마운트되면 자동으로 교체됨
+                }
+            }, 100);
+            // 10초 후 체크 중단
+            setTimeout(function() { clearInterval(checkReact); }, 10000);
+        });
+    </script>
 </body>
 </html>

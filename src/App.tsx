@@ -12,11 +12,24 @@ import { ToastContainer } from '@components/common/ToastContainer'
 import { useRecipeStore } from '@stores/useRecipeStore'
 import { useAutoSave } from '@/hooks/useAutoSave'
 
-// 로딩 스피너 컴포넌트
+// 로딩 스피너 컴포넌트 (SEO를 위한 텍스트 콘텐츠 포함)
 function LoadingSpinner() {
     return (
-        <div className="flex items-center justify-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bread-600"></div>
+        <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bread-600 mb-6"></div>
+            <p className="text-gray-600 text-lg mb-4">레시피북을 불러오는 중...</p>
+            {/* SEO: 검색엔진이 볼 수 있는 콘텐츠 */}
+            <div className="text-gray-500 text-sm text-center max-w-md">
+                <p className="mb-2">
+                    레시피북은 제과제빵 전문가와 홈베이커를 위한 무료 레시피 변환 도구입니다.
+                </p>
+                <p className="mb-2">
+                    베이커스 퍼센트 계산, DDT(반죽 목표 온도) 계산, 팬 크기별 레시피 스케일링을 지원합니다.
+                </p>
+                <p>
+                    직접법, 스펀지법, 폴리시, 비가 등 다양한 제법 간 변환이 가능합니다.
+                </p>
+            </div>
         </div>
     )
 }

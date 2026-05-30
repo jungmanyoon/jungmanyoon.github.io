@@ -456,6 +456,27 @@ const AdvancedDashboard: React.FC = () => {
   // 현재 편집 중인 공정 ID (편집 중일 때는 원본 표시, 아닐 때는 번역 표시)
   const [editingProcessId, setEditingProcessId] = useState<string | null>(null);
 
+  // 데스크톱(lg, 1024px+) 여부 추적
+  // 사이드바/공정 패널의 인라인 고정폭/높이(style)는 모바일에서 가로 스크롤을 유발하므로
+  // lg 이상에서만 인라인 style을 적용하고, 모바일에서는 Tailwind 반응형 클래스(w-full 등)에 맡긴다.
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : true
+  );
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mql = window.matchMedia('(min-width: 1024px)');
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    // 초기 동기화 + 변경 구독 (구형 Safari 호환 위해 addListener 폴백)
+    setIsDesktop(mql.matches);
+    if (mql.addEventListener) {
+      mql.addEventListener('change', handler);
+      return () => mql.removeEventListener('change', handler);
+    } else {
+      mql.addListener(handler);
+      return () => mql.removeListener(handler);
+    }
+  }, []);
+
   // 수율 예측 공정 선택 상태
   const [yieldStageSelection, setYieldStageSelection] = useState<ProcessStageSelection>({
     ...DEFAULT_STAGE_SELECTION
@@ -2025,24 +2046,26 @@ const AdvancedDashboard: React.FC = () => {
   // ============================================
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100 text-sm">
+    // 모바일: 세로 스택으로 흐르며 자연 스크롤 허용(min-h-screen) / 데스크톱(lg): 기존 고정 h-screen 보존
+    <div className="min-h-screen lg:h-screen flex flex-col bg-gray-100 text-sm">
       {/* ===== 상단 헤더 ===== */}
-      <div className="bg-white border-b shadow-sm px-4 py-2 flex items-center justify-between gap-4 flex-shrink-0">
-        {/* 좌측: 제품 정보 + 출처 */}
-        <div className="flex items-center gap-3">
-          <Cookie className="w-5 h-5 text-amber-600" />
+      {/* 모바일: 세로 정렬(flex-col)로 컨트롤 줄바꿈 / 데스크톱(lg): 기존 가로 정렬 보존 */}
+      <div className="bg-white border-b shadow-sm px-3 sm:px-4 py-2 flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 flex-shrink-0">
+        {/* 좌측: 제품 정보 + 출처 (모바일: 줄바꿈 허용, 데스크톱: 기존 한 줄) */}
+        <div className="flex items-center flex-wrap gap-2 lg:gap-3">
+          <Cookie className="w-5 h-5 text-amber-600 flex-shrink-0" />
           <input
             type="text"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
-            className="text-lg font-bold w-36 border-b border-transparent hover:border-gray-300 focus:border-amber-500 focus:outline-none"
+            className="text-lg font-bold w-36 min-h-[44px] lg:min-h-0 border-b border-transparent hover:border-gray-300 focus:border-amber-500 focus:outline-none"
             placeholder={t('advDashboard.productName')}
           />
           {/* 제품 타입 선택 */}
           <div className="flex items-center gap-1 border-l pl-3">
             <button
               onClick={() => setProductType('bread')}
-              className={`px-3 py-1 text-xs rounded-l ${
+              className={`px-3 py-1 min-h-[44px] lg:min-h-0 text-xs rounded-l ${
                 productType === 'bread'
                   ? 'bg-amber-500 text-white font-medium'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -2053,7 +2076,7 @@ const AdvancedDashboard: React.FC = () => {
             </button>
             <button
               onClick={() => setProductType('pastry')}
-              className={`px-3 py-1 text-xs rounded-r ${
+              className={`px-3 py-1 min-h-[44px] lg:min-h-0 text-xs rounded-r ${
                 productType === 'pastry'
                   ? 'bg-amber-500 text-white font-medium'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -2089,11 +2112,11 @@ const AdvancedDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* 중앙: 배수 조절 */}
-        <div className="flex items-center gap-3">
+        {/* 중앙: 배수 조절 (모바일: 줄바꿈 허용, 데스크톱: 기존 한 줄) */}
+        <div className="flex items-center flex-wrap gap-2 lg:gap-3">
           <button
             onClick={() => setIsPanLinked(!isPanLinked)}
-            className={`p-1.5 rounded flex items-center gap-1 ${isPanLinked ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}
+            className={`p-1.5 min-h-[44px] lg:min-h-0 rounded flex items-center gap-1 ${isPanLinked ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}
             title={isPanLinked ? t('advDashboard.multiplierLinked') : t('advDashboard.multiplierUnlinked')}
           >
             {isPanLinked ? <Link className="w-4 h-4" /> : <Unlink className="w-4 h-4" />}
@@ -2134,7 +2157,7 @@ const AdvancedDashboard: React.FC = () => {
                 <button
                   key={m}
                   onClick={() => handleQuickMultiplier(m)}
-                  className={`px-1.5 py-0.5 text-xs rounded transition-colors ${
+                  className={`px-2.5 py-1.5 lg:px-1.5 lg:py-0.5 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${
                     multiplier === m
                       ? 'bg-amber-500 text-white'
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -2147,9 +2170,9 @@ const AdvancedDashboard: React.FC = () => {
           )}
         </div>
 
-        {/* 우측: 요약 + 액션 */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded">
+        {/* 우측: 요약 + 액션 (모바일: 줄바꿈 허용, 데스크톱: 기존 한 줄) */}
+        <div className="flex items-center flex-wrap gap-2 lg:gap-4">
+          <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded">
             <span>{t('advDashboard.original')}:<b className="text-gray-700 ml-1">{totalWeight}g</b></span>
             <span className="text-gray-300">→</span>
             <span>{t('advDashboard.converted')}:<b className="text-blue-600 ml-1">{convertedTotal}g</b></span>
@@ -2160,31 +2183,31 @@ const AdvancedDashboard: React.FC = () => {
             <span className="text-gray-300">|</span>
             <span>{t('advDashboard.lossRate')}:<b className={`ml-1 ${lossRate > 100 ? 'text-red-500' : lossRate < 95 ? 'text-orange-500' : 'text-green-600'}`}>{lossRate}%</b></span>
           </div>
-          <div className="flex gap-1.5">
+          <div className="flex flex-wrap gap-1.5">
             <button
               onClick={resetAllConversion}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 border border-gray-300"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 border border-gray-300"
               title={t('advDashboard.resetConversion')}
             >
               <RotateCcw className="w-4 h-4" />{t('advDashboard.reset')}
             </button>
             <button
               onClick={handleSaveRecipe}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-amber-500 text-white rounded hover:bg-amber-600"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-amber-500 text-white rounded hover:bg-amber-600"
               title={t('advDashboard.saveRecipe')}
             >
               <Save className="w-4 h-4" />{t('advDashboard.save')}
             </button>
             <button
               onClick={handleCopyAsText}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
               title={t('advDashboard.copyAsText')}
             >
               <Copy className="w-4 h-4" />{t('advDashboard.copy')}
             </button>
             <button
               onClick={handleExportRecipe}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-200 rounded hover:bg-gray-300"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-gray-200 rounded hover:bg-gray-300"
               title={t('advDashboard.exportJson')}
             >
               <FileText className="w-4 h-4" />{t('advDashboard.json')}
@@ -2194,11 +2217,13 @@ const AdvancedDashboard: React.FC = () => {
       </div>
 
       {/* ===== 메인 콘텐츠 ===== */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* 모바일: 세로 스택(flex-col)으로 사이드바→본문 순서 흐름 / 데스크톱(lg): 기존 가로 분할 보존 */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-visible lg:overflow-hidden">
         {/* ===== 좌측 사이드바 (리사이즈 가능) ===== */}
+        {/* 모바일: 전체 너비(w-full)로 상단 배치 / 데스크톱(lg): 인라인 고정폭 적용 (isDesktop일 때만 width 지정해 가로 스크롤 방지) */}
         <div
-          className="bg-white border-r flex-shrink-0 overflow-y-auto"
-          style={{ width: layoutSettings.sidebarWidth }}
+          className="bg-white border-r flex-shrink-0 w-full lg:w-auto overflow-y-auto"
+          style={isDesktop ? { width: layoutSettings.sidebarWidth } : undefined}
         >
 
           {/* 팬/틀 설정 */}
@@ -2677,27 +2702,31 @@ const AdvancedDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* 사이드바 리사이즈 핸들 */}
-        <ResizeHandle
-          direction="horizontal"
-          onResize={(delta) => setSidebarWidth(layoutSettings.sidebarWidth + delta)}
-          className="hover:bg-blue-100"
-        />
+        {/* 사이드바 리사이즈 핸들 (모바일 세로 스택에서는 의미 없어 숨김 / 데스크톱만 표시) */}
+        <div className="hidden lg:block">
+          <ResizeHandle
+            direction="horizontal"
+            onResize={(delta) => setSidebarWidth(layoutSettings.sidebarWidth + delta)}
+            className="hover:bg-blue-100"
+          />
+        </div>
 
         {/* ===== 중앙: 레시피 테이블 (컴팩트) ===== */}
-        <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+        <div className="flex-1 flex flex-col overflow-visible lg:overflow-hidden min-h-0">
           <div className="flex-1 overflow-auto p-1 min-h-0">
-            <div className="grid gap-1 h-full grid-cols-2">
+            {/* 모바일: 원본/변환을 세로 스택(grid-cols-1)으로 가로 스크롤 방지 / 데스크톱(lg): 기존 2열 나란히 보존 */}
+            <div className="grid gap-1 h-full grid-cols-1 lg:grid-cols-2">
 
               {/* 원래 레시피 */}
               <div className="bg-white rounded shadow-sm border flex flex-col overflow-hidden min-w-0">
-                <div className="bg-gray-50 border-b px-2 py-0.5 flex items-center justify-between flex-shrink-0">
-                  <span className="font-semibold text-gray-700 flex items-center gap-1 text-[11px]">
-                    <Droplets className="w-3 h-3" />{t('advDashboard.originalRecipe')}
+                <div className="bg-gray-50 border-b px-2 py-1 flex items-center justify-between flex-shrink-0 gap-2">
+                  <span className="font-semibold text-gray-700 flex items-center gap-1 text-xs">
+                    <Droplets className="w-3 h-3 flex-shrink-0" />{t('advDashboard.originalRecipe')}
                   </span>
                   <div className="flex gap-2">
-                    <button onClick={() => setIsBulkInputOpen(true)} className="text-[10px] text-blue-600 hover:text-blue-700 font-medium">📋 {t('advDashboard.bulkInput')}</button>
-                    <button onClick={addIngredient} className="text-[10px] text-amber-600 hover:text-amber-700 font-medium">{t('advDashboard.addIngredient')}</button>
+                    {/* 가독 최소치 text-xs로 상향 + 모바일 터치영역(py) 확보 */}
+                    <button onClick={() => setIsBulkInputOpen(true)} className="text-xs text-blue-600 hover:text-blue-700 font-medium py-1.5 lg:py-0">📋 {t('advDashboard.bulkInput')}</button>
+                    <button onClick={addIngredient} className="text-xs text-amber-600 hover:text-amber-700 font-medium py-1.5 lg:py-0">{t('advDashboard.addIngredient')}</button>
                   </div>
                 </div>
                 <div className="flex-1 overflow-auto">
@@ -2724,7 +2753,7 @@ const AdvancedDashboard: React.FC = () => {
                                   <span className="flex items-center gap-1">
                                     <span>{phaseMeta.icon}</span>
                                     <span>{t(phaseMeta.labelKey)}</span>
-                                    <span className="text-[10px] font-normal opacity-60">({t('advDashboard.itemCount', { count: items.length })})</span>
+                                    <span className="text-xs font-normal opacity-70">({t('advDashboard.itemCount', { count: items.length })})</span>
                                   </span>
                                 </td>
                               </tr>
@@ -2805,18 +2834,18 @@ const AdvancedDashboard: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
-                <div className="bg-gray-50 border-t px-2 py-0.5 text-[11px] flex-shrink-0">
+                <div className="bg-gray-50 border-t px-2 py-1 text-xs flex-shrink-0">
                   <span>{t('advDashboard.total')}: <b>{totalWeight}g</b></span>
                 </div>
               </div>
 
               {/* 변환 레시피 (단계별 구분선 포함) */}
               <div className="bg-white rounded shadow-sm border border-blue-200 flex flex-col overflow-hidden min-w-0">
-                <div className="bg-blue-50 border-b border-blue-200 px-2 py-0.5 flex items-center justify-between flex-shrink-0">
-                  <span className="font-semibold text-blue-700 flex items-center gap-1 text-[11px]">
-                    <ThermometerSun className="w-3 h-3" />{t('advDashboard.convertedRecipe')}
+                <div className="bg-blue-50 border-b border-blue-200 px-2 py-1 flex items-center justify-between flex-shrink-0 gap-2">
+                  <span className="font-semibold text-blue-700 flex items-center gap-1 text-xs">
+                    <ThermometerSun className="w-3 h-3 flex-shrink-0" />{t('advDashboard.convertedRecipe')}
                   </span>
-                  {effectiveMultiplier !== 1 && <span className="text-[9px] bg-blue-200 text-blue-700 px-1 py-0.5 rounded font-medium">×{effectiveMultiplier}</span>}
+                  {effectiveMultiplier !== 1 && <span className="text-xs bg-blue-200 text-blue-700 px-1.5 py-0.5 rounded font-medium flex-shrink-0">×{effectiveMultiplier}</span>}
                 </div>
                 <div className="flex-1 overflow-auto">
                   <table className="w-full">
@@ -2839,7 +2868,7 @@ const AdvancedDashboard: React.FC = () => {
                                   <span className="flex items-center gap-1">
                                     <span>{phaseMeta.icon}</span>
                                     <span>{t(phaseMeta.labelKey)}</span>
-                                    <span className="text-[10px] font-normal opacity-60">({t('advDashboard.itemCount', { count: items.length })})</span>
+                                    <span className="text-xs font-normal opacity-70">({t('advDashboard.itemCount', { count: items.length })})</span>
                                   </span>
                                 </td>
                               </tr>
@@ -2861,24 +2890,27 @@ const AdvancedDashboard: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
-                <div className="bg-blue-50 border-t border-blue-200 px-2 py-0.5 text-[11px] flex-shrink-0">
+                <div className="bg-blue-50 border-t border-blue-200 px-2 py-1 text-xs flex-shrink-0">
                   <span className="text-blue-700">{t('advDashboard.total')}: <b>{Math.round(prefermentTotal + mainDoughTotal)}g</b></span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 공정 패널 리사이즈 핸들 */}
-          <ResizeHandle
-            direction="vertical"
-            onResize={(delta) => setProcessPanelHeight(layoutSettings.processPanelHeight - delta)}
-            className="hover:bg-blue-100"
-          />
+          {/* 공정 패널 리사이즈 핸들 (모바일 세로 스택에서는 숨김 / 데스크톱만 표시) */}
+          <div className="hidden lg:block">
+            <ResizeHandle
+              direction="vertical"
+              onResize={(delta) => setProcessPanelHeight(layoutSettings.processPanelHeight - delta)}
+              className="hover:bg-blue-100"
+            />
+          </div>
 
           {/* ===== 하단: 공정 패널 (리사이즈 가능) ===== */}
+          {/* 모바일: 고정 높이 인라인 style 미적용(내용만큼 자연 확장) / 데스크톱(lg): 기존 리사이즈 높이 보존 */}
           <div
             className="bg-white border-t flex-shrink-0 overflow-hidden flex flex-col"
-            style={{ height: layoutSettings.processPanelHeight }}
+            style={isDesktop ? { height: layoutSettings.processPanelHeight } : undefined}
           >
             <div className="bg-gray-50 border-b px-3 py-1 flex items-center justify-between flex-shrink-0">
               <span className="font-semibold text-gray-700 flex items-center gap-1.5 text-sm">
@@ -2919,7 +2951,7 @@ const AdvancedDashboard: React.FC = () => {
                         <ChevronDown className="w-3 h-3" />
                       </button>
                     </div>
-                    <span className="text-gray-400 font-mono text-[11px] w-4 flex-shrink-0">{idx + 1}.</span>
+                    <span className="text-gray-400 font-mono text-xs w-4 flex-shrink-0">{idx + 1}.</span>
                     {editingProcessId === proc.id ? (
                       <textarea
                         value={displayText}
@@ -2940,7 +2972,7 @@ const AdvancedDashboard: React.FC = () => {
                     )}
                     {/* 시간: 값이 있을 때 뱃지 표시 + 삭제 버튼 */}
                     {proc.time ? (
-                      <div className="flex items-center gap-0.5 text-[11px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded group/time">
+                      <div className="flex items-center gap-0.5 text-xs text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded group/time">
                         <Clock className="w-3 h-3 flex-shrink-0" />
                         <input
                           type="number"
@@ -2948,7 +2980,7 @@ const AdvancedDashboard: React.FC = () => {
                           onChange={(e) => updateProcess(proc.id, 'time', parseInt(e.target.value) || 0)}
                           className="w-8 bg-transparent border-0 p-0 text-center focus:outline-none"
                         />
-                        <span className="text-[10px] flex-shrink-0">{t('units.minute')}</span>
+                        <span className="text-xs flex-shrink-0">{t('units.minute')}</span>
                         <button
                           onClick={() => updateProcess(proc.id, 'time', undefined)}
                           className="text-blue-400 hover:text-blue-600 opacity-0 group-hover/time:opacity-100 ml-0.5 flex-shrink-0"
@@ -2968,7 +3000,7 @@ const AdvancedDashboard: React.FC = () => {
                     )}
                     {/* 온도: 값이 있을 때 뱃지 표시 + 삭제 버튼 */}
                     {proc.temp ? (
-                      <div className="flex items-center gap-0.5 text-[11px] text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded group/temp">
+                      <div className="flex items-center gap-0.5 text-xs text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded group/temp">
                         <ThermometerSun className="w-3 h-3 flex-shrink-0" />
                         <input
                           type="number"
@@ -2976,7 +3008,7 @@ const AdvancedDashboard: React.FC = () => {
                           onChange={(e) => updateProcess(proc.id, 'temp', parseInt(e.target.value) || 0)}
                           className="w-8 bg-transparent border-0 p-0 text-center focus:outline-none"
                         />
-                        <span className="text-[10px] flex-shrink-0">{t('units.celsius')}</span>
+                        <span className="text-xs flex-shrink-0">{t('units.celsius')}</span>
                         <button
                           onClick={() => updateProcess(proc.id, 'temp', undefined)}
                           className="text-orange-400 hover:text-orange-600 opacity-0 group-hover/temp:opacity-100 ml-0.5 flex-shrink-0"
@@ -3035,7 +3067,7 @@ const AdvancedDashboard: React.FC = () => {
               <div className="mt-2 pt-2 border-t border-gray-200">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-medium text-gray-500">📌 {t('advDashboard.memo')}</span>
-                  {memo && <span className="text-[10px] text-gray-400">({t('advDashboard.memoCharCount', { count: memo.length })})</span>}
+                  {memo && <span className="text-xs text-gray-500">({t('advDashboard.memoCharCount', { count: memo.length })})</span>}
                 </div>
                 <textarea
                   value={memo}

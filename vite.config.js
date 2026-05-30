@@ -108,17 +108,49 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        // manualChunks: {
-        //   'vendor-react': ['react', 'react-dom'],
-        //   'vendor-ui': ['tailwindcss'],
-        //   'vendor-utils': ['zustand', 'html2canvas'],
-        //   'calculations': [
-        //     './src/utils/calculations/bakersPercentage.ts',
-        //     './src/utils/calculations/ddtCalculator.ts'
-        //   ]
-        // },
+        // 코드 스플리팅: vendor 라이브러리를 용도별 청크로 분리해 메인 청크를 500KB 아래로 유지
+        // 함수형 manualChunks - node_modules 경로 기반으로 안전하게 분리
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return undefined
+          }
+          // React 코어 (react, react-dom, scheduler) - 가장 안정적이고 변경이 드물어 장기 캐싱에 유리
+          if (
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-dom/') ||
+            id.includes('node_modules/scheduler/')
+          ) {
+            return 'react-vendor'
+          }
+          // 상태 관리 + 국제화 (zustand, i18next 계열, react-i18next)
+          if (
+            id.includes('node_modules/zustand/') ||
+            id.includes('node_modules/i18next') ||
+            id.includes('node_modules/react-i18next/')
+          ) {
+            return 'state-i18n'
+          }
+          // html2canvas - 화면 캡처용 대용량 라이브러리, 사용처가 한정적이라 단독 분리
+          if (id.includes('node_modules/html2canvas/')) {
+            return 'html2canvas'
+          }
+          // docx - 문서 생성용 대용량 라이브러리, 내보내기 기능에서만 사용되어 단독 분리
+          if (id.includes('node_modules/docx/')) {
+            return 'docx'
+          }
+          // lucide-react - 아이콘 라이브러리, 별도 청크로 분리
+          if (id.includes('node_modules/lucide-react/')) {
+            return 'icons'
+          }
+          // 그 외 나머지 의존성은 공통 vendor 청크로 묶어 과도한 파편화 방지
+          return 'vendor'
+        },
         chunkFileNames: (chunkInfo) => {
-          const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop() : 'chunk'
+          // facadeModuleId가 없는 vendor 청크는 manualChunks에서 지정한 이름(chunkInfo.name)을 사용
+          // (예: react-vendor, state-i18n, html2canvas) - 캐싱/디버깅 식별성 향상
+          const facadeModuleId = chunkInfo.facadeModuleId
+            ? chunkInfo.facadeModuleId.split('/').pop()
+            : (chunkInfo.name || 'chunk')
           return `assets/js/${facadeModuleId}-[hash].js`
         },
         entryFileNames: 'assets/js/[name]-[hash].js',

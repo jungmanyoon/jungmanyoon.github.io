@@ -150,8 +150,8 @@ const RecipeCard = memo<RecipeCardProps>(({
   // Compact 뷰 렌더링
   if (compact) {
     return (
-      <div 
-        className="bg-white border border-bread-200 rounded-lg p-3 hover:shadow-md hover:border-bread-300 transition-all cursor-pointer"
+      <div
+        className="bg-white border border-bread-200 rounded-lg p-3 hover:shadow-md hover:border-bread-300 active:bg-bread-50 transition-all cursor-pointer"
         onClick={handleSelect}
         role="button"
         tabIndex={0}
@@ -183,7 +183,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             {onEdit && (
               <button
                 onClick={handleEdit}
-                className="text-gray-400 hover:text-bread-600 transition-colors p-1"
+                className="text-gray-400 hover:text-bread-600 transition-colors p-2 -m-1 flex items-center justify-center min-w-[36px] min-h-[36px]"
                 aria-label={t('recipeList.editRecipe')}
                 type="button"
               >
@@ -192,7 +192,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             )}
             <button
               onClick={handleDelete}
-              className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none"
+              className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[36px] min-h-[36px]"
               aria-label={t('recipeList.deleteRecipe')}
               type="button"
             >
@@ -224,8 +224,9 @@ const RecipeCard = memo<RecipeCardProps>(({
       }}
     >
       <div className="flex justify-between items-start mb-2">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-bread-700">
+        <div className="flex-1 min-w-0">
+          {/* 모바일: text-base(16px), 데스크톱: text-lg(18px) 유지 + 긴 이름 줄바꿈 처리 */}
+          <h3 className="text-base sm:text-lg font-semibold text-bread-700 break-words">
             {getLocalizedRecipeName(recipe)}
           </h3>
           {sourceInfo && (
@@ -239,7 +240,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           {onEdit && (
             <button
               onClick={handleEdit}
-              className="text-gray-400 hover:text-bread-600 transition-colors p-1"
+              className="text-gray-400 hover:text-bread-600 transition-colors p-2 -m-1 flex items-center justify-center min-w-[40px] min-h-[40px]"
               aria-label={t('recipeList.editRecipe')}
               type="button"
             >
@@ -248,7 +249,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           )}
           <button
             onClick={handleDelete}
-            className="text-gray-400 hover:text-red-500 transition-colors"
+            className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[40px] min-h-[40px]"
             aria-label={t('recipeList.deleteRecipe')}
             type="button"
           >

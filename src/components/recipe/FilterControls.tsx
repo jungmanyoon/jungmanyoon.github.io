@@ -136,9 +136,10 @@ const FilterControls: React.FC<FilterControlsProps> = ({
     <div
       ref={containerRef}
       onKeyDown={handleDropdownKeyDown}
-      className={`bg-white border border-bread-200 rounded-lg p-4 ${className}`}
+      className={`bg-white border border-bread-200 rounded-lg p-3 sm:p-4 ${className}`}
     >
-      <div className="flex flex-wrap items-center gap-4">
+      {/* 모바일: 세로 스택(flex-col), 데스크톱: 가로 정렬(sm:flex-row) 유지 */}
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4">
         {/* Filter Icon and Title */}
         <div className="flex items-center gap-2 text-bread-700 font-medium">
           <Filter className="w-5 h-5" />
@@ -150,7 +151,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           )}
         </div>
 
-        <div className="flex-1 flex flex-wrap items-center gap-3">
+        {/* 모바일: 필터 버튼이 가로로 넘치지 않게 flex-wrap, 데스크톱: 기존 레이아웃 유지 */}
+        <div className="flex-1 flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Difficulty Filter */}
           <div className="relative">
             <button
@@ -160,7 +162,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               aria-expanded={openDropdown === 'difficulty'}
               aria-controls="filter-dropdown-difficulty"
               className="
-                px-3 py-2
+                px-3 py-2 min-h-[44px]
                 border border-bread-200 rounded-lg
                 bg-white hover:bg-bread-50
                 text-bread-700 text-sm
@@ -178,7 +180,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               aria-label={t('filter.difficulty')}
               className={`
               absolute top-full left-0 mt-1
-              w-48
+              w-48 max-w-[calc(100vw-1.5rem)]
               bg-white border border-bread-200 rounded-lg shadow-lg
               ${openDropdown === 'difficulty' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
@@ -189,7 +191,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                   <label
                     key={value}
                     className="
-                      flex items-center gap-2 px-3 py-2
+                      flex items-center gap-2 px-3 py-2 min-h-[44px]
                       hover:bg-bread-50 rounded cursor-pointer
                       transition-colors duration-150
                     "
@@ -216,7 +218,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               aria-expanded={openDropdown === 'productType'}
               aria-controls="filter-dropdown-productType"
               className="
-                px-3 py-2
+                px-3 py-2 min-h-[44px]
                 border border-bread-200 rounded-lg
                 bg-white hover:bg-bread-50
                 text-bread-700 text-sm
@@ -234,7 +236,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               aria-label={t('advDashboard.productType')}
               className={`
               absolute top-full left-0 mt-1
-              w-48
+              w-48 max-w-[calc(100vw-1.5rem)]
               bg-white border border-bread-200 rounded-lg shadow-lg
               ${openDropdown === 'productType' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
@@ -245,7 +247,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                   <label
                     key={value}
                     className="
-                      flex items-center gap-2 px-3 py-2
+                      flex items-center gap-2 px-3 py-2 min-h-[44px]
                       hover:bg-bread-50 rounded cursor-pointer
                       transition-colors duration-150
                     "
@@ -272,7 +274,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               aria-expanded={openDropdown === 'timeRange'}
               aria-controls="filter-dropdown-timeRange"
               className="
-                px-3 py-2
+                px-3 py-2 min-h-[44px]
                 border border-bread-200 rounded-lg
                 bg-white hover:bg-bread-50
                 text-bread-700 text-sm
@@ -290,7 +292,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               aria-label={t('filter.time')}
               className={`
               absolute top-full left-0 mt-1
-              w-48
+              w-48 max-w-[calc(100vw-1.5rem)]
               bg-white border border-bread-200 rounded-lg shadow-lg
               ${openDropdown === 'timeRange' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
@@ -303,7 +305,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                   aria-checked={!filters.timeRange}
                   onClick={() => handleTimeRangeChange(null)}
                   className={`
-                    w-full text-left px-3 py-2
+                    w-full text-left px-3 py-2 min-h-[44px]
                     hover:bg-bread-50 rounded
                     transition-colors duration-150
                     text-sm text-bread-700
@@ -324,7 +326,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                     }
                     onClick={() => handleTimeRangeChange(value)}
                     className={`
-                      w-full text-left px-3 py-2
+                      w-full text-left px-3 py-2 min-h-[44px]
                       hover:bg-bread-50 rounded
                       transition-colors duration-150
                       text-sm text-bread-700
@@ -372,7 +374,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 aria-label={t('filter.tags')}
                 className={`
                 absolute top-full left-0 mt-1
-                w-56
+                w-56 max-w-[calc(100vw-1.5rem)]
                 bg-white border border-bread-200 rounded-lg shadow-lg
                 ${openDropdown === 'tags' ? 'opacity-100 visible' : 'opacity-0 invisible'}
                 transition-all duration-200
@@ -384,7 +386,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                     <label
                       key={tag}
                       className="
-                        flex items-center gap-2 px-3 py-2
+                        flex items-center gap-2 px-3 py-2 min-h-[44px]
                         hover:bg-bread-50 rounded cursor-pointer
                         transition-colors duration-150
                       "
@@ -404,8 +406,9 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           )}
 
           {/* Sort Control */}
-          <div className="ml-auto flex items-center gap-2">
-            <label htmlFor="sort-select" className="text-sm text-bread-600">
+          {/* 모바일: 전체폭(w-full)으로 줄바꿈, 데스크톱: ml-auto로 우측 정렬 유지 */}
+          <div className="w-full sm:w-auto sm:ml-auto flex items-center gap-2">
+            <label htmlFor="sort-select" className="text-sm text-bread-600 flex-none">
               {t('filter.sortBy')}:
             </label>
             <select
@@ -413,7 +416,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               value={sortBy}
               onChange={(e) => onSortChange(e.target.value as RecipeSortOption)}
               className="
-                px-3 py-2
+                flex-1 sm:flex-none
+                px-3 py-2 min-h-[44px]
                 border border-bread-200 rounded-lg
                 bg-white hover:bg-bread-50
                 text-bread-700 text-sm
@@ -436,7 +440,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               type="button"
               onClick={onClearFilters}
               className="
-                px-3 py-2
+                px-3 py-2 min-h-[44px]
                 border border-bread-300 rounded-lg
                 bg-white hover:bg-bread-50
                 text-bread-600 hover:text-bread-700 text-sm

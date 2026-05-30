@@ -28,7 +28,9 @@
       "@utils/*": ["src/utils/*"],
       "@constants/*": ["src/constants/*"],
       "@types/*": ["src/types/*"],
-      "@stores/*": ["src/stores/*"]
+      "@stores/*": ["src/stores/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@data/*": ["src/data/*"]
     }
   },
   "include": ["src"],

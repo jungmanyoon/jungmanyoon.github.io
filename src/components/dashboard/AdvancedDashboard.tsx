@@ -2716,7 +2716,7 @@ const AdvancedDashboard: React.FC = () => {
                       {ingredientsByPhase.map(({ phase, items }, phaseIndex) => {
                         const phaseMeta = PHASE_META[phase] || PHASE_META.other;
                         return (
-                          <React.Fragment key={phase}>
+                          <React.Fragment key={`${phase}-${phaseIndex}`}>
                             {/* 단계 구분선 (2개 이상 단계가 있을 때만 표시) */}
                             {hasMultiplePhases && (
                               <tr className={`${phaseMeta.bgColor} ${phaseMeta.borderColor} border-y-2`}>
@@ -2737,7 +2737,9 @@ const AdvancedDashboard: React.FC = () => {
                                 : ['main', 'filling', 'frosting', 'topping', 'glaze', 'other'];
 
                               return (
-                                <tr key={ing.id} className={`border-b border-gray-100 hover:bg-gray-50 ${dynamicStyles.rowHeight}`}>
+                                // key: 원본 재료 id는 전역 고유하지만 단계(phase) 스코프를 prefix로
+                                // 추가해 단계 재배치 시에도 안정적이고 고유한 키를 보장
+                                <tr key={`${phase}-${ing.id}`} className={`border-b border-gray-100 hover:bg-gray-50 ${dynamicStyles.rowHeight}`}>
                                   <td className="px-1.5">
                                     <select value={ing.category} onChange={(e) => updateIngredient(ing.id, 'category', e.target.value)}
                                       className="w-full text-xs border-0 bg-transparent p-0 focus:outline-none appearance-none cursor-pointer">
@@ -2826,10 +2828,10 @@ const AdvancedDashboard: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className={dynamicStyles.fontSize}>
-                      {convertedIngredientsByPhase.map(({ phase, items }) => {
+                      {convertedIngredientsByPhase.map(({ phase, items }, phaseIndex) => {
                         const phaseMeta = PHASE_META[phase] || PHASE_META.other;
                         return (
-                          <React.Fragment key={phase}>
+                          <React.Fragment key={`${phase}-${phaseIndex}`}>
                             {/* 단계 구분선 (2개 이상 단계가 있을 때만 표시) */}
                             {convertedHasMultiplePhases && (
                               <tr className={`${phaseMeta.bgColor} ${phaseMeta.borderColor} border-y-2`}>
@@ -2843,8 +2845,11 @@ const AdvancedDashboard: React.FC = () => {
                               </tr>
                             )}
                             {/* 해당 단계의 재료들 */}
-                            {items.map((ing: any) => (
-                              <tr key={ing.id} className={`border-b border-blue-100 ${dynamicStyles.rowHeight}`}>
+                            {/* key: 단계(phase) + 카테고리 + id + index 복합 키로 중복 방지
+                                (스트레이트법 합산 경로에서 liquid/other 이름이 같으면 ing.id가
+                                 'straight-${name}' 형태로 충돌할 수 있어 phase 스코프로 격리) */}
+                            {items.map((ing: any, ingIndex: number) => (
+                              <tr key={`${phase}-${ing.category}-${ing.id}-${ingIndex}`} className={`border-b border-blue-100 ${dynamicStyles.rowHeight}`}>
                                 <td className="px-2 text-blue-600">{CATEGORY_LABELS[ing.category]}</td>
                                 <td className="px-2">{translateIngredient(ing.name)}</td>
                                 <td className="px-2 text-right font-mono font-medium text-blue-700">{ing.convertedAmount}</td>

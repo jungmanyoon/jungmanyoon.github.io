@@ -3,13 +3,16 @@
  * Individual toast notification with animations and accessibility
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react'
 import type { Toast as ToastType } from '@stores/useToastStore'
 
 interface ToastProps {
   toast: ToastType
   onDismiss: (id: string) => void
+  // hover 시 자동 dismiss 타이머 일시정지/재개 (store에서 주입)
+  onPause?: (id: string) => void
+  onResume?: (id: string) => void
 }
 
 const ICON_MAP = {
@@ -46,12 +49,19 @@ const STYLE_MAP = {
   }
 }
 
-export const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
+export const Toast: React.FC<ToastProps> = ({ toast, onDismiss, onPause, onResume }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [isLeaving, setIsLeaving] = useState(false)
+  // 닫기 애니메이션 타이머 핸들 (cleanup 대상)
+  const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Icon = ICON_MAP[toast.type]
   const styles = STYLE_MAP[toast.type]
+
+  // error는 즉시 안내가 필요하므로 alert/assertive, 그 외에는 status/polite
+  const isError = toast.type === 'error'
+  const role = isError ? 'alert' : 'status'
+  const ariaLive: 'assertive' | 'polite' = isError ? 'assertive' : 'polite'
 
   useEffect(() => {
     // Trigger enter animation
@@ -60,19 +70,41 @@ export const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
     })
   }, [])
 
+  // 언마운트 시 닫기 애니메이션 타이머 정리(메모리 누수 방지)
+  useEffect(() => {
+    return () => {
+      if (leaveTimerRef.current) {
+        clearTimeout(leaveTimerRef.current)
+        leaveTimerRef.current = null
+      }
+    }
+  }, [])
+
   const handleDismiss = () => {
     setIsLeaving(true)
     // Wait for exit animation before removing
-    setTimeout(() => {
+    leaveTimerRef.current = setTimeout(() => {
       onDismiss(toast.id)
     }, 300)
   }
 
+  // hover/focus 시 자동 dismiss 타이머 일시정지, 벗어나면 재개
+  const handlePause = () => {
+    onPause?.(toast.id)
+  }
+  const handleResume = () => {
+    onResume?.(toast.id)
+  }
+
   return (
     <div
-      role="alert"
-      aria-live="polite"
+      role={role}
+      aria-live={ariaLive}
       aria-atomic="true"
+      onMouseEnter={handlePause}
+      onMouseLeave={handleResume}
+      onFocus={handlePause}
+      onBlur={handleResume}
       className={`
         flex items-start gap-3 p-4 rounded-lg border shadow-lg
         min-w-[320px] max-w-[480px]
@@ -122,7 +154,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
           transition-colors
           ${styles.icon}
         `}
-        aria-label="닫기"
+        aria-label="알림 닫기"
       >
         <X className="w-4 h-4" />
       </button>

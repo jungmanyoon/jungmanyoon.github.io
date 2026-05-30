@@ -107,10 +107,13 @@ export interface PanConfig {
   fillRatio: number; // 권장 충전율 (0.6-0.8)
 }
 
-export type PanType = 
+// panScaling.ts 의 PanType 과 호환되도록 'chiffon' 을 포함한 상위집합 유니온
+// (런타임 변경 없음 - 허용값 확장만 수행)
+export type PanType =
   | 'round' | 'square' | 'rectangular' | 'loaf'
   | 'muffin' | 'bundt' | 'springform' | 'sheet'
-  | 'baguette' | 'pullman' | 'tube' | 'tart';
+  | 'baguette' | 'pullman' | 'tube' | 'tart'
+  | 'chiffon';
 
 export type PanMaterial = 
   | 'aluminum' | 'steel' | 'silicone' | 'glass' | 'ceramic';
@@ -173,9 +176,26 @@ export interface Recipe {
   
   // 원가 정보 (optional)
   costing?: CostingInfo;
-  
+
+  // 비용적(specific volume) 설정 (optional) - 대시보드에서 원본/변환 제품 비용적 저장용
+  specificVolume?: SpecificVolumeConfig;
+
+  // 배수 변환 설정 (optional) - 대시보드에서 배수/팬 연동 상태 저장용
+  multiplierConfig?: MultiplierConfig;
+
   createdAt: Date;
   updatedAt: Date;
+}
+
+// ===== 대시보드 변환 설정 타입 (모두 optional 필드) =====
+export interface SpecificVolumeConfig {
+  original?: string;   // 원본 제품 비용적 키
+  converted?: string;  // 변환 제품 비용적 키
+}
+
+export interface MultiplierConfig {
+  multiplier?: number;    // 배수 값
+  isPanLinked?: boolean;  // 팬 크기 연동 여부
 }
 
 export type RecipeCategory = 

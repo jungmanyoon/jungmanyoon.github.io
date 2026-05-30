@@ -119,21 +119,29 @@ function handleBakersPercentage(input: BakersPercentageInput) {
 // DDT 계산
 function handleDDTCalculation(input: DDTInput) {
   const { targetTemp, flourTemp, roomTemp, prefermentTemp, frictionFactor } = input
-  
+
+  // 섭씨 물온도 DDT 공식 전용 마찰계수 보정 (C-5 결함 수정)
+  // calculateWaterTemp 는 섭씨 공식이므로 화씨 마찰계수(예: stand 24)를 넣으면 물온도가
+  // 비현실적으로 낮거나 음수가 된다. 입력이 없으면 섭씨 스탠드 믹서 기본값(8)을 사용한다.
+  const celsiusFriction =
+    frictionFactor != null
+      ? frictionFactor
+      : DDTCalculator.FRICTION_FACTORS_CELSIUS['stand']
+
   let waterTemp: number
-  
+
   if (prefermentTemp) {
     waterTemp = DDTCalculator.calculateWaterTempWithPreferment(
       targetTemp,
       { flour: flourTemp, room: roomTemp, preferment: prefermentTemp },
-      frictionFactor
+      celsiusFriction
     )
   } else {
     waterTemp = DDTCalculator.calculateWaterTemp(
       targetTemp,
       flourTemp,
       roomTemp,
-      frictionFactor
+      celsiusFriction
     )
   }
   

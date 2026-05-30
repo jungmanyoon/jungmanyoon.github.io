@@ -236,6 +236,74 @@ describe('DDTCalculator', () => {
     })
   })
 
+  describe('FRICTION_FACTORS_CELSIUS (C-5 결함 수정)', () => {
+    it('모든 믹서 타입에 대한 섭씨 마찰열이 정의되어야 함', () => {
+      const mixerTypes: MixerType[] = ['hand', 'stand', 'spiral', 'planetary', 'intensive']
+
+      mixerTypes.forEach(type => {
+        expect(DDTCalculator.FRICTION_FACTORS_CELSIUS[type]).toBeDefined()
+        expect(DDTCalculator.FRICTION_FACTORS_CELSIUS[type]).toBeGreaterThanOrEqual(0)
+      })
+    })
+
+    it('손반죽 섭씨 마찰열은 0이어야 함', () => {
+      expect(DDTCalculator.FRICTION_FACTORS_CELSIUS['hand']).toBe(0)
+    })
+
+    it('섭씨 마찰열은 실측 권장 범위(stand 6~9, intensive 11~14) 내여야 함', () => {
+      // 제빵 이론(Hamelman, SFBI) 실측 기준 섭씨 마찰열 범위
+      expect(DDTCalculator.FRICTION_FACTORS_CELSIUS['stand']).toBeGreaterThanOrEqual(6)
+      expect(DDTCalculator.FRICTION_FACTORS_CELSIUS['stand']).toBeLessThanOrEqual(9)
+      expect(DDTCalculator.FRICTION_FACTORS_CELSIUS['intensive']).toBeGreaterThanOrEqual(11)
+      expect(DDTCalculator.FRICTION_FACTORS_CELSIUS['intensive']).toBeLessThanOrEqual(14)
+    })
+
+    it('섭씨 마찰열이 화씨 값보다 작아야 함(과대 마찰열 방지)', () => {
+      const mixerTypes: MixerType[] = ['stand', 'spiral', 'planetary', 'intensive']
+      mixerTypes.forEach(type => {
+        expect(DDTCalculator.FRICTION_FACTORS_CELSIUS[type])
+          .toBeLessThan(DDTCalculator.FRICTION_FACTORS[type])
+      })
+    })
+
+    it('섭씨 마찰열을 적용하면 여름철에도 물 온도가 비현실적 음수가 아니어야 함', () => {
+      // 여름철 시나리오: 목표 24°C, 밀가루 25°C, 실온 28°C, 스탠드 믹서(섭씨 8°C)
+      const summerFriction = DDTCalculator.FRICTION_FACTORS_CELSIUS['stand']
+      const waterTemp = DDTCalculator.calculateWaterTemp(24, 25, 28, summerFriction)
+      // (24 * 3) - 25 - 28 - 8 = 72 - 61 = 11 (얼음 없이 실현 가능)
+      expect(waterTemp).toBe(11)
+      expect(waterTemp).toBeGreaterThan(0)
+    })
+  })
+
+  describe('recommendFrictionFactorCelsius (C-5 결함 수정)', () => {
+    it('손반죽은 항상 0을 반환해야 함', () => {
+      expect(DDTCalculator.recommendFrictionFactorCelsius('hand', 30, 90)).toBe(0)
+    })
+
+    it('스탠드 믹서 기본 섭씨 마찰열을 반환해야 함', () => {
+      const friction = DDTCalculator.recommendFrictionFactorCelsius('stand', 10, 65)
+      expect(friction).toBe(DDTCalculator.FRICTION_FACTORS_CELSIUS['stand'])
+    })
+
+    it('긴 믹싱 시간에서 마찰열을 증가시켜야 함', () => {
+      const shortMix = DDTCalculator.recommendFrictionFactorCelsius('stand', 5, 65)
+      const longMix = DDTCalculator.recommendFrictionFactorCelsius('stand', 20, 65)
+      expect(longMix).toBeGreaterThan(shortMix)
+    })
+
+    it('높은 수화율에서 마찰열을 감소시켜야 함', () => {
+      const lowHydration = DDTCalculator.recommendFrictionFactorCelsius('stand', 10, 55)
+      const highHydration = DDTCalculator.recommendFrictionFactorCelsius('stand', 10, 80)
+      expect(highHydration).toBeLessThan(lowHydration)
+    })
+
+    it('반환값이 0 미만이 되지 않아야 함', () => {
+      const friction = DDTCalculator.recommendFrictionFactorCelsius('spiral', 3, 90)
+      expect(friction).toBeGreaterThanOrEqual(0)
+    })
+  })
+
   describe('SEASONAL_DDT', () => {
     it('모든 계절에 대한 권장 DDT가 정의되어야 함', () => {
       const seasons = ['spring', 'summer', 'autumn', 'winter']

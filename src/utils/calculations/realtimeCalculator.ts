@@ -11,6 +11,7 @@
  */
 
 import type { Recipe, Ingredient, PanConfig, MethodConfig } from '@/types/recipe.types'
+import { PanScalingTS } from '@/utils/calculations/panScaling'
 
 export interface ConvertedRecipe {
   preferment: {
@@ -78,15 +79,16 @@ export class RealtimeRecipeCalculator {
 
       case 'loaf': // 식빵틀
         if (length && width && height) {
-          // 식빵틀은 위가 더 넓음 - 사다리꼴 근사
-          // 평균값 사용: 0.85 계수
-          return length * width * height * 0.85
+          // 식빵틀은 위가 더 넓은 사다리꼴 형상 - 형상 보정 계수 적용
+          // 계수는 panScaling.ts(LOAF_TRAPEZOID_FACTOR=0.85)를 단일 진실원천으로 참조
+          return PanScalingTS.calculateBoxLoafVolume(length, width, height, 'loaf')
         }
         break
 
-      case 'pullman': // 풀먼 식빵틀 (뚜껑 있음)
+      case 'pullman': // 풀먼 식빵틀 (뚜껑 있음, 각형이라 형상 보정 없음)
         if (length && width && height) {
-          return length * width * height
+          // 동일 헬퍼를 사용하되 pullman 은 PULLMAN_SHAPE_FACTOR=1.0 적용
+          return PanScalingTS.calculateBoxLoafVolume(length, width, height, 'pullman')
         }
         break
 

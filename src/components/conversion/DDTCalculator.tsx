@@ -132,7 +132,9 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
     prefermentTemp: null as number | null,
     mixerType: 'stand' as MixerType,
     mixingTime: 10,
-    frictionFactor: 24,
+    // 섭씨 물온도 DDT 공식 전용 기본 마찰계수 (스탠드 믹서 = 8°C)
+    // 기존 화씨 기본값 24 를 섭씨 공식에 넣으면 물온도가 비현실적으로 낮아짐(C-5 결함)
+    frictionFactor: 8,
     waterTemp: null as number | null,
     useIce: false,
     iceAmount: 0,
@@ -170,8 +172,9 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
   }, [recipe, liquidTotal])
 
   // 권장 마찰계수 계산 - useMemo 최적화
+  // 섭씨 물온도 DDT 공식 전용 추천값 사용 (C-5 결함 수정: 화씨 recommendFrictionFactor 사용 금지)
   const recommendedFriction = useMemo(() => {
-    return DDTCalc.recommendFrictionFactor(
+    return DDTCalc.recommendFrictionFactorCelsius(
       localData.mixerType,
       localData.mixingTime,
       doughHydration
@@ -280,8 +283,16 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
 
   // 입력 변경 핸들러 - useCallback 최적화
   const handleInputChange = useCallback((field: string, value: any) => {
-    setLocalData(prev => ({ ...prev, [field]: value }))
-  }, [])
+    setLocalData(prev => {
+      const next = { ...prev, [field]: value }
+      // 믹서 종류를 바꾸면 수동 모드에서 마찰계수를 해당 믹서의 섭씨 상수로 동기화 (C-5 결함 수정)
+      // Auto 모드일 때는 recommendedFriction useEffect 가 덮어쓰므로 건드리지 않는다.
+      if (field === 'mixerType' && !useAutoFriction) {
+        next.frictionFactor = DDTCalc.FRICTION_FACTORS_CELSIUS[value as MixerType]
+      }
+      return next
+    })
+  }, [useAutoFriction])
 
   // 예측 온도 - useMemo 최적화
   const predictedTemp = useMemo(() => predictFinalTemp(), [predictFinalTemp])
@@ -373,10 +384,10 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
             options={mixerOptions}
           />
 
-          {/* Friction Factor with Auto-Recommendation */}
+          {/* Friction Factor with Auto-Recommendation (섭씨 °C 단위) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('ddt.labels.mixerFriction')}
+              {t('ddt.labels.mixerFriction')} (°C)
             </label>
             <div className="flex gap-2">
               <Input
@@ -384,8 +395,8 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
                 value={localData.frictionFactor}
                 onValueChange={(value) => handleInputChange('frictionFactor', Number(value))}
                 min={0}
-                max={50}
-                step={1}
+                max={15}
+                step={0.5}
                 placeholder={t('ddt.labels.mixerFriction')}
                 disabled={useAutoFriction}
               />
@@ -457,15 +468,15 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
             t={t}
           />
 
-          {/* 마찰계수 참고 정보 */}
+          {/* 마찰계수 참고 정보 (섭씨 물온도 DDT 공식 기준값, C-5 결함 수정) */}
           <div className="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
-            <p className="font-semibold mb-1">{t('ddt.frictionReference.title')}:</p>
+            <p className="font-semibold mb-1">{t('ddt.frictionReference.title')} (°C):</p>
             <ul className="space-y-0.5">
-              <li>• {t('ddt.mixerTypes.hand')}: 0°C</li>
-              <li>• {t('ddt.mixerTypes.stand')}: 24°C</li>
-              <li>• {t('ddt.mixerTypes.spiral')}: 22°C</li>
-              <li>• {t('ddt.mixerTypes.planetary')}: 26°C</li>
-              <li>• {t('ddt.mixerTypes.intensive')}: 30°C</li>
+              <li>• {t('ddt.mixerTypes.hand')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['hand']}°C</li>
+              <li>• {t('ddt.mixerTypes.spiral')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['spiral']}°C</li>
+              <li>• {t('ddt.mixerTypes.stand')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['stand']}°C</li>
+              <li>• {t('ddt.mixerTypes.planetary')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['planetary']}°C</li>
+              <li>• {t('ddt.mixerTypes.intensive')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['intensive']}°C</li>
             </ul>
           </div>
         </div>

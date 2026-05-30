@@ -1,6 +1,23 @@
 export type PanType = 'round' | 'square' | 'rectangular' | 'loaf' | 'chiffon'
 
 /**
+ * 식빵틀(loaf) 사다리꼴 형상 보정 계수 (단일 진실원천)
+ *
+ * 의미: 충전율(fillRatio)이 아니라 "기하 형상 보정 계수"이다.
+ * 일반 식빵틀은 탈형을 위해 윗면이 약간 넓은 사다리꼴 단면을 가지므로,
+ * 직육면체(length*width*height) 가정 대비 실제 내부 부피가 작다.
+ * 윗변/아랫변 평균을 사용하면 약 0.85 수준으로 근사된다.
+ *
+ * 사용처:
+ * - QuickPanCalculator 등 호출부: calculateLoafPanVolume에 bottomLength = width * 0.85 형태로 전달
+ * - realtimeCalculator.calculatePanVolume: 직육면체 부피에 이 계수를 곱해 동일 결과 산출
+ *
+ * 주의: pullman(풀먼/뚜껑형)은 직각 각형이라 형상 보정이 불필요하므로 계수 1.0을 사용한다.
+ */
+export const LOAF_TRAPEZOID_FACTOR = 0.85
+export const PULLMAN_SHAPE_FACTOR = 1.0
+
+/**
  * 제품 종류별 팬닝 데이터 (비용적 및 충전율)
  * 비용적(specificVolume): 반죽 1g당 차지하는 부피 (ml/g)
  * 충전율(fillRatio): 팬에 채우는 비율 (0.0~1.0)
@@ -354,6 +371,27 @@ export class PanScalingTS {
       default:
         throw new Error(`알 수 없는 팬 타입: ${type}`)
     }
+  }
+
+  /**
+   * 직육면체 치수(length/width/height) 기반 식빵틀 부피 계산 (단일 진실원천)
+   *
+   * realtimeCalculator 등 length/width/height 만 가진 PanConfig 에서 사용한다.
+   * panType 에 따라 사다리꼴 형상 보정 계수를 적용한다.
+   *   - 'pullman' : 각형이라 보정 없음 (PULLMAN_SHAPE_FACTOR = 1.0)
+   *   - 그 외 loaf : 사다리꼴 보정 (LOAF_TRAPEZOID_FACTOR = 0.85)
+   *
+   * 이렇게 하면 topLength/bottomLength 가 없는 호출부에서도
+   * QuickPanCalculator(bottomLength = width * 0.85)와 동일한 부피가 나온다.
+   */
+  static calculateBoxLoafVolume(
+    length: number,
+    width: number,
+    height: number,
+    panType: 'loaf' | 'pullman' = 'loaf'
+  ): number {
+    const factor = panType === 'pullman' ? PULLMAN_SHAPE_FACTOR : LOAF_TRAPEZOID_FACTOR
+    return length * width * height * factor
   }
 
   static weightToVolume(weight: number, density: number = 0.55): number {

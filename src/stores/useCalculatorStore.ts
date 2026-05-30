@@ -27,7 +27,9 @@ const initialDDT: DDTState = {
   targetTemp: 25,
   flourTemp: 20,
   roomTemp: 22,
-  frictionFactor: 24,
+  // 섭씨 물온도 DDT 공식 전용 기본값 (스탠드 믹서 FRICTION_FACTORS_CELSIUS.stand = 8)
+  // 기존 화씨 기본값 24 를 그대로 섭씨 공식에 넣으면 물온도가 비현실적으로 낮아짐(C-5 결함)
+  frictionFactor: 8,
   includePreferment: false,
   results: null
 }

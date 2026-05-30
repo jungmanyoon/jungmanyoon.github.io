@@ -23,16 +23,38 @@ interface TemperatureInputs {
 
 export class DDTCalculator {
   /**
-   * 기본 마찰계수 (Friction Factor)
-   * 믹서 종류별 평균값 (°F 기준, 섭씨 환산 시 약 60% 값)
-   * 참고: King Arthur Baking, SFBI 표준
+   * 마찰계수 (Friction Factor) - 화씨(°F) 기준 전통 베이커리 표준값
+   * 출처: King Arthur Baking, SFBI(샌프란시스코 베이킹 인스티튜트) 표준.
+   *       이 값들은 화씨 DDT 공식(목표온도*믹서수 - (실온+밀가루+물+마찰))에서 쓰는 °F 마찰열이다.
+   * 주의: 본 상수는 predictDoughTemp / recommendFrictionFactor 등 화씨 기반 보조 계산용이며,
+   *       섭씨 물온도 DDT 공식에 그대로 대입하면 마찰열이 과대 적용된다(C-5 결함).
+   *       섭씨 물온도 계산에는 아래 FRICTION_FACTORS_CELSIUS 를 사용할 것.
+   * hand 은 손반죽으로 기계 마찰열이 없어 0(체온 영향은 별도 effectiveFriction 로직에서 처리).
    */
   static readonly FRICTION_FACTORS: Record<MixerType, number> = {
-    'hand': 4,           // 손반죽 (체온 + 약간의 마찰열)
-    'stand': 24,         // 스탠드 믹서
+    'hand': 0,           // 손반죽 (기계 마찰열 없음)
     'spiral': 22,        // 스파이럴 믹서
+    'stand': 24,         // 스탠드 믹서
     'planetary': 26,     // 플래니터리 믹서
     'intensive': 30      // 고속 믹서
+  }
+
+  /**
+   * 섭씨(°C) 마찰열 - 섭씨 DDT 물온도 공식 전용 (C-5 결함 수정용)
+   * 근거: 화씨 마찰계수를 섭씨 "온도차"로 환산하면 delta°C = delta°F / 1.8 이다.
+   *       (마찰계수는 절대온도가 아니라 믹싱으로 더해지는 온도 상승분이므로 32 오프셋은 적용하지 않음)
+   *       stand 24°F / 1.8 ~= 13.3°C 이지만, 실측 제빵 이론(Hamelman, SFBI)에서
+   *       가정용 스탠드/스파이럴 믹서의 실제 반죽 온도 상승은 7~9°C 수준으로 보고된다.
+   *       여름철(실온 28°C, 밀가루 25°C)에도 물온도가 비현실적 음수로 떨어지지 않도록
+   *       실측 하한값을 채택한다.
+   *       hand 0~1, spiral/stand 6~9, intensive 11~14 권장 범위 내에서 결정.
+   */
+  static readonly FRICTION_FACTORS_CELSIUS: Record<MixerType, number> = {
+    'hand': 0,           // 손반죽 (기계 마찰열 없음)
+    'spiral': 7,         // 스파이럴 믹서 (저속, 마찰열 낮음)
+    'stand': 8,          // 스탠드 믹서 (가정용 표준)
+    'planetary': 9,      // 플래니터리 믹서
+    'intensive': 12      // 고속/인텐시브 믹서
   }
 
   /**
@@ -294,7 +316,37 @@ export class DDTCalculator {
     } else if (doughHydration < 60) {
       baseFactor += 1 // 낮은 수화율은 마찰 증가
     }
-    
+
     return Math.max(0, baseFactor)
+  }
+
+  /**
+   * 섭씨 마찰계수 추천 (섭씨 물온도 DDT 공식 전용, C-5 결함 수정)
+   * recommendFrictionFactor 와 동일한 보정 로직을 쓰되, 화씨 상수 대신 섭씨 상수를 기준으로 한다.
+   * 화씨 보정폭(+-2, +-1)도 섭씨 스케일(약 1/1.8)로 축소하여 적용한다.
+   */
+  static recommendFrictionFactorCelsius(
+    mixerType: MixerType,
+    mixingTime: number,
+    doughHydration: number
+  ): number {
+    if (mixerType === 'hand') return 0
+    let baseFactor = this.FRICTION_FACTORS_CELSIUS[mixerType]
+
+    // 믹싱 시간에 따른 조정 (섭씨 스케일: +-1°C)
+    if (mixingTime > 15) {
+      baseFactor += 1
+    } else if (mixingTime < 5) {
+      baseFactor -= 1
+    }
+
+    // 수화율에 따른 조정 (섭씨 스케일: +-0.5°C)
+    if (doughHydration > 75) {
+      baseFactor -= 0.5 // 높은 수화율은 마찰 감소
+    } else if (doughHydration < 60) {
+      baseFactor += 0.5 // 낮은 수화율은 마찰 증가
+    }
+
+    return Math.max(0, Math.round(baseFactor * 10) / 10)
   }
 }

@@ -9,6 +9,9 @@
 
 import { create } from 'zustand'
 import type { Recipe, Ingredient, PanConfig, ProcessStep } from '@/types/recipe.types'
+// 식빵틀 부피 형상 보정의 단일 진실원천(panScaling.ts)을 참조한다.
+// store -> calculations 단방향 import 이므로 순환이 발생하지 않는다.
+import { PanScalingTS } from '@/utils/calculations/panScaling'
 
 export type CalculationMode = 'bakers' | 'weight' | 'recipe'
 export type MethodType = 'straight' | 'sponge' | 'poolish' | 'biga' | 'tangzhong' | 'autolyse' | 'overnight' | 'sourdough'
@@ -169,9 +172,16 @@ function calculatePanVolume(pan: PanConfig): number {
       break
 
     case 'loaf':
+      // 식빵틀은 위가 더 넓은 사다리꼴 - panScaling 의 LOAF_TRAPEZOID_FACTOR(0.85) 적용
       if (length && width && height) {
-        // 식빵틀은 위가 더 넓음 (평균 사용)
-        return length * width * height * 0.85
+        return PanScalingTS.calculateBoxLoafVolume(length, width, height, 'loaf')
+      }
+      break
+
+    case 'pullman':
+      // 풀먼은 뚜껑형 각형 - 형상 보정 불필요(PULLMAN_SHAPE_FACTOR=1.0)
+      if (length && width && height) {
+        return PanScalingTS.calculateBoxLoafVolume(length, width, height, 'pullman')
       }
       break
   }

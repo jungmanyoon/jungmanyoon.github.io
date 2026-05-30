@@ -43,81 +43,83 @@ const TABS = [
     id: 'locale',
     nameKey: 'settingsTabs.locale',
     icon: Globe,
-    color: 'text-indigo-500',
-    bgColor: 'bg-indigo-50',
-    borderColor: 'border-indigo-200',
+    // 무지개 색상 제거 -> brand 체계로 통일 (active=brand, inactive=gray)
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
     descKey: 'settingsTabs.localeDesc'
   },
   {
     id: 'storage',
     nameKey: 'settingsTabs.storage',
     icon: HardDrive,
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200',
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
     descKey: 'settingsTabs.storageDesc'
   },
   {
     id: 'pan',
     nameKey: 'settingsTabs.pan',
     icon: Box,
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-50',
-    borderColor: 'border-orange-200',
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
     descKey: 'settingsTabs.panDesc'
   },
   {
     id: 'product',
     nameKey: 'settingsTabs.product',
     icon: Scale,
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-50',
-    borderColor: 'border-amber-200',
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
     descKey: 'settingsTabs.productDesc'
   },
   {
     id: 'environment',
     nameKey: 'settingsTabs.environment',
     icon: Thermometer,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
     descKey: 'settingsTabs.environmentDesc'
   },
   {
     id: 'method',
     nameKey: 'settingsTabs.method',
     icon: FlaskConical,
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-50',
-    borderColor: 'border-amber-200',
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
     descKey: 'settingsTabs.methodDesc'
   },
   {
     id: 'yieldLoss',
     nameKey: 'settingsTabs.yieldLoss',
     icon: TrendingDown,
-    color: 'text-red-500',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
     descKey: 'settingsTabs.yieldLossDesc'
   },
   {
     id: 'ingredient',
     nameKey: 'settingsTabs.ingredient',
     icon: Apple,
-    color: 'text-green-500',
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
     descKey: 'settingsTabs.ingredientDesc'
   },
   {
     id: 'advanced',
     nameKey: 'settingsTabs.advanced',
     icon: Cog,
-    color: 'text-gray-500',
-    bgColor: 'bg-gray-50',
-    borderColor: 'border-gray-200',
+    // 이미 무채색이었으나 active 시 brand로 통일해 일관성 확보
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
     descKey: 'settingsTabs.advancedDesc'
   }
 ]
@@ -267,7 +269,7 @@ export default function SettingsPage({
               </button>
               <button
                 onClick={handleResetAll}
-                className="flex items-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="flex items-center gap-1 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
                 {t('common.reset')}
@@ -323,7 +325,7 @@ export default function SettingsPage({
       {/* 내보내기 모달 */}
       {showExportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+          <div className="bg-white rounded-xl shadow-modal w-full max-w-md mx-4 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">{t('settings.modal.exportTitle')}</h3>
               <button
@@ -345,7 +347,7 @@ export default function SettingsPage({
               </button>
               <button
                 onClick={handleExport}
-                className="flex items-center gap-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                className="flex items-center gap-1 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
               >
                 <Download className="w-4 h-4" />
                 {t('common.download')}
@@ -358,7 +360,7 @@ export default function SettingsPage({
       {/* 가져오기 모달 */}
       {showImportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
+          <div className="bg-white rounded-xl shadow-modal w-full max-w-lg mx-4 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">{t('settings.modal.importTitle')}</h3>
               <button
@@ -389,7 +391,7 @@ export default function SettingsPage({
                     type="file"
                     accept=".json"
                     onChange={handleFileImport}
-                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100"
                   />
                 </div>
 
@@ -427,7 +429,7 @@ export default function SettingsPage({
                   <button
                     onClick={handleImport}
                     disabled={!importData.trim()}
-                    className="flex items-center gap-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     <Upload className="w-4 h-4" />
                     {t('common.import')}

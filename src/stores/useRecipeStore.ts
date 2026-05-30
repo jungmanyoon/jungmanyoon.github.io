@@ -178,6 +178,16 @@ export const useRecipeStore = create<RecipeStore>()(
           }
 
           return state
+        },
+        // 복원 시 createdAt/updatedAt를 Date로 정규화 (persist는 문자열로 직렬화함)
+        onRehydrateStorage: () => (state) => {
+          if (state && Array.isArray(state.recipes)) {
+            state.recipes = state.recipes.map((recipe: any) => ({
+              ...recipe,
+              createdAt: recipe.createdAt ? new Date(recipe.createdAt) : recipe.createdAt,
+              updatedAt: recipe.updatedAt ? new Date(recipe.updatedAt) : recipe.updatedAt
+            }))
+          }
         }
       }
     ),
@@ -215,17 +225,17 @@ export const selectFilteredRecipes = (state: RecipeStore) => {
   // 검색어 필터
   if (state.filters.searchQuery) {
     const query = state.filters.searchQuery.toLowerCase()
-    filtered = filtered.filter(r => 
-      r.name.toLowerCase().includes(query) ||
+    filtered = filtered.filter(r =>
+      (r.name ?? '').toLowerCase().includes(query) ||
       r.nameKo?.toLowerCase().includes(query) ||
-      r.tags.some(tag => tag.toLowerCase().includes(query))
+      (r.tags ?? []).some(tag => tag.toLowerCase().includes(query))
     )
   }
 
   // 태그 필터
   if (state.filters.tags && state.filters.tags.length > 0) {
-    filtered = filtered.filter(r => 
-      state.filters.tags!.some(tag => r.tags.includes(tag))
+    filtered = filtered.filter(r =>
+      state.filters.tags!.some(tag => (r.tags ?? []).includes(tag))
     )
   }
 
@@ -248,9 +258,11 @@ export const selectFilteredRecipes = (state: RecipeStore) => {
         const difficultyOrder = ['beginner', 'intermediate', 'advanced', 'professional']
         return difficultyOrder.indexOf(a.difficulty) - difficultyOrder.indexOf(b.difficulty)
       case 'createdAt':
-        return b.createdAt.getTime() - a.createdAt.getTime()
+        // persist 복원 후 문자열일 수 있으므로 방어적으로 Date 변환
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       case 'updatedAt':
-        return b.updatedAt.getTime() - a.updatedAt.getTime()
+        // persist 복원 후 문자열일 수 있으므로 방어적으로 Date 변환
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       case 'totalTime':
         return a.totalTime - b.totalTime
       default:

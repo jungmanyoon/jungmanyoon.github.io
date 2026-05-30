@@ -283,14 +283,14 @@ const AdvancedDashboard: React.FC = () => {
     // 기본값을 복사하고 설정 스토어의 오버라이드 적용
     return {
       ...BREAD_SPECIFIC_VOLUMES,
-      ...CAKE_SPECIFIC_VOLUMES,  // 🆕 제과 비용적 추가
+      ...CAKE_SPECIFIC_VOLUMES,  // 제과 비용적 추가
       ...productSettings.breadVolumes,
-      // 커스텀 제품 추가
+      ...productSettings.cakeVolumes,  // [C-6 수정] 케이크 비용적 오버라이드 병합
+      // 커스텀 제품 추가 (bread/cake/pastry/other 4종 모두 반영)
       ...productSettings.customProducts
-        .filter(p => p.category === 'bread' || p.category === 'pastry')
         .reduce((acc, p) => ({ ...acc, [p.name]: p.specificVolume }), {} as Record<string, number>)
     };
-  }, [productSettings.breadVolumes, productSettings.customProducts]);
+  }, [productSettings.breadVolumes, productSettings.cakeVolumes, productSettings.customProducts]);
 
   // 설정에서 팬 데이터를 동적으로 생성 (카테고리별 그룹화)
   const PAN_DATA = useMemo(() => {
@@ -1507,8 +1507,23 @@ const AdvancedDashboard: React.FC = () => {
   }, []);
 
   // ===== 초기화 함수들 =====
+  // [C-7] 초기화 직후 되돌리기(Undo) 토스트를 띄우는 공통 헬퍼
+  // 스냅샷을 클로저에 보관해 두고, 사용자가 '되돌리기'를 누르면 그대로 복원한다.
+  const showUndoToast = useCallback((restore: () => void) => {
+    addToast({
+      type: 'info',
+      message: '변환 설정을 초기화했습니다',
+      duration: 6000,  // 5~7초 제공
+      action: { label: '되돌리기', onClick: restore },
+    });
+  }, [addToast]);
+
   // 팬 설정 초기화: 변환 팬을 원래 팬과 동일하게
-  const resetPanSettings = useCallback(() => {
+  // showUndo=false면 토스트를 띄우지 않는다 (전체 초기화에서 중복 방지용)
+  const resetPanSettings = useCallback((showUndo: boolean = true) => {
+    // 초기화 직전 스냅샷 보관 (resetPanSettings가 건드리는 상태: pans, isPanLinked)
+    const prevPans = pans;
+    const prevIsPanLinked = isPanLinked;
     setPans([{
       id: '1',
       mode: originalPan.mode,
@@ -1522,30 +1537,65 @@ const AdvancedDashboard: React.FC = () => {
       unitWeight: originalPan.unitWeight,
     }]);
     setIsPanLinked(true);
-  }, [originalPan]);
+    if (showUndo) {
+      showUndoToast(() => {
+        setPans(prevPans);
+        setIsPanLinked(prevIsPanLinked);
+      });
+    }
+  }, [originalPan, pans, isPanLinked, showUndoToast]);
 
   // 비용적 초기화: 변환 비용적을 원래 비용적과 동일하게
-  const resetSpecificVolume = useCallback(() => {
+  const resetSpecificVolume = useCallback((showUndo: boolean = true) => {
+    const prevConvertedProduct = convertedProduct;
+    // 이미 기본값과 동일하면 변화 없음 -> 토스트 생략
+    if (prevConvertedProduct === originalProduct) {
+      setConvertedProduct(originalProduct);
+      return;
+    }
     setConvertedProduct(originalProduct);
-  }, [originalProduct]);
+    if (showUndo) {
+      showUndoToast(() => setConvertedProduct(prevConvertedProduct));
+    }
+  }, [originalProduct, convertedProduct, showUndoToast]);
 
   // 오븐 초기화: 기본값으로
-  const resetOvenSettings = useCallback(() => {
+  const resetOvenSettings = useCallback((showUndo: boolean = true) => {
+    const prevOven = oven;
     setOven({
       type: 'convection',
       level: '',
       firstBake: { topTemp: 200, bottomTemp: 170, time: 24 },
       secondBake: { topTemp: 0, bottomTemp: 0, time: 0 },
     });
-  }, []);
+    if (showUndo) {
+      showUndoToast(() => setOven(prevOven));
+    }
+  }, [oven, showUndoToast]);
 
   // 전체 변환 초기화
   const resetAllConversion = useCallback(() => {
-    resetPanSettings();
-    resetSpecificVolume();
-    resetOvenSettings();
+    // 초기화 직전 스냅샷 보관 (reset이 건드리는 전체 상태)
+    const prevPans = pans;
+    const prevIsPanLinked = isPanLinked;
+    const prevConvertedProduct = convertedProduct;
+    const prevOven = oven;
+    const prevMultiplier = multiplier;
+
+    // 개별 reset은 토스트를 띄우지 않도록 호출 (전체용 단일 토스트로 통합)
+    resetPanSettings(false);
+    resetSpecificVolume(false);
+    resetOvenSettings(false);
     setMultiplier(1);
-  }, [resetPanSettings, resetSpecificVolume, resetOvenSettings]);
+
+    showUndoToast(() => {
+      setPans(prevPans);
+      setIsPanLinked(prevIsPanLinked);
+      setConvertedProduct(prevConvertedProduct);
+      setOven(prevOven);
+      setMultiplier(prevMultiplier);
+    });
+  }, [resetPanSettings, resetSpecificVolume, resetOvenSettings, pans, isPanLinked, convertedProduct, oven, multiplier, showUndoToast]);
 
   // 레시피 저장 (실제 저장 로직)
   const saveRecipeData = useCallback((overwriteId?: string) => {

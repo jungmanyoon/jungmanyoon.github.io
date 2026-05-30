@@ -39,6 +39,7 @@ test[0-9].*
 nul
 진행상황.txt
 debug-*.png
+.review-shots/
 
 # Cache
 .cache/

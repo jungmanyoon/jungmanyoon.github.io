@@ -21,7 +21,7 @@ export default {
         }
       },
       fontFamily: {
-        'sans': ['Pretendard', 'Noto Sans KR', 'sans-serif'],
+        'sans': ['Pretendard Variable', 'Pretendard', '-apple-system', 'system-ui', 'Noto Sans KR', 'sans-serif'],
       }
     },
   },

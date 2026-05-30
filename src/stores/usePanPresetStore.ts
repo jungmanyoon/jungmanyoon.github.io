@@ -146,8 +146,9 @@ export const usePanPresetStore = create<PanPresetStore>()(
       },
 
       getRecentlyUsed: (limit = 5) => {
+        // persist 복원/외부 import 후 updatedAt이 문자열일 수 있어 방어적 변환
         return [...get().presets]
-          .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
           .slice(0, limit)
       },
 
@@ -202,8 +203,14 @@ export const usePanPresetStore = create<PanPresetStore>()(
       importPresets: (data) => {
         try {
           const imported = JSON.parse(data) as PanPreset[]
+          // 외부 JSON의 날짜 필드는 문자열이므로 Date로 정규화 (getTime 크래시 방지)
+          const normalized = imported.map(preset => ({
+            ...preset,
+            createdAt: new Date(preset.createdAt),
+            updatedAt: new Date(preset.updatedAt)
+          }))
           set(state => ({
-            presets: [...imported, ...state.presets]
+            presets: [...normalized, ...state.presets]
           }))
         } catch (error) {
           console.error('프리셋 가져오기 실패:', error)
@@ -213,7 +220,18 @@ export const usePanPresetStore = create<PanPresetStore>()(
     }),
     {
       name: 'pan-presets-storage',
-      version: 1
+      version: 1,
+      // persist 복원 시 날짜 필드(createdAt/updatedAt)가 문자열로 역직렬화되므로
+      // Date로 정규화하여 이후 .getTime() 등 날짜 연산 크래시를 방지
+      onRehydrateStorage: () => (state) => {
+        if (state?.presets) {
+          state.presets = state.presets.map(preset => ({
+            ...preset,
+            createdAt: new Date(preset.createdAt),
+            updatedAt: new Date(preset.updatedAt)
+          }))
+        }
+      }
     }
   )
 )

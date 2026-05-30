@@ -251,25 +251,84 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* 빈 상태 */}
+        {/* 빈 상태 - 풍부한 콘텐츠 포함 (AdSense 정책 준수) */}
         {recipes.length === 0 && (
-          <section className="text-center py-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-3">
-              <ChefHat className="w-8 h-8 text-amber-600" />
+          <section className="py-6">
+            {/* 시작 안내 */}
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-3">
+                <ChefHat className="w-8 h-8 text-amber-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                {t('home.noRecipesYet')}
+              </h3>
+              <p className="text-sm text-gray-500 mb-4">
+                {t('home.createFirstRecipe')}
+              </p>
+              <button
+                onClick={handleNewRecipe}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                {t('home.createNew')}
+              </button>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-1">
-              {t('home.noRecipesYet')}
-            </h3>
-            <p className="text-sm text-gray-500 mb-4">
-              {t('home.createFirstRecipe')}
-            </p>
-            <button
-              onClick={handleNewRecipe}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors text-sm"
-            >
-              <Plus className="w-4 h-4" />
-              {t('home.createNew')}
-            </button>
+
+            {/* 주요 기능 소개 - SEO & AdSense 콘텐츠 */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+              <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                레시피북 주요 기능
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
+                <div className="flex items-start gap-2">
+                  <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-amber-600 text-xs font-bold">1</span>
+                  </div>
+                  <div>
+                    <strong className="text-gray-800">베이커스 퍼센트 계산</strong>
+                    <p className="text-xs mt-0.5">모든 재료를 밀가루 중량 대비 백분율로 자동 변환합니다.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-amber-600 text-xs font-bold">2</span>
+                  </div>
+                  <div>
+                    <strong className="text-gray-800">DDT(반죽온도) 계산</strong>
+                    <p className="text-xs mt-0.5">목표 반죽 온도에 맞는 물 온도를 자동 계산합니다.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-amber-600 text-xs font-bold">3</span>
+                  </div>
+                  <div>
+                    <strong className="text-gray-800">팬 크기 스케일링</strong>
+                    <p className="text-xs mt-0.5">다양한 팬 크기에 맞춰 레시피를 자동 조정합니다.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-amber-600 text-xs font-bold">4</span>
+                  </div>
+                  <div>
+                    <strong className="text-gray-800">제법 변환</strong>
+                    <p className="text-xs mt-0.5">직접법, 스펀지법, 폴리시, 비가 등 제법 간 변환을 지원합니다.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 베이킹 팁 - 추가 콘텐츠 */}
+            <div className="bg-amber-50 rounded-lg p-4">
+              <h4 className="font-semibold text-amber-800 mb-2">💡 베이킹 팁</h4>
+              <p className="text-sm text-amber-700 leading-relaxed">
+                베이커스 퍼센트는 제빵 업계 표준 레시피 표기법입니다. 밀가루를 100%로 기준 삼고
+                다른 재료를 백분율로 표시하면, 어떤 양으로 만들어도 일관된 결과를 얻을 수 있습니다.
+                레시피북은 이 계산을 자동으로 처리해 드립니다.
+              </p>
+            </div>
           </section>
         )}
       </div>

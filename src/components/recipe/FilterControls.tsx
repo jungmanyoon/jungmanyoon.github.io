@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Filter, X, ChevronDown } from 'lucide-react'
 import { RecipeFilters, RecipeSortOption } from '@types/store.types'
@@ -24,6 +24,46 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   className = ''
 }) => {
   const { t } = useTranslation()
+
+  // 접근성: 어떤 드롭다운이 열려 있는지 관리 (hover 전용 -> 상태 기반 토글로 전환)
+  type DropdownKey = 'difficulty' | 'productType' | 'timeRange' | 'tags'
+  const [openDropdown, setOpenDropdown] = useState<DropdownKey | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const toggleDropdown = useCallback((key: DropdownKey) => {
+    setOpenDropdown(prev => (prev === key ? null : key))
+  }, [])
+
+  const closeDropdown = useCallback(() => {
+    setOpenDropdown(null)
+  }, [])
+
+  // 외부 클릭 시 열린 드롭다운 닫기
+  useEffect(() => {
+    if (!openDropdown) return
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        closeDropdown()
+      }
+    }
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('touchstart', handlePointerDown)
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('touchstart', handlePointerDown)
+    }
+  }, [openDropdown, closeDropdown])
+
+  // Escape 키로 열린 드롭다운 닫기
+  const handleDropdownKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Escape') {
+        event.stopPropagation()
+        closeDropdown()
+      }
+    },
+    [closeDropdown]
+  )
 
   const difficultyOptions: { value: DifficultyLevel; labelKey: string }[] = [
     { value: 'beginner', labelKey: 'filter.beginner' },
@@ -93,7 +133,11 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   }
 
   return (
-    <div className={`bg-white border border-bread-200 rounded-lg p-4 ${className}`}>
+    <div
+      ref={containerRef}
+      onKeyDown={handleDropdownKeyDown}
+      className={`bg-white border border-bread-200 rounded-lg p-4 ${className}`}
+    >
       <div className="flex flex-wrap items-center gap-4">
         {/* Filter Icon and Title */}
         <div className="flex items-center gap-2 text-bread-700 font-medium">
@@ -108,8 +152,13 @@ const FilterControls: React.FC<FilterControlsProps> = ({
 
         <div className="flex-1 flex flex-wrap items-center gap-3">
           {/* Difficulty Filter */}
-          <div className="relative group">
+          <div className="relative">
             <button
+              type="button"
+              onClick={() => toggleDropdown('difficulty')}
+              aria-haspopup="listbox"
+              aria-expanded={openDropdown === 'difficulty'}
+              aria-controls="filter-dropdown-difficulty"
               className="
                 px-3 py-2
                 border border-bread-200 rounded-lg
@@ -117,19 +166,24 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 text-bread-700 text-sm
                 transition-colors duration-200
                 flex items-center gap-2
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
               "
             >
               {t('filter.difficulty')}
               <ChevronDown className="w-4 h-4" />
             </button>
-            <div className="
+            <div
+              id="filter-dropdown-difficulty"
+              role="listbox"
+              aria-label={t('filter.difficulty')}
+              className={`
               absolute top-full left-0 mt-1
               w-48
               bg-white border border-bread-200 rounded-lg shadow-lg
-              opacity-0 invisible group-hover:opacity-100 group-hover:visible
+              ${openDropdown === 'difficulty' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
               z-10
-            ">
+            `}>
               <div className="p-2 space-y-1">
                 {difficultyOptions.map(({ value, labelKey }) => (
                   <label
@@ -154,8 +208,13 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           </div>
 
           {/* Product Type Filter - 제품 타입 (제빵/제과) */}
-          <div className="relative group">
+          <div className="relative">
             <button
+              type="button"
+              onClick={() => toggleDropdown('productType')}
+              aria-haspopup="listbox"
+              aria-expanded={openDropdown === 'productType'}
+              aria-controls="filter-dropdown-productType"
               className="
                 px-3 py-2
                 border border-bread-200 rounded-lg
@@ -163,19 +222,24 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 text-bread-700 text-sm
                 transition-colors duration-200
                 flex items-center gap-2
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
               "
             >
               {t('advDashboard.productType')}
               <ChevronDown className="w-4 h-4" />
             </button>
-            <div className="
+            <div
+              id="filter-dropdown-productType"
+              role="listbox"
+              aria-label={t('advDashboard.productType')}
+              className={`
               absolute top-full left-0 mt-1
               w-48
               bg-white border border-bread-200 rounded-lg shadow-lg
-              opacity-0 invisible group-hover:opacity-100 group-hover:visible
+              ${openDropdown === 'productType' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
               z-10
-            ">
+            `}>
               <div className="p-2 space-y-1">
                 {productTypeOptions.map(({ value, labelKey }) => (
                   <label
@@ -200,8 +264,13 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           </div>
 
           {/* Time Range Filter */}
-          <div className="relative group">
+          <div className="relative">
             <button
+              type="button"
+              onClick={() => toggleDropdown('timeRange')}
+              aria-haspopup="menu"
+              aria-expanded={openDropdown === 'timeRange'}
+              aria-controls="filter-dropdown-timeRange"
               className="
                 px-3 py-2
                 border border-bread-200 rounded-lg
@@ -209,27 +278,36 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 text-bread-700 text-sm
                 transition-colors duration-200
                 flex items-center gap-2
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
               "
             >
               {t('filter.time')}
               <ChevronDown className="w-4 h-4" />
             </button>
-            <div className="
+            <div
+              id="filter-dropdown-timeRange"
+              role="menu"
+              aria-label={t('filter.time')}
+              className={`
               absolute top-full left-0 mt-1
               w-48
               bg-white border border-bread-200 rounded-lg shadow-lg
-              opacity-0 invisible group-hover:opacity-100 group-hover:visible
+              ${openDropdown === 'timeRange' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
               z-10
-            ">
+            `}>
               <div className="p-2 space-y-1">
                 <button
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={!filters.timeRange}
                   onClick={() => handleTimeRangeChange(null)}
                   className={`
                     w-full text-left px-3 py-2
                     hover:bg-bread-50 rounded
                     transition-colors duration-150
                     text-sm text-bread-700
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
                     ${!filters.timeRange ? 'bg-bread-100 font-medium' : ''}
                   `}
                 >
@@ -238,12 +316,19 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 {timeRangeOptions.map(({ value, labelKey }) => (
                   <button
                     key={labelKey}
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={
+                      filters.timeRange?.min === value.min &&
+                      filters.timeRange?.max === value.max
+                    }
                     onClick={() => handleTimeRangeChange(value)}
                     className={`
                       w-full text-left px-3 py-2
                       hover:bg-bread-50 rounded
                       transition-colors duration-150
                       text-sm text-bread-700
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
                       ${
                         filters.timeRange?.min === value.min &&
                         filters.timeRange?.max === value.max
@@ -261,8 +346,13 @@ const FilterControls: React.FC<FilterControlsProps> = ({
 
           {/* Tags Filter */}
           {availableTags.length > 0 && (
-            <div className="relative group">
+            <div className="relative">
               <button
+                type="button"
+                onClick={() => toggleDropdown('tags')}
+                aria-haspopup="listbox"
+                aria-expanded={openDropdown === 'tags'}
+                aria-controls="filter-dropdown-tags"
                 className="
                   px-3 py-2
                   border border-bread-200 rounded-lg
@@ -270,20 +360,25 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                   text-bread-700 text-sm
                   transition-colors duration-200
                   flex items-center gap-2
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
                 "
               >
                 {t('filter.tags')}
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="
+              <div
+                id="filter-dropdown-tags"
+                role="listbox"
+                aria-label={t('filter.tags')}
+                className={`
                 absolute top-full left-0 mt-1
                 w-56
                 bg-white border border-bread-200 rounded-lg shadow-lg
-                opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                ${openDropdown === 'tags' ? 'opacity-100 visible' : 'opacity-0 invisible'}
                 transition-all duration-200
                 z-10
                 max-h-64 overflow-y-auto
-              ">
+              `}>
                 <div className="p-2 space-y-1">
                   {availableTags.map(tag => (
                     <label
@@ -323,7 +418,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 bg-white hover:bg-bread-50
                 text-bread-700 text-sm
                 transition-colors duration-200
-                focus:outline-none focus:ring-2 focus:ring-bread-500
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
                 cursor-pointer
               "
             >
@@ -338,6 +433,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           {/* Clear Filters Button */}
           {activeFilterCount > 0 && (
             <button
+              type="button"
               onClick={onClearFilters}
               className="
                 px-3 py-2
@@ -346,6 +442,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 text-bread-600 hover:text-bread-700 text-sm
                 transition-colors duration-200
                 flex items-center gap-2
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
               "
             >
               <X className="w-4 h-4" />

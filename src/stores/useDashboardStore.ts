@@ -104,8 +104,8 @@ export const useDashboardStore = create<DashboardStore>()(
             panScaleFactor: scaleFactor,
           }
 
-          pushToHistory(state, '팬 크기 변경', `Pan size changed`)
-          set({ conversionConfig: newConfig })
+          const historyUpdate = pushToHistory(state, newConfig, '팬 크기 변경', `Pan size changed`)
+          set({ conversionConfig: newConfig, ...historyUpdate })
           get().recalculate()
         },
 
@@ -120,8 +120,8 @@ export const useDashboardStore = create<DashboardStore>()(
             methodOptions: options || {},
           }
 
-          pushToHistory(state, `제법 변경: ${getMethodNameKo(method)}`, `Method: ${method}`)
-          set({ conversionConfig: newConfig })
+          const historyUpdate = pushToHistory(state, newConfig, `제법 변경: ${getMethodNameKo(method)}`, `Method: ${method}`)
+          set({ conversionConfig: newConfig, ...historyUpdate })
           get().recalculate()
         },
 
@@ -135,8 +135,8 @@ export const useDashboardStore = create<DashboardStore>()(
             batchMultiplier: multiplier,
           }
 
-          pushToHistory(state, `수량 ${multiplier}배`, `Quantity ×${multiplier}`)
-          set({ conversionConfig: newConfig })
+          const historyUpdate = pushToHistory(state, newConfig, `수량 ${multiplier}배`, `Quantity ×${multiplier}`)
+          set({ conversionConfig: newConfig, ...historyUpdate })
           get().recalculate()
         },
 
@@ -149,8 +149,8 @@ export const useDashboardStore = create<DashboardStore>()(
             targetYield: yield_,
           }
 
-          pushToHistory(state, `목표 생산량 변경`, `Target yield changed`)
-          set({ conversionConfig: newConfig })
+          const historyUpdate = pushToHistory(state, newConfig, `목표 생산량 변경`, `Target yield changed`)
+          set({ conversionConfig: newConfig, ...historyUpdate })
           get().recalculate()
         },
 
@@ -176,8 +176,8 @@ export const useDashboardStore = create<DashboardStore>()(
             environment: config,
           }
 
-          pushToHistory(state, `환경 조정`, `Environment adjusted`)
-          set({ conversionConfig: newConfig })
+          const historyUpdate = pushToHistory(state, newConfig, `환경 조정`, `Environment adjusted`)
+          set({ conversionConfig: newConfig, ...historyUpdate })
           get().recalculate()
         },
 
@@ -190,21 +190,30 @@ export const useDashboardStore = create<DashboardStore>()(
             ...config,
           }
 
-          pushToHistory(state, `복합 변환 적용`, `Multiple conversions applied`)
-          set({ conversionConfig: newConfig })
+          const historyUpdate = pushToHistory(state, newConfig, `복합 변환 적용`, `Multiple conversions applied`)
+          set({ conversionConfig: newConfig, ...historyUpdate })
           get().recalculate()
         },
 
         // ===== 히스토리 =====
         undo: () => {
           const state = get()
-          if (state.historyIndex <= 0) return
+          // 히스토리에는 "적용 완료된 스냅샷"만 쌓이고 변경 전 baseline은 없다.
+          // historyIndex === -1 이면 더 되돌릴 항목이 없으므로 무동작.
+          if (state.historyIndex < 0) return
 
           const newIndex = state.historyIndex - 1
-          const entry = state.history[newIndex]
+          // newIndex === -1 이면 첫 변경을 되돌리는 것이므로 초기(default) config로 복원.
+          const newConfig =
+            newIndex >= 0
+              ? state.history[newIndex].config
+              : {
+                  ...defaultConversionConfig,
+                  targetPan: state.sourceRecipe?.panConfig || null,
+                }
 
           set({
-            conversionConfig: entry.config,
+            conversionConfig: newConfig,
             historyIndex: newIndex,
           })
           get().recalculate()
@@ -212,6 +221,8 @@ export const useDashboardStore = create<DashboardStore>()(
 
         redo: () => {
           const state = get()
+          // 마지막 스냅샷에 도달했거나 히스토리가 비었으면 무동작.
+          // historyIndex === -1(baseline) 에서도 다음 스냅샷(index 0)으로 진행 가능.
           if (state.historyIndex >= state.history.length - 1) return
 
           const newIndex = state.historyIndex + 1
@@ -224,7 +235,9 @@ export const useDashboardStore = create<DashboardStore>()(
           get().recalculate()
         },
 
-        canUndo: () => get().historyIndex > 0,
+        // historyIndex >= 0 이면 현재 스냅샷에서 한 단계 되돌릴 수 있다
+        // (index === 0 이면 baseline으로 복원).
+        canUndo: () => get().historyIndex >= 0,
         canRedo: () => get().historyIndex < get().history.length - 1,
 
         // ===== 결과 저장 =====
@@ -399,11 +412,28 @@ function getMethodNameKo(method: BreadMethod): string {
   return names[method] || method
 }
 
-function pushToHistory(state: DashboardState, labelKo: string, label: string) {
+/**
+ * 변환 히스토리에 새 스냅샷을 추가하고 갱신된 {history, historyIndex}를 반환한다.
+ *
+ * - newConfig: 적용 완료된(변경 후) ConversionConfig 스냅샷. undo/redo는 이 스냅샷을
+ *   순서대로 오가며 복원하므로, 반드시 "변경 후" config를 넘겨야 정합한다.
+ * - history는 현재 위치(historyIndex)까지만 유지한 뒤 새 항목을 push한다.
+ *   (undo 도중 새 변경이 발생하면 redo 분기는 폐기됨)
+ * - 최대 50개 유지. shift로 가장 오래된 항목을 버릴 때 historyIndex를
+ *   newHistory.length - 1 로 보정해 off-by-one을 방지한다.
+ *
+ * 반환값을 호출부의 set()에 병합해 사용한다.
+ */
+function pushToHistory(
+  state: DashboardState,
+  newConfig: ConversionConfig,
+  labelKo: string,
+  label: string
+): { history: ConversionHistoryEntry[]; historyIndex: number } {
   const entry: ConversionHistoryEntry = {
     id: generateId(),
     timestamp: new Date(),
-    config: { ...state.conversionConfig },
+    config: { ...newConfig },
     label,
     labelKo,
   }
@@ -411,10 +441,17 @@ function pushToHistory(state: DashboardState, labelKo: string, label: string) {
   const newHistory = state.history.slice(0, state.historyIndex + 1)
   newHistory.push(entry)
 
+  // push 직후 historyIndex는 마지막 항목을 가리킨다.
+  let newHistoryIndex = newHistory.length - 1
+
   // 최대 50개 히스토리 유지
   if (newHistory.length > 50) {
     newHistory.shift()
+    // shift로 길이가 1 줄었으므로 인덱스를 보정 (off-by-one 방지)
+    newHistoryIndex = newHistory.length - 1
   }
+
+  return { history: newHistory, historyIndex: newHistoryIndex }
 }
 
 function createInitialSummary(recipe: Recipe): ConversionSummary {

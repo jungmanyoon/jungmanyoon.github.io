@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Pretendard Variable 웹폰트 (jsDelivr CDN) - 한글 본문 폰트 로드, 미적용 시 맑은 고딕 폴백 -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/variable/pretendardvariable.min.css">
+
     <meta name="description" content="무료 제과제빵 레시피 변환기 - 베이커스 퍼센트 계산, DDT(반죽 온도) 계산, 팬 크기별 레시피 조정을 자동으로 처리합니다. 전문 제빵사와 홈베이커를 위한 필수 도구.">
     <meta name="keywords" content="제빵, 레시피, 변환, 베이킹, 무료, 베이커스 퍼센트, DDT 계산기, 팬 스케일링, 제과, 빵 만들기">
     <meta name="author" content="레시피북">
@@ -85,9 +90,9 @@
     </script>
 </head>
 <body>
-    <!-- SEO: 정적 콘텐츠 (React 마운트 전 Google 크롤러가 볼 수 있음) -->
-    <div id="root">
-        <div id="static-content" style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <!-- SEO: 정적 콘텐츠 - #root 외부에 배치하여 React가 삭제하지 못하게 함 -->
+    <!-- 크롤러는 볼 수 있지만 사용자에게는 숨김 (React 마운트 후 CSS로 숨김) -->
+    <div id="seo-content" style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
             <!-- 헤더 -->
             <header style="background: linear-gradient(135deg, #d97706, #ea580c); color: white; padding: 40px 20px; border-radius: 12px; margin-bottom: 30px; text-align: center;">
                 <h1 style="font-size: 2.5rem; margin: 0 0 10px 0;">🍞 레시피북</h1>
@@ -328,13 +333,15 @@
             <div style="text-align: center; padding: 40px; color: #666;">
                 <p>애플리케이션을 불러오는 중입니다...</p>
             </div>
-        </div>
     </div>
+
+    <!-- React 앱 마운트 위치 - 정적 콘텐츠와 분리 -->
+    <div id="root"></div>
 
     <!-- SEO: JavaScript 비활성화 시 표시되는 콘텐츠 -->
     <noscript>
         <style>
-            #static-content { display: block !important; }
+            #seo-content { display: block !important; }
         </style>
         <div style="max-width: 800px; margin: 40px auto; padding: 20px; font-family: sans-serif; background: #fef3c7; border-radius: 12px;">
             <h2 style="color: #92400e;">JavaScript가 비활성화되어 있습니다</h2>
@@ -353,17 +360,24 @@
 
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- React 마운트 후 정적 콘텐츠 숨김 -->
+    <!-- React 마운트 후 정적 콘텐츠 숨김 (크롤러용으로 DOM에는 유지) -->
     <script>
-        // React가 마운트되면 정적 콘텐츠를 숨김
+        // React가 마운트되면 정적 콘텐츠를 시각적으로만 숨김 (DOM에는 유지하여 크롤러가 볼 수 있음)
         window.addEventListener('DOMContentLoaded', function() {
             var checkReact = setInterval(function() {
                 var root = document.getElementById('root');
-                if (root && root.children.length > 0 && !root.querySelector('#static-content')) {
-                    // React가 마운트됨
+                var seoContent = document.getElementById('seo-content');
+                if (root && root.children.length > 0) {
+                    // React가 마운트됨 - 정적 콘텐츠 숨기기 (크롤러용으로 DOM 유지)
+                    if (seoContent) {
+                        seoContent.style.position = 'absolute';
+                        seoContent.style.left = '-9999px';
+                        seoContent.style.width = '1px';
+                        seoContent.style.height = '1px';
+                        seoContent.style.overflow = 'hidden';
+                        seoContent.setAttribute('aria-hidden', 'true');
+                    }
                     clearInterval(checkReact);
-                } else if (root && root.querySelector('#static-content')) {
-                    // 아직 정적 콘텐츠가 있음 - React가 마운트되면 자동으로 교체됨
                 }
             }, 100);
             // 10초 후 체크 중단

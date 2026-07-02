@@ -83,7 +83,7 @@ export default function UserGuide({ onBack, onNavigate }: UserGuideProps) {
               <span className="bg-bread-100 text-bread-700 px-3 py-1 rounded-full text-sm">2</span>
               DDT 계산기 (반죽 온도 계산)
             </h2>
-            <div className="bg-blue-50 p-4 rounded-lg mb-4">
+            <div className="bg-brand-50 p-4 rounded-lg mb-4">
               <p className="text-gray-600 mb-3">
                 <strong>DDT(Desired Dough Temperature)</strong>는 반죽의 목표 온도입니다.
                 일관된 발효를 위해 매우 중요하며, 이 계산기는 물 온도를 자동으로 계산해줍니다.
@@ -179,9 +179,9 @@ export default function UserGuide({ onBack, onNavigate }: UserGuideProps) {
           </section>
 
           {/* 팁 */}
-          <section className="bg-green-50 p-6 rounded-lg">
-            <h2 className="text-xl font-semibold text-green-800 mb-4">💡 베이킹 팁</h2>
-            <ul className="text-green-900 space-y-3">
+          <section className="bg-brand-50 p-6 rounded-lg">
+            <h2 className="text-xl font-semibold text-brand-800 mb-4"><span aria-hidden="true">💡</span> 베이킹 팁</h2>
+            <ul className="text-brand-900 space-y-3">
               <li>
                 <strong>재료 계량:</strong> 정확한 계량을 위해 항상 저울을 사용하세요.
                 특히 밀가루는 컵 계량 시 오차가 크게 발생합니다.

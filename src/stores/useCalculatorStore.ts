@@ -13,7 +13,7 @@ import {
   YieldState,
   PanConversionState,
   MethodConversionState
-} from '@types/store.types'
+} from '@/types/store.types'
 
 const initialBakersPercentage: BakersPercentageState = {
   flourAmount: 1000,
@@ -58,7 +58,7 @@ const initialMethodConversion: MethodConversionState = {
 
 export const useCalculatorStore = create<CalculatorStore>()(
   devtools(
-    (set, get) => ({
+    (set) => ({
       // 상태
       bakersPercentage: initialBakersPercentage,
       ddtCalculation: initialDDT,

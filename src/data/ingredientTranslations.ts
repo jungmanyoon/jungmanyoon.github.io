@@ -841,7 +841,6 @@ export function translateBakingNote(note: string, targetLang: 'ko' | 'en' = 'en'
     '티스푼': 'tsp',
     '테이블스푼': 'tbsp',
     '컵': 'cup',
-    '분': 'min',
     '시간': 'hour',
     '개': 'pcs',
     '조각': 'pieces',
@@ -871,9 +870,13 @@ export function translateBakingNote(note: string, targetLang: 'ko' | 'en' = 'en'
 
   let translated = note;
 
-  // 숫자+% 패턴 유지
-  // 각 한글 용어를 영어로 치환
-  for (const [ko, en] of Object.entries(termMap)) {
+  // 단일 음절 '분'은 숫자 뒤에서만 단위(min)로 치환한다.
+  // (전역 치환하면 '전분'->'전min', '충분'->'충min' 등 재료명/복합어가 파괴됨)
+  translated = translated.replace(/(\d+)\s*분/g, '$1 min');
+
+  // 각 한글 용어를 영어로 치환. 긴 키부터 적용해 복합어('전분','수분')를 먼저 처리한다.
+  const sortedTerms = Object.entries(termMap).sort((a, b) => b[0].length - a[0].length);
+  for (const [ko, en] of sortedTerms) {
     translated = translated.replace(new RegExp(ko, 'g'), en);
   }
 

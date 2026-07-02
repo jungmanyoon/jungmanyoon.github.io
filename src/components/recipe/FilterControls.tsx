@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Filter, X, ChevronDown } from 'lucide-react'
-import { RecipeFilters, RecipeSortOption } from '@types/store.types'
-import { DifficultyLevel } from '@types/recipe.types'
+import { RecipeFilters, RecipeSortOption } from '@/types/store.types'
+import { DifficultyLevel } from '@/types/recipe.types'
 
 interface FilterControlsProps {
   filters: RecipeFilters

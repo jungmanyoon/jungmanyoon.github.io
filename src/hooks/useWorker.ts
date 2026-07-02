@@ -233,7 +233,7 @@ export function useCachedWorker<TInput, TOutput>(
     // 캐시 크기 제한 (최대 100개)
     if (cacheRef.current.size > 100) {
       const firstKey = cacheRef.current.keys().next().value
-      cacheRef.current.delete(firstKey)
+      if (firstKey !== undefined) cacheRef.current.delete(firstKey)
     }
 
     return result

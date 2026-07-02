@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useCallback, memo } from 'react'
+import { useState, useMemo, useCallback, memo } from 'react'
 import { useTranslation } from 'react-i18next'
-import Button from '../common/Button'
+import Button from '../common/Button.jsx'
 import RecipeCard from './RecipeCard'
-import { Recipe } from '@types/recipe.types'
+import { Recipe } from '@/types/recipe.types'
 import { Plus } from 'lucide-react'
 
 interface RecipeListProps {
@@ -26,7 +26,7 @@ const CategoryTab = memo<{
   count: number
   isSelected: boolean
   onClick: () => void
-}>(({ categoryKey, categoryName, count, isSelected, onClick }) => (
+}>(({ categoryName, count, isSelected, onClick }) => (
   <button
     onClick={onClick}
     className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${

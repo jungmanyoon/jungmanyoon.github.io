@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { lazy, Suspense, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@stores/useAppStore'
@@ -176,7 +175,7 @@ function App() {
             case 'settings':
                 return <SettingsPage onClose={() => setActiveTab('home')} />
             case 'help':
-                return <Help />
+                return <Help onClose={() => setActiveTab('home')} />
             case 'privacy':
                 return <PrivacyPolicy onBack={() => setActiveTab('home')} />
             case 'terms':

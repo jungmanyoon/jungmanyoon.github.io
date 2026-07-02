@@ -10,7 +10,7 @@
  * 성능 목표: <50ms
  */
 
-import type { Recipe, Ingredient, PanConfig, MethodConfig } from '@/types/recipe.types'
+import type { Recipe, Ingredient, PanConfig } from '@/types/recipe.types'
 import { PanScalingTS } from '@/utils/calculations/panScaling'
 
 export interface ConvertedRecipe {
@@ -159,7 +159,7 @@ export class RealtimeRecipeCalculator {
     )
     const water = ingredients.find((i) => i.name?.includes('물'))
     const yeast = ingredients.find(
-      (i) => i.category === 'yeast' || i.name?.includes('이스트')
+      (i) => i.category === 'leavening' || i.name?.includes('이스트')
     )
 
     if (!flour || !water || !yeast) {
@@ -237,7 +237,7 @@ export class RealtimeRecipeCalculator {
     )
     const water = ingredients.find((i) => i.name?.includes('물'))
     const yeast = ingredients.find(
-      (i) => i.category === 'yeast' || i.name?.includes('이스트')
+      (i) => i.category === 'leavening' || i.name?.includes('이스트')
     )
 
     if (!flour || !water || !yeast) {

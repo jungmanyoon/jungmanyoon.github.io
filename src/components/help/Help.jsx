@@ -110,9 +110,10 @@ function Help({ onClose }) {
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
+            aria-label={getContent(t, 'help.close', '도움말 닫기')}
+            className="text-gray-500 hover:text-gray-700 text-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded"
           >
-            ✕
+            <span aria-hidden="true">✕</span>
           </button>
         </div>
 
@@ -169,7 +170,7 @@ function Help({ onClose }) {
                   <li>{getContent(t, 'help.basicUsage.methodConversion.notime', DEFAULT_CONTENT.basicUsage.methodConversion.notime)}</li>
                 </ul>
                 <p className="text-xs text-gray-500 mt-2">
-                  ⚠️ {getContent(t, 'help.basicUsage.methodConversion.warning', DEFAULT_CONTENT.basicUsage.methodConversion.warning)}
+                  <span aria-hidden="true">⚠️</span> {getContent(t, 'help.basicUsage.methodConversion.warning', DEFAULT_CONTENT.basicUsage.methodConversion.warning)}
                 </p>
               </div>
             </div>
@@ -183,7 +184,7 @@ function Help({ onClose }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-bread-50 rounded-lg">
                 <h4 className="font-medium text-bread-700 mb-2">
-                  📏 {getContent(t, 'help.features.panScaling.title', DEFAULT_CONTENT.features.panScaling.title)}
+                  <span aria-hidden="true">📏</span> {getContent(t, 'help.features.panScaling.title', DEFAULT_CONTENT.features.panScaling.title)}
                 </h4>
                 <p className="text-sm text-gray-600">
                   {getContent(t, 'help.features.panScaling.desc', DEFAULT_CONTENT.features.panScaling.desc)}
@@ -192,7 +193,7 @@ function Help({ onClose }) {
 
               <div className="p-4 bg-bread-50 rounded-lg">
                 <h4 className="font-medium text-bread-700 mb-2">
-                  ✨ {getContent(t, 'help.features.advancedPan.title', DEFAULT_CONTENT.features.advancedPan.title)}
+                  <span aria-hidden="true">✨</span> {getContent(t, 'help.features.advancedPan.title', DEFAULT_CONTENT.features.advancedPan.title)}
                 </h4>
                 <p className="text-sm text-gray-600">
                   {getContent(t, 'help.features.advancedPan.desc', DEFAULT_CONTENT.features.advancedPan.desc)}
@@ -203,7 +204,7 @@ function Help({ onClose }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="p-4 bg-bread-50 rounded-lg">
                 <h4 className="font-medium text-bread-700 mb-2">
-                  🌡️ {getContent(t, 'help.features.ddtCalc.title', DEFAULT_CONTENT.features.ddtCalc.title)}
+                  <span aria-hidden="true">🌡️</span> {getContent(t, 'help.features.ddtCalc.title', DEFAULT_CONTENT.features.ddtCalc.title)}
                 </h4>
                 <p className="text-sm text-gray-600">
                   {getContent(t, 'help.features.ddtCalc.desc', DEFAULT_CONTENT.features.ddtCalc.desc)}
@@ -212,7 +213,7 @@ function Help({ onClose }) {
 
               <div className="p-4 bg-bread-50 rounded-lg">
                 <h4 className="font-medium text-bread-700 mb-2">
-                  🌍 {getContent(t, 'help.features.envAdjust.title', DEFAULT_CONTENT.features.envAdjust.title)}
+                  <span aria-hidden="true">🌍</span> {getContent(t, 'help.features.envAdjust.title', DEFAULT_CONTENT.features.envAdjust.title)}
                 </h4>
                 <p className="text-sm text-gray-600">
                   {getContent(t, 'help.features.envAdjust.desc', DEFAULT_CONTENT.features.envAdjust.desc)}
@@ -267,11 +268,11 @@ function Help({ onClose }) {
             <h3 className="text-lg font-semibold text-bread-600 mb-3">
               {getContent(t, 'help.bakersPercent.title', DEFAULT_CONTENT.bakersPercent.title)}
             </h3>
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800 mb-2">
+            <div className="p-4 bg-brand-50 rounded-lg">
+              <p className="text-sm text-brand-800 mb-2">
                 {getContent(t, 'help.bakersPercent.desc', DEFAULT_CONTENT.bakersPercent.desc)}
               </p>
-              <p className="text-sm text-blue-800">
+              <p className="text-sm text-brand-800">
                 {getContent(t, 'help.bakersPercent.example', DEFAULT_CONTENT.bakersPercent.example)}
               </p>
             </div>

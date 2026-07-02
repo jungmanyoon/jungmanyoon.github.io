@@ -3,16 +3,15 @@
  * 모든 재료를 밀가루 대비 백분율로 표현하는 제빵 업계 표준 방식
  */
 
-import { 
-  Ingredient, 
-  BakersPercentageCalculation,
-  RecipeYield 
-} from '@types/recipe.types'
-import { 
+import {
+  Ingredient,
+  BakersPercentageCalculation
+} from '@/types/recipe.types'
+import {
   BakersPercentageResult,
-  CalculatorIngredient 
-} from '@types/store.types'
-import { calculateMoisture, isLiquidIngredient } from '../data/ingredientMoisture'
+  CalculatorIngredient
+} from '@/types/store.types'
+import { calculateMoisture } from '../data/ingredientMoisture.js'
 
 interface BakersIngredient extends Ingredient {
   percentage?: number
@@ -160,7 +159,6 @@ export class BakersPercentage {
     flourAmount: number
   ): BakersPercentageCalculation {
     const withPercentages = this.toBakersPercentage(ingredients, flourAmount)
-    const totalWeight = this.calculateTotalWeight(ingredients)
     const hydration = this.calculateHydration(ingredients)
     const totalPercentage = withPercentages.reduce(
       (sum, ing) => sum + (ing.percentage || 0), 

@@ -5,8 +5,8 @@
 
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { Recipe } from '@types/recipe.types'
-import { RecipeStore, RecipeFilters, RecipeSortOption } from '@types/store.types'
+import { Recipe } from '@/types/recipe.types'
+import { RecipeStore, RecipeFilters, RecipeSortOption } from '@/types/store.types'
 import sampleRecipes from '@data/sampleRecipes.js'
 
 const initialFilters: RecipeFilters = {
@@ -15,6 +15,36 @@ const initialFilters: RecipeFilters = {
   searchQuery: '',
   tags: [],
   timeRange: undefined
+}
+
+/**
+ * 신뢰할 수 없는 외부 레시피(import/파일 로드)를 정규화한다.
+ * 목록 정렬(localeCompare)·필터·계산에서 참조하는 핵심 필드가 누락되면
+ * TypeError로 화면 전체가 크래시하므로, 스토어 진입점에서 불변식을 보장한다.
+ */
+const sanitizeRecipe = (raw: any): Recipe => {
+  const now = new Date()
+  const rid =
+    (raw && typeof raw.id === 'string' && raw.id) ||
+    `import-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  return {
+    ...raw,
+    id: rid,
+    name: typeof raw?.name === 'string' ? raw.name : '(이름 없음)',
+    productType: raw?.productType === 'pastry' ? 'pastry' : 'bread',
+    category: raw?.category ?? 'bread',
+    type: raw?.type ?? 'yeast',
+    difficulty: raw?.difficulty ?? 'beginner',
+    servings: Number.isFinite(raw?.servings) ? raw.servings : 1,
+    prepTime: Number.isFinite(raw?.prepTime) ? raw.prepTime : 0,
+    bakingTime: Number.isFinite(raw?.bakingTime) ? raw.bakingTime : 0,
+    totalTime: Number.isFinite(raw?.totalTime) ? raw.totalTime : 0,
+    ingredients: Array.isArray(raw?.ingredients) ? raw.ingredients : [],
+    tags: Array.isArray(raw?.tags) ? raw.tags : [],
+    steps: Array.isArray(raw?.steps) ? raw.steps : [],
+    createdAt: raw?.createdAt ? new Date(raw.createdAt) : now,
+    updatedAt: raw?.updatedAt ? new Date(raw.updatedAt) : now,
+  } as Recipe
 }
 
 export const useRecipeStore = create<RecipeStore>()(
@@ -78,10 +108,15 @@ export const useRecipeStore = create<RecipeStore>()(
         importRecipes: async (recipes: Recipe[]) => {
           return new Promise((resolve) => {
             set((state) => {
-              // 중복 체크
+              // 신뢰할 수 없는 입력을 정규화하고 객체가 아닌 항목은 스킵
+              const incoming = Array.isArray(recipes) ? recipes : []
+              const sanitized = incoming
+                .filter((r) => r && typeof r === 'object')
+                .map((r) => sanitizeRecipe(r))
+              // 중복 체크 (sanitizeRecipe가 id를 보장하므로 undefined-id로 인한 무력화 없음)
               const existingIds = new Set(state.recipes.map(r => r.id))
-              const newRecipes = recipes.filter(r => !existingIds.has(r.id))
-              
+              const newRecipes = sanitized.filter(r => !existingIds.has(r.id))
+
               return {
                 recipes: [...state.recipes, ...newRecipes]
               }
@@ -251,9 +286,9 @@ export const selectFilteredRecipes = (state: RecipeStore) => {
   filtered.sort((a, b) => {
     switch (state.sortBy) {
       case 'name':
-        return a.name.localeCompare(b.name)
+        return (a.name ?? '').localeCompare(b.name ?? '')
       case 'category':
-        return a.category.localeCompare(b.category)
+        return (a.category ?? '').localeCompare(b.category ?? '')
       case 'difficulty':
         const difficultyOrder = ['beginner', 'intermediate', 'advanced', 'professional']
         return difficultyOrder.indexOf(a.difficulty) - difficultyOrder.indexOf(b.difficulty)

@@ -100,6 +100,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
   const {
     product,
     setVolumeOverride,
+    deleteVolumeOverride,
     addCustomProduct,
     deleteCustomProduct
   } = useSettingsStore()
@@ -330,12 +331,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                     <span className="text-xs text-gray-500">cm³/g</span>
                     {modified && (
                       <button
-                        onClick={() => {
-                          const newOverrides = { ...product.breadVolumes }
-                          delete newOverrides[name]
-                          // Reset to default by setting it again
-                          handleVolumeUpdate('bread', name, defaultVolume)
-                        }}
+                        onClick={() => deleteVolumeOverride('bread', name)}
                         className="p-1 text-amber-500 hover:bg-amber-100 rounded"
                         title={t('settings.product.resetToDefault')}
                       >
@@ -426,9 +422,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                     <span className="text-xs text-gray-500">cm³/g</span>
                     {modified && (
                       <button
-                        onClick={() => {
-                          handleVolumeUpdate('cake', name, defaultVolume)
-                        }}
+                        onClick={() => deleteVolumeOverride('cake', name)}
                         className="p-1 text-pink-500 hover:bg-pink-100 rounded"
                         title={t('settings.product.resetToDefault')}
                       >

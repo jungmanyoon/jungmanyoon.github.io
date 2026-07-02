@@ -5,7 +5,7 @@
 
 import { BakersPercentage } from '@utils/calculations/bakersPercentage'
 import { DDTCalculator } from '@utils/calculations/ddtCalculator'
-import { Ingredient, Recipe } from '@types/recipe.types'
+import { Ingredient, Recipe } from '@/types/recipe.types'
 
 export type WorkerMessage = 
   | { type: 'BAKERS_PERCENTAGE'; data: BakersPercentageInput }

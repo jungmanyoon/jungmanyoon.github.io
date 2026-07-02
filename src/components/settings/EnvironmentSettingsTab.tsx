@@ -496,7 +496,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             return (
               <div
                 key={profile.id}
-                className={`relative p-4 rounded-lg border-2 transition-all ${
+                className={`group relative p-4 rounded-lg border-2 transition-all ${
                   isActive
                     ? 'border-cyan-500 bg-cyan-50'
                     : 'border-gray-200 bg-white hover:border-gray-300'
@@ -529,13 +529,14 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
 
                 {/* 편집/삭제 버튼 (빌트인 아닌 경우만) */}
                 {!isBuiltIn && (
-                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 hover:opacity-100 transition-opacity">
+                  <div className="absolute top-2 right-2 flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100 transition-opacity">
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         startEditingProfile(profile)
                       }}
-                      className="p-1 bg-white rounded hover:bg-gray-100"
+                      aria-label={t('common.edit')}
+                      className="p-1 bg-white rounded hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                     >
                       <Edit2 className="w-3 h-3 text-gray-500" />
                     </button>
@@ -546,7 +547,8 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                           deleteEnvironmentProfile(profile.id)
                         }
                       }}
-                      className="p-1 bg-white rounded hover:bg-red-50"
+                      aria-label={t('common.delete')}
+                      className="p-1 bg-white rounded hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                     >
                       <Trash2 className="w-3 h-3 text-red-500" />
                     </button>

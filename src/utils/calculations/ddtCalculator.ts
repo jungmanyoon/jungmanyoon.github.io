@@ -3,8 +3,8 @@
  * 목표 반죽 온도를 달성하기 위한 물 온도 계산
  */
 
-import { DDTCalculation } from '@types/recipe.types'
-import { DDTState, DDTResult } from '@types/store.types'
+import { DDTCalculation } from '@/types/recipe.types'
+import { DDTState, DDTResult } from '@/types/store.types'
 
 export type MixerType = 'hand' | 'stand' | 'spiral' | 'planetary' | 'intensive'
 
@@ -71,10 +71,10 @@ export class DDTCalculator {
    * 물 온도 계산 (기본 DDT 공식)
    */
   static calculateWaterTemp(
-    targetTemp: number, 
-    flourTemp: number, 
-    roomTemp: number, 
-    frictionFactor: number = 24
+    targetTemp: number,
+    flourTemp: number,
+    roomTemp: number,
+    frictionFactor: number = 8   // 섭씨 전용 공식: 기본값도 섭씨 stand(8). 화씨 24 유입 방지
   ): number {
     // DDT = (밀가루 온도 + 실온 + 물 온도 + 마찰계수) / 3
     // 물 온도 = (DDT × 3) - 밀가루 온도 - 실온 - 마찰계수
@@ -87,9 +87,9 @@ export class DDTCalculator {
    * 프리퍼먼트가 있는 경우 물 온도 계산
    */
   static calculateWaterTempWithPreferment(
-    targetTemp: number, 
-    temps: TemperatureInputs, 
-    frictionFactor: number = 24
+    targetTemp: number,
+    temps: TemperatureInputs,
+    frictionFactor: number = 8   // 섭씨 전용 공식: 기본값도 섭씨 stand(8)
   ): number {
     const { flour, room, preferment } = temps
     
@@ -149,7 +149,10 @@ export class DDTCalculator {
     mixerType: MixerType = 'stand'
   ): number {
     const { flour, water = 20, room, preferment } = temps
-    const frictionFactor = this.FRICTION_FACTORS[mixerType] || 24
+    // 입력 온도(flour/water/room)는 섭씨이므로 섭씨 마찰상수를 사용해야 한다(C-5 정합).
+    // 화씨 상수(FRICTION_FACTORS)를 쓰면 예측 반죽온도가 약 5°C 과대 산출된다.
+    // `?? 8`: hand의 0을 falsy로 삼켜 24로 대체되던 버그(`|| 24`)도 함께 제거.
+    const frictionFactor = this.FRICTION_FACTORS_CELSIUS[mixerType] ?? 8
 
     // 손반죽은 마찰계수 0 고정
     const effectiveFriction = mixerType === 'hand' ? 0 : frictionFactor

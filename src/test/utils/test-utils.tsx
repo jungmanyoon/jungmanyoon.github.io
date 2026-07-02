@@ -1,6 +1,6 @@
-import React, { ReactElement } from 'react'
+import { ReactElement } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
-import { vi } from 'vitest'
+import { vi, expect } from 'vitest'
 
 // 커스텀 렌더링 함수
 const customRender = (

@@ -9,7 +9,7 @@
  * - 강력분 500
  */
 
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react'
 import { findIngredientInfo } from '@/data/ingredientDatabase'

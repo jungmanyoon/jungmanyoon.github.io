@@ -16,10 +16,6 @@ export default function Contact({ onBack }: ContactProps) {
     window.location.href = 'mailto:jmyoon0702@gmail.com?subject=[Recipe Book] Inquiry'
   }
 
-  const handleGithubClick = () => {
-    window.open('https://github.com/jungmanyoon/baking-converter', '_blank')
-  }
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
@@ -44,9 +40,9 @@ export default function Contact({ onBack }: ContactProps) {
             <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('legal.contact.methods')}</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {/* 이메일 */}
-              <div
-                onClick={handleEmailClick}
-                className="p-6 border-2 border-gray-200 rounded-lg hover:border-bread-400 hover:bg-bread-50 transition-all cursor-pointer group"
+              <a
+                href="mailto:jmyoon0702@gmail.com?subject=[Recipe Book] Inquiry"
+                className="block p-6 border-2 border-gray-200 rounded-lg hover:border-bread-400 hover:bg-bread-50 transition-all cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-bread-100 rounded-full flex items-center justify-center group-hover:bg-bread-200 transition-colors">
@@ -62,12 +58,14 @@ export default function Contact({ onBack }: ContactProps) {
                 <p className="mt-3 text-sm text-gray-500">
                   {t('legal.contact.emailDesc')}
                 </p>
-              </div>
+              </a>
 
               {/* GitHub */}
-              <div
-                onClick={handleGithubClick}
-                className="p-6 border-2 border-gray-200 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all cursor-pointer group"
+              <a
+                href="https://github.com/jungmanyoon/baking-converter"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-6 border-2 border-gray-200 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors">
@@ -83,7 +81,7 @@ export default function Contact({ onBack }: ContactProps) {
                 <p className="mt-3 text-sm text-gray-500">
                   {t('legal.contact.githubDesc')}
                 </p>
-              </div>
+              </a>
             </div>
           </section>
 

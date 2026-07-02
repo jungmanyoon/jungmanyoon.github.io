@@ -93,6 +93,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
     yieldLoss,
     setCategoryLossOverride,
     setProductLossOverride,
+    deleteProductLossOverride,
     setEnvironmentAdjustment,
     resetToDefaults
   } = useSettingsStore()
@@ -452,7 +453,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                     {hasOverride && (
                       <button
                         onClick={() => {
-                          setProductLossOverride(productKey, {})
+                          deleteProductLossOverride(productKey)
                           setEditingProduct(null)
                         }}
                         className="mt-2 text-xs text-red-600 hover:text-red-700"

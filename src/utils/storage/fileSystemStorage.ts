@@ -24,7 +24,7 @@ export function isFileSystemAccessSupported(): boolean {
 
 // IndexedDB에서 저장된 디렉토리 핸들 가져오기
 async function getStoredDirectoryHandle(): Promise<FileSystemDirectoryHandle | null> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const request = indexedDB.open(DB_NAME, 1)
 
     request.onerror = () => resolve(null)

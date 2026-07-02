@@ -4,7 +4,7 @@
  * 공정별 선택 기능 지원
  */
 
-import React, { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   calculateYieldLoss,

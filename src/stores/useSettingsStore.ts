@@ -368,12 +368,14 @@ interface SettingsStore {
 
   // 제품 설정 액션
   setVolumeOverride: (category: 'bread' | 'cake', product: string, volume: number) => void
+  deleteVolumeOverride: (category: 'bread' | 'cake', product: string) => void
   addCustomProduct: (product: ProductVolumeSettings['customProducts'][0]) => void
   deleteCustomProduct: (id: string) => void
 
   // 수율 손실 설정 액션
   setCategoryLossOverride: (category: string, rates: Partial<ProcessLossRates>) => void
   setProductLossOverride: (product: string, rates: Partial<ProcessLossRates>) => void
+  deleteProductLossOverride: (product: string) => void
   setEnvironmentAdjustment: (enabled: boolean) => void
 
   // 제법 설정 액션
@@ -393,6 +395,7 @@ interface SettingsStore {
   addCustomIngredient: (ingredient: Omit<CustomIngredient, 'id'>) => void
   deleteCustomIngredient: (id: string) => void
   setMoistureOverride: (ingredient: string, moisture: number) => void
+  deleteMoistureOverride: (ingredient: string) => void
   setCostOverride: (ingredient: string, cost: CostOverride) => void          // 원가 오버라이드
   setNutritionOverride: (ingredient: string, nutrition: NutritionOverride) => void  // 영양 오버라이드
   deleteCostOverride: (ingredient: string) => void
@@ -500,6 +503,21 @@ export const useSettingsStore = create<SettingsStore>()(
         }))
       },
 
+      // 비용적 오버라이드 삭제 (복원 시 '수정됨' 상태를 실제로 해제)
+      deleteVolumeOverride: (category, product) => {
+        set(state => {
+          const key = category === 'bread' ? 'breadVolumes' : 'cakeVolumes'
+          const rest = { ...state.product[key] }
+          delete rest[product]
+          return {
+            product: {
+              ...state.product,
+              [key]: rest
+            }
+          }
+        })
+      },
+
       addCustomProduct: (productData) => {
         const newProduct = {
           ...productData,
@@ -542,6 +560,20 @@ export const useSettingsStore = create<SettingsStore>()(
             productOverrides: { ...state.yieldLoss.productOverrides, [product]: rates }
           }
         }))
+      },
+
+      // 제품 수율손실 오버라이드 삭제 (제거 버튼이 실제로 오버라이드를 지우도록)
+      deleteProductLossOverride: (product) => {
+        set(state => {
+          const rest = { ...state.yieldLoss.productOverrides }
+          delete rest[product]
+          return {
+            yieldLoss: {
+              ...state.yieldLoss,
+              productOverrides: rest
+            }
+          }
+        })
       },
 
       setEnvironmentAdjustment: (enabled) => {
@@ -664,6 +696,20 @@ export const useSettingsStore = create<SettingsStore>()(
             moistureOverrides: { ...state.ingredient.moistureOverrides, [ingredientName]: moisture }
           }
         }))
+      },
+
+      // 수분 오버라이드 삭제 (초기화 버튼이 강조/카운트를 실제로 해제하도록)
+      deleteMoistureOverride: (ingredientName) => {
+        set(state => {
+          const rest = { ...state.ingredient.moistureOverrides }
+          delete rest[ingredientName]
+          return {
+            ingredient: {
+              ...state.ingredient,
+              moistureOverrides: rest
+            }
+          }
+        })
       },
 
       // 원가 오버라이드 설정

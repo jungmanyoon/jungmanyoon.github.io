@@ -20,7 +20,19 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
 
   useEffect(() => {
     if (recipe) {
-      setFormData(recipe)
+      // 도메인 Recipe에는 instructions/notes가 없을 수 있어(steps만 존재) 통째 교체 시
+      // 렌더에서 formData.instructions.map이 크래시한다. 기본값과 병합하고 배열 필드를 강제 정규화.
+      setFormData({
+        name: '',
+        description: '',
+        category: 'bread',
+        method: 'straight',
+        servings: 1,
+        notes: '',
+        ...recipe,
+        ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients : [],
+        instructions: Array.isArray(recipe.instructions) ? recipe.instructions : [],
+      })
     }
   }, [recipe])
 
@@ -157,7 +169,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
       <div className="card mb-3">
         <h3 className="text-base font-semibold mb-2">{t('components.recipeEditor.instructions')}</h3>
         <div className="space-y-2">
-          {formData.instructions.map((instruction, index) => (
+          {(formData.instructions || []).map((instruction, index) => (
             <div key={index} className="flex gap-2">
               <span className="text-bread-600 font-medium">{index + 1}.</span>
               <input

@@ -7,9 +7,9 @@
  * - 변환 배율이 있으면 원본 → 변환 값을 인라인 표시
  */
 
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { ChevronDown, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react'
 import type { Recipe, Ingredient, IngredientPhase, PhaseType } from '@/types/recipe.types'
 
 // 단계 타입별 메타데이터 (라벨은 i18n으로 동적 처리)
@@ -61,8 +61,6 @@ export default function PhaseIngredientsView({
   recipe,
   multiplier = 1,
   showConversion = true,
-  editable = false,
-  onIngredientChange,
   compact = false,
   className = ''
 }: PhaseIngredientsViewProps) {

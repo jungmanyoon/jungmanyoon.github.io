@@ -7,27 +7,19 @@ import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocaleStore } from '@/stores/useLocaleStore';
 import {
-  convertTemperature,
   convertWeight,
   convertVolume,
   convertLength,
-  formatWithUnit,
   formatNumber,
   celsiusToFahrenheit,
   gramsToOunces,
   mlToCups,
   cmToInches,
-  UNIT_SYMBOLS,
-  TemperatureUnit,
-  WeightUnit,
-  VolumeUnit,
-  LengthUnit
+  UNIT_SYMBOLS
 } from '@/utils/unitConverter';
 import {
   findIngredient,
-  getIngredientName,
-  translateToEnglish,
-  translateToKorean
+  getIngredientName
 } from '@/data/ingredientTranslations';
 import { translateProcessStep as translateProcessStepFn } from '@/data/processStepTranslations';
 

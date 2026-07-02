@@ -239,7 +239,6 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     // 발효/시간
     '발효': 'fermentation',
     '휴지': 'rest',
-    '분': 'min',
     '시간': 'hour',
     '약불': 'low heat',
     '중불': 'medium heat',
@@ -254,7 +253,6 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     '감아': 'wrap',
 
     // 온도/설정
-    '도': '°C',
     '상온': 'room temperature',
     '냉장': 'refrigerated',
     '냉동': 'frozen',
@@ -283,8 +281,16 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     translated = translated.replace(pattern, replacement as string);
   }
 
-  // 남은 한글 단어에 대해 개별 용어 치환
-  for (const [ko, en] of Object.entries(termMap)) {
+  // 단일 음절 오염 방지: '분'/'도'는 숫자 뒤에서만 단위로 치환한다.
+  // (그냥 전역 치환하면 '분할'->'min할', '온도'/'정도'->'온°C'/'정°C'로 한글 단어가 파괴됨)
+  translated = translated
+    .replace(/(\d+)\s*분/g, '$1 min')
+    .replace(/(\d+)\s*도/g, '$1°C');
+
+  // 남은 한글 단어에 대해 개별 용어 치환.
+  // 긴 키를 먼저 치환해야 '분할'이 '분'보다, '믹싱합니다'가 '믹싱'보다 우선 적용된다.
+  const sortedTerms = Object.entries(termMap).sort((a, b) => b[0].length - a[0].length);
+  for (const [ko, en] of sortedTerms) {
     translated = translated.replace(new RegExp(ko, 'g'), en);
   }
 

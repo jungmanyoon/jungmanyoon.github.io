@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Recipe, BreadMethod, SourceType } from '@types/recipe.types'
+import { Recipe, BreadMethod, SourceType } from '@/types/recipe.types'
 import { Pencil, Youtube, BookOpen, Globe, User, GraduationCap } from 'lucide-react'
 import { toast } from '@utils/toast'
 import { useLocalization } from '@/hooks/useLocalization'

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { expect, afterEach, vi } from 'vitest'
+import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
 // React Testing Library 정리
@@ -23,15 +23,29 @@ Object.defineProperty(window, 'matchMedia', {
 })
 
 // localStorage 모킹
+// 실제로 값을 저장/반환하는 in-memory 구현(기존 vi.fn() 목은 항상 undefined 반환).
+// spy 기능도 유지하기 위해 각 메서드를 vi.fn()으로 감싼다.
+const createStorageMock = () => {
+  let store: Record<string, string> = {}
+  return {
+    getItem: vi.fn((key: string) => (key in store ? store[key] : null)),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = String(value)
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key]
+    }),
+    clear: vi.fn(() => {
+      store = {}
+    }),
+    key: vi.fn((index: number) => Object.keys(store)[index] ?? null),
+    get length() {
+      return Object.keys(store).length
+    },
+  }
+}
 Object.defineProperty(window, 'localStorage', {
-  value: {
-    getItem: vi.fn(),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-    key: vi.fn(),
-    length: 0,
-  },
+  value: createStorageMock(),
   writable: true,
 })
 

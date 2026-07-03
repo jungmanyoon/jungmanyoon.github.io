@@ -166,14 +166,13 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {MIXER_TYPES.map(mixer => {
             const currentValue = advanced.mixerFriction[mixer.key] ?? mixer.defaultValue
-            const isCustom = mixer.key === 'custom'
+            // MIXER_TYPES 에는 'custom' 키가 없어 커스텀 분기는 도달 불가(죽은 코드) → 제거
+            // 커스텀 믹서는 아래 expertMode 전용 블록에서 별도 처리됨
 
             return (
               <div
                 key={mixer.key}
-                className={`p-4 border rounded-lg ${
-                  isCustom ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-200'
-                }`}
+                className="p-4 border rounded-lg bg-white border-gray-200"
               >
                 <div className="flex items-center gap-2 mb-2 text-gray-600">
                   {mixer.icon}

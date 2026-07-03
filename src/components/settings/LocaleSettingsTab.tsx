@@ -6,7 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { useLocaleStore } from '@/stores/useLocaleStore';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, UnitSystem, UNIT_SYSTEMS } from '@/i18n';
-import { TemperatureUnit, WeightUnit, VolumeUnit, LengthUnit, UNIT_SYMBOLS } from '@/utils/unitConverter';
+import { TemperatureUnit, WeightUnit, VolumeUnit, LengthUnit } from '@/utils/unitConverter';
 
 export default function LocaleSettingsTab() {
   const { t } = useTranslation();

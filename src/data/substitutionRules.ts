@@ -378,12 +378,15 @@ export const SUBSTITUTION_RULES: SubstitutionRule[] = [
 
 /**
  * 원재료에 대한 대체 규칙 조회
+ *
+ * 정확 매칭(공백 무시)만 반환한다.
+ * (양방향 부분매칭은 '설탕' 조회 시 '황설탕/흑설탕' 규칙까지, '황설탕' 조회 시 '설탕' 규칙까지
+ *  잘못 섞여 반환되는 문제가 있었음)
  */
 export function getSubstitutionRules(originalIngredient: string): SubstitutionRule[] {
-  const ingredientLower = originalIngredient.toLowerCase()
+  const normalized = originalIngredient.toLowerCase().trim().replace(/\s+/g, '')
   return SUBSTITUTION_RULES.filter(
-    rule => rule.original.toLowerCase().includes(ingredientLower) ||
-            ingredientLower.includes(rule.original.toLowerCase())
+    rule => rule.original.toLowerCase().replace(/\s+/g, '') === normalized
   )
 }
 

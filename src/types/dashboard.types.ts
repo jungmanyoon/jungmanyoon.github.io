@@ -5,10 +5,8 @@
 
 import type {
   Recipe,
-  Ingredient,
   PanConfig,
-  BreadMethod,
-  RecipeYield
+  BreadMethod
 } from './recipe.types'
 
 // ===== 패널 상태 =====

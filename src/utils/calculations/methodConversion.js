@@ -27,7 +27,11 @@ export class MethodConversion {
 
     // 중종용 재료 계산 (전문가 표준 기준)
     const spongeFlour = flourTotal * spongePortion
-    const spongeLiquid = spongeFlour * 0.6 // 60% 수화율 (BAKERpedia 표준 58-65%)
+    const desiredSpongeLiquid = spongeFlour * 0.6 // 60% 수화율 (BAKERpedia 표준 58-65%)
+    // 저수화율 방어: 원본 액체보다 많이 가져갈 수 없도록 클램프 (질량 보존)
+    const spongeLiquid = Math.min(desiredSpongeLiquid, liquidTotal)
+    // 투입/차감 공통 비율 [0,1] (음수·과차감으로 인한 액체 소실 차단)
+    const liquidRatio = liquidTotal > 0 ? Math.min(Math.max(spongeLiquid / liquidTotal, 0), 1) : 0
     const spongeYeast = yeastTotal // 전체 이스트를 중종에 사용 (Wikipedia, ChainBaker 표준)
     
     // 중종 재료
@@ -45,10 +49,9 @@ export class MethodConversion {
       })
     }
     
-    // 액체 분배 - 기존 액체 재료에서 차감
+    // 액체 분배 - 기존 액체 재료에서 차감 (투입/차감 동일 조건: liquidRatio)
     const liquidIngredients = ingredients.filter(ing => ing.type === 'liquid' || ing.type === 'egg')
-    if (liquidIngredients.length > 0 && spongeLiquid <= liquidTotal) {
-      const liquidRatio = spongeLiquid / liquidTotal
+    if (liquidIngredients.length > 0 && liquidRatio > 0) {
       liquidIngredients.forEach(liquid => {
         const liquidAmount = parseFloat(liquid.amount) || 0
         const spongeAmount = liquidAmount * liquidRatio
@@ -85,8 +88,7 @@ export class MethodConversion {
         const ratio = originalAmount / flourTotal
         newIngredient.amount = (originalAmount - spongeFlour * ratio).toFixed(1)
       } else if (ingredient.type === 'liquid' || ingredient.type === 'egg') {
-        // 액체는 중종에 사용된 비율만큼 차감
-        const liquidRatio = spongeLiquid / liquidTotal
+        // 액체는 중종에 사용된 비율만큼 차감 (liquidRatio [0,1] 클램프로 음수/소실 방지)
         newIngredient.amount = (originalAmount - originalAmount * liquidRatio).toFixed(1)
       } else if (ingredient.type === 'yeast') {
         // 이스트는 모두 중종에 사용되므로 본반죽에는 없음
@@ -135,7 +137,10 @@ export class MethodConversion {
     
     // 폴리쉬용 재료 계산
     const poolishFlour = flourTotal * poolishPortion
-    const poolishLiquid = poolishFlour // 100% 수화율
+    const desiredPoolishLiquid = poolishFlour // 100% 수화율
+    // 저수화율 방어: 원본 액체보다 많이 가져갈 수 없도록 클램프 (질량 보존)
+    const poolishLiquid = Math.min(desiredPoolishLiquid, liquidTotal)
+    const liquidRatio = liquidTotal > 0 ? Math.min(Math.max(poolishLiquid / liquidTotal, 0), 1) : 0
     const poolishYeast = poolishFlour * 0.002 // 0.2%
     
     // 폴리쉬 재료
@@ -153,10 +158,9 @@ export class MethodConversion {
       })
     }
     
-    // 액체 분배 - 기존 액체 재료에서 차감
+    // 액체 분배 - 기존 액체 재료에서 차감 (투입/차감 동일 조건: liquidRatio)
     const liquidIngredients = ingredients.filter(ing => ing.type === 'liquid' || ing.type === 'egg')
-    if (liquidIngredients.length > 0 && poolishLiquid <= liquidTotal) {
-      const liquidRatio = poolishLiquid / liquidTotal
+    if (liquidIngredients.length > 0 && liquidRatio > 0) {
       liquidIngredients.forEach(liquid => {
         const liquidAmount = parseFloat(liquid.amount) || 0
         const poolishAmount = liquidAmount * liquidRatio
@@ -190,7 +194,7 @@ export class MethodConversion {
         const ratio = originalAmount / flourTotal
         newIngredient.amount = (originalAmount - poolishFlour * ratio).toFixed(1)
       } else if (ingredient.type === 'liquid' || ingredient.type === 'egg') {
-        const liquidRatio = poolishLiquid / liquidTotal
+        // liquidRatio [0,1] 클램프로 음수/소실 방지
         newIngredient.amount = (originalAmount - originalAmount * liquidRatio).toFixed(1)
       } else if (ingredient.type === 'yeast') {
         newIngredient.amount = (originalAmount - poolishYeast).toFixed(2)
@@ -233,7 +237,10 @@ export class MethodConversion {
     
     // 비가용 재료 계산
     const bigaFlour = flourTotal * bigaPortion
-    const bigaLiquid = bigaFlour * 0.5 // 50% 수화율
+    const desiredBigaLiquid = bigaFlour * 0.5 // 50% 수화율
+    // 저수화율 방어: 원본 액체보다 많이 가져갈 수 없도록 클램프 (질량 보존)
+    const bigaLiquid = Math.min(desiredBigaLiquid, liquidTotal)
+    const liquidRatio = liquidTotal > 0 ? Math.min(Math.max(bigaLiquid / liquidTotal, 0), 1) : 0
     const bigaYeast = bigaFlour * 0.001 // 0.1%
     
     // 비가 재료
@@ -251,10 +258,13 @@ export class MethodConversion {
       })
     }
     
-    // 액체 분배 - 기존 액체 재료에서 차감
+    // 액체가 부족한 경우 경고 (원본 목표 수화율 기준)
+    if (desiredBigaLiquid > liquidTotal) {
+      console.warn('원본 레시피의 수화율이 너무 낮아 비가법 변환이 어렵습니다.')
+    }
+    // 액체 분배 - 기존 액체 재료에서 차감 (투입/차감 동일 조건: liquidRatio)
     const liquidIngredients = ingredients.filter(ing => ing.type === 'liquid' || ing.type === 'egg')
-    if (liquidIngredients.length > 0 && bigaLiquid <= liquidTotal) {
-      const liquidRatio = bigaLiquid / liquidTotal
+    if (liquidIngredients.length > 0 && liquidRatio > 0) {
       liquidIngredients.forEach(liquid => {
         const liquidAmount = parseFloat(liquid.amount) || 0
         const bigaAmount = liquidAmount * liquidRatio
@@ -268,9 +278,6 @@ export class MethodConversion {
           })
         }
       })
-    } else if (bigaLiquid > liquidTotal) {
-      // 액체가 부족한 경우 경고
-      console.warn('원본 레시피의 수화율이 너무 낮아 비가법 변환이 어렵습니다.')
     }
     
     // 이스트 추가
@@ -291,7 +298,7 @@ export class MethodConversion {
         const ratio = originalAmount / flourTotal
         newIngredient.amount = (originalAmount - bigaFlour * ratio).toFixed(1)
       } else if (ingredient.type === 'liquid' || ingredient.type === 'egg') {
-        const liquidRatio = bigaLiquid / liquidTotal
+        // liquidRatio [0,1] 클램프로 음수/소실 방지
         newIngredient.amount = (originalAmount - originalAmount * liquidRatio).toFixed(1)
       } else if (ingredient.type === 'yeast') {
         // 이스트가 없는 경우 추가
@@ -325,7 +332,7 @@ export class MethodConversion {
         biga: '16-24시간',
         mainDough: '1-2시간'
       },
-      notes: liquidTotal < bigaLiquid ? 
+      notes: liquidTotal < desiredBigaLiquid ?
         '원본 레시피의 수화율이 낮아 일부 조정이 필요할 수 있습니다.' : null
     }
   }
@@ -428,7 +435,10 @@ export class MethodConversion {
 
     // 탕종용 재료 계산 (밀가루 : 물 = 1 : 5 비율)
     const tangzhongFlour = flourTotal * tangzhongPortion
-    const tangzhongLiquid = tangzhongFlour * 5 // 1:5 비율
+    const desiredTangzhongLiquid = tangzhongFlour * 5 // 1:5 비율
+    // 저수화율 방어: 원본 액체보다 많이 가져갈 수 없도록 클램프 (질량 보존)
+    const tangzhongLiquid = Math.min(desiredTangzhongLiquid, liquidTotal)
+    const liquidRatio = liquidTotal > 0 ? Math.min(Math.max(tangzhongLiquid / liquidTotal, 0), 1) : 0
 
     // 탕종 재료
     const tangzhong = []
@@ -445,13 +455,13 @@ export class MethodConversion {
     }
 
     const liquidIngredients = ingredients.filter(ing => ing.type === 'liquid')
-    if (liquidIngredients.length > 0 && tangzhongLiquid <= liquidTotal) {
+    if (liquidIngredients.length > 0 && tangzhongLiquid > 0) {
       tangzhong.push({
         name: liquidIngredients[0].name,
         amount: tangzhongLiquid.toFixed(1),
         unit: 'g',
         type: 'liquid',
-        percentage: 500
+        percentage: (tangzhongLiquid / tangzhongFlour * 100).toFixed(0)
       })
     }
 
@@ -464,8 +474,8 @@ export class MethodConversion {
         const ratio = originalAmount / flourTotal
         newIngredient.amount = (originalAmount - tangzhongFlour * ratio).toFixed(1)
       } else if (ingredient.type === 'liquid') {
-        const ratio = originalAmount / liquidTotal
-        newIngredient.amount = (originalAmount - tangzhongLiquid * ratio).toFixed(1)
+        // liquidRatio [0,1] 클램프로 음수/소실 방지
+        newIngredient.amount = (originalAmount - originalAmount * liquidRatio).toFixed(1)
       } else {
         newIngredient.amount = originalAmount.toFixed(1)
       }

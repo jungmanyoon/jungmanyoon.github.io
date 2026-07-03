@@ -78,10 +78,14 @@ export class NutritionCalculator {
   /**
    * 영양성분표 생성 (한국 식품의약품안전처 기준)
    */
-  static generateNutritionLabel(totalNutrition, perServing, servingSize = 100) {
+  static generateNutritionLabel(totalNutrition, perServing, servingSize = 100, ingredients = null) {
+    const safeServingSize = servingSize > 0 ? servingSize : 100
     return {
-      servingSize: `${servingSize}g`,
-      servingsPerContainer: Math.ceil(this.getTotalWeight(totalNutrition) / servingSize),
+      servingSize: `${safeServingSize}g`,
+      servingsPerContainer: Math.max(
+        1,
+        Math.ceil(this.getTotalWeight(totalNutrition, ingredients) / safeServingSize)
+      ),
       calories: Math.round(perServing.calories),
       
       // 주요 영양소 (% 일일권장량 기준)
@@ -172,24 +176,45 @@ export class NutritionCalculator {
   }
 
   /**
-   * 총 중량 계산 (추정)
+   * 총 중량 계산
+   * 우선순위: (1) 실제 재료 중량 합(convertToGrams 누계, 정확)
+   *          (2) 재료 미제공 시 칼로리 기반 추정(제빵물 평균 열량밀도 약 2.7 kcal/g)
+   * @param {Object} totalNutrition - 총 영양 성분
+   * @param {Array|null} ingredients - 원본 재료 배열(있으면 실제 중량 합 사용)
    */
-  static getTotalWeight(totalNutrition) {
-    // 대략적인 계산: 칼로리 기준으로 추정
-    return Math.round(totalNutrition.calories * 2.5) // 1g당 평균 0.4kcal 가정
+  static getTotalWeight(totalNutrition, ingredients = null) {
+    // (1) 실제 재료 중량 합 (가장 정확)
+    if (Array.isArray(ingredients) && ingredients.length > 0) {
+      const sum = ingredients.reduce((acc, ing) => {
+        const info = getNutritionInfo(ing.name)
+        const grams = this.convertToGrams(ing.amount, ing.unit, info)
+        return acc + (Number.isFinite(grams) ? grams : 0)
+      }, 0)
+      if (sum > 0) return Math.round(sum)
+    }
+
+    // (2) 대체: 칼로리 기반 추정. 제빵물 평균 열량밀도 약 2.7 kcal/g -> 중량 = 칼로리 / 2.7
+    //     (기존 *2.5 는 0.4kcal/g 가정으로 실제 대비 약 6~7배 과대였음)
+    const calories = totalNutrition?.calories || 0
+    return Math.round(calories / 2.7)
   }
 
   /**
    * 영양 밀도 분석
    */
   static analyzeNutritionDensity(perServing) {
+    // 0-나눗셈 방어: 칼로리가 0이면 비율/밀도 지표는 0으로 처리 (NaN/Infinity 전파 차단)
+    const calories = perServing.calories || 0
+    const hasCalories = calories > 0
+    const per100kcal = hasCalories ? calories / 100 : 0
+
     const analysis = {
-      caloriesPerGram: perServing.calories / 100,
-      proteinPercent: (perServing.protein * 4) / perServing.calories * 100, // 단백질 칼로리 비율
-      carbPercent: (perServing.carbohydrates * 4) / perServing.calories * 100,
-      fatPercent: (perServing.fat * 9) / perServing.calories * 100,
-      fiberDensity: perServing.fiber / (perServing.calories / 100), // 100kcal당 식이섬유
-      sodiumDensity: perServing.sodium / (perServing.calories / 100), // 100kcal당 나트륨
+      caloriesPerGram: calories / 100,
+      proteinPercent: hasCalories ? (perServing.protein * 4) / calories * 100 : 0, // 단백질 칼로리 비율
+      carbPercent: hasCalories ? (perServing.carbohydrates * 4) / calories * 100 : 0,
+      fatPercent: hasCalories ? (perServing.fat * 9) / calories * 100 : 0,
+      fiberDensity: per100kcal > 0 ? perServing.fiber / per100kcal : 0, // 100kcal당 식이섬유
+      sodiumDensity: per100kcal > 0 ? perServing.sodium / per100kcal : 0, // 100kcal당 나트륨
       healthScore: 0
     }
 
@@ -208,7 +233,7 @@ export class NutritionCalculator {
     score -= Math.min(analysis.sodiumDensity / 10, 30)
 
     // 설탕 비율 (낮을수록 좋음, 최대 -20점)
-    const sugarPercent = (perServing.sugar * 4) / perServing.calories * 100
+    const sugarPercent = hasCalories ? (perServing.sugar * 4) / calories * 100 : 0
     score -= Math.min(sugarPercent / 2, 20)
 
     analysis.healthScore = Math.max(0, Math.min(100, Math.round(score)))
@@ -298,12 +323,18 @@ export class NutritionCalculator {
     nutrients.forEach(nutrient => {
       const value1 = nutrition1[nutrient] || 0
       const value2 = nutrition2[nutrient] || 0
-      const diff = ((value2 - value1) / value1 * 100).toFixed(1)
+      // 0-나눗셈 방어: 기준값(value1)이 0이면 백분율 변화가 무한대가 되므로 N/A 처리
+      let difference
+      if (value1 === 0) {
+        difference = value2 === 0 ? '0%' : 'N/A'
+      } else {
+        difference = `${((value2 - value1) / value1 * 100).toFixed(1)}%`
+      }
 
       comparison.differences[nutrient] = {
         [label1]: value1,
         [label2]: value2,
-        difference: `${diff}%`,
+        difference,
         winner: this.determineNutrientWinner(nutrient, value1, value2)
       }
     })

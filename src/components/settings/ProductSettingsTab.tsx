@@ -100,6 +100,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
   const {
     product,
     setVolumeOverride,
+    deleteVolumeOverride,
     addCustomProduct,
     deleteCustomProduct
   } = useSettingsStore()
@@ -136,10 +137,34 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
     )
   }, [searchTerm])
 
-  // 비용적 업데이트
-  const handleVolumeUpdate = useCallback((category: 'bread' | 'cake', productName: string, volume: number) => {
-    setVolumeOverride(category, productName, volume)
+  // 입력 중 로컬 상태 (빈칸/0 입력 시 즉시 기본값으로 덮어쓰지 않도록 자유 입력 허용)
+  const [editingVolumes, setEditingVolumes] = useState<Record<string, string>>({})
+
+  // 비용적 입력 변경: 유효한 양수일 때만 오버라이드 반영, 그 외에는 로컬 문자열 상태만 유지
+  const handleVolumeInputChange = useCallback((category: 'bread' | 'cake', productName: string, raw: string) => {
+    const key = `${category}:${productName}`
+    setEditingVolumes(prev => ({ ...prev, [key]: raw }))
+    const parsed = parseFloat(raw)
+    if (raw.trim() !== '' && !isNaN(parsed) && parsed > 0) {
+      setVolumeOverride(category, productName, parsed)
+    }
   }, [setVolumeOverride])
+
+  // 편집 종료: 빈칸/무효/0 이하로 끝냈으면 오버라이드 제거해 기본값 복원
+  const handleVolumeBlur = useCallback((category: 'bread' | 'cake', productName: string) => {
+    const key = `${category}:${productName}`
+    setEditingVolumes(prev => {
+      if (!(key in prev)) return prev
+      const raw = prev[key]
+      const parsed = parseFloat(raw)
+      if (raw.trim() === '' || isNaN(parsed) || parsed <= 0) {
+        deleteVolumeOverride(category, productName)
+      }
+      const next = { ...prev }
+      delete next[key]
+      return next
+    })
+  }, [deleteVolumeOverride])
 
   // 커스텀 제품 저장
   const handleSaveCustom = useCallback(() => {
@@ -297,7 +322,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
 
           {/* 빵 목록 */}
           <div className="space-y-1 max-h-96 overflow-y-auto">
-            {filteredBreadProducts.map(([name, defaultVolume]) => {
+            {filteredBreadProducts.map(([name]) => {
               const currentVolume = getBreadVolume(name)
               const modified = isOverridden('bread', name)
 
@@ -318,8 +343,9 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
-                      value={currentVolume}
-                      onChange={(e) => handleVolumeUpdate('bread', name, parseFloat(e.target.value) || defaultVolume)}
+                      value={editingVolumes[`bread:${name}`] ?? currentVolume}
+                      onChange={(e) => handleVolumeInputChange('bread', name, e.target.value)}
+                      onBlur={() => handleVolumeBlur('bread', name)}
                       className={`w-20 px-2 py-1 text-sm border rounded text-center font-mono ${
                         modified ? 'border-amber-300 bg-white' : ''
                       }`}
@@ -330,12 +356,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                     <span className="text-xs text-gray-500">cm³/g</span>
                     {modified && (
                       <button
-                        onClick={() => {
-                          const newOverrides = { ...product.breadVolumes }
-                          delete newOverrides[name]
-                          // Reset to default by setting it again
-                          handleVolumeUpdate('bread', name, defaultVolume)
-                        }}
+                        onClick={() => deleteVolumeOverride('bread', name)}
                         className="p-1 text-amber-500 hover:bg-amber-100 rounded"
                         title={t('settings.product.resetToDefault')}
                       >
@@ -393,7 +414,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
 
           {/* 케이크 목록 */}
           <div className="space-y-1 max-h-96 overflow-y-auto">
-            {filteredCakeProducts.map(([name, defaultVolume]) => {
+            {filteredCakeProducts.map(([name]) => {
               const currentVolume = getCakeVolume(name)
               const modified = isOverridden('cake', name)
 
@@ -414,8 +435,9 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
-                      value={currentVolume}
-                      onChange={(e) => handleVolumeUpdate('cake', name, parseFloat(e.target.value) || defaultVolume)}
+                      value={editingVolumes[`cake:${name}`] ?? currentVolume}
+                      onChange={(e) => handleVolumeInputChange('cake', name, e.target.value)}
+                      onBlur={() => handleVolumeBlur('cake', name)}
                       className={`w-20 px-2 py-1 text-sm border rounded text-center font-mono ${
                         modified ? 'border-pink-300 bg-white' : ''
                       }`}
@@ -426,9 +448,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                     <span className="text-xs text-gray-500">cm³/g</span>
                     {modified && (
                       <button
-                        onClick={() => {
-                          handleVolumeUpdate('cake', name, defaultVolume)
-                        }}
+                        onClick={() => deleteVolumeOverride('cake', name)}
                         className="p-1 text-pink-500 hover:bg-pink-100 rounded"
                         title={t('settings.product.resetToDefault')}
                       >

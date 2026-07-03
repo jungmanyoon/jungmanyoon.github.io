@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { BakersPercentage } from '@utils/calculations/bakersPercentage'
-import { Ingredient } from '@types/recipe.types'
+import { Ingredient } from '@/types/recipe.types'
 import { createMockRecipe } from '@/test/utils/test-utils'
 
 describe('BakersPercentage', () => {
@@ -32,9 +32,27 @@ describe('BakersPercentage', () => {
     it('밀가루 양이 0이거나 음수일 때 에러를 던져야 한다', () => {
       expect(() => BakersPercentage.toBakersPercentage(mockIngredients, 0))
         .toThrow('밀가루 양은 0보다 커야 합니다.')
-      
+
       expect(() => BakersPercentage.toBakersPercentage(mockIngredients, -100))
         .toThrow('밀가루 양은 0보다 커야 합니다.')
+    })
+
+    it('소금/이스트/설탕 등 다양한 재료의 퍼센트를 정확히 계산해야 한다', () => {
+      // 밀가루 1000g 기준: 물 65%, 소금 2%, 이스트 1%, 설탕 5%
+      const fullIngredients: Ingredient[] = [
+        { id: '1', name: '강력분', category: 'flour', amount: 1000, unit: 'g', isFlour: true },
+        { id: '2', name: '물', category: 'liquid', amount: 650, unit: 'g' },
+        { id: '3', name: '소금', category: 'salt', amount: 20, unit: 'g' },
+        { id: '4', name: '이스트', category: 'leavening', amount: 10, unit: 'g' },
+        { id: '5', name: '설탕', category: 'sugar', amount: 50, unit: 'g' }
+      ]
+      const result = BakersPercentage.toBakersPercentage(fullIngredients, 1000)
+
+      expect(result[0].percentage).toBe(100) // 밀가루
+      expect(result[1].percentage).toBe(65)  // 물
+      expect(result[2].percentage).toBe(2)   // 소금
+      expect(result[3].percentage).toBe(1)   // 이스트
+      expect(result[4].percentage).toBe(5)   // 설탕
     })
   })
 
@@ -79,6 +97,17 @@ describe('BakersPercentage', () => {
       const hydration = BakersPercentage.calculateHydration(noFlourIngredients)
       expect(hydration).toBe(0)
     })
+
+    it('여러 종류의 밀가루와 액체를 합산하여 수화율을 계산해야 한다', () => {
+      const complexIngredients: Ingredient[] = [
+        { id: '1', name: '강력분', category: 'flour', amount: 800, unit: 'g', isFlour: true },
+        { id: '2', name: '박력분', category: 'flour', amount: 200, unit: 'g', isFlour: true },
+        { id: '3', name: '물', category: 'liquid', amount: 500, unit: 'g' },
+        { id: '4', name: '우유', category: 'liquid', amount: 200, unit: 'g' }
+      ]
+      const hydration = BakersPercentage.calculateHydration(complexIngredients)
+      expect(hydration).toBe(70) // (500+200) / (800+200) * 100
+    })
   })
 
   describe('getTotalFlour', () => {
@@ -111,7 +140,7 @@ describe('BakersPercentage', () => {
       expect(liquidTotal).toBe(350)
     })
 
-    it('계란류도 액체로 계산해야 한다', () => {
+    it('계란류는 수분 함량(75%)만 액체로 계산해야 한다', () => {
       const ingredientsWithEgg = [
         ...mockIngredients,
         {
@@ -122,9 +151,10 @@ describe('BakersPercentage', () => {
           unit: 'g' as const
         }
       ]
-      
+
       const liquidTotal = BakersPercentage.getTotalLiquid(ingredientsWithEgg)
-      expect(liquidTotal).toBe(450) // 350ml + 100g
+      // 350ml(물) + 100g 계란 * 0.75(수분율) = 425
+      expect(liquidTotal).toBe(425)
     })
   })
 
@@ -276,6 +306,33 @@ describe('BakersPercentage', () => {
       const validation = BakersPercentage.validateRatios(lowHydrationIngredients)
       expect(validation.isValid).toBe(false)
       expect(validation.warnings).toContain('수화율이 50% 미만입니다. 매우 단단한 반죽이 될 수 있습니다.')
+    })
+
+    it('높은 수화율(100% 초과)에서 경고를 표시해야 한다', () => {
+      const highHydrationIngredients = [
+        {
+          id: 'flour',
+          name: '강력분',
+          category: 'flour' as const,
+          amount: 1000,
+          unit: 'g' as const,
+          percentage: 100,
+          isBakersPercentage: true
+        },
+        {
+          id: 'water',
+          name: '물',
+          category: 'liquid' as const,
+          amount: 1200, // 120% hydration
+          unit: 'ml' as const,
+          percentage: 120,
+          isBakersPercentage: true
+        }
+      ]
+
+      const validation = BakersPercentage.validateRatios(highHydrationIngredients)
+      expect(validation.isValid).toBe(false)
+      expect(validation.warnings).toContain('수화율이 100%를 초과합니다. 매우 묽은 반죽이 될 수 있습니다.')
     })
 
     it('높은 소금 비율에서 경고를 표시해야 한다', () => {

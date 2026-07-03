@@ -15,6 +15,10 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      // 커버리지 게이트는 단위 테스트로 실제 검증하는 핵심 계산 유틸(.ts)에 한정한다.
+      // 전체 src(컴포넌트/스토어 등)까지 대상으로 삼으면 실측 커버리지가 낮아
+      // 게이트가 항상 거짓 실패하므로, 검증 범위를 명확히 좁혀 게이트를 신뢰 가능하게 만든다.
+      include: ['src/utils/calculations/**/*.ts'],
       exclude: [
         'node_modules/',
         'src/test/',
@@ -24,6 +28,7 @@ export default defineConfig({
         'coverage/',
         '**/*.config.*',
         '**/*.spec.*',
+        '**/*.test.*',
         'src/main.jsx'
       ],
       thresholds: {

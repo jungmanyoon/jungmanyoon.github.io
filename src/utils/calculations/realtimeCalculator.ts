@@ -10,7 +10,7 @@
  * 성능 목표: <50ms
  */
 
-import type { Recipe, Ingredient, PanConfig, MethodConfig } from '@/types/recipe.types'
+import type { Recipe, Ingredient, PanConfig } from '@/types/recipe.types'
 import { PanScalingTS } from '@/utils/calculations/panScaling'
 
 export interface ConvertedRecipe {
@@ -159,7 +159,7 @@ export class RealtimeRecipeCalculator {
     )
     const water = ingredients.find((i) => i.name?.includes('물'))
     const yeast = ingredients.find(
-      (i) => i.category === 'yeast' || i.name?.includes('이스트')
+      (i) => i.category === 'leavening' || i.name?.includes('이스트')
     )
 
     if (!flour || !water || !yeast) {
@@ -171,9 +171,9 @@ export class RealtimeRecipeCalculator {
     const spongeWater = Math.round(spongeFlour * 0.6 * 10) / 10 // 60% 수화율
     const spongeYeast = yeast.amount // 모든 이스트를 스펀지에
 
-    // 본반죽 재료 계산
-    const mainFlour = Math.round((flour.amount - spongeFlour) * 10) / 10
-    const mainWater = Math.round((water.amount - spongeWater) * 10) / 10
+    // 본반죽 재료 계산 (Math.max(0,...)로 음수 방어)
+    const mainFlour = Math.max(0, Math.round((flour.amount - spongeFlour) * 10) / 10)
+    const mainWater = Math.max(0, Math.round((water.amount - spongeWater) * 10) / 10)
 
     return {
       preferment: {
@@ -237,25 +237,30 @@ export class RealtimeRecipeCalculator {
     )
     const water = ingredients.find((i) => i.name?.includes('물'))
     const yeast = ingredients.find(
-      (i) => i.category === 'yeast' || i.name?.includes('이스트')
+      (i) => i.category === 'leavening' || i.name?.includes('이스트')
     )
 
     if (!flour || !water || !yeast) {
       throw new Error('밀가루, 물, 이스트를 찾을 수 없습니다.')
     }
 
-    // 폴리시 재료 계산 (밀가루는 본반죽에만, 물과 이스트만 폴리시에)
-    const polishWater = Math.round(flour.amount * prefermentRatio * 10) / 10
-    const polishYeast = Math.round(yeast.amount * 0.2 * 10) / 10 // 20%만 사용
+    // 폴리시 재료 계산
+    // 폴리시(poolish)의 정의: 밀가루 + 동량의 물(100% 수화율) + 소량의 이스트.
+    // (기존 구현은 밀가루 없이 물+이스트로 모델링해 폴리시 정의와 상충했음 → 정합)
+    const polishFlour = Math.round(flour.amount * prefermentRatio * 10) / 10
+    const polishWater = polishFlour // 100% 수화율
+    const polishYeast = Math.round(yeast.amount * 0.2 * 10) / 10 // 이스트 20%를 폴리시에
 
-    // 본반죽 재료
-    const mainWater = Math.round((water.amount - polishWater) * 10) / 10
-    const mainYeast = Math.round((yeast.amount - polishYeast) * 10) / 10
+    // 본반죽 재료 (Math.max(0,...)로 음수 방어)
+    const mainFlour = Math.max(0, Math.round((flour.amount - polishFlour) * 10) / 10)
+    const mainWater = Math.max(0, Math.round((water.amount - polishWater) * 10) / 10)
+    const mainYeast = Math.max(0, Math.round((yeast.amount - polishYeast) * 10) / 10)
 
     return {
       preferment: {
         name: '폴리시',
         ingredients: [
+          { ...flour, amount: polishFlour },
           { ...water, amount: polishWater },
           { ...yeast, amount: polishYeast },
         ],
@@ -264,7 +269,7 @@ export class RealtimeRecipeCalculator {
       },
       mainDough: {
         ingredients: [
-          flour, // 모든 밀가루
+          { ...flour, amount: mainFlour },
           { ...water, amount: mainWater },
           { ...yeast, amount: mainYeast },
           ...ingredients.filter(
@@ -276,9 +281,9 @@ export class RealtimeRecipeCalculator {
         ],
       },
       steps: [
-        '1. 폴리시 만들기: 물 + 이스트만 섞기 (밀가루 없음)',
+        '1. 폴리시 만들기: 밀가루 + 동량의 물 + 소량의 이스트 섞기 (100% 수화율)',
         '2. 폴리시 발효: 12-16시간, 15-18°C (냉장 발효 가능)',
-        '3. 본반죽: 발효된 폴리시 + 모든 재료 믹싱',
+        '3. 본반죽: 발효된 폴리시 + 나머지 재료 믹싱',
         '4. 1차 발효: 60-90분',
         '5. 분할 → 둥글리기 → 벤치타임',
         '6. 성형 → 팬닝',
@@ -286,7 +291,7 @@ export class RealtimeRecipeCalculator {
         '8. 굽기',
       ],
       notes: [
-        `폴리시 비율: 밀가루 대비 ${Math.round(prefermentRatio * 100)}% 물`,
+        `폴리시 비율: 밀가루의 ${Math.round(prefermentRatio * 100)}% (동량의 물 포함, 100% 수화율)`,
         '장점: 강한 밀 풍미, 크러스트 발달, 구멍 큼',
         '특징: 프랑스빵, 바게트 등에 적합',
       ],
@@ -352,10 +357,11 @@ export class RealtimeRecipeCalculator {
 export const PAN_PRESETS: Record<string, PanConfig> = {
   'small': {
     id: 'loaf-small',
-    name: '소형 (15×7×6cm, 630ml)',
+    // 사다리꼴 형상 보정(0.85) 반영: 15×7×6×0.85 = 535.5ml (계산값과 라벨 정합)
+    name: '소형 (15×7×6cm, 535ml)',
     type: 'loaf',
     dimensions: { length: 15, width: 7, height: 6 },
-    volume: 630,
+    volume: 535,
     material: 'aluminum',
     fillRatio: 0.7,
   },

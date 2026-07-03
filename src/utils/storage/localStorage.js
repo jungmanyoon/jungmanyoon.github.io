@@ -13,6 +13,15 @@ const STORAGE_KEYS = {
 export class LocalStorageService {
   static VERSION = 2
 
+  /** 저장 공간 초과(QuotaExceededError) 여부 판별 */
+  static isQuotaError(error) {
+    return !!error && (
+      error.name === 'QuotaExceededError' ||
+      error.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+      error.code === 22
+    )
+  }
+
   static ensureVersion() {
     try {
       const ver = parseInt(localStorage.getItem(STORAGE_KEYS.VERSION) || '0', 10)
@@ -64,7 +73,11 @@ export class LocalStorageService {
       localStorage.setItem(STORAGE_KEYS.RECIPES, JSON.stringify(recipes))
       return true
     } catch (error) {
-      console.error('Failed to save recipe:', error)
+      if (LocalStorageService.isQuotaError(error)) {
+        console.error('저장 공간이 부족하여 레시피를 저장하지 못했습니다(QuotaExceededError). 불필요한 레시피를 삭제해 주세요.')
+      } else {
+        console.error('Failed to save recipe:', error)
+      }
       return false
     }
   }
@@ -134,7 +147,11 @@ export class LocalStorageService {
       this.ensureVersion()
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings))
     } catch (error) {
-      console.error('Failed to save settings:', error)
+      if (LocalStorageService.isQuotaError(error)) {
+        console.error('저장 공간이 부족하여 설정을 저장하지 못했습니다(QuotaExceededError).')
+      } else {
+        console.error('Failed to save settings:', error)
+      }
     }
   }
 

@@ -13,7 +13,6 @@
 
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDashboardStore } from '@/stores/useDashboardStore';
 import { useRecipeStore } from '@/stores/useRecipeStore';
 import { useToastStore } from '@/stores/useToastStore';
 import { useSettingsStore } from '@/stores/useSettingsStore';
@@ -23,17 +22,15 @@ import ResizeHandle from '@/components/common/ResizeHandle';
 import AutocompleteInput from '@/components/common/AutocompleteInput';
 import BulkIngredientInput from '@/components/common/BulkIngredientInput';
 import YieldLossCalculator from '@/components/common/YieldLossCalculator';
-import PhaseIngredientsView from '@/components/recipe/PhaseIngredientsView';
 import { ProcessStageSelection, DEFAULT_STAGE_SELECTION } from '@/utils/calculations/yieldLoss';
 import { findIngredientInfo } from '@/data/ingredientDatabase';
 import {
   ChevronDown, ChevronRight, ChevronUp, Plus, Minus, X,
   Save, Flame, Scale, Wheat, Droplets, TrendingDown,
   Cookie, Layers, ThermometerSun, Link, Unlink,
-  Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText,
-  Youtube, Globe, BookOpen, User, GraduationCap
+  Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText
 } from 'lucide-react';
-import { SourceType } from '@types/recipe.types';
+import { SourceType } from '@/types/recipe.types';
 
 // ============================================
 // 타입 정의
@@ -135,11 +132,6 @@ const CAKE_SPECIFIC_VOLUMES: Record<string, number> = {
   '무스케이크': 1.8,        // 매우 조밀함
 };
 
-// 제과 제품 판별 헬퍼 함수
-const isPastryProduct = (productName: string): boolean => {
-  return Object.keys(CAKE_BATTER_SPECIFIC_GRAVITY).includes(productName);
-};
-
 // 현재 화면은 제빵용 - 동적 비용적은 컴포넌트 내부에서 useMemo로 생성됨
 // (기본값 BREAD_SPECIFIC_VOLUMES + 설정 스토어의 오버라이드)
 
@@ -182,11 +174,6 @@ const METHOD_KEYS: Record<string, string> = {
   coldFerment: 'method.coldFerment', retard: 'method.retard',
 };
 
-// Translation keys for category labels (used with t() function)
-const CATEGORY_KEYS: Record<string, string> = {
-  flour: 'dashboard.flour', liquid: 'dashboard.liquid', wetOther: 'dashboard.fat', other: 'dashboard.other',
-};
-
 // 단계(Phase) 메타데이터 - 구분선 표시용 (labelKey for translation)
 const PHASE_META: Record<string, { icon: string; labelKey: string; bgColor: string; textColor: string; borderColor: string }> = {
   tangzhong: { icon: '🍜', labelKey: 'phase.tangzhong', bgColor: 'bg-pink-50', textColor: 'text-pink-700', borderColor: 'border-pink-200' },
@@ -205,7 +192,6 @@ const PHASE_META: Record<string, { icon: string; labelKey: string; bgColor: stri
 };
 
 // 동적 크기 계산 (20-25개 재료 기준) - v2.2: 컴팩트 버전
-const MAX_INGREDIENTS = 25;
 const getDynamicStyles = (ingredientCount: number) => {
   const count = Math.max(ingredientCount, 6);
   const rowHeight = count > 15 ? 'py-0.5' : count > 10 ? 'py-1' : 'py-1';
@@ -502,7 +488,7 @@ const AdvancedDashboard: React.FC = () => {
       setProductName(currentRecipe.name || t('advDashboard.defaultRecipeName'));
 
       // 제품 타입 로드 (기본값: bread)
-      setProductType((currentRecipe as any).productType || 'bread');
+      setProductType(currentRecipe.productType || 'bread');
 
       // 출처 정보 로드
       if (currentRecipe.source) {
@@ -768,7 +754,7 @@ const AdvancedDashboard: React.FC = () => {
 
       // 비용적 설정 로드
       if (currentRecipe.specificVolume) {
-        const svData = currentRecipe.specificVolume as any;
+        const svData = currentRecipe.specificVolume;
         if (svData.original) setOriginalProduct(svData.original);
         if (svData.converted) setConvertedProduct(svData.converted);
       } else if (currentRecipe.tags && Array.isArray(currentRecipe.tags)) {
@@ -784,7 +770,7 @@ const AdvancedDashboard: React.FC = () => {
 
       // 배수 설정 로드 + 유효성 검증 (음수/0 방지)
       if (currentRecipe.multiplierConfig) {
-        const mcData = currentRecipe.multiplierConfig as any;
+        const mcData = currentRecipe.multiplierConfig;
         if (typeof mcData.multiplier === 'number') {
           // 배수는 최소 0.01 이상 보장
           setMultiplier(Math.max(0.01, Math.abs(mcData.multiplier) || 1));
@@ -798,10 +784,10 @@ const AdvancedDashboard: React.FC = () => {
       }
 
       // 수율 예측 공정 선택 상태 로드
-      if ((currentRecipe as any).yieldStageSelection) {
+      if (currentRecipe.yieldStageSelection) {
         setYieldStageSelection({
           ...DEFAULT_STAGE_SELECTION,
-          ...(currentRecipe as any).yieldStageSelection
+          ...currentRecipe.yieldStageSelection
         });
       } else {
         // 저장된 상태가 없으면 기본값으로 리셋
@@ -1418,23 +1404,6 @@ const AdvancedDashboard: React.FC = () => {
   // 동적 스타일
   const dynamicStyles = useMemo(() => getDynamicStyles(ingredients.length), [ingredients.length]);
 
-  // PhaseIngredientsView용 Recipe 객체 생성
-  const recipeForPhaseView = useMemo(() => ({
-    id: currentRecipe?.id || 'temp',
-    name: productName,
-    ingredients: ingredients.map(ing => ({
-      id: ing.id,
-      name: ing.name,
-      category: ing.category === 'wetOther' ? 'fat' : ing.category,
-      amount: ing.amount,
-      unit: 'g' as const,
-      bakersPercentage: ing.ratio,
-      isFlour: ing.category === 'flour'
-    })),
-    // phases가 있으면 currentRecipe에서 가져옴
-    phases: currentRecipe?.phases
-  }), [currentRecipe, productName, ingredients]);
-
   // ============================================
   // 이벤트 핸들러
   // ============================================
@@ -1448,7 +1417,7 @@ const AdvancedDashboard: React.FC = () => {
     const prefermentYeastRatio = methodConfig?.prefermentYeastRatio ?? defaultYeast.prefermentYeastRatio;
 
     setMethod({
-      type: type as any,
+      type: type as MethodSettings['type'],
       flourRatio: ratios.flour,
       waterRatio: ratios.water,
       yeastAdjustment,
@@ -1725,7 +1694,7 @@ const AdvancedDashboard: React.FC = () => {
       addRecipe(newRecipe as any);
       addToast({ type: 'success', message: t('advDashboard.recipeSaved', { name: productName }) });
     }
-  }, [productName, source, pans, oven, usePreferment, mainDoughIngredients, convertedIngredients, processes, memo, convertedProduct, method, yieldStageSelection, currentRecipe, addRecipe, updateRecipe, addToast]);
+  }, [productName, productType, source, pans, oven, ingredients, processes, memo, convertedProduct, originalProduct, method, originalPan, multiplier, isPanLinked, yieldStageSelection, currentRecipe, defaultPanType, defaultCategory, addRecipe, updateRecipe, addToast, t]);
 
   // 레시피 저장 (중복 이름 확인)
   const handleSaveRecipe = useCallback(() => {
@@ -1963,7 +1932,6 @@ const AdvancedDashboard: React.FC = () => {
 
   // 일괄 입력 모달 상태
   const [isBulkInputOpen, setIsBulkInputOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'table' | 'phase'>('table'); // 뷰 모드: 테이블 vs 단계
 
   const addIngredient = useCallback(() => {
     const newOrder = Math.max(...ingredients.map(i => i.order), 0) + 1;
@@ -1999,7 +1967,7 @@ const AdvancedDashboard: React.FC = () => {
     setIngredients(prev => prev.map(ing => {
       if (ing.id !== id) return ing;
       const updated = { ...ing, [field]: value };
-      if (field === 'category') updated.subCategory = CATEGORY_LABELS[value] || '기타';
+      if (field === 'category') updated.subCategory = CATEGORY_LABELS[value as keyof typeof CATEGORY_LABELS] || '기타';
       // 무게 변경 시 비율 자동 계산
       if (field === 'amount') {
         const flour = prev.filter(i => i.category === 'flour').reduce((s, i) => s + (i.id === id ? value : i.amount), 0);
@@ -2879,7 +2847,7 @@ const AdvancedDashboard: React.FC = () => {
                                  'straight-${name}' 형태로 충돌할 수 있어 phase 스코프로 격리) */}
                             {items.map((ing: any, ingIndex: number) => (
                               <tr key={`${phase}-${ing.category}-${ing.id}-${ingIndex}`} className={`border-b border-blue-100 ${dynamicStyles.rowHeight}`}>
-                                <td className="px-2 text-blue-600">{CATEGORY_LABELS[ing.category]}</td>
+                                <td className="px-2 text-blue-600">{CATEGORY_LABELS[ing.category as keyof typeof CATEGORY_LABELS]}</td>
                                 <td className="px-2">{translateIngredient(ing.name)}</td>
                                 <td className="px-2 text-right font-mono font-medium text-blue-700">{ing.convertedAmount}</td>
                               </tr>

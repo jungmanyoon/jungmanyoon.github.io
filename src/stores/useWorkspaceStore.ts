@@ -8,13 +8,13 @@
  */
 
 import { create } from 'zustand'
-import type { Recipe, Ingredient, PanConfig, ProcessStep } from '@/types/recipe.types'
+import type { Recipe, Ingredient, PanConfig } from '@/types/recipe.types'
 // 식빵틀 부피 형상 보정의 단일 진실원천(panScaling.ts)을 참조한다.
 // store -> calculations 단방향 import 이므로 순환이 발생하지 않는다.
 import { PanScalingTS } from '@/utils/calculations/panScaling'
 
 export type CalculationMode = 'bakers' | 'weight' | 'recipe'
-export type MethodType = 'straight' | 'sponge' | 'poolish' | 'biga' | 'tangzhong' | 'autolyse' | 'overnight' | 'sourdough'
+export type MethodType = 'straight' | 'sponge' | 'poolish' | 'biga' | 'tangzhong' | 'autolyse' | 'overnight' | 'no-time' | 'sourdough'
 
 interface WorkspaceState {
   // 선택 상태

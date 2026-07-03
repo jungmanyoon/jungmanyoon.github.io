@@ -126,12 +126,18 @@ export default function StorageSettingsTab() {
       }
 
       // 설정 불러오기
+      let settingsImported = false
       const settingsData = await fileSystemStorage.readFile<any>('SETTINGS')
       if (settingsData) {
-        settingsStore.importSettings(JSON.stringify(settingsData))
+        settingsImported = settingsStore.importSettings(JSON.stringify(settingsData))
+        if (!settingsImported) {
+          // 설정 파싱/적용 실패 시 성공 토스트로 오인시키지 않고 실패 알림
+          toast.error(t('settings.storage.loadFailed'))
+          return
+        }
       }
 
-      if (loadedCount > 0 || settingsData) {
+      if (loadedCount > 0 || settingsImported) {
         toast.success(t('settings.storage.loadedSuccess', { count: loadedCount }))
       } else {
         toast.info(t('settings.storage.noSavedFiles'))

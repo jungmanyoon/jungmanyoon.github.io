@@ -9,7 +9,7 @@ import { useSettingsStore } from '@/stores/useSettingsStore'
 import { CustomIngredient, IngredientSubstitution, CostOverride, NutritionOverride } from '@/types/settings.types'
 import { INGREDIENT_DATABASE, IngredientInfo, PRIMARY_INGREDIENT_NAMES } from '@/data/ingredientDatabase'
 import { nutritionDatabase, NutritionData } from '@/data/nutritionDatabase'
-import { SUBSTITUTION_RULES, SubstitutionRule, getSubstitutionRules } from '@/data/substitutionRules'
+import { SUBSTITUTION_RULES, SubstitutionRule } from '@/data/substitutionRules'
 import { findIngredientByKorean, translateBakingNote } from '@/data/ingredientTranslations'
 import {
   Apple,
@@ -117,6 +117,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
     addCustomIngredient,
     deleteCustomIngredient,
     setMoistureOverride,
+    deleteMoistureOverride,
     addSubstitution,
     deleteSubstitution,
     setCostOverride,
@@ -199,6 +200,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
 
       const cost = (ingredient.costOverrides || {})[custom.name]
       const nutrition = (ingredient.nutritionOverrides || {})[custom.name]
+      const moistureOverride = (ingredient.moistureOverrides || {})[custom.name]
       const subs = ingredient.substitutions.filter(s => s.original === custom.name)
 
       // 커스텀 재료도 기본 데이터 조회 시도
@@ -208,8 +210,8 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       result.push({
         name: custom.name,
         category: custom.category,
-        moisture: custom.moisture,
-        moistureOverridden: false,
+        moisture: moistureOverride ?? custom.moisture,
+        moistureOverridden: moistureOverride !== undefined,
         cost,
         nutrition,
         defaultNutrition,
@@ -381,10 +383,8 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
     if (!ing) return
 
     if (ing.moistureOverridden) {
-      // 수분함량 오버라이드 삭제 (원본 값으로 복원)
-      if (ing.originalData?.moisture !== undefined) {
-        setMoistureOverride(name, ing.originalData.moisture)
-      }
+      // 수분함량 오버라이드 실제 삭제 (원본 값 재대입이 아니라 키 제거 → 강조/카운트 해제)
+      deleteMoistureOverride(name)
     }
     if (ing.cost) {
       deleteCostOverride(name)
@@ -392,7 +392,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
     if (ing.nutrition) {
       deleteNutritionOverride(name)
     }
-  }, [unifiedIngredients, setMoistureOverride, deleteCostOverride, deleteNutritionOverride])
+  }, [unifiedIngredients, deleteMoistureOverride, deleteCostOverride, deleteNutritionOverride])
 
   // 수정된 항목 수 계산
   const modifiedCount = useMemo(() => {

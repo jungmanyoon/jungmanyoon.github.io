@@ -4,8 +4,8 @@
   "description": "무료 제과제빵 레시피 변환 웹 애플리케이션",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#8B4513",
-  "background_color": "#FFF8DC",
+  "theme_color": "#D97706",
+  "background_color": "#FFFBEB",
   "orientation": "portrait-primary",
   "icons": [
     {

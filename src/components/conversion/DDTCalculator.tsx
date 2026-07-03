@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo, memo } from 'react'
+import { useState, useEffect, useCallback, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
-import Button from '../common/Button'
-import Input from '../common/Input'
+import Button from '../common/Button.jsx'
+import Input from '../common/Input.jsx'
 import { DDTCalculator as DDTCalc, MixerType } from '@utils/calculations/ddtCalculator'
-import { Recipe } from '@types/recipe.types'
+import { Recipe } from '@/types/recipe.types'
 import { useCalculatorStore } from '@stores/useCalculatorStore'
 import { useAppStore } from '@stores/useAppStore'
 
@@ -119,7 +119,7 @@ ResultDisplay.displayName = 'ResultDisplay'
 // DDTCalculator 메인 컴포넌트 최적화
 const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }) => {
   const { t } = useTranslation()
-  const { ddtCalculation, updateDDT } = useCalculatorStore()
+  const { updateDDT } = useCalculatorStore()
   const { addToHistory } = useAppStore()
   
   const [season, setSeason] = useState<Season>('spring')
@@ -193,8 +193,9 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
     const { targetTemp, flourTemp, roomTemp, prefermentTemp, frictionFactor } = localData
     
     let calculatedWaterTemp: number
-    
-    if (prefermentTemp) {
+
+    // prefermentTemp 0°C 는 유효한 사전반죽 온도이므로 truthy 판정 금지 (null 체크)
+    if (prefermentTemp != null) {
       calculatedWaterTemp = DDTCalc.calculateWaterTempWithPreferment(
         targetTemp,
         { flour: flourTemp, room: roomTemp, preferment: prefermentTemp },
@@ -209,8 +210,8 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
       )
     }
 
-    // 얼음 필요량 계산
-    if (calculatedWaterTemp < 0 || localData.useIce) {
+    // 얼음 필요량 계산: 매 계산마다 물온도 기준으로 재판정 (이전 useIce 상태에 고착되지 않도록)
+    if (calculatedWaterTemp < 0) {
       const currentWaterTemp = 20 // 일반 수돗물 온도
       const iceData = DDTCalc.calculateIceAmount(
         liquidTotal,
@@ -240,9 +241,9 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
       targetTemp,
       flourTemp,
       roomTemp,
-      prefermentTemp: prefermentTemp || undefined,
+      prefermentTemp: prefermentTemp != null ? prefermentTemp : undefined,
       frictionFactor,
-      includePreferment: !!prefermentTemp,
+      includePreferment: prefermentTemp != null,
       results: {
         waterTemp: calculatedWaterTemp,
         warnings: [],
@@ -271,7 +272,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
       flour: localData.flourTemp,
       water: localData.waterTemp,
       room: localData.roomTemp,
-      preferment: localData.prefermentTemp || undefined
+      preferment: localData.prefermentTemp != null ? localData.prefermentTemp : undefined
     }
     
     return DDTCalc.predictDoughTemp(
@@ -348,7 +349,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
             label={`${t('ddt.labels.ddtValue')} (°C)`}
             type="number"
             value={localData.targetTemp}
-            onValueChange={(value) => handleInputChange('targetTemp', Number(value))}
+            onValueChange={(value: string) => handleInputChange('targetTemp', Number(value))}
             min={20}
             max={30}
             step={0.5}
@@ -359,7 +360,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
             label={`${t('ddt.labels.flourTemp')} (°C)`}
             type="number"
             value={localData.flourTemp}
-            onValueChange={(value) => handleInputChange('flourTemp', Number(value))}
+            onValueChange={(value: string) => handleInputChange('flourTemp', Number(value))}
             min={-10}
             max={40}
             step={0.5}
@@ -370,7 +371,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
             label={`${t('ddt.labels.roomTemp')} (°C)`}
             type="number"
             value={localData.roomTemp}
-            onValueChange={(value) => handleInputChange('roomTemp', Number(value))}
+            onValueChange={(value: string) => handleInputChange('roomTemp', Number(value))}
             min={-10}
             max={40}
             step={0.5}
@@ -393,7 +394,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
               <Input
                 type="number"
                 value={localData.frictionFactor}
-                onValueChange={(value) => handleInputChange('frictionFactor', Number(value))}
+                onValueChange={(value: string) => handleInputChange('frictionFactor', Number(value))}
                 min={0}
                 max={15}
                 step={0.5}
@@ -444,7 +445,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
               label={`${t('ddt.labels.prefermentTemp')} (°C)`}
               type="number"
               value={localData.prefermentTemp}
-              onValueChange={(value) => handleInputChange('prefermentTemp', Number(value))}
+              onValueChange={(value: string) => handleInputChange('prefermentTemp', Number(value))}
               min={0}
               max={40}
               step={0.5}

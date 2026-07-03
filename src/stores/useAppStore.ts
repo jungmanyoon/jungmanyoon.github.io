@@ -11,7 +11,7 @@ import {
   ErrorState, 
   UserPreferences, 
   HistoryItem 
-} from '@types/store.types'
+} from '@/types/store.types'
 
 const initialPreferences: UserPreferences = {
   language: 'ko',
@@ -27,7 +27,7 @@ const initialPreferences: UserPreferences = {
 
 interface AppStore extends AppState {
   // 액션
-  setActiveTab: (tab: TabType) => void
+  setActiveTab: (tab: TabType, pushHistory?: boolean) => void
   setLoading: (loading: boolean) => void
   setError: (error: ErrorState | null) => void
   clearError: () => void
@@ -42,7 +42,7 @@ interface AppStore extends AppState {
 export const useAppStore = create<AppStore>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set) => ({
         // 상태
         activeTab: 'recipes',
         isLoading: false,

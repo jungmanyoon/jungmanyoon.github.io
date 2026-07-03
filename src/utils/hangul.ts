@@ -53,9 +53,6 @@ export function extractChosung(text: string): string {
  * "ㅂㄹㅂ" 패턴이 "박력분"과 매칭되는지 확인
  */
 export function matchChosung(text: string, pattern: string): boolean {
-  const textChosungs = extractChosung(text)
-  const patternLower = pattern.toLowerCase()
-
   let textIdx = 0
   let patternIdx = 0
 

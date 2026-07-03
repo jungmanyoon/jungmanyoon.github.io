@@ -3,7 +3,7 @@
  * 사용자 선호도 학습 및 개인화된 추천 제공
  */
 
-import { Recipe, RecipeCategory, DifficultyLevel, BreadMethod } from '@types/recipe.types'
+import { Recipe, RecipeCategory, DifficultyLevel, BreadMethod } from '@/types/recipe.types'
 import { getNutritionData } from '@data/nutritionDatabase'
 import { CostCalculator } from '@data/costDatabase'
 
@@ -109,7 +109,8 @@ export class RecipeRecommendationEngine {
     }
 
     if (options?.maxTime) {
-      eligibleRecipes = eligibleRecipes.filter(r => r.totalTime <= options.maxTime)
+      const maxTime = options.maxTime
+      eligibleRecipes = eligibleRecipes.filter(r => r.totalTime <= maxTime)
     }
 
     // 점수 계산
@@ -548,7 +549,7 @@ export function getQuickRecipes(recipes: Recipe[], maxTime: number = 60): Recipe
  * 건강한 레시피 추천
  */
 export function getHealthyRecipes(recipes: Recipe[]): Recipe[] {
-  return recipes.map(recipe => {
+  return recipes.map(_recipe => {
     const nutrition = recipes.map(r => {
       let totalCalories = 0
       let totalSugar = 0

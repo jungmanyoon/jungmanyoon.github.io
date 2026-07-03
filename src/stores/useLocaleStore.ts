@@ -10,9 +10,7 @@ import {
   TemperatureUnit,
   WeightUnit,
   VolumeUnit,
-  LengthUnit,
-  DEFAULT_UNIT_PREFERENCES,
-  IMPERIAL_UNIT_PREFERENCES
+  LengthUnit
 } from '@/utils/unitConverter';
 
 // ============ 타입 정의 ============
@@ -82,7 +80,7 @@ const DEFAULT_LOCALE_SETTINGS: LocaleSettings = {
 
 export const useLocaleStore = create<LocaleStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...DEFAULT_LOCALE_SETTINGS,
 
       setLanguage: (language) => {

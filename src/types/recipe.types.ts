@@ -183,8 +183,22 @@ export interface Recipe {
   // 배수 변환 설정 (optional) - 대시보드에서 배수/팬 연동 상태 저장용
   multiplierConfig?: MultiplierConfig;
 
+  // 수율 예측 공정 선택 상태 (optional) - 대시보드에서 저장/복원용
+  yieldStageSelection?: YieldStageSelection;
+
   createdAt: Date;
   updatedAt: Date;
+}
+
+// ===== 수율 예측 공정 선택 타입 =====
+// yieldLoss.ts 의 ProcessStageSelection 과 구조 호환 (런타임 의존 없이 타입만 일치)
+export interface YieldStageSelection {
+  mixing: boolean;
+  fermentation: boolean;
+  dividing: boolean;
+  shaping: boolean;
+  baking: boolean;
+  cooling: boolean;
 }
 
 // ===== 대시보드 변환 설정 타입 (모두 optional 필드) =====

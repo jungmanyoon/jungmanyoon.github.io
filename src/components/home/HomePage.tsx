@@ -37,11 +37,12 @@ const CATEGORY_ICONS: Record<string, string> = {
   savory: '🥧'
 }
 
-// 난이도 색상 (정보 전달용 의미색: success/warning/brand/danger)
+// 난이도 색상 (정보 전달용 의미색: 초급 emerald -> 중급 amber -> 상급 orange -> 전문가 rose)
+// 4단계가 명확히 구분되도록 색상 단계를 벌림. 색만으로 구분되지 않게 텍스트 라벨은 항상 병기.
 const DIFFICULTY_COLORS: Record<string, string> = {
   beginner: 'bg-emerald-100 text-emerald-700',
   intermediate: 'bg-amber-100 text-amber-700',
-  advanced: 'bg-brand-100 text-brand-700',
+  advanced: 'bg-orange-100 text-orange-700',
   professional: 'bg-rose-100 text-rose-700'
 }
 
@@ -96,8 +97,8 @@ export default function HomePage() {
 
   return (
     <div className="bg-gradient-to-br from-brand-50 to-brand-100 flex flex-col h-full">
-      {/* 히어로 섹션 - 컴팩트 */}
-      <div className="bg-gradient-to-r from-brand-600 to-brand-500 text-white">
+      {/* 히어로 섹션 - 컴팩트 (WCAG AA 대비 확보를 위해 배경을 brand-700/600으로 어둡게) */}
+      <div className="bg-gradient-to-r from-brand-700 to-brand-600 text-white">
         {/* 모바일은 패딩 축소(px-3 py-4), sm 이상에서 데스크톱 패딩(px-4 py-5) 보존 */}
         <div className="container mx-auto px-3 py-4 sm:px-4 sm:py-5">
           <div className="flex items-center gap-3 mb-3">
@@ -108,28 +109,28 @@ export default function HomePage() {
             <div>
               {/* 히어로 제목: 모바일 text-xl, sm 이상 기존 text-2xl 보존 */}
               <h1 className="text-xl sm:text-2xl font-bold">{t('home.title')}</h1>
-              <p className="text-brand-100 text-xs sm:text-sm">{t('home.subtitle')}</p>
+              <p className="text-white text-xs sm:text-sm">{t('home.subtitle')}</p>
             </div>
           </div>
 
           {/* 통계 카드 - 모바일 2열, sm 이상 기존 4열 보존 */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div className="bg-white/10 backdrop-blur rounded-lg px-3 py-2">
-              <div className="flex items-center gap-1.5 text-brand-100 text-xs">
+              <div className="flex items-center gap-1.5 text-white text-xs">
                 <BookOpen className="w-3.5 h-3.5" />
                 {t('home.savedRecipes')}
               </div>
               <div className="text-2xl font-bold">{stats.totalRecipes}</div>
             </div>
             <div className="bg-white/10 backdrop-blur rounded-lg px-3 py-2">
-              <div className="flex items-center gap-1.5 text-brand-100 text-xs">
+              <div className="flex items-center gap-1.5 text-white text-xs">
                 <Wheat className="w-3.5 h-3.5" />
                 {t('home.breadRecipes')}
               </div>
               <div className="text-2xl font-bold">{stats.categoryCount['bread'] || 0}</div>
             </div>
             <div className="bg-white/10 backdrop-blur rounded-lg px-3 py-2">
-              <div className="flex items-center gap-1.5 text-brand-100 text-xs">
+              <div className="flex items-center gap-1.5 text-white text-xs">
                 <Sparkles className="w-3.5 h-3.5" />
                 {t('home.cakeRecipes')}
               </div>
@@ -138,7 +139,7 @@ export default function HomePage() {
               </div>
             </div>
             <div className="bg-white/10 backdrop-blur rounded-lg px-3 py-2">
-              <div className="flex items-center gap-1.5 text-brand-100 text-xs">
+              <div className="flex items-center gap-1.5 text-white text-xs">
                 <TrendingUp className="w-3.5 h-3.5" />
                 {t('home.avgIngredients')}
               </div>
@@ -230,21 +231,21 @@ export default function HomePage() {
                     className="text-left min-h-[44px] px-3 py-2.5 bg-white rounded-lg shadow-sm border border-gray-200 hover:border-brand-300 hover:shadow transition-all group"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="text-2xl flex-shrink-0">{categoryIcon}</div>
+                      <div className="text-2xl flex-shrink-0" aria-hidden="true">{categoryIcon}</div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-semibold text-gray-800 truncate group-hover:text-brand-600 transition-colors">
                           {getLocalizedRecipeName(recipe)}
                         </h3>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] ${difficultyColor}`}>
+                          <span className={`px-1.5 py-0.5 rounded text-xs ${difficultyColor}`}>
                             {t(`filter.${difficultyKey}`)}
                           </span>
-                          <span className="text-[10px] text-gray-500">
+                          <span className="text-xs text-gray-500">
                             {recipe.ingredients?.length || 0}{t('home.ingredients')}
                           </span>
                         </div>
                         {recipe.source?.name && (
-                          <p className="text-[10px] text-gray-400 truncate">
+                          <p className="text-xs text-gray-400 truncate">
                             {t('home.source')}: {recipe.source.name}
                           </p>
                         )}

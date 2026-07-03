@@ -4,6 +4,13 @@ import { precacheAndRoute } from 'workbox-precaching'
 
 declare const self: ServiceWorkerGlobalScope & { __WB_MANIFEST: any }
 
+// 표준 lib.dom의 NotificationOptions에는 vibrate가 없으나 다수 브라우저가 지원한다.
+declare global {
+  interface NotificationOptions {
+    vibrate?: number[]
+  }
+}
+
 const CACHE_NAME = 'recipe-book-v2.0'
 const STATIC_CACHE = 'static-v2.0'
 const DYNAMIC_CACHE = 'dynamic-v2.0'

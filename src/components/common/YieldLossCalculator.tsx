@@ -4,7 +4,7 @@
  * 공정별 선택 기능 지원
  */
 
-import React, { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   calculateYieldLoss,
@@ -121,7 +121,11 @@ export default function YieldLossCalculator({
   const inputWeight = externalInputWeight ?? internalInputWeight
   const category = externalCategory ?? internalCategory
   const productType = externalProductType ?? internalProductType
-  const environment = externalEnvironment ?? { humidity, temperature }
+  // 매 렌더 새 객체 생성 방지: 안정 참조로 유지해야 아래 result/requiredInput useMemo 가 유효
+  const environment = useMemo(
+    () => externalEnvironment ?? { humidity, temperature },
+    [externalEnvironment, humidity, temperature]
+  )
   const stageSelection = externalStageSelection ?? internalStageSelection
 
   // 공정 선택 변경 핸들러

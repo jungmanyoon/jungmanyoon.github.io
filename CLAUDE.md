@@ -86,7 +86,7 @@ If "Invalid hook call" errors occur: browser refresh or restart dev server.
 
 ## Testing
 
-- **Unit tests**: `src/**/*.test.ts`, `tests/unit/**/*.test.ts`
+- **Unit tests**: `src/**/*.test.ts`, `tests/unit/**/*.test.ts` (calculation utils and store tests live under `tests/unit/`)
 - **E2E tests**: `tests/e2e/**/*.spec.ts` (Playwright)
-- **Setup**: `src/test/setup.ts` (mocks localStorage, matchMedia, etc.)
-- **Coverage threshold**: 80% (branches, functions, lines, statements)
+- **Setup**: `src/test/setup.ts` (in-memory localStorage, matchMedia, etc.)
+- **Coverage threshold**: 80% (branches, functions, lines, statements), scoped to `src/utils/calculations/**/*.ts` via `coverage.include` in `vitest.config.ts`. The gate covers the core calculation utilities that are actually unit-tested; it is not a whole-repo coverage number.

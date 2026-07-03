@@ -26,16 +26,7 @@ export default defineConfig({
     exclude: []
   },
   plugins: [
-    react({
-      // Fast Refresh 설정 - lazy 컴포넌트 HMR 안정성
-      fastRefresh: true,
-      // Babel 설정으로 HMR 경계 명확화
-      babel: {
-        plugins: [
-          // React 컴포넌트 경계 유지
-        ]
-      }
-    }),
+    react(),
     VitePWA({
       registerType: 'prompt',
       injectRegister: 'auto',
@@ -47,8 +38,8 @@ export default defineConfig({
         name: '레시피북 - 제과제빵 레시피 변환기',
         short_name: '레시피북',
         description: '무료 제과제빵 레시피 변환 웹 애플리케이션',
-        theme_color: '#8B4513',
-        background_color: '#FFF8DC',
+        theme_color: '#D97706',
+        background_color: '#FFFBEB',
         display: 'standalone',
         orientation: 'portrait-primary',
         start_url: '/',
@@ -105,7 +96,8 @@ export default defineConfig({
   build: {
     target: 'es2015',
     outDir: 'dist',
-    sourcemap: true,
+    // 공개 배포(gh-pages)에 원본 소스가 노출되지 않도록 소스맵 비활성
+    sourcemap: false,
     rollupOptions: {
       output: {
         // 코드 스플리팅: vendor 라이브러리를 용도별 청크로 분리해 메인 청크를 500KB 아래로 유지
@@ -133,10 +125,6 @@ export default defineConfig({
           // html2canvas - 화면 캡처용 대용량 라이브러리, 사용처가 한정적이라 단독 분리
           if (id.includes('node_modules/html2canvas/')) {
             return 'html2canvas'
-          }
-          // docx - 문서 생성용 대용량 라이브러리, 내보내기 기능에서만 사용되어 단독 분리
-          if (id.includes('node_modules/docx/')) {
-            return 'docx'
           }
           // lucide-react - 아이콘 라이브러리, 별도 청크로 분리
           if (id.includes('node_modules/lucide-react/')) {

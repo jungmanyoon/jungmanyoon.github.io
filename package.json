@@ -6,7 +6,8 @@
   "homepage": "https://jungmanyoon.github.io",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run typecheck && vite build",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -21,8 +22,6 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
     "html2canvas": "^1.4.1",
     "i18next": "^25.7.2",
     "i18next-browser-languagedetector": "^8.2.0",
@@ -44,7 +43,9 @@
     "@vitest/coverage-v8": "^1.1.0",
     "@vitest/ui": "^1.6.1",
     "autoprefixer": "^10.4.16",
+    "cors": "^2.8.5",
     "docx": "^9.5.1",
+    "express": "^5.1.0",
     "gh-pages": "^6.3.0",
     "jsdom": "^23.2.0",
     "postcss": "^8.4.32",
@@ -66,6 +67,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/recipe-book"
+    "url": "git+https://github.com/jungmanyoon/jungmanyoon.github.io.git"
   }
 }

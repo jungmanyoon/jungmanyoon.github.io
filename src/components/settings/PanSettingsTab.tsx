@@ -149,13 +149,6 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
     return panItem.name
   }, [t])
 
-  // 타입 라벨 번역 헬퍼
-  const getTypeLabel = useCallback((categoryValue: string, typeValue: string) => {
-    const types = PAN_TYPES[categoryValue] || []
-    const type = types.find(t => t.value === typeValue)
-    return type ? t(`settings.pan.types.${type.labelKey}`) : typeValue
-  }, [t])
-
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formData, setFormData] = useState<PanFormData>(EMPTY_PAN_FORM)

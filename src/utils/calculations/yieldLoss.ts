@@ -272,7 +272,7 @@ export function calculateYieldLoss(
 function generateYieldTips(
   category: ProductCategory,
   productType?: string,
-  totalLoss?: number,
+  _totalLoss?: number,
   environment?: EnvironmentFactors
 ): string[] {
   const tips: string[] = []

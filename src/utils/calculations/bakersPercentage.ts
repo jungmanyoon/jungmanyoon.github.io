@@ -3,16 +3,15 @@
  * 모든 재료를 밀가루 대비 백분율로 표현하는 제빵 업계 표준 방식
  */
 
-import { 
-  Ingredient, 
-  BakersPercentageCalculation,
-  RecipeYield 
-} from '@types/recipe.types'
-import { 
+import {
+  Ingredient,
+  BakersPercentageCalculation
+} from '@/types/recipe.types'
+import {
   BakersPercentageResult,
-  CalculatorIngredient 
-} from '@types/store.types'
-import { calculateMoisture, isLiquidIngredient } from '../data/ingredientMoisture'
+  CalculatorIngredient
+} from '@/types/store.types'
+import { calculateMoisture } from '../data/ingredientMoisture.js'
 
 interface BakersIngredient extends Ingredient {
   percentage?: number
@@ -86,15 +85,27 @@ export class BakersPercentage {
   }
 
   /**
-   * 액체 총량 계산
+   * 달걀의 수분 함량 비율 (달걀 전란은 약 75%가 수분)
+   * 수화율 계산 시 달걀 전체 중량을 100% 액체로 보면 과대평가되므로 이 비율을 적용한다.
+   */
+  static readonly EGG_MOISTURE_RATIO = 0.75
+
+  /**
+   * 액체 총량 계산 (수화율 기준)
+   * - 순수 액체(liquid)는 전량 반영
+   * - 달걀(egg)은 수분 함량(약 75%)만 반영하여 과대평가를 방지
    */
   static getTotalLiquid(ingredients: Ingredient[]): number {
-    return ingredients
-      .filter(ingredient => 
-        ingredient.category === 'liquid' || 
-        ingredient.category === 'egg'
-      )
-      .reduce((total, ingredient) => total + (ingredient.amount || 0), 0)
+    return ingredients.reduce((total, ingredient) => {
+      const amount = ingredient.amount || 0
+      if (ingredient.category === 'liquid') {
+        return total + amount
+      }
+      if (ingredient.category === 'egg') {
+        return total + amount * BakersPercentage.EGG_MOISTURE_RATIO
+      }
+      return total
+    }, 0)
   }
 
   /**
@@ -160,7 +171,6 @@ export class BakersPercentage {
     flourAmount: number
   ): BakersPercentageCalculation {
     const withPercentages = this.toBakersPercentage(ingredients, flourAmount)
-    const totalWeight = this.calculateTotalWeight(ingredients)
     const hydration = this.calculateHydration(ingredients)
     const totalPercentage = withPercentages.reduce(
       (sum, ing) => sum + (ing.percentage || 0), 

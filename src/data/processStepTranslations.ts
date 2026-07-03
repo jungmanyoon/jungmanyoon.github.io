@@ -128,10 +128,10 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     [/글루텐이?\s*(\d+)%\s*형성되면/g, 'When $1% gluten is developed,'],
     [/글루텐\s*형성/g, 'gluten development'],
 
-    // 발효 관련
-    [/1차\s*발효\s*(\d+)-?(\d+)?\s*분/g, 'First rise $1-$2 min'],
+    // 발효 관련 (범위는 상/하한 모두 있을 때만 매칭 -> 단일 값은 아래 단일 패턴이 처리해 '60- min' 잔여 하이픈 방지)
+    [/1차\s*발효\s*(\d+)-(\d+)\s*분/g, 'First rise $1-$2 min'],
     [/1차\s*발효\s*(\d+)\s*분/g, 'First rise $1 min'],
-    [/2차\s*발효\s*(\d+)-?(\d+)?\s*분/g, 'Final proof $1-$2 min'],
+    [/2차\s*발효\s*(\d+)-(\d+)\s*분/g, 'Final proof $1-$2 min'],
     [/2차\s*발효\s*(\d+)\s*분/g, 'Final proof $1 min'],
     [/중간\s*발효\s*(\d+)\s*분/g, 'Bench rest $1 min'],
 
@@ -154,9 +154,9 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     [/오므려\s*성형/g, 'Fold and seal'],
     [/이음매가?\s*아래로\s*가게\s*놓고/g, 'Place seam-side down'],
 
-    // 굽기 관련
-    [/(\d+)\s*도에서\s*(\d+)-?(\d+)?\s*분\s*굽기/g, 'Bake at $1°C for $2-$3 min'],
-    [/(\d+)도에서\s*(\d+)\s*분\s*굽기/g, 'Bake at $1°C for $2 min'],
+    // 굽기 관련 (범위는 상/하한 모두 있을 때만 매칭 -> 단일 값은 아래 단일 패턴이 처리해 '25- min' 잔여 하이픈 방지)
+    [/(\d+)\s*도에서\s*(\d+)-(\d+)\s*분\s*굽기/g, 'Bake at $1°C for $2-$3 min'],
+    [/(\d+)\s*도에서\s*(\d+)\s*분\s*굽기/g, 'Bake at $1°C for $2 min'],
     [/달걀물\s*바르고/g, 'Brush with egg wash,'],
     [/스팀\s*필수/g, 'steam required'],
     [/쿠프\s*넣고/g, 'Score,'],
@@ -167,7 +167,8 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     [/매끈하고\s*광택나는\s*상태/g, 'until smooth and glossy'],
     [/냉장\s*보관/g, 'refrigerate'],
     [/냉장에서\s*(\d+)\s*시간/g, 'in fridge for $1 hours'],
-    [/상온에서\s*(\d+)-?(\d+)?\s*시간/g, 'at room temperature for $1-$2 hours'],
+    [/상온에서\s*(\d+)-(\d+)\s*시간/g, 'at room temperature for $1-$2 hours'],
+    [/상온에서\s*(\d+)\s*시간/g, 'at room temperature for $1 hours'],
     [/틀의\s*(\d+)%\s*까지/g, 'until $1% of pan height'],
     [/틀의\s*(\d+)%/g, '$1% of pan'],
 
@@ -178,7 +179,8 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     [/탕종:?/g, 'Tangzhong:'],
     [/폴리쉬:?/g, 'Poolish:'],
     [/오토리즈:?/g, 'Autolyse:'],
-    [/(\d+)-?(\d+)?°?C까지\s*(저어가며\s*)?가열/g, 'Heat (stirring) to $1-$2°C'],
+    [/(\d+)-(\d+)°?C까지\s*(저어가며\s*)?가열/g, 'Heat (stirring) to $1-$2°C'],
+    [/(\d+)°?C까지\s*(저어가며\s*)?가열/g, 'Heat (stirring) to $1°C'],
     [/랩\s*씌워/g, 'Cover with plastic wrap'],
     [/하룻밤\s*권장/g, 'overnight recommended'],
     [/폴딩\s*(\d+)회/g, '$1 folds'],
@@ -239,7 +241,6 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     // 발효/시간
     '발효': 'fermentation',
     '휴지': 'rest',
-    '분': 'min',
     '시간': 'hour',
     '약불': 'low heat',
     '중불': 'medium heat',
@@ -254,7 +255,6 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     '감아': 'wrap',
 
     // 온도/설정
-    '도': '°C',
     '상온': 'room temperature',
     '냉장': 'refrigerated',
     '냉동': 'frozen',
@@ -283,8 +283,16 @@ export function translateProcessStep(text: string, targetLang: 'ko' | 'en' = 'en
     translated = translated.replace(pattern, replacement as string);
   }
 
-  // 남은 한글 단어에 대해 개별 용어 치환
-  for (const [ko, en] of Object.entries(termMap)) {
+  // 단일 음절 오염 방지: '분'/'도'는 숫자 뒤에서만 단위로 치환한다.
+  // (그냥 전역 치환하면 '분할'->'min할', '온도'/'정도'->'온°C'/'정°C'로 한글 단어가 파괴됨)
+  translated = translated
+    .replace(/(\d+)\s*분/g, '$1 min')
+    .replace(/(\d+)\s*도/g, '$1°C');
+
+  // 남은 한글 단어에 대해 개별 용어 치환.
+  // 긴 키를 먼저 치환해야 '분할'이 '분'보다, '믹싱합니다'가 '믹싱'보다 우선 적용된다.
+  const sortedTerms = Object.entries(termMap).sort((a, b) => b[0].length - a[0].length);
+  for (const [ko, en] of sortedTerms) {
     translated = translated.replace(new RegExp(ko, 'g'), en);
   }
 

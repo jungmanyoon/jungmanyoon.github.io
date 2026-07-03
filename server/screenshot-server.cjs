@@ -6,8 +6,8 @@ const path = require('path');
 const app = express();
 const PORT = 3001;
 
-// 미들웨어 설정
-app.use(cors());
+// 미들웨어 설정 (로컬 개발 서버 오리진만 허용)
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -33,10 +33,16 @@ app.post('/api/save-screenshot', (req, res) => {
     
     // 파일명에서 문제가 될 수 있는 문자 제거
     safeFilename = safeFilename.replace(/[<>:"|?*]/g, '_');
-    
-    // 프로젝트 루트 디렉토리에 저장
-    const rootDir = path.join(__dirname, '..');
-    const filePath = path.join(rootDir, safeFilename);
+
+    // 경로 이탈(path traversal) 차단: 디렉토리 성분('..', '/', '\\') 제거
+    safeFilename = path.basename(safeFilename);
+
+    // 프로젝트 루트 디렉토리에 저장 (최종 경로가 루트 바로 아래인지 재검증 - 이중 방어)
+    const rootDir = path.resolve(__dirname, '..');
+    const filePath = path.resolve(rootDir, safeFilename);
+    if (path.dirname(filePath) !== rootDir) {
+      return res.status(400).json({ error: 'Invalid filename' });
+    }
     
     // 이미 파일이 존재하는지 확인
     const fileExists = fs.existsSync(filePath);

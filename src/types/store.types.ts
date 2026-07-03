@@ -3,7 +3,7 @@
  * 글로벌 상태 관리를 위한 타입 시스템
  */
 
-import { Recipe, Ingredient, PanConfig, BreadMethod, ConversionResult } from './recipe.types';
+import { Recipe, Ingredient, PanConfig, BreadMethod } from './recipe.types';
 
 // ===== 앱 상태 관련 타입 =====
 export interface AppState {
@@ -33,7 +33,11 @@ export type TabType =
   | 'recipes'
   | 'editor'
   | 'settings'
-  | 'help';
+  | 'help'
+  | 'privacy'
+  | 'terms'
+  | 'guide'
+  | 'contact';
 
 export interface ErrorState {
   message: string;

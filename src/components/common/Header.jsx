@@ -20,20 +20,29 @@ function Header() {
     { id: 'help', labelKey: 'nav.help', icon: HelpCircle },
   ]
 
+  // 탭 공통 스타일: 활성만 브랜드색(amber), 비활성은 뉴트럴. 색이 아니라 "상태"로 위계 표현.
+  const tabClass = (active) =>
+    `inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] shrink-0 px-2 py-2 sm:px-3 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors ${
+      active
+        ? 'bg-brand-50 text-brand-700'
+        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+    }`
+
   return (
-    <header className="bg-bread-600 text-white shadow">
+    // 뉴트럴 화이트 헤더 + 스크롤 시 고정. 넓은 주황 풀블리드를 걷어내 "화이트 앱 + 주황 포인트"로.
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200 text-slate-700">
       {/* 모바일 패딩 축소(px-2 py-2), sm 이상 기존 패딩(py-3) 보존 */}
       <div className="container mx-auto px-2 py-2 sm:py-3">
         {/* 좁은 화면에서 로고와 nav가 겹치지 않도록 gap 부여 */}
         <div className="flex items-center justify-between gap-2">
-          {/* Logo - 터치영역 44px, 좁은 화면에서 줄어들지 않도록 shrink-0 */}
+          {/* Logo - 터치영역 44px, 좁은 화면에서 줄어들지 않도록 shrink-0. 브랜드색은 아이콘에만. */}
           <button
             onClick={() => setActiveTab('home')}
-            className="flex items-center space-x-2 min-h-[44px] shrink-0 hover:opacity-80 transition-opacity"
+            className="flex items-center space-x-2 min-h-[44px] shrink-0 rounded-lg px-1 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors"
           >
-            <Wheat className="w-5 h-5" />
+            <Wheat className="w-5 h-5 text-brand-600" />
             {/* 앱 이름: 모바일 text-base, sm 이상 기존 text-lg 보존 */}
-            <h1 className="text-base sm:text-lg font-bold text-white">{t('app.name')}</h1>
+            <h1 className="text-base sm:text-lg font-bold text-slate-900">{t('app.name')}</h1>
           </button>
 
           {/* Navigation
@@ -47,16 +56,14 @@ function Header() {
             {/* Main Navigation */}
             {navTabs.map(tab => {
               const Icon = tab.icon
+              const active = activeTab === tab.id
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] shrink-0 px-2 py-2 sm:px-3 rounded text-sm font-medium focus:outline-none focus:ring-2 focus:ring-white/70 transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-white/20 text-white'
-                      : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  }`}
+                  className={tabClass(active)}
                   aria-label={t(tab.labelKey)}
+                  aria-current={active ? 'page' : undefined}
                   title={t(tab.labelKey)}
                 >
                   {/* 라벨은 sm 이상에서만 노출(모바일은 아이콘만으로 컴팩트) */}
@@ -66,21 +73,19 @@ function Header() {
             })}
 
             {/* Divider - 모바일은 간격 축소 */}
-            <span className="w-px h-6 bg-white/20 mx-1 sm:mx-2 shrink-0"></span>
+            <span className="w-px h-6 bg-slate-200 mx-1 sm:mx-2 shrink-0"></span>
 
             {/* Utility Tabs - 아이콘 only, 터치영역 44px */}
             {utilTabs.map(tab => {
               const Icon = tab.icon
+              const active = activeTab === tab.id
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] shrink-0 px-2 py-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-white/70 transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-white/20'
-                      : 'text-white/70 hover:bg-white/10 hover:text-white'
-                  }`}
+                  className={tabClass(active)}
                   aria-label={t(tab.labelKey)}
+                  aria-current={active ? 'page' : undefined}
                   title={t(tab.labelKey)}
                 >
                   <Icon className="w-4 h-4" />

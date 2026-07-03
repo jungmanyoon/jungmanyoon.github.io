@@ -7,16 +7,17 @@
     @apply bg-gray-50 text-gray-900;
   }
   
+  /* 제목 위계는 색이 아니라 크기/굵기로 표현한다. 주황(brand)은 액센트에만 남긴다. */
   h1 {
-    @apply text-2xl font-bold text-bread-700;
+    @apply text-2xl font-bold text-slate-900;
   }
-  
+
   h2 {
-    @apply text-xl font-semibold text-bread-600;
+    @apply text-xl font-semibold text-slate-800;
   }
-  
+
   h3 {
-    @apply text-lg font-medium text-bread-600;
+    @apply text-lg font-medium text-slate-700;
   }
 }
 

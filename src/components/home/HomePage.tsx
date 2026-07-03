@@ -107,8 +107,8 @@ export default function HomePage() {
               <ChefHat className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
             <div>
-              {/* 히어로 제목: 모바일 text-xl, sm 이상 기존 text-2xl 보존 */}
-              <h1 className="text-xl sm:text-2xl font-bold">{t('home.title')}</h1>
+              {/* 히어로 제목: 모바일 text-xl, sm 이상 text-2xl. 주황 배경 위이므로 흰색 명시(전역 h1 뉴트럴색 오버라이드) */}
+              <h1 className="text-xl sm:text-2xl font-bold text-white">{t('home.title')}</h1>
               <p className="text-white text-xs sm:text-sm">{t('home.subtitle')}</p>
             </div>
           </div>

@@ -19,6 +19,8 @@
 
 - 2026-07-03(7): 남은 low/info 40건 반영(stores 7·calc 14·components 16·misc 3). API장애로 1차 병렬 실패 후 회복, 스토어 동기+calc/components 병렬 재시도 성공. recipe.types에 YieldStageSelection 추가, 테스트 기대값 3건 동반갱신(달걀수분·폴리시정의·팬치수throw). 통합검증 typecheck0/test164/build/coverage green. 보류: misc 구조·위험 5건 + 대시보드 as any 7건(사유문서화).
 
+- 2026-07-03(8): 후속 처리. PWA 이중화 통합(수동 public/sw.js·manifest.json 삭제 + index.html 수동 manifest 링크 제거 -> VitePWA 단일화; 앱 preview+playwright 런타임 검증: manifest 링크 1개/webmanifest, sw workbox 등록, shortcuts·share_target·amber 실효). fileSystemStorage @ts-ignore 4건 -> declarations.d.ts에 File System Access API 타입 보강으로 제거. e2e basic-functionality 정비(header 2개 strict violation=SEO정적header, #root 스코프로 해소 + 조건부스킵 제거 aria-label/active검증 + 반응형 의미화) -> 실제 실행 4/4 통과. typecheck0/unit164/build 통과. 남은 보류 6건(alias·루트스크립트·i18n이중화·declarations any·noUncheckedIndexedAccess·대시보드 as any).
+
 ## 진행 현황
 - [x] P0 (Critical + 최우선 High) 완료
 - [ ] P1 (타입 게이트 + High 잔여 + 설정 오버라이드/i18n) 완료
@@ -39,7 +41,7 @@
 
 ## [MEDIUM] (15건)
 
-- [ ] **(빌드/설정)** 손으로 만든 PWA(public/sw.js·manifest.json·index.html 링크)와 VitePWA 플러그인 이중 공존 — `vite.config.js:39`
+- [x] **(빌드/설정)** 손으로 만든 PWA(public/sw.js·manifest.json·index.html 링크)와 VitePWA 플러그인 이중 공존 — `vite.config.js:39`
   - 수정: PWA 소스를 하나로 통일: (a) VitePWA를 쓸 거면 public/sw.js·public/manifest.json을 삭제하고 index.html의 수동 manifest 링크도 제거해 VitePWA가 주입하도록 위임, 또는 (b) 손수 만든 SW/manifest만 쓸 거면 VitePWA 플러그인을 제거. 빌드 후 dist/sw.js와 실제 링크된 manifest 파일명이 하나로 수렴하는지 검증.
 - [x] **(빌드/설정)** screenshot-server가 클라이언트 filename으로 경로 이탈 쓰기 가능(path traversal) — `server/screenshot-server.cjs:35`
   - 수정: path.basename(safeFilename)로 디렉토리 성분 제거 + 결과 경로가 rootDir 하위인지 path.resolve로 재검증, cors를 http://localhost:5173로 제한. 근본적으로는 이 서버 자체가 죽은 코드이므로 제거를 우선 검토.
@@ -126,7 +128,7 @@
 - [x] **(스토어)** useDashboardStore.saveAsNewRecipe가 레시피를 생성만 하고 저장하지 않으며 id만 반환 — `src/stores/useDashboardStore.ts:247`
 - [x] **(스토어)** usePanPresetStore가 상태 계층에서 confirm/alert 부작용 및 importPresets 스키마 미검증 — `src/stores/usePanPresetStore.ts:203`
 - [x] **(스토어)** resetAllStores가 5개 스토어를 누락해 전체 리셋 계약을 지키지 못함 — `src/stores/index.ts:24`
-- [ ] **(테스트)** e2e basic-functionality 스펙의 조건부 스킵으로 인한 거짓 통과(false green) — `tests/e2e/basic-functionality.spec.ts:19` (원high)
+- [x] **(테스트)** e2e basic-functionality 스펙의 조건부 스킵으로 인한 거짓 통과(false green) — `tests/e2e/basic-functionality.spec.ts:19` (원high)
 - [x] **(테스트)** 반응형 e2e 테스트가 항상 참인 무의미 단언만 수행 — `tests/e2e/basic-functionality.spec.ts:38` (원medium)
 - [x] **(테스트)** 저장소에 남은 00-debug 스펙 3종 - assertion 없이 항상 통과하는 노이즈 테스트 — `tests/e2e/00-debug.spec.js:42` (원medium)
 - [x] **(테스트)** 동일 유틸에 대한 중복·분기된 단위 테스트 스위트 이중 실행 — `tests/unit/utils/bakersPercentage.test.ts:1` (원medium)
@@ -168,7 +170,7 @@
   - 수정: ! 대신 필수 치수 가드/throw, 또는 팬 타입별 discriminated union 설계.
 - [ ] **[Low]** declarations.d.ts 와일드카드가 모든 .js 기본 import를 any로 만듦(sampleRecipes 포함) — `src/declarations.d.ts:3`
   - 수정: 시드 데이터 .ts화(Recipe[]) 또는 로드 시 런타임 검증.
-- [ ] **[Low]** fileSystemStorage.ts @ts-ignore 4건(File System Access API 미지원 우회) — `src/utils/storage/fileSystemStorage.ts:112`
+- [x] **[Low]** fileSystemStorage.ts @ts-ignore 4건(File System Access API 미지원 우회) — `src/utils/storage/fileSystemStorage.ts:112`
   - 수정: declaration merging으로 타입 보강 또는 @ts-expect-error로 범위 축소.
 - [ ] **[Info]** 도메인 타입 잔여 any(ConversionChange.from/to, HistoryItem.data) + noUncheckedIndexedAccess 미설정 — `src/types/recipe.types.ts:355`, `store.types.ts:61`
   - 수정: 제네릭/판별유니온 대체, 여력 시 noUncheckedIndexedAccess 도입.

@@ -96,54 +96,53 @@ export default function HomePage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-brand-50 to-brand-100 flex flex-col h-full">
-      {/* 히어로 섹션 - 컴팩트 (WCAG AA 대비 확보를 위해 배경을 brand-700/600으로 어둡게) */}
-      <div className="bg-gradient-to-r from-brand-700 to-brand-600 text-white">
+    <div className="bg-surface-canvas flex flex-col h-full">
+      {/* 히어로 섹션 - 화이트 베이스 + amber 액센트 (주황 그라디언트 워시 제거) */}
+      <div className="border-b border-line">
         {/* 모바일은 패딩 축소(px-3 py-4), sm 이상에서 데스크톱 패딩(px-4 py-5) 보존 */}
         <div className="container mx-auto px-3 py-4 sm:px-4 sm:py-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-white/20 rounded-lg">
-              {/* 아이콘: 모바일 축소(w-6), sm 이상 기존 크기(w-7) 보존 */}
-              <ChefHat className="w-6 h-6 sm:w-7 sm:h-7" />
+            {/* 아이콘 배지: 브랜드색은 여기(작은 면적)에만 */}
+            <div className="p-2 bg-brand-50 rounded-xl">
+              <ChefHat className="w-6 h-6 sm:w-7 sm:h-7 text-brand-600" />
             </div>
             <div>
-              {/* 히어로 제목: 모바일 text-xl, sm 이상 text-2xl. 주황 배경 위이므로 흰색 명시(전역 h1 뉴트럴색 오버라이드) */}
-              <h1 className="text-xl sm:text-2xl font-bold text-white">{t('home.title')}</h1>
-              <p className="text-white text-xs sm:text-sm">{t('home.subtitle')}</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-ink">{t('home.title')}</h1>
+              <p className="text-ink-subtle text-xs sm:text-sm">{t('home.subtitle')}</p>
             </div>
           </div>
 
-          {/* 통계 카드 - 모바일 2열, sm 이상 기존 4열 보존 */}
+          {/* 통계 카드 - canvas 위 화이트 카드 + amber 아이콘, 뉴트럴 수치 */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <div className="bg-white/10 backdrop-blur rounded-lg px-3 py-2">
-              <div className="flex items-center gap-1.5 text-white text-xs">
-                <BookOpen className="w-3.5 h-3.5" />
+            <div className="bg-surface-paper border border-line rounded-xl px-3 py-2">
+              <div className="flex items-center gap-1.5 text-ink-subtle text-xs">
+                <BookOpen className="w-3.5 h-3.5 text-brand-500" />
                 {t('home.savedRecipes')}
               </div>
-              <div className="text-2xl font-bold">{stats.totalRecipes}</div>
+              <div className="text-2xl font-bold text-ink">{stats.totalRecipes}</div>
             </div>
-            <div className="bg-white/10 backdrop-blur rounded-lg px-3 py-2">
-              <div className="flex items-center gap-1.5 text-white text-xs">
-                <Wheat className="w-3.5 h-3.5" />
+            <div className="bg-surface-paper border border-line rounded-xl px-3 py-2">
+              <div className="flex items-center gap-1.5 text-ink-subtle text-xs">
+                <Wheat className="w-3.5 h-3.5 text-brand-500" />
                 {t('home.breadRecipes')}
               </div>
-              <div className="text-2xl font-bold">{stats.categoryCount['bread'] || 0}</div>
+              <div className="text-2xl font-bold text-ink">{stats.categoryCount['bread'] || 0}</div>
             </div>
-            <div className="bg-white/10 backdrop-blur rounded-lg px-3 py-2">
-              <div className="flex items-center gap-1.5 text-white text-xs">
-                <Sparkles className="w-3.5 h-3.5" />
+            <div className="bg-surface-paper border border-line rounded-xl px-3 py-2">
+              <div className="flex items-center gap-1.5 text-ink-subtle text-xs">
+                <Sparkles className="w-3.5 h-3.5 text-brand-500" />
                 {t('home.cakeRecipes')}
               </div>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-ink">
                 {(stats.categoryCount['cake'] || 0) + (stats.categoryCount['dessert'] || 0)}
               </div>
             </div>
-            <div className="bg-white/10 backdrop-blur rounded-lg px-3 py-2">
-              <div className="flex items-center gap-1.5 text-white text-xs">
-                <TrendingUp className="w-3.5 h-3.5" />
+            <div className="bg-surface-paper border border-line rounded-xl px-3 py-2">
+              <div className="flex items-center gap-1.5 text-ink-subtle text-xs">
+                <TrendingUp className="w-3.5 h-3.5 text-brand-500" />
                 {t('home.avgIngredients')}
               </div>
-              <div className="text-2xl font-bold">{stats.avgIngredients}</div>
+              <div className="text-2xl font-bold text-ink">{stats.avgIngredients}</div>
             </div>
           </div>
         </div>

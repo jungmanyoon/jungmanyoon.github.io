@@ -136,6 +136,23 @@ const DEFAULT_USER_PANS: UserPan[] = [
 // 기본 팬 ID 목록 (번역용)
 export const DEFAULT_PAN_IDS = DEFAULT_USER_PANS.map(p => p.id)
 
+// 기본 팬 id -> 원본 매핑 (persist 저장 최소화 및 복원 시 재병합에 사용)
+const DEFAULT_PANS_BY_ID = new Map<string, UserPan>(DEFAULT_USER_PANS.map(p => [p.id, p]))
+
+/**
+ * 기본 팬이 사용자에 의해 수정되었는지 판단(생성/수정 시각 등 메타는 제외한 내용 비교).
+ * 수정되지 않은 기본 팬은 persist에서 제외해 저장 용량을 크게 줄인다.
+ */
+const isPanModifiedFromDefault = (def: UserPan, cur: UserPan): boolean =>
+  def.name !== cur.name ||
+  def.category !== cur.category ||
+  def.type !== cur.type ||
+  def.volume !== cur.volume ||
+  def.notes !== cur.notes ||
+  def.isFavorite !== cur.isFavorite ||
+  def.fillRatio !== cur.fillRatio ||
+  JSON.stringify(def.dimensions) !== JSON.stringify(cur.dimensions)
+
 const DEFAULT_PAN_SETTINGS: PanSettings = {
   myPans: DEFAULT_USER_PANS,
   fillRatioOverrides: {},
@@ -863,8 +880,21 @@ export const useSettingsStore = create<SettingsStore>()(
       importSettings: (data) => {
         try {
           const parsed = JSON.parse(data)
+          // import된 팬의 날짜 필드는 문자열이므로 Date로 정규화(이후 날짜 연산 크래시 방지)
+          const importedPan: PanSettings =
+            parsed.pan && Array.isArray(parsed.pan.myPans)
+              ? {
+                  ...DEFAULT_PAN_SETTINGS,
+                  ...parsed.pan,
+                  myPans: parsed.pan.myPans.map((p: any) => ({
+                    ...p,
+                    createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
+                    updatedAt: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+                  })),
+                }
+              : { ...DEFAULT_PAN_SETTINGS, ...parsed.pan }
           set({
-            pan: { ...DEFAULT_PAN_SETTINGS, ...parsed.pan },
+            pan: importedPan,
             product: { ...DEFAULT_PRODUCT_SETTINGS, ...parsed.product },
             yieldLoss: { ...DEFAULT_YIELD_LOSS_SETTINGS, ...parsed.yieldLoss },
             method: { ...DEFAULT_METHOD_SETTINGS, ...parsed.method },
@@ -907,6 +937,64 @@ export const useSettingsStore = create<SettingsStore>()(
     {
       name: 'recipe-settings-storage',
       version: 5,  // v1→v2: 기본 팬, v2→v3: 원가/영양, v3→v4: 저장소 설정, v4→v5: prefermentYeastRatio
+      // 저장 범위 축소: 기본 팬 60여 개를 통째로 매번 직렬화하지 않고,
+      // 사용자가 추가/수정한 팬 + 삭제 추적 정보만 저장한다(복원 시 onRehydrateStorage에서 기본 팬 재병합).
+      partialize: (state) => ({
+        pan: {
+          // 사용자가 추가했거나 내용을 수정한 팬만 저장(수정 안 된 기본 팬 원본은 제외)
+          myPans: state.pan.myPans.filter(p => {
+            const def = DEFAULT_PANS_BY_ID.get(p.id)
+            return !def || isPanModifiedFromDefault(def, p)
+          }),
+          fillRatioOverrides: state.pan.fillRatioOverrides,
+          manufacturerVariance: state.pan.manufacturerVariance,
+          // 삭제 추적: 저장 시점에 남아있는 기본 팬 id 목록.
+          // 복원 시 이 목록에 없는 기본 팬은 "사용자가 삭제한 것"으로 보고 되살리지 않는다.
+          keptDefaultPanIds: state.pan.myPans
+            .filter(p => DEFAULT_PANS_BY_ID.has(p.id))
+            .map(p => p.id),
+        },
+        product: state.product,
+        yieldLoss: state.yieldLoss,
+        method: state.method,
+        environment: state.environment,
+        ingredient: state.ingredient,
+        advanced: state.advanced,
+        storage: state.storage,
+      }),
+      // 복원 시 (1) 팬 날짜 필드 정규화 (2) 저장에서 빠진 기본 팬 재병합
+      onRehydrateStorage: () => (state) => {
+        if (!state?.pan) return
+        // keptDefaultPanIds는 partialize가 저장한 여분 필드(런타임 존재, 정적 타입엔 없음)
+        const panState = state.pan as PanSettings & { keptDefaultPanIds?: string[] }
+        const savedPans = Array.isArray(panState.myPans) ? panState.myPans : []
+
+        // (1) 저장된 팬의 날짜 필드 정규화(persist는 Date를 문자열로 직렬화)
+        const normalizedSaved: UserPan[] = savedPans.map(p => ({
+          ...p,
+          createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
+          updatedAt: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+        }))
+        const savedIds = new Set(normalizedSaved.map(p => p.id))
+
+        // (2) 되살릴 기본 팬 결정
+        //   - 신형 저장본: keptDefaultPanIds 명시 목록 사용(삭제한 기본 팬은 제외)
+        //   - 구형 저장본(기본 팬을 통째로 저장하던 시절): 목록이 없으므로 이미 저장에
+        //     포함된 기본 팬만 유지(missingDefaults가 비어 하위호환이 유지됨)
+        const keptDefaultIds = Array.isArray(panState.keptDefaultPanIds)
+          ? panState.keptDefaultPanIds
+          : normalizedSaved.filter(p => DEFAULT_PANS_BY_ID.has(p.id)).map(p => p.id)
+        const keptSet = new Set(keptDefaultIds)
+
+        // 저장 객체엔 없지만 "유지 대상"인 기본 팬을 원본에서 복원
+        const missingDefaults = DEFAULT_USER_PANS.filter(
+          dp => keptSet.has(dp.id) && !savedIds.has(dp.id)
+        )
+
+        panState.myPans = [...normalizedSaved, ...missingDefaults]
+        // 여분 추적 필드는 런타임 상태에 남길 필요 없음
+        delete panState.keptDefaultPanIds
+      },
       migrate: (persistedState: any, version: number) => {
         let state = persistedState
 

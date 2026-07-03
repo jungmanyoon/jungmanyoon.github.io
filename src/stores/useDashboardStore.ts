@@ -9,6 +9,9 @@ import type { Recipe, Ingredient, PanConfig, BreadMethod } from '@/types/recipe.
 // 식빵틀 부피 형상 보정의 단일 진실원천(panScaling.ts)을 참조한다.
 // store -> calculations 단방향 import 이므로 순환이 발생하지 않는다.
 import { PanScalingTS } from '@/utils/calculations/panScaling'
+// 변환 결과를 실제로 레시피 스토어에 저장하기 위해 참조.
+// useRecipeStore는 대시보드 스토어를 import하지 않으므로 순환이 없다.
+import { useRecipeStore } from './useRecipeStore'
 import type {
   DashboardState,
   DashboardActions,
@@ -256,7 +259,8 @@ export const useDashboardStore = create<DashboardStore>()(
             updatedAt: new Date(),
           }
 
-          // 레시피 스토어에 추가 (외부에서 처리)
+          // 변환 결과를 실제로 레시피 스토어에 저장(기존에는 생성만 하고 저장 안 됨)
+          useRecipeStore.getState().addRecipe(newRecipe)
           return newRecipe.id
         },
 
@@ -368,7 +372,12 @@ function calculatePanScaleFactor(
   const originalVolume = calculatePanVolume(originalPan)
   const targetVolume = calculatePanVolume(targetPan)
 
-  return targetVolume / originalVolume
+  // 원본 부피가 0/비유한이면 division-by-zero로 배율이 Infinity/NaN이 되어
+  // 재료량이 전부 오염된다. 이 경우 원본 유지(배율 1)로 폴백한다.
+  if (!originalVolume || !Number.isFinite(originalVolume)) return 1
+
+  const factor = targetVolume / originalVolume
+  return Number.isFinite(factor) ? factor : 1
 }
 
 function calculatePanVolume(pan: PanConfig): number {

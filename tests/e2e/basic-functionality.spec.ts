@@ -36,16 +36,26 @@ test.describe('기본 기능 테스트', () => {
   })
 
   test('반응형 디자인이 작동해야 한다', async ({ page }) => {
+    // 가로 스크롤이 생기지 않아야 한다(반응형의 핵심 특성) - body visible만 보는 무의미 단언 대체
+    const expectNoHorizontalOverflow = async () => {
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+      )
+      expect(overflow).toBeLessThanOrEqual(1) // 반올림/스크롤바 오차 1px 허용
+    }
+
     // 데스크톱 뷰
     await page.setViewportSize({ width: 1200, height: 800 })
-    await expect(page.locator('body')).toBeVisible()
-    
+    await expect(page.locator('header')).toBeVisible()
+
     // 태블릿 뷰
     await page.setViewportSize({ width: 768, height: 1024 })
-    await expect(page.locator('body')).toBeVisible()
-    
+    await expect(page.locator('header')).toBeVisible()
+    await expectNoHorizontalOverflow()
+
     // 모바일 뷰
     await page.setViewportSize({ width: 375, height: 667 })
-    await expect(page.locator('body')).toBeVisible()
+    await expect(page.locator('header')).toBeVisible()
+    await expectNoHorizontalOverflow()
   })
 })

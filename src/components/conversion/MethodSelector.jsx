@@ -44,10 +44,10 @@ function MethodSelector({ currentMethod, selectedMethod, onMethodChange }) {
 
               <div className="mt-2">
                 <p className="text-green-600">
-                  {t('components.methodSelector.advantages')} {method.advantages.slice(0, 2).join(', ')}
+                  {t('components.methodSelector.advantages')} {(method.advantages || []).slice(0, 2).join(', ')}
                 </p>
                 <p className="text-red-600">
-                  {t('components.methodSelector.disadvantages')} {method.disadvantages.slice(0, 2).join(', ')}
+                  {t('components.methodSelector.disadvantages')} {(method.disadvantages || []).slice(0, 2).join(', ')}
                 </p>
               </div>
             </div>

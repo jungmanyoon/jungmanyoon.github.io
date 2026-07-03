@@ -488,7 +488,7 @@ const AdvancedDashboard: React.FC = () => {
       setProductName(currentRecipe.name || t('advDashboard.defaultRecipeName'));
 
       // 제품 타입 로드 (기본값: bread)
-      setProductType((currentRecipe as any).productType || 'bread');
+      setProductType(currentRecipe.productType || 'bread');
 
       // 출처 정보 로드
       if (currentRecipe.source) {
@@ -754,7 +754,7 @@ const AdvancedDashboard: React.FC = () => {
 
       // 비용적 설정 로드
       if (currentRecipe.specificVolume) {
-        const svData = currentRecipe.specificVolume as any;
+        const svData = currentRecipe.specificVolume;
         if (svData.original) setOriginalProduct(svData.original);
         if (svData.converted) setConvertedProduct(svData.converted);
       } else if (currentRecipe.tags && Array.isArray(currentRecipe.tags)) {
@@ -770,7 +770,7 @@ const AdvancedDashboard: React.FC = () => {
 
       // 배수 설정 로드 + 유효성 검증 (음수/0 방지)
       if (currentRecipe.multiplierConfig) {
-        const mcData = currentRecipe.multiplierConfig as any;
+        const mcData = currentRecipe.multiplierConfig;
         if (typeof mcData.multiplier === 'number') {
           // 배수는 최소 0.01 이상 보장
           setMultiplier(Math.max(0.01, Math.abs(mcData.multiplier) || 1));
@@ -784,10 +784,10 @@ const AdvancedDashboard: React.FC = () => {
       }
 
       // 수율 예측 공정 선택 상태 로드
-      if ((currentRecipe as any).yieldStageSelection) {
+      if (currentRecipe.yieldStageSelection) {
         setYieldStageSelection({
           ...DEFAULT_STAGE_SELECTION,
-          ...(currentRecipe as any).yieldStageSelection
+          ...currentRecipe.yieldStageSelection
         });
       } else {
         // 저장된 상태가 없으면 기본값으로 리셋
@@ -1417,7 +1417,7 @@ const AdvancedDashboard: React.FC = () => {
     const prefermentYeastRatio = methodConfig?.prefermentYeastRatio ?? defaultYeast.prefermentYeastRatio;
 
     setMethod({
-      type: type as any,
+      type: type as MethodSettings['type'],
       flourRatio: ratios.flour,
       waterRatio: ratios.water,
       yeastAdjustment,
@@ -1694,7 +1694,7 @@ const AdvancedDashboard: React.FC = () => {
       addRecipe(newRecipe as any);
       addToast({ type: 'success', message: t('advDashboard.recipeSaved', { name: productName }) });
     }
-  }, [productName, source, pans, oven, usePreferment, mainDoughIngredients, convertedIngredients, processes, memo, convertedProduct, method, yieldStageSelection, currentRecipe, addRecipe, updateRecipe, addToast]);
+  }, [productName, productType, source, pans, oven, ingredients, processes, memo, convertedProduct, originalProduct, method, originalPan, multiplier, isPanLinked, yieldStageSelection, currentRecipe, defaultPanType, defaultCategory, addRecipe, updateRecipe, addToast, t]);
 
   // 레시피 저장 (중복 이름 확인)
   const handleSaveRecipe = useCallback(() => {

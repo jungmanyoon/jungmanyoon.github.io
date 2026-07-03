@@ -42,6 +42,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
   const { t } = useTranslation()
   const {
     environment,
+    method,
     setEnvironmentDefaults,
     addEnvironmentProfile,
     updateEnvironmentProfile,
@@ -71,7 +72,8 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
 
   // 발효 시간 영향 계산
   const fermentationImpact = useMemo(() => {
-    const baseTemp = 26 // 기준 온도
+    // 제법 탭의 baseTemperature 설정을 기준온도로 사용 (하드코딩 26 제거, 미설정 시에만 26 폴백)
+    const baseTemp = method.baseTemperature ?? 26
     const coefficient = calculateFermentationTimeCoefficient(currentEnvironment.temperature, baseTemp)
 
     if (coefficient < 1) {
@@ -96,7 +98,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
       percent: 0,
       message: t('settings.environment.fermentationNormal')
     }
-  }, [currentEnvironment.temperature, t])
+  }, [currentEnvironment.temperature, method.baseTemperature, t])
 
   // 고도 영향 메시지
   const altitudeImpact = useMemo(() => {

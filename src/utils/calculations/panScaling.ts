@@ -358,16 +358,38 @@ export class PanScalingTS {
 
   static calculatePanVolume(pan: PanConfigTS): number {
     const { type, dimensions } = pan
+    // non-null 단언(!) 대신 필수 치수를 명시적으로 검증한다.
+    // (누락 시 조용히 NaN을 반환해 오류를 은폐하지 않고 명확히 throw)
     switch (type) {
-      case 'round':
-        return this.calculateRoundPanVolume(dimensions.diameter!, dimensions.height!)
+      case 'round': {
+        const { diameter, height } = dimensions
+        if (diameter == null || height == null) {
+          throw new Error('원형 팬 부피 계산에는 diameter, height가 필요합니다.')
+        }
+        return this.calculateRoundPanVolume(diameter, height)
+      }
       case 'square':
-      case 'rectangular':
-        return this.calculateSquarePanVolume(dimensions.length!, dimensions.width!, dimensions.height!)
-      case 'loaf':
-        return this.calculateLoafPanVolume(dimensions.topLength!, dimensions.bottomLength!, dimensions.width!, dimensions.height!)
-      case 'chiffon':
-        return this.calculateChiffonPanVolume(dimensions.outerDiameter!, dimensions.innerDiameter!, dimensions.height!)
+      case 'rectangular': {
+        const { length, width, height } = dimensions
+        if (length == null || width == null || height == null) {
+          throw new Error('사각/직사각 팬 부피 계산에는 length, width, height가 필요합니다.')
+        }
+        return this.calculateSquarePanVolume(length, width, height)
+      }
+      case 'loaf': {
+        const { topLength, bottomLength, width, height } = dimensions
+        if (topLength == null || bottomLength == null || width == null || height == null) {
+          throw new Error('식빵틀 부피 계산에는 topLength, bottomLength, width, height가 필요합니다.')
+        }
+        return this.calculateLoafPanVolume(topLength, bottomLength, width, height)
+      }
+      case 'chiffon': {
+        const { outerDiameter, innerDiameter, height } = dimensions
+        if (outerDiameter == null || innerDiameter == null || height == null) {
+          throw new Error('쉬폰틀 부피 계산에는 outerDiameter, innerDiameter, height가 필요합니다.')
+        }
+        return this.calculateChiffonPanVolume(outerDiameter, innerDiameter, height)
+      }
       default:
         throw new Error(`알 수 없는 팬 타입: ${type}`)
     }

@@ -38,7 +38,12 @@ export default function AutocompleteInput({
   const resolvedPlaceholder = placeholder ?? t('components.autocomplete.placeholder')
   // 설정 스토어에서 통합 재료 목록 가져오기 (커스텀 목록이 없을 때만)
   const getAllIngredientNames = useSettingsStore(state => state.getAllIngredientNames)
-  const suggestions = customSuggestions ?? getAllIngredientNames()
+  // 커스텀 재료 배열을 구독해 변경 시에만 재계산(매 렌더 새 배열 생성으로 인한 useMemo 무력화 방지)
+  const customIngredients = useSettingsStore(state => state.ingredient.customIngredients)
+  const suggestions = useMemo(
+    () => customSuggestions ?? getAllIngredientNames(),
+    [customSuggestions, getAllIngredientNames, customIngredients]
+  )
   const [isOpen, setIsOpen] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)

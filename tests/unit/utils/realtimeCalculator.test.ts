@@ -156,13 +156,14 @@ describe('RealtimeRecipeCalculator.convertToPolishMethod', () => {
     ]
   } as unknown as Recipe
 
-  it('폴리시 비율 0.25로 물/이스트를 분리한다(밀가루는 본반죽에)', () => {
+  it('폴리시 비율 0.25로 밀가루/물/이스트를 분리한다(폴리시=밀가루+동량 물, 100% 수화율)', () => {
     const result = RealtimeRecipeCalculator.convertToPolishMethod(recipe, 0.25)
-    // polishWater = 1000*0.25 = 250, polishYeast = 10*0.2 = 2
-    expect(result.preferment.ingredients[0].amount).toBe(250)
-    expect(result.preferment.ingredients[1].amount).toBe(2)
-    // 본반죽: 밀가루 전량 1000, mainWater = 650-250 = 400, mainYeast = 10-2 = 8
-    expect(result.mainDough.ingredients[0].amount).toBe(1000)
+    // polishFlour = 1000*0.25 = 250, polishWater = polishFlour = 250, polishYeast = 10*0.2 = 2
+    expect(result.preferment.ingredients[0].amount).toBe(250) // 밀가루
+    expect(result.preferment.ingredients[1].amount).toBe(250) // 물(동량, 100% 수화율)
+    expect(result.preferment.ingredients[2].amount).toBe(2)   // 이스트
+    // 본반죽: mainFlour = 1000-250 = 750, mainWater = 650-250 = 400, mainYeast = 10-2 = 8
+    expect(result.mainDough.ingredients[0].amount).toBe(750)
     expect(result.mainDough.ingredients[1].amount).toBe(400)
     expect(result.mainDough.ingredients[2].amount).toBe(8)
   })

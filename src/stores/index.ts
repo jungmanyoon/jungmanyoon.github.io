@@ -8,6 +8,11 @@
 import { useAppStore } from './useAppStore'
 import { useRecipeStore } from './useRecipeStore'
 import { useCalculatorStore } from './useCalculatorStore'
+import { useSettingsStore } from './useSettingsStore'
+import { useDashboardStore } from './useDashboardStore'
+import { usePanPresetStore } from './usePanPresetStore'
+import { useWorkspaceStore } from './useWorkspaceStore'
+import { useLocaleStore } from './useLocaleStore'
 
 export { useAppStore, selectFavoriteHistory, selectRecentHistory, selectHistoryByType } from './useAppStore'
 export { useRecipeStore, selectFilteredRecipes } from './useRecipeStore'
@@ -32,4 +37,11 @@ export const resetAllStores = () => {
   useCalculatorStore.getState().resetCalculator('yield')
   useCalculatorStore.getState().resetCalculator('pan')
   useCalculatorStore.getState().resetCalculator('method')
+  // 이전엔 아래 5개 스토어가 누락되어 "전체 리셋" 계약을 지키지 못했다.
+  // 각 스토어가 제공하는 안전한 초기화 액션을 호출한다.
+  useSettingsStore.getState().resetAllSettings()      // 팬/제법/환경/재료 등 설정 기본값 복원
+  useDashboardStore.getState().clearSourceRecipe()    // 변환 워크플로우 초기 상태로
+  usePanPresetStore.getState().clearAll()             // 저장된 팬 프리셋 비움
+  useWorkspaceStore.getState().selectRecipe(null)     // 워크스페이스 선택/계산 초기화
+  useLocaleStore.getState().resetToDefaults()         // 언어/단위 설정 기본값 복원
 }

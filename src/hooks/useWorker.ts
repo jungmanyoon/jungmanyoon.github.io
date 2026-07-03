@@ -28,7 +28,8 @@ export function useWorker<TInput, TOutput>(
   terminate: () => void
 } {
   const workerRef = useRef<Worker | null>(null)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  // 호출별 타임아웃을 개별 추적 (공유 ref로 인한 취소 어긋남 방지, 언마운트 시 일괄 정리)
+  const timeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set())
   const [result, setResult] = useState<WorkerResult<TOutput>>({
     data: null,
     error: null,
@@ -42,40 +43,40 @@ export function useWorker<TInput, TOutput>(
       { type: 'module' }
     )
 
+    const timeouts = timeoutsRef.current
     return () => {
       workerRef.current?.terminate()
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
+      timeouts.forEach(id => clearTimeout(id))
+      timeouts.clear()
     }
   }, [workerPath])
 
   // 메시지 전송 함수
   const postMessage = useCallback((data: TInput): Promise<TOutput> => {
-    return new Promise((resolve, reject) => {
-      if (!workerRef.current) {
+    return new Promise<TOutput>((resolve, reject) => {
+      const worker = workerRef.current
+      if (!worker) {
         reject(new Error('Worker not initialized'))
         return
       }
 
       setResult({ data: null, error: null, loading: true })
 
-      // 타임아웃 설정
-      if (options.timeout) {
-        timeoutRef.current = setTimeout(() => {
-          const error = new Error('Worker timeout')
-          setResult({ data: null, error, loading: false })
-          options.onTimeout?.()
-          reject(error)
-        }, options.timeout)
+      let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+      // 성공/에러/타임아웃 어느 경로로 끝나든 리스너와 타임아웃을 반드시 정리 (누적 방지)
+      const cleanup = () => {
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId)
+          timeoutsRef.current.delete(timeoutId)
+          timeoutId = null
+        }
+        worker.removeEventListener('message', handleMessage)
+        worker.removeEventListener('error', handleError)
       }
 
-      // 메시지 핸들러
-      const handleMessage = (event: MessageEvent) => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
-        }
-
+      function handleMessage(event: MessageEvent) {
+        cleanup()
         if (event.data.type === 'ERROR') {
           const error = new Error(event.data.error)
           setResult({ data: null, error, loading: false })
@@ -87,21 +88,29 @@ export function useWorker<TInput, TOutput>(
         }
       }
 
-      // 에러 핸들러
-      const handleError = (error: ErrorEvent) => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
-        }
-
+      function handleError(error: ErrorEvent) {
+        cleanup()
         const err = new Error(error.message)
         setResult({ data: null, error: err, loading: false })
         options.onError?.(err)
         reject(err)
       }
 
-      workerRef.current.addEventListener('message', handleMessage, { once: true })
-      workerRef.current.addEventListener('error', handleError, { once: true })
-      workerRef.current.postMessage(data)
+      // 타임아웃 설정 (이 호출에 국한)
+      if (options.timeout) {
+        timeoutId = setTimeout(() => {
+          cleanup()
+          const error = new Error('Worker timeout')
+          setResult({ data: null, error, loading: false })
+          options.onTimeout?.()
+          reject(error)
+        }, options.timeout)
+        timeoutsRef.current.add(timeoutId)
+      }
+
+      worker.addEventListener('message', handleMessage)
+      worker.addEventListener('error', handleError)
+      worker.postMessage(data)
     })
   }, [options])
 
@@ -109,9 +118,8 @@ export function useWorker<TInput, TOutput>(
   const terminate = useCallback(() => {
     workerRef.current?.terminate()
     workerRef.current = null
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
+    timeoutsRef.current.forEach(id => clearTimeout(id))
+    timeoutsRef.current.clear()
     setResult({ data: null, error: null, loading: false })
   }, [])
 

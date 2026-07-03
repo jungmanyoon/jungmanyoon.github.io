@@ -127,7 +127,14 @@ function PanSelector({ onPanSelect }) {
               </label>
               <select
                 value={customPan.type}
-                onChange={(e) => setCustomPan({ ...customPan, type: e.target.value })}
+                onChange={(e) => {
+                  const newCustomPan = { ...customPan, type: e.target.value }
+                  setCustomPan(newCustomPan)
+                  // 커스텀 모드일 때 type 변경도 부모로 전파 (dimensions 변경과 동일 처리)
+                  if (useCustom) {
+                    onPanSelect(newCustomPan)
+                  }
+                }}
                 className="w-full px-3 py-2 border border-bread-300 rounded-md"
               >
                 <option value={PAN_TYPES.ROUND}>{t('components.panSelector.panTypeOptions.round')}</option>

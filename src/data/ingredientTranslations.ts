@@ -87,9 +87,10 @@ export const INGREDIENT_TRANSLATIONS: IngredientTranslation[] = [
   // ===== 당류 (Sugar) =====
   {
     id: 'white_sugar',
-    ko: '백설탕',
+    // ko 대표값을 '설탕'으로 정합 (ingredientDatabase/nutrition/cost/sampleRecipes 모두 '설탕'을 정본으로 사용)
+    ko: '설탕',
     en: 'Granulated Sugar',
-    aliases: { ko: ['설탕', '정백당'], en: ['White Sugar', 'Table Sugar'] },
+    aliases: { ko: ['백설탕', '정백당'], en: ['White Sugar', 'Table Sugar', 'Sugar'] },
     category: 'sugar',
     cupWeight: 200
   },
@@ -266,14 +267,16 @@ export const INGREDIENT_TRANSLATIONS: IngredientTranslation[] = [
     id: 'egg_yolk',
     ko: '노른자',
     en: 'Egg Yolk',
-    aliases: { ko: ['난황'] },
+    // '계란노른자'는 sampleRecipes/nutrition/costDatabase에서 실제 사용되는 표기 -> 교차조회 정합
+    aliases: { ko: ['난황', '계란노른자'] },
     category: 'egg'
   },
   {
     id: 'egg_white',
     ko: '흰자',
     en: 'Egg White',
-    aliases: { ko: ['난백'] },
+    // '계란흰자'는 sampleRecipes/nutrition/substitutionRules에서 실제 사용되는 표기 -> 교차조회 정합
+    aliases: { ko: ['난백', '계란흰자'] },
     category: 'egg'
   },
 

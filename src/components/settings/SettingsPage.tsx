@@ -185,16 +185,24 @@ export default function SettingsPage({
 
   // 파일로 가져오기
   const handleFileImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const input = e.target
+    const file = input.files?.[0]
     if (!file) return
 
     const reader = new FileReader()
     reader.onload = (event) => {
       const content = event.target?.result as string
       setImportData(content)
+      setImportError('')
+      // 같은 파일을 다시 선택해도 onChange 가 발화하도록 값 초기화
+      input.value = ''
+    }
+    reader.onerror = () => {
+      setImportError(t('settings.modal.invalidFormat'))
+      input.value = ''
     }
     reader.readAsText(file)
-  }, [])
+  }, [t])
 
   // 초기화 처리
   const handleResetAll = useCallback(() => {

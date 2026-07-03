@@ -4,10 +4,43 @@
  */
 
 import { create } from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
+import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { Recipe } from '@/types/recipe.types'
 import { RecipeStore, RecipeFilters, RecipeSortOption } from '@/types/store.types'
 import sampleRecipes from '@data/sampleRecipes.js'
+
+/**
+ * QuotaExceededError 방어용 localStorage 래퍼.
+ * 레시피가 많아지면 persist 직렬화가 브라우저 저장 한도를 넘어
+ * setItem이 throw할 수 있는데, 이 예외를 삼켜 앱 크래시를 막고
+ * 콘솔 경고만 남긴다(이번 변경분은 영구 저장되지 않음).
+ */
+const quotaSafeStorage = createJSONStorage(() => ({
+  getItem: (name: string): string | null => {
+    try {
+      return localStorage.getItem(name)
+    } catch {
+      return null
+    }
+  },
+  setItem: (name: string, value: string): void => {
+    try {
+      localStorage.setItem(name, value)
+    } catch (e) {
+      console.warn(
+        '[recipe-store] 로컬 저장 실패(용량 초과 가능). 이번 변경은 영구 저장되지 않습니다:',
+        e
+      )
+    }
+  },
+  removeItem: (name: string): void => {
+    try {
+      localStorage.removeItem(name)
+    } catch {
+      /* noop */
+    }
+  },
+}))
 
 const initialFilters: RecipeFilters = {
   category: [],
@@ -188,6 +221,7 @@ export const useRecipeStore = create<RecipeStore>()(
       {
         name: 'recipe-store',
         version: 3,
+        storage: quotaSafeStorage,
         partialize: (state) => ({
           recipes: state.recipes,
           filters: state.filters,

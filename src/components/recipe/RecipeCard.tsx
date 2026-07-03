@@ -151,16 +151,7 @@ const RecipeCard = memo<RecipeCardProps>(({
   if (compact) {
     return (
       <div
-        className="bg-white border border-bread-200 rounded-lg p-3 hover:shadow-md hover:border-bread-300 active:bg-bread-50 transition-all cursor-pointer"
-        onClick={handleSelect}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            handleSelect()
-          }
-        }}
+        className="relative bg-white border border-bread-200 rounded-lg p-3 hover:shadow-md hover:border-bread-300 transition-all"
       >
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -168,18 +159,26 @@ const RecipeCard = memo<RecipeCardProps>(({
               {categoryIcon}
             </span>
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-sm text-bread-700 truncate">
-                {getLocalizedRecipeName(recipe)}
+              <h3 className="font-medium text-sm text-bread-700">
+                {/* 카드 전체를 클릭 영역으로 확장하는 stretched button (중첩 인터랙티브 해소) */}
+                <button
+                  type="button"
+                  onClick={handleSelect}
+                  aria-label={getLocalizedRecipeName(recipe)}
+                  className="block w-full truncate text-left cursor-pointer rounded-lg after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500"
+                >
+                  {getLocalizedRecipeName(recipe)}
+                </button>
               </h3>
               {sourceInfo && (
-                <div className={`flex items-center gap-1 mt-0.5 ${sourceInfo.color}`}>
+                <div className={`relative z-10 flex items-center gap-1 mt-0.5 ${sourceInfo.color}`}>
                   <sourceInfo.Icon size={10} />
                   <span className="text-[10px] truncate">{sourceInfo.name}</span>
                 </div>
               )}
             </div>
           </div>
-          <div className="flex gap-1 ml-2">
+          <div className="flex gap-1 ml-2 relative z-10">
             {onEdit && (
               <button
                 onClick={handleEdit}
@@ -211,32 +210,31 @@ const RecipeCard = memo<RecipeCardProps>(({
   
   // 기본 카드 뷰 렌더링
   return (
-    <div 
-      className="card hover:shadow-lg transition-shadow cursor-pointer"
-      onClick={handleSelect}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          handleSelect()
-        }
-      }}
+    <div
+      className="card relative hover:shadow-lg transition-shadow"
     >
       <div className="flex justify-between items-start mb-2">
         <div className="flex-1 min-w-0">
           {/* 모바일: text-base(16px), 데스크톱: text-lg(18px) 유지 + 긴 이름 줄바꿈 처리 */}
           <h3 className="text-base sm:text-lg font-semibold text-bread-700 break-words">
-            {getLocalizedRecipeName(recipe)}
+            {/* 카드 전체를 클릭 영역으로 확장하는 stretched button (중첩 인터랙티브 해소) */}
+            <button
+              type="button"
+              onClick={handleSelect}
+              aria-label={getLocalizedRecipeName(recipe)}
+              className="block w-full text-left break-words cursor-pointer rounded-lg after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500"
+            >
+              {getLocalizedRecipeName(recipe)}
+            </button>
           </h3>
           {sourceInfo && (
-            <div className={`flex items-center gap-1 mt-1 ${sourceInfo.color}`}>
+            <div className={`relative z-10 flex items-center gap-1 mt-1 ${sourceInfo.color}`}>
               <sourceInfo.Icon size={12} />
               <span className="text-xs">{sourceInfo.name}</span>
             </div>
           )}
         </div>
-        <div className="flex gap-1 ml-2">
+        <div className="flex gap-1 ml-2 relative z-10">
           {onEdit && (
             <button
               onClick={handleEdit}

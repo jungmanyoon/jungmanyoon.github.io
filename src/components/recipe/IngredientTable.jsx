@@ -4,12 +4,18 @@ import Button from '../common/Button.jsx'
 import Input from '../common/Input.jsx'
 import { COMMON_INGREDIENTS } from '../../constants/ingredients.js'
 
+// 편집 행 재정렬/삽입/삭제 시 React key 안정성을 위한 고유 키 생성기
+let ingredientRowKeySeq = 0
+const genIngredientRowKey = () => `ing-row-${Date.now()}-${ingredientRowKeySeq++}`
+
 function IngredientTable({ ingredients = [], onChange }) {
   const { t } = useTranslation()
-  // 재료가 비어있으면 기본 행 추가
+  // 재료가 비어있으면 기본 행 추가 / 기존 행에 안정 key가 없으면 부여(마운트 1회)
   React.useEffect(() => {
     if (ingredients.length === 0) {
-      onChange([{ name: '', amount: '', unit: 'g', type: 'flour' }])
+      onChange([{ _key: genIngredientRowKey(), name: '', amount: '', unit: 'g', type: 'flour' }])
+    } else if (ingredients.some(ing => ing._key === undefined)) {
+      onChange(ingredients.map(ing => (ing._key !== undefined ? ing : { ...ing, _key: genIngredientRowKey() })))
     }
   }, [])
   const handleIngredientChange = (index, field, value) => {
@@ -44,7 +50,7 @@ function IngredientTable({ ingredients = [], onChange }) {
     if (nextRow >= ingredients.length) {
       // 마지막 행 복사하여 새 행 추가
       const last = ingredients[ingredients.length - 1] || { name: '', amount: '', unit: 'g', type: 'flour' }
-      const cloned = { ...last, name: '', amount: '' }
+      const cloned = { ...last, _key: genIngredientRowKey(), name: '', amount: '' }
       onChange([...ingredients, cloned])
       setTimeout(() => {
         const el = document.querySelector(`[data-cell="${ingredients.length}:${nextField}"]`)
@@ -57,7 +63,7 @@ function IngredientTable({ ingredients = [], onChange }) {
   }
 
   const addIngredient = () => {
-    onChange([...ingredients, { name: '', amount: '', unit: 'g', type: 'flour' }])
+    onChange([...ingredients, { _key: genIngredientRowKey(), name: '', amount: '', unit: 'g', type: 'flour' }])
   }
 
   const removeIngredient = (index) => {
@@ -93,7 +99,7 @@ function IngredientTable({ ingredients = [], onChange }) {
         </thead>
         <tbody>
           {ingredients.map((ingredient, index) => (
-            <tr key={index} className="border-b border-bread-100">
+            <tr key={ingredient._key ?? index} className="border-b border-bread-100">
               <td className="py-1 pr-2">
                 <input
                   type="text"

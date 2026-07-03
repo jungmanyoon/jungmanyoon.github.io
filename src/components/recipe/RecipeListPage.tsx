@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useRef, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import RecipeList from './RecipeList'
 import SearchBar from '@components/common/SearchBar'
@@ -33,8 +33,14 @@ const RecipeListPage: React.FC = () => {
   // 광고 모달 상태
   const [showAdModal, setShowAdModal] = useState(false)
 
+  // 초기화 1회 실행 가드 (의존성 변경으로 effect 가 재실행돼도 초기화 로직은 최초 1회만)
+  const didInitRef = useRef(false)
+
   // 초기 진입 시 빈 경우 또는 출처 정보 없는 경우 샘플 레시피 주입
   useEffect(() => {
+    if (didInitRef.current) return
+    didInitRef.current = true
+
     // 레시피가 없으면 샘플 로드
     if (!recipes || recipes.length === 0) {
       resetToSampleRecipes()
@@ -53,7 +59,7 @@ const RecipeListPage: React.FC = () => {
         toast.success(t('message.sampleRecipesUpdated'))
       }
     }
-  }, [])
+  }, [recipes, resetToSampleRecipes, t])
 
   const handleSelect = useCallback((recipe: any) => {
     setCurrentRecipe(recipe)

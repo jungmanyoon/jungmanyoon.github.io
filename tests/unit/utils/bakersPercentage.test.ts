@@ -140,7 +140,7 @@ describe('BakersPercentage', () => {
       expect(liquidTotal).toBe(350)
     })
 
-    it('계란류도 액체로 계산해야 한다', () => {
+    it('계란류는 수분 함량(75%)만 액체로 계산해야 한다', () => {
       const ingredientsWithEgg = [
         ...mockIngredients,
         {
@@ -151,9 +151,10 @@ describe('BakersPercentage', () => {
           unit: 'g' as const
         }
       ]
-      
+
       const liquidTotal = BakersPercentage.getTotalLiquid(ingredientsWithEgg)
-      expect(liquidTotal).toBe(450) // 350ml + 100g
+      // 350ml(물) + 100g 계란 * 0.75(수분율) = 425
+      expect(liquidTotal).toBe(425)
     })
   })
 

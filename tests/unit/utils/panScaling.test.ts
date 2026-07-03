@@ -107,9 +107,9 @@ describe('PanScalingTS - 부피 계산', () => {
       expect(() => PanScalingTS.calculatePanVolume(pan)).toThrow('알 수 없는 팬 타입')
     })
 
-    it('필수 치수(지름)가 누락되면 NaN을 반환한다(방어 안 됨을 고정)', () => {
+    it('필수 치수(지름)가 누락되면 에러를 던진다(NaN 은폐 방지)', () => {
       const pan: PanConfigTS = { type: 'round', dimensions: { height: 10 } }
-      expect(Number.isNaN(PanScalingTS.calculatePanVolume(pan))).toBe(true)
+      expect(() => PanScalingTS.calculatePanVolume(pan)).toThrow('diameter, height가 필요합니다')
     })
   })
 

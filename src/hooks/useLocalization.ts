@@ -284,11 +284,28 @@ export function useLocalization() {
 
   /**
    * 공정 단계 설명을 현재 언어로 변환
+   * 영어 변환 결과에 남는 섭씨(°C) 표기는 화씨 사용자를 위해 °F로 변환한다.
+   * (범위 "180-200°C"와 단일 "180°C" 모두 처리)
    */
   const translateProcessStep = useCallback((description: string): string => {
     if (language === 'ko') return description; // 이미 한글이면 그대로 반환
-    return translateProcessStepFn(description, language);
-  }, [language]);
+
+    const translated = translateProcessStepFn(description, language);
+
+    if (tempUnit === 'fahrenheit') {
+      return translated
+        .replace(
+          /(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*°C/g,
+          (_m, a, b) => `${Math.round(celsiusToFahrenheit(parseFloat(a)))}-${Math.round(celsiusToFahrenheit(parseFloat(b)))}°F`
+        )
+        .replace(
+          /(\d+(?:\.\d+)?)\s*°C/g,
+          (_m, c) => `${Math.round(celsiusToFahrenheit(parseFloat(c)))}°F`
+        );
+    }
+
+    return translated;
+  }, [language, tempUnit]);
 
   // ============ 팬 이름 로컬라이징 ============
 

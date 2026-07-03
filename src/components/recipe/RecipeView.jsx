@@ -14,9 +14,12 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
     )
   }
 
+  // 재료 분류 판정: 정식 데이터는 category, 레거시 편집 데이터는 type 을 사용하므로 둘 다 확인
+  const isCategory = (ing, cat) => ing.category === cat || ing.type === cat
+
   const calculateBakersPercentage = (amount, ingredients = recipe.ingredients) => {
     const flourTotal = ingredients
-      .filter(ing => ing.type === 'flour')
+      .filter(ing => isCategory(ing, 'flour'))
       .reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
 
     if (flourTotal === 0) return 0
@@ -42,7 +45,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
 
   // 재료 테이블 렌더링 함수
   const renderIngredientTable = (ingredients, title) => {
-    const flourTotal = ingredients.filter(ing => ing.type === 'flour').reduce((sum, ing) => sum + parseFloat(ing.amount || 0), 0)
+    const flourTotal = ingredients.filter(ing => isCategory(ing, 'flour')).reduce((sum, ing) => sum + parseFloat(ing.amount || 0), 0)
 
     return (
       <div>
@@ -184,8 +187,8 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
                 <span>{t('components.recipeView.hydration')}</span>
                 <span className="font-medium">
                   {(() => {
-                    const flour = recipe.ingredients.filter(ing => ing.type === 'flour').reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
-                    const liquid = recipe.ingredients.filter(ing => ing.type === 'liquid').reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
+                    const flour = recipe.ingredients.filter(ing => isCategory(ing, 'flour')).reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
+                    const liquid = recipe.ingredients.filter(ing => isCategory(ing, 'liquid')).reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
                     return flour > 0 ? ((liquid / flour) * 100).toFixed(1) : 0
                   })()}%
                 </span>
@@ -194,7 +197,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
                 <span>{t('components.recipeView.doughYield')}</span>
                 <span className="font-medium">
                   {(() => {
-                    const flour = recipe.ingredients.filter(ing => ing.type === 'flour').reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
+                    const flour = recipe.ingredients.filter(ing => isCategory(ing, 'flour')).reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
                     const total = recipe.ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
                     return flour > 0 ? ((total / flour) * 100).toFixed(1) : 0
                   })()}%

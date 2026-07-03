@@ -2141,15 +2141,15 @@ const AdvancedDashboard: React.FC = () => {
         {/* 우측: 요약 + 액션 (모바일: 줄바꿈 허용, 데스크톱: 기존 한 줄) */}
         <div className="flex items-center flex-wrap gap-2 lg:gap-4">
           <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded">
-            <span>{t('advDashboard.original')}:<b className="text-gray-700 ml-1">{totalWeight}g</b></span>
+            <span className="cursor-help" title="원본 레시피의 총 반죽량">{t('advDashboard.original')}:<b className="text-gray-700 ml-1">{totalWeight}g</b></span>
             <span className="text-gray-300">→</span>
-            <span>{t('advDashboard.converted')}:<b className="text-blue-600 ml-1">{convertedTotal}g</b></span>
+            <span className="cursor-help" title="변환(배수·팬 반영) 후 총 반죽량">{t('advDashboard.converted')}:<b className="text-brand-600 ml-1">{convertedTotal}g</b></span>
             <span className="text-gray-300">|</span>
-            <span>{t('advDashboard.hydration')}:<b className="ml-1">{hydration}%</b></span>
+            <span className="cursor-help" title="밀가루 대비 수분 비율입니다 (60~80% 권장)">{t('advDashboard.hydration')}:<b className="ml-1">{hydration}%</b></span>
             <span className="text-gray-300">|</span>
-            <span>{t('advDashboard.pan')}:<b className="ml-1">{panTotalWeight}g</b></span>
+            <span className="cursor-help" title="팬 부피를 기준으로 권장되는 반죽량">{t('advDashboard.pan')}:<b className="ml-1">{panTotalWeight}g</b></span>
             <span className="text-gray-300">|</span>
-            <span>{t('advDashboard.lossRate')}:<b className={`ml-1 ${lossRate > 100 ? 'text-red-500' : lossRate < 95 ? 'text-orange-500' : 'text-green-600'}`}>{lossRate}%</b></span>
+            <span className="cursor-help" title="굽기까지 예상되는 무게(수분) 손실 비율">{t('advDashboard.lossRate')}:<b className={`ml-1 ${lossRate > 100 ? 'text-red-500' : lossRate < 95 ? 'text-orange-500' : 'text-green-600'}`}>{lossRate}%</b></span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <button
@@ -2168,14 +2168,14 @@ const AdvancedDashboard: React.FC = () => {
             </button>
             <button
               onClick={handleCopyAsText}
-              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-white text-slate-700 border border-slate-300 rounded hover:bg-slate-50"
               title={t('advDashboard.copyAsText')}
             >
               <Copy className="w-4 h-4" />{t('advDashboard.copy')}
             </button>
             <button
               onClick={handleExportRecipe}
-              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-gray-200 rounded hover:bg-gray-300"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs text-slate-400 rounded hover:bg-slate-100 hover:text-slate-600"
               title={t('advDashboard.exportJson')}
             >
               <FileText className="w-4 h-4" />{t('advDashboard.json')}
@@ -2480,6 +2480,7 @@ const AdvancedDashboard: React.FC = () => {
           {/* 오븐 설정 */}
           <CollapsibleSection
             title={t('advDashboard.oven')}
+            defaultOpen={false}
             icon={<Flame className="w-4 h-4" />}
             badge={(() => {
               const typeLabel = t(`advDashboard.ovenTypes.${oven.type}`);
@@ -2610,6 +2611,7 @@ const AdvancedDashboard: React.FC = () => {
           {productType === 'bread' && (
             <CollapsibleSection
               title={t('advDashboard.method')}
+              defaultOpen={false}
               icon={<Wheat className="w-4 h-4" />}
               badge={t(METHOD_KEYS[method.type])}
               badgeColor={method.type === 'straight' ? 'bg-gray-100 text-gray-600' : 'bg-amber-100 text-amber-700'}
@@ -2901,7 +2903,7 @@ const AdvancedDashboard: React.FC = () => {
                     style={{ minWidth: itemSize.width || 200, maxWidth: '100%' }}
                   >
                     {/* 순서 변경 버튼 */}
-                    <div className="flex flex-col opacity-0 group-hover:opacity-100 flex-shrink-0">
+                    <div className="flex flex-col opacity-100 lg:opacity-0 lg:group-hover:opacity-100 flex-shrink-0">
                       <button
                         onClick={() => moveProcess(proc.id, 'up')}
                         className="text-gray-400 hover:text-gray-600 -mb-0.5"
@@ -2951,7 +2953,7 @@ const AdvancedDashboard: React.FC = () => {
                         <span className="text-xs flex-shrink-0">{t('units.minute')}</span>
                         <button
                           onClick={() => updateProcess(proc.id, 'time', undefined)}
-                          className="text-blue-400 hover:text-blue-600 opacity-0 group-hover/time:opacity-100 ml-0.5 flex-shrink-0"
+                          className="text-blue-400 hover:text-blue-600 opacity-100 lg:opacity-0 lg:group-hover/time:opacity-100 ml-0.5 flex-shrink-0"
                           title={t('advDashboard.deleteTime')}
                         >
                           <X className="w-2.5 h-2.5" />
@@ -2960,7 +2962,7 @@ const AdvancedDashboard: React.FC = () => {
                     ) : (
                       <button
                         onClick={() => updateProcess(proc.id, 'time', 1)}
-                        className="opacity-0 group-hover:opacity-60 hover:opacity-100 text-blue-400 bg-blue-50 px-1 py-0.5 rounded"
+                        className="opacity-100 lg:opacity-0 lg:group-hover:opacity-60 hover:opacity-100 text-blue-400 bg-blue-50 px-1 py-0.5 rounded"
                         title={t('advDashboard.addTime')}
                       >
                         <Clock className="w-3 h-3" />
@@ -2979,7 +2981,7 @@ const AdvancedDashboard: React.FC = () => {
                         <span className="text-xs flex-shrink-0">{t('units.celsius')}</span>
                         <button
                           onClick={() => updateProcess(proc.id, 'temp', undefined)}
-                          className="text-orange-400 hover:text-orange-600 opacity-0 group-hover/temp:opacity-100 ml-0.5 flex-shrink-0"
+                          className="text-orange-400 hover:text-orange-600 opacity-100 lg:opacity-0 lg:group-hover/temp:opacity-100 ml-0.5 flex-shrink-0"
                           title={t('advDashboard.deleteTemp')}
                         >
                           <X className="w-2.5 h-2.5" />
@@ -2988,13 +2990,13 @@ const AdvancedDashboard: React.FC = () => {
                     ) : (
                       <button
                         onClick={() => updateProcess(proc.id, 'temp', 27)}
-                        className="opacity-0 group-hover:opacity-60 hover:opacity-100 text-orange-400 bg-orange-50 px-1 py-0.5 rounded"
+                        className="opacity-100 lg:opacity-0 lg:group-hover:opacity-60 hover:opacity-100 text-orange-400 bg-orange-50 px-1 py-0.5 rounded"
                         title={t('advDashboard.addTemp')}
                       >
                         <ThermometerSun className="w-3 h-3" />
                       </button>
                     )}
-                    <button onClick={() => removeProcess(proc.id)} className="text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100">
+                    <button onClick={() => removeProcess(proc.id)} className="text-red-300 hover:text-red-500 opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
                       <X className="w-3.5 h-3.5" />
                     </button>
                     {/* 너비 조절 핸들 */}

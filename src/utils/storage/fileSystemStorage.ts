@@ -109,12 +109,10 @@ async function verifyPermission(
 ): Promise<boolean> {
   const options = { mode }
 
-  // @ts-ignore - queryPermission은 아직 TypeScript 타입에 없음
   if ((await handle.queryPermission(options)) === 'granted') {
     return true
   }
 
-  // @ts-ignore - requestPermission은 아직 TypeScript 타입에 없음
   if ((await handle.requestPermission(options)) === 'granted') {
     return true
   }
@@ -165,7 +163,6 @@ export class FileSystemStorage {
     }
 
     try {
-      // @ts-ignore
       const handle = await window.showDirectoryPicker({
         mode: 'readwrite',
         startIn: 'documents'
@@ -293,7 +290,6 @@ export class FileSystemStorage {
     const files: string[] = []
 
     try {
-      // @ts-ignore
       for await (const entry of this.directoryHandle.values()) {
         if (entry.kind === 'file' && entry.name.endsWith('.json')) {
           files.push(entry.name)

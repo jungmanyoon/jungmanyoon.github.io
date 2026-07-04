@@ -25,8 +25,8 @@ const NutritionPanel = ({ recipe, servings }) => {
 
   if (!nutritionData) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="flex items-center text-gray-500">
+      <div className="bg-surface-paper rounded-lg shadow-sm border border-line p-4">
+        <div className="flex items-center text-ink-subtle">
           <Activity className="w-5 h-5 mr-2" />
           <span>영양 정보를 계산할 수 없습니다</span>
         </div>
@@ -37,12 +37,12 @@ const NutritionPanel = ({ recipe, servings }) => {
   const { perServing, label, density, baking } = nutritionData
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-surface-paper rounded-lg shadow-sm border border-line">
       {/* 헤더 */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-line">
         <div className="flex items-center">
           <Activity className="w-5 h-5 mr-2 text-green-600" />
-          <h3 className="text-lg font-semibold text-gray-900">영양 정보</h3>
+          <h3 className="text-lg font-semibold text-ink">영양 정보</h3>
         </div>
         <button
           onClick={() => setShowDetails(!showDetails)}
@@ -56,39 +56,39 @@ const NutritionPanel = ({ recipe, servings }) => {
         {/* 기본 영양 정보 */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-ink">
               {Math.round(perServing.calories)}
             </div>
-            <div className="text-sm text-gray-600">칼로리</div>
+            <div className="text-sm text-ink-muted">칼로리</div>
           </div>
           
           <div className="text-center">
             <div className="text-xl font-semibold text-blue-600">
               {perServing.protein.toFixed(1)}g
             </div>
-            <div className="text-sm text-gray-600">단백질</div>
+            <div className="text-sm text-ink-muted">단백질</div>
           </div>
           
           <div className="text-center">
             <div className="text-xl font-semibold text-amber-600">
               {perServing.carbohydrates.toFixed(1)}g
             </div>
-            <div className="text-sm text-gray-600">탄수화물</div>
+            <div className="text-sm text-ink-muted">탄수화물</div>
           </div>
           
           <div className="text-center">
             <div className="text-xl font-semibold text-red-600">
               {perServing.fat.toFixed(1)}g
             </div>
-            <div className="text-sm text-gray-600">지방</div>
+            <div className="text-sm text-ink-muted">지방</div>
           </div>
         </div>
 
         {/* 영양 점수 */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">영양 점수</span>
-            <span className="text-sm text-gray-600">{density.healthScore}/100</span>
+            <span className="text-sm font-medium text-ink-muted">영양 점수</span>
+            <span className="text-sm text-ink-muted">{density.healthScore}/100</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3">
             <div
@@ -126,48 +126,48 @@ const NutritionPanel = ({ recipe, servings }) => {
 
         {/* 상세 정보 */}
         {showDetails && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="mt-4 pt-4 border-t border-line">
             {/* 상세 영양소 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">상세 영양소</h4>
+                <h4 className="font-medium text-ink mb-2">상세 영양소</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">식이섬유</span>
+                    <span className="text-ink-muted">식이섬유</span>
                     <span>{perServing.fiber.toFixed(1)}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">당분</span>
+                    <span className="text-ink-muted">당분</span>
                     <span>{perServing.sugar.toFixed(1)}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">나트륨</span>
+                    <span className="text-ink-muted">나트륨</span>
                     <span>{perServing.sodium.toFixed(1)}mg</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">콜레스테롤</span>
+                    <span className="text-ink-muted">콜레스테롤</span>
                     <span>{perServing.cholesterol.toFixed(1)}mg</span>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">영양 밀도</h4>
+                <h4 className="font-medium text-ink mb-2">영양 밀도</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">단백질 비율</span>
+                    <span className="text-ink-muted">단백질 비율</span>
                     <span>{density.proteinPercent.toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">탄수화물 비율</span>
+                    <span className="text-ink-muted">탄수화물 비율</span>
                     <span>{density.carbPercent.toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">지방 비율</span>
+                    <span className="text-ink-muted">지방 비율</span>
                     <span>{density.fatPercent.toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">100kcal당 식이섬유</span>
+                    <span className="text-ink-muted">100kcal당 식이섬유</span>
                     <span>{density.fiberDensity.toFixed(1)}g</span>
                   </div>
                 </div>
@@ -176,13 +176,13 @@ const NutritionPanel = ({ recipe, servings }) => {
 
             {/* 제빵 분석 */}
             <div className="mb-4">
-              <h4 className="font-medium text-gray-900 mb-2">제빵 분석</h4>
+              <h4 className="font-medium text-ink mb-2">제빵 분석</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-600 mb-1">밀가루 구성</p>
+                  <p className="text-ink-muted mb-1">밀가루 구성</p>
                   {baking.flourTypes.map((flour, index) => (
                     <div key={index} className="flex justify-between text-xs mb-1">
-                      <span className={flour.isWholeGrain ? 'text-green-700' : 'text-gray-700'}>
+                      <span className={flour.isWholeGrain ? 'text-green-700' : 'text-ink-muted'}>
                         {flour.name}
                       </span>
                       <span>{Math.round(flour.weight)}g</span>
@@ -192,15 +192,15 @@ const NutritionPanel = ({ recipe, servings }) => {
                 
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-gray-600">설탕 함량</span>
+                    <span className="text-ink-muted">설탕 함량</span>
                     <span>{Math.round(baking.sugarContent)}g</span>
                   </div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-gray-600">유지 함량</span>
+                    <span className="text-ink-muted">유지 함량</span>
                     <span>{Math.round(baking.fatContent)}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">통곡물 비율</span>
+                    <span className="text-ink-muted">통곡물 비율</span>
                     <span>{Math.round((baking.wholeGrains / (baking.wholeGrains + baking.refinedFlours)) * 100)}%</span>
                   </div>
                 </div>
@@ -209,7 +209,7 @@ const NutritionPanel = ({ recipe, servings }) => {
 
             {/* 일일권장량 */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">일일권장량 대비 (%)</h4>
+              <h4 className="font-medium text-ink mb-2">일일권장량 대비 (%)</h4>
               <div className="space-y-2">
                 {[
                   { name: '지방', value: label.totalFat.dailyValue, color: 'bg-red-500' },
@@ -219,14 +219,14 @@ const NutritionPanel = ({ recipe, servings }) => {
                   { name: '단백질', value: label.protein.dailyValue, color: 'bg-blue-500' }
                 ].map((nutrient, index) => (
                   <div key={index} className="flex items-center">
-                    <span className="w-16 text-sm text-gray-600 mr-2">{nutrient.name}</span>
+                    <span className="w-16 text-sm text-ink-muted mr-2">{nutrient.name}</span>
                     <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
                       <div
                         className={`h-2 rounded-full ${nutrient.color}`}
                         style={{ width: `${Math.min(nutrient.value, 100)}%` }}
                       />
                     </div>
-                    <span className="text-sm font-medium text-gray-900 w-12 text-right">
+                    <span className="text-sm font-medium text-ink w-12 text-right">
                       {nutrient.value}%
                     </span>
                   </div>

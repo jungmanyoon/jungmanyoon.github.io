@@ -136,7 +136,7 @@ const RecipeListPage: React.FC = () => {
     <div className="flex flex-col h-full">
       {/* Search and Filter Controls */}
       {/* 모바일: 패딩 축소(p-3), 데스크톱: 기존 p-4 유지. 가로 스크롤 방지 위해 overflow-x-hidden */}
-      <div className="flex-none space-y-3 p-3 sm:p-4 bg-bread-50 border-b border-bread-200 overflow-x-hidden">
+      <div className="flex-none space-y-3 p-3 sm:p-4 bg-surface-muted border-b border-line overflow-x-hidden">
         <SearchBar
           value={filters.searchQuery || ''}
           onChange={handleSearchChange}

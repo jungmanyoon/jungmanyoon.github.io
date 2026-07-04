@@ -38,6 +38,25 @@ export default {
         'warning': '#F59E0B',
         'danger': '#F43F5E',
         'info': '#3B82F6',
+        // 뉴트럴(surface/line/ink) - 화면 대부분(80%+)을 담당. brand(amber)는 CTA/활성/강조 액센트로만.
+        // Codex(gpt-5.5)와 협의한 슬레이트 기반 의미 토큰. bread/brand는 그대로 두고 "추가만" 함.
+        'surface': {
+          canvas: '#F8FAFC',   // 페이지 배경(slate-50)
+          paper: '#FFFFFF',    // 카드/패널/폼 표면
+          muted: '#F1F5F9',    // 접힌/보조 영역(slate-100)
+        },
+        'line': {
+          DEFAULT: '#E2E8F0',  // 기본 보더(slate-200)
+          soft: '#F1F5F9',     // 약한 보더(slate-100)
+          strong: '#CBD5E1',   // 강한 보더(slate-300)
+        },
+        'ink': {
+          DEFAULT: '#0F172A',  // 기본 텍스트(slate-900)
+          muted: '#475569',    // 보조 텍스트(slate-600)
+          subtle: '#64748B',   // 더 약한 텍스트(slate-500)
+          disabled: '#94A3B8', // 비활성(slate-400)
+          inverse: '#FFFFFF',  // 어두운 배경 위 텍스트
+        },
       },
       borderRadius: {
         'sm': '0.375rem',

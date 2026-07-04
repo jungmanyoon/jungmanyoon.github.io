@@ -50,7 +50,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     <div className={`relative ${className}`}>
       <div className="relative">
         <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-bread-600 pointer-events-none"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted pointer-events-none"
           aria-hidden="true"
         />
         <input
@@ -61,12 +61,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
           aria-label={t('components.searchBar.ariaLabel')}
           className="
             w-full pl-10 pr-10 py-2.5
-            border border-bread-200 rounded-lg
-            bg-white
-            text-bread-900 placeholder-bread-400
+            border border-line rounded-lg
+            bg-surface-paper
+            text-ink placeholder-ink-disabled
             focus:outline-none focus:ring-2 focus:ring-bread-500 focus:border-transparent
             transition-all duration-200
-            hover:border-bread-300
+            hover:border-line
           "
         />
         {localValue && (
@@ -76,7 +76,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             className="
               absolute right-3 top-1/2 -translate-y-1/2
               w-5 h-5
-              text-bread-400 hover:text-bread-600
+              text-ink-disabled hover:text-ink-muted
               transition-colors duration-200
               focus:outline-none focus:ring-2 focus:ring-bread-500 rounded
             "

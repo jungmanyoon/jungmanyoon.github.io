@@ -11,6 +11,7 @@ import { useSettingsStore } from '@/stores/useSettingsStore'
 import { ProductVolumeSettings } from '@/types/settings.types'
 import {
   Cake,
+  CakeSlice,
   Plus,
   Trash2,
   Save,
@@ -213,11 +214,11 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
             <Scale className="w-5 h-5 text-amber-500" />
             {t('settings.product.title')}
           </h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-ink-subtle mt-1">
             {t('settings.product.titleDesc')}
           </p>
         </div>
@@ -246,7 +247,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             activeSection === 'bread'
               ? 'border-amber-500 text-amber-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              : 'border-transparent text-ink-subtle hover:text-ink-muted'
           }`}
         >
           <span className="flex items-center gap-1">
@@ -259,7 +260,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             activeSection === 'cake'
               ? 'border-pink-500 text-pink-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              : 'border-transparent text-ink-subtle hover:text-ink-muted'
           }`}
         >
           <span className="flex items-center gap-1">
@@ -272,7 +273,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             activeSection === 'custom'
               ? 'border-purple-500 text-purple-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              : 'border-transparent text-ink-subtle hover:text-ink-muted'
           }`}
         >
           {t('settings.product.tabs.custom')} ({product.customProducts.length})
@@ -283,7 +284,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
       {activeSection === 'bread' && (
         <div className="space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-disabled" />
             <input
               type="text"
               value={searchTerm}
@@ -307,11 +308,11 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                   return (
                     <span
                       key={name}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-white rounded text-xs"
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-surface-paper rounded text-xs"
                     >
                       {getProductDisplayName(name)}: {volume} cm³/g
                       {original !== undefined && (
-                        <span className="text-gray-400">({t('settings.product.default')} {original})</span>
+                        <span className="text-ink-disabled">({t('settings.product.default')} {original})</span>
                       )}
                     </span>
                   )
@@ -330,12 +331,12 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                 <div
                   key={name}
                   className={`flex items-center justify-between p-2 rounded-lg ${
-                    modified ? 'bg-amber-50' : 'bg-gray-50'
+                    modified ? 'bg-amber-50' : 'bg-surface-muted'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span>🍞</span>
-                    <span className="text-sm font-medium text-gray-800">{getProductDisplayName(name)}</span>
+                    <Wheat size={16} className="text-ink-muted" />
+                    <span className="text-sm font-medium text-ink">{getProductDisplayName(name)}</span>
                     {modified && (
                       <span className="px-1.5 py-0.5 bg-amber-200 text-amber-700 text-xs rounded">{t('settings.product.modified')}</span>
                     )}
@@ -347,13 +348,13 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                       onChange={(e) => handleVolumeInputChange('bread', name, e.target.value)}
                       onBlur={() => handleVolumeBlur('bread', name)}
                       className={`w-20 px-2 py-1 text-sm border rounded text-center font-mono ${
-                        modified ? 'border-amber-300 bg-white' : ''
+                        modified ? 'border-amber-300 bg-surface-paper' : ''
                       }`}
                       min="0.5"
                       max="10"
                       step="0.1"
                     />
-                    <span className="text-xs text-gray-500">cm³/g</span>
+                    <span className="text-xs text-ink-subtle">cm³/g</span>
                     {modified && (
                       <button
                         onClick={() => deleteVolumeOverride('bread', name)}
@@ -375,7 +376,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
       {activeSection === 'cake' && (
         <div className="space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-disabled" />
             <input
               type="text"
               value={searchTerm}
@@ -399,11 +400,11 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                   return (
                     <span
                       key={name}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-white rounded text-xs"
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-surface-paper rounded text-xs"
                     >
                       {getProductDisplayName(name)}: {volume} cm³/g
                       {original !== undefined && (
-                        <span className="text-gray-400">({t('settings.product.default')} {original})</span>
+                        <span className="text-ink-disabled">({t('settings.product.default')} {original})</span>
                       )}
                     </span>
                   )
@@ -422,12 +423,12 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                 <div
                   key={name}
                   className={`flex items-center justify-between p-2 rounded-lg ${
-                    modified ? 'bg-pink-50' : 'bg-gray-50'
+                    modified ? 'bg-pink-50' : 'bg-surface-muted'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span>🎂</span>
-                    <span className="text-sm font-medium text-gray-800">{getProductDisplayName(name)}</span>
+                    <CakeSlice size={16} className="text-ink-muted" />
+                    <span className="text-sm font-medium text-ink">{getProductDisplayName(name)}</span>
                     {modified && (
                       <span className="px-1.5 py-0.5 bg-pink-200 text-pink-700 text-xs rounded">{t('settings.product.modified')}</span>
                     )}
@@ -439,13 +440,13 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                       onChange={(e) => handleVolumeInputChange('cake', name, e.target.value)}
                       onBlur={() => handleVolumeBlur('cake', name)}
                       className={`w-20 px-2 py-1 text-sm border rounded text-center font-mono ${
-                        modified ? 'border-pink-300 bg-white' : ''
+                        modified ? 'border-pink-300 bg-surface-paper' : ''
                       }`}
                       min="0.5"
                       max="10"
                       step="0.1"
                     />
-                    <span className="text-xs text-gray-500">cm³/g</span>
+                    <span className="text-xs text-ink-subtle">cm³/g</span>
                     {modified && (
                       <button
                         onClick={() => deleteVolumeOverride('cake', name)}
@@ -467,7 +468,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
       {activeSection === 'custom' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-ink-muted">
               {t('settings.product.custom.desc')}
             </p>
             <button
@@ -483,15 +484,15 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
           {showCustomForm && (
             <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium text-gray-800">{t('settings.product.custom.newProduct')}</h4>
-                <button onClick={() => setShowCustomForm(false)} className="p-1 hover:bg-white rounded">
-                  <X className="w-4 h-4 text-gray-500" />
+                <h4 className="font-medium text-ink">{t('settings.product.custom.newProduct')}</h4>
+                <button onClick={() => setShowCustomForm(false)} className="p-1 hover:bg-surface-paper rounded">
+                  <X className="w-4 h-4 text-ink-subtle" />
                 </button>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-ink-muted mb-1">
                     {t('settings.product.custom.productName')} *
                   </label>
                   <input
@@ -503,7 +504,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-ink-muted mb-1">
                     {t('settings.product.custom.category')}
                   </label>
                   <select
@@ -522,7 +523,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-ink-muted mb-1">
                     {t('settings.product.custom.specificVolume')}
                   </label>
                   <input
@@ -550,7 +551,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                 </button>
                 <button
                   onClick={() => setShowCustomForm(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 border border-line rounded-lg hover:bg-surface-muted"
                 >
                   {t('common.cancel')}
                 </button>
@@ -566,13 +567,13 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
                 return (
                   <div
                     key={prod.id}
-                    className="flex items-center justify-between p-3 bg-white border rounded-lg"
+                    className="flex items-center justify-between p-3 bg-surface-paper border rounded-lg"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{catInfo?.icon || '🧁'}</span>
                       <div>
-                        <div className="font-medium text-gray-800">{prod.name}</div>
-                        <div className="text-xs text-gray-500">
+                        <div className="font-medium text-ink">{prod.name}</div>
+                        <div className="text-xs text-ink-subtle">
                           {t(`settings.product.categories.${prod.category}`)} · {t('settings.product.custom.volumeLabel')} {prod.specificVolume} cm³/g
                         </div>
                       </div>
@@ -592,14 +593,14 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
               })}
             </div>
           ) : (
-            <div className="text-center p-8 text-gray-500 border border-dashed rounded-lg">
+            <div className="text-center p-8 text-ink-subtle border border-dashed rounded-lg">
               <Scale className="w-12 h-12 mx-auto mb-3 text-gray-300" />
               <p>{t('settings.product.custom.emptyState')}</p>
             </div>
           )}
 
           {/* 도움말 */}
-          <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
+          <div className="p-3 bg-surface-muted border border-line rounded-lg text-sm text-ink-muted">
             <div className="flex items-start gap-2">
               <Info className="w-4 h-4 mt-0.5" />
               <div>

@@ -15,18 +15,18 @@ function Input({
 }) {
   const inputClasses = `
     w-full px-3 py-2 border rounded-md
-    focus:outline-none focus:ring-2 focus:ring-bread-400
-    ${error ? 'border-red-500' : 'border-bread-300'}
-    ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
+    focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-400
+    ${error ? 'border-danger' : 'border-line'}
+    ${disabled ? 'bg-surface-muted text-ink-disabled cursor-not-allowed' : 'bg-surface-paper'}
     ${className}
   `.trim()
 
   return (
     <div className="mb-4">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-ink-muted mb-1">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-danger ml-1">*</span>}
         </label>
       )}
       
@@ -47,7 +47,7 @@ function Input({
       />
       
       {error && (
-        <p className="mt-1 text-sm text-red-500">{error}</p>
+        <p className="mt-1 text-sm text-danger">{error}</p>
       )}
     </div>
   )

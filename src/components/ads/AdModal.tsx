@@ -42,7 +42,7 @@ export default function AdModal({
       />
 
       {/* 모달 컨텐츠 */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+      <div className="relative bg-surface-paper rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-bread-500 to-amber-500 px-6 py-4">
           <div className="flex items-center justify-between">
@@ -65,22 +65,22 @@ export default function AdModal({
         {/* 감사 메시지 영역 */}
         <div className="p-6 text-center">
           <div className="mb-4 flex justify-center">
-            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center">
-              <Sparkles className="w-8 h-8 text-amber-500" />
+            <div className="w-16 h-16 bg-surface-muted rounded-full flex items-center justify-center">
+              <Sparkles className="w-8 h-8 text-ink-muted" />
             </div>
           </div>
 
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          <h3 className="text-lg font-semibold text-ink mb-2">
             {t('adModal.thankYouMessage')}
           </h3>
 
-          <p className="text-gray-600 text-sm mb-4">
+          <p className="text-ink-muted text-sm mb-4">
             {t('adModal.supportMessage')}
           </p>
 
           {/* 레시피 개수 안내 */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
-            <p className="text-amber-700 text-sm">
+          <div className="bg-surface-muted border border-line rounded-lg p-3 mb-4">
+            <p className="text-ink-muted text-sm">
               {t('adModal.recipeCountInfo')}
             </p>
           </div>

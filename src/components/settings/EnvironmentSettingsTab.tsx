@@ -219,31 +219,31 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center p-3 bg-white/70 rounded-lg">
             <Thermometer className="w-5 h-5 mx-auto text-red-500 mb-1" />
-            <div className="text-2xl font-bold text-gray-800">
+            <div className="text-2xl font-bold text-ink">
               {currentEnvironment.temperature}°C
             </div>
-            <div className="text-xs text-gray-500">{t('settings.environment.temperature')}</div>
+            <div className="text-xs text-ink-subtle">{t('settings.environment.temperature')}</div>
           </div>
           <div className="text-center p-3 bg-white/70 rounded-lg">
             <Droplets className="w-5 h-5 mx-auto text-blue-500 mb-1" />
-            <div className="text-2xl font-bold text-gray-800">
+            <div className="text-2xl font-bold text-ink">
               {currentEnvironment.humidity}%
             </div>
-            <div className="text-xs text-gray-500">{t('settings.environment.humidity')}</div>
+            <div className="text-xs text-ink-subtle">{t('settings.environment.humidity')}</div>
           </div>
           <div className="text-center p-3 bg-white/70 rounded-lg">
             <Mountain className="w-5 h-5 mx-auto text-green-600 mb-1" />
-            <div className="text-2xl font-bold text-gray-800">
+            <div className="text-2xl font-bold text-ink">
               {currentEnvironment.altitude}m
             </div>
-            <div className="text-xs text-gray-500">{t('settings.environment.altitude')}</div>
+            <div className="text-xs text-ink-subtle">{t('settings.environment.altitude')}</div>
           </div>
         </div>
 
         {/* 발효 영향 */}
         <div className="mt-3 p-2 bg-white/50 rounded flex items-center gap-2">
           <Timer className="w-4 h-4 text-orange-500" />
-          <span className="text-sm text-gray-700">
+          <span className="text-sm text-ink-muted">
             {t('settings.environment.fermentationTime')}: {' '}
             <span className={`font-medium ${
               fermentationImpact.direction === 'faster' ? 'text-orange-600' :
@@ -276,19 +276,19 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
 
       {/* 기본 설정 */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800">{t('settings.environment.defaultSettings')}</h3>
-        <p className="text-sm text-gray-500">
+        <h3 className="text-lg font-semibold text-ink">{t('settings.environment.defaultSettings')}</h3>
+        <p className="text-sm text-ink-subtle">
           {t('settings.environment.defaultSettingsDesc')}
         </p>
 
         {/* 온도 슬라이더 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <label className="flex items-center gap-2 text-sm font-medium text-ink-muted">
               <Thermometer className="w-4 h-4 text-red-500" />
               {t('settings.environment.temperature')}
             </label>
-            <span className="text-lg font-mono font-bold text-gray-800">
+            <span className="text-lg font-mono font-bold text-ink">
               {environment.defaults.temperature}°C
             </span>
           </div>
@@ -301,7 +301,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             onChange={(e) => handleDefaultChange('temperature', parseInt(e.target.value))}
             className="w-full h-2 bg-gradient-to-r from-blue-300 via-green-300 to-red-300 rounded-lg appearance-none cursor-pointer"
           />
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-xs text-ink-disabled">
             <span>{t('settings.environment.tempWinter')}</span>
             <span>{t('settings.environment.tempOptimal')}</span>
             <span>{t('settings.environment.tempSummer')}</span>
@@ -311,11 +311,11 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
         {/* 습도 슬라이더 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <label className="flex items-center gap-2 text-sm font-medium text-ink-muted">
               <Droplets className="w-4 h-4 text-blue-500" />
               {t('settings.environment.humidity')}
             </label>
-            <span className="text-lg font-mono font-bold text-gray-800">
+            <span className="text-lg font-mono font-bold text-ink">
               {environment.defaults.humidity}%
             </span>
           </div>
@@ -328,7 +328,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             onChange={(e) => handleDefaultChange('humidity', parseInt(e.target.value))}
             className="w-full h-2 bg-gradient-to-r from-yellow-200 via-blue-300 to-blue-500 rounded-lg appearance-none cursor-pointer"
           />
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-xs text-ink-disabled">
             <span>{t('settings.environment.humidityDry')}</span>
             <span>{t('settings.environment.humidityOptimal')}</span>
             <span>{t('settings.environment.humidityWet')}</span>
@@ -338,11 +338,11 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
         {/* 고도 입력 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <label className="flex items-center gap-2 text-sm font-medium text-ink-muted">
               <Mountain className="w-4 h-4 text-green-600" />
               {t('settings.environment.altitudeLabel')}
             </label>
-            <span className="text-lg font-mono font-bold text-gray-800">
+            <span className="text-lg font-mono font-bold text-ink">
               {environment.defaults.altitude}m
             </span>
           </div>
@@ -355,7 +355,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             onChange={(e) => handleDefaultChange('altitude', parseInt(e.target.value))}
             className="w-full"
           />
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-xs text-ink-disabled">
             <span>{t('settings.environment.seaLevel')}</span>
             <span>{t('settings.environment.lowAltitude')}</span>
             <span>1500m</span>
@@ -368,8 +368,8 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">{t('settings.environment.profiles')}</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-lg font-semibold text-ink">{t('settings.environment.profiles')}</h3>
+            <p className="text-sm text-ink-subtle">
               {t('settings.environment.profilesDesc')}
             </p>
           </div>
@@ -389,16 +389,16 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
         {showProfileForm && (
           <div className="p-4 border border-cyan-200 bg-cyan-50/50 rounded-lg space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="font-medium text-gray-800">
+              <h4 className="font-medium text-ink">
                 {editingProfileId ? t('settings.environment.editProfile') : t('settings.environment.newProfile')}
               </h4>
-              <button onClick={resetProfileForm} className="p-1 hover:bg-gray-100 rounded">
-                <X className="w-4 h-4 text-gray-500" />
+              <button onClick={resetProfileForm} className="p-1 hover:bg-surface-muted rounded">
+                <X className="w-4 h-4 text-ink-subtle" />
               </button>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink-muted mb-1">
                 {t('settings.environment.profileName')}
               </label>
               <input
@@ -412,7 +412,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">{t('settings.environment.temperature')} (°C)</label>
+                <label className="block text-xs text-ink-subtle mb-1">{t('settings.environment.temperature')} (°C)</label>
                 <input
                   type="number"
                   value={profileForm.temperature}
@@ -423,7 +423,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">{t('settings.environment.humidity')} (%)</label>
+                <label className="block text-xs text-ink-subtle mb-1">{t('settings.environment.humidity')} (%)</label>
                 <input
                   type="number"
                   value={profileForm.humidity}
@@ -434,7 +434,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">{t('settings.environment.altitude')} (m)</label>
+                <label className="block text-xs text-ink-subtle mb-1">{t('settings.environment.altitude')} (m)</label>
                 <input
                   type="number"
                   value={profileForm.altitude}
@@ -457,7 +457,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
               </button>
               <button
                 onClick={resetProfileForm}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-line rounded-lg hover:bg-surface-muted transition-colors"
               >
                 {t('common.cancel')}
               </button>
@@ -473,16 +473,16 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
             className={`p-4 rounded-lg border-2 text-left transition-all ${
               !environment.activeProfileId
                 ? 'border-cyan-500 bg-cyan-50'
-                : 'border-gray-200 bg-white hover:border-gray-300'
+                : 'border-line bg-surface-paper hover:border-line'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-gray-800">{t('settings.environment.default')}</span>
+              <span className="font-medium text-ink">{t('settings.environment.default')}</span>
               {!environment.activeProfileId && (
                 <Check className="w-4 h-4 text-cyan-600" />
               )}
             </div>
-            <div className="text-xs text-gray-500 space-y-0.5">
+            <div className="text-xs text-ink-subtle space-y-0.5">
               <div>{environment.defaults.temperature}°C</div>
               <div>{environment.defaults.humidity}% {t('settings.environment.humidityUnit')}</div>
               <div>{environment.defaults.altitude}m</div>
@@ -501,7 +501,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                 className={`group relative p-4 rounded-lg border-2 transition-all ${
                   isActive
                     ? 'border-cyan-500 bg-cyan-50'
-                    : 'border-gray-200 bg-white hover:border-gray-300'
+                    : 'border-line bg-surface-paper hover:border-line'
                 }`}
               >
                 <button
@@ -514,15 +514,15 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                         profile.id === 'summer' ? 'text-orange-500' :
                         profile.id === 'winter' ? 'text-blue-500' :
                         profile.id === 'spring' ? 'text-green-500' :
-                        'text-gray-500'
+                        'text-ink-subtle'
                       }`} />
-                      <span className="font-medium text-gray-800">{getProfileDisplayName(profile)}</span>
+                      <span className="font-medium text-ink">{getProfileDisplayName(profile)}</span>
                     </div>
                     {isActive && (
                       <Check className="w-4 h-4 text-cyan-600" />
                     )}
                   </div>
-                  <div className="text-xs text-gray-500 space-y-0.5">
+                  <div className="text-xs text-ink-subtle space-y-0.5">
                     <div>{profile.temperature}°C</div>
                     <div>{profile.humidity}% {t('settings.environment.humidityUnit')}</div>
                     <div>{profile.altitude}m</div>
@@ -538,9 +538,9 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                         startEditingProfile(profile)
                       }}
                       aria-label={t('common.edit')}
-                      className="p-1 bg-white rounded hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                      className="p-1 bg-surface-paper rounded hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                     >
-                      <Edit2 className="w-3 h-3 text-gray-500" />
+                      <Edit2 className="w-3 h-3 text-ink-subtle" />
                     </button>
                     <button
                       onClick={(e) => {
@@ -550,7 +550,7 @@ export default function EnvironmentSettingsTab({ className = '' }: EnvironmentSe
                         }
                       }}
                       aria-label={t('common.delete')}
-                      className="p-1 bg-white rounded hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                      className="p-1 bg-surface-paper rounded hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                     >
                       <Trash2 className="w-3 h-3 text-red-500" />
                     </button>

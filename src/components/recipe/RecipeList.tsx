@@ -32,7 +32,7 @@ const CategoryTab = memo<{
     className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
       isSelected
         ? 'bg-bread-500 text-white'
-        : 'bg-bread-100 text-bread-700 hover:bg-bread-200'
+        : 'bg-surface-muted text-ink-muted hover:bg-line'
     }`}
   >
     {categoryName} ({count})
@@ -125,7 +125,7 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
   return (
     <div className="max-w-7xl mx-auto px-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-bread-700">{t('components.recipeList.myRecipes')}</h2>
+        <h2 className="text-xl font-bold text-ink">{t('components.recipeList.myRecipes')}</h2>
         <Button
           onClick={handleNewRecipe}
           className="flex items-center gap-2 px-4 py-2"
@@ -157,8 +157,8 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
       </div>
 
       {displayRecipes.length === 0 ? (
-        <div className="text-center py-8 bg-bread-50 rounded-lg">
-          <p className="text-gray-600 mb-3 text-sm">
+        <div className="text-center py-8 bg-surface-muted rounded-lg">
+          <p className="text-ink-muted mb-3 text-sm">
             {selectedCategory === 'all'
               ? t('components.recipeList.noRecipes')
               : t('components.recipeList.noCategoryRecipes', { category: categorizedRecipes[selectedCategory]?.name })}

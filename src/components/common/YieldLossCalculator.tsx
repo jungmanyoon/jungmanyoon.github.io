@@ -196,7 +196,7 @@ export default function YieldLossCalculator({
             (-{result.totalLossPercent}%)
           </span>
           {selectedCount < 6 && (
-            <span className="ml-1 text-gray-400 text-xs">({selectedCount}{t('components.yieldLoss.processes')})</span>
+            <span className="ml-1 text-ink-disabled text-xs">({selectedCount}{t('components.yieldLoss.processes')})</span>
           )}
         </span>
       </div>
@@ -204,23 +204,23 @@ export default function YieldLossCalculator({
   }
 
   return (
-    <div className={`bg-white border rounded-lg shadow-sm ${className}`}>
+    <div className={`bg-surface-paper border rounded-lg shadow-sm ${className}`}>
       {/* 헤더 */}
       <div className="flex items-center justify-between p-3 border-b bg-gradient-to-r from-orange-50 to-amber-50">
         <div className="flex items-center gap-2">
           <TrendingDown className="w-5 h-5 text-orange-600" />
-          <h3 className="font-semibold text-gray-800">{t('components.yieldLoss.title')}</h3>
+          <h3 className="font-semibold text-ink">{t('components.yieldLoss.title')}</h3>
         </div>
         <div className="flex gap-1">
           <button
             onClick={() => setMode('forward')}
-            className={`px-2 py-1 text-xs rounded ${mode === 'forward' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600'}`}
+            className={`px-2 py-1 text-xs rounded ${mode === 'forward' ? 'bg-orange-500 text-white' : 'bg-surface-muted text-ink-muted'}`}
           >
             {t('components.yieldLoss.inputToOutput')}
           </button>
           <button
             onClick={() => setMode('reverse')}
-            className={`px-2 py-1 text-xs rounded ${mode === 'reverse' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600'}`}
+            className={`px-2 py-1 text-xs rounded ${mode === 'reverse' ? 'bg-orange-500 text-white' : 'bg-surface-muted text-ink-muted'}`}
           >
             {t('components.yieldLoss.outputToInput')}
           </button>
@@ -233,7 +233,7 @@ export default function YieldLossCalculator({
         {!externalCategory && (
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.productType')}</label>
+              <label className="block text-xs text-ink-subtle mb-1">{t('components.yieldLoss.productType')}</label>
               <select
                 value={internalCategory}
                 onChange={(e) => {
@@ -248,7 +248,7 @@ export default function YieldLossCalculator({
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.detailProduct')}</label>
+              <label className="block text-xs text-ink-subtle mb-1">{t('components.yieldLoss.detailProduct')}</label>
               <select
                 value={internalProductType}
                 onChange={(e) => setInternalProductType(e.target.value)}
@@ -266,17 +266,17 @@ export default function YieldLossCalculator({
         <div>
           <button
             onClick={() => setShowStageSelection(!showStageSelection)}
-            className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-800 mb-2"
+            className="flex items-center gap-1 text-xs text-ink-muted hover:text-ink mb-2"
           >
             {showStageSelection ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             <span className="font-medium">{t('components.yieldLoss.processSelection')}</span>
-            <span className="text-gray-400">({selectedCount}/6 {t('components.yieldLoss.selectedProcesses')})</span>
+            <span className="text-ink-disabled">({selectedCount}/6 {t('components.yieldLoss.selectedProcesses')})</span>
           </button>
 
           {showStageSelection && (
-            <div className="p-2 bg-gray-50 rounded space-y-2">
+            <div className="p-2 bg-surface-muted rounded space-y-2">
               <div className="flex justify-between items-center mb-1">
-                <span className="text-xs text-gray-500">{t('components.yieldLoss.selectProcessesForCalc')}</span>
+                <span className="text-xs text-ink-subtle">{t('components.yieldLoss.selectProcessesForCalc')}</span>
                 <div className="flex gap-1">
                   <button
                     onClick={() => handleSelectAll(true)}
@@ -286,7 +286,7 @@ export default function YieldLossCalculator({
                   </button>
                   <button
                     onClick={() => handleSelectAll(false)}
-                    className="px-2 py-0.5 text-xs bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                    className="px-2 py-0.5 text-xs bg-gray-200 text-ink-muted rounded hover:bg-gray-300"
                   >
                     {t('components.yieldLoss.deselectAll')}
                   </button>
@@ -300,7 +300,7 @@ export default function YieldLossCalculator({
                     className={`flex items-center gap-1 px-2 py-1.5 rounded text-xs transition-colors ${
                       stageSelection[stage.key]
                         ? 'bg-orange-100 text-orange-700 border border-orange-300'
-                        : 'bg-white text-gray-400 border border-gray-200 line-through'
+                        : 'bg-surface-paper text-ink-disabled border border-line line-through'
                     }`}
                   >
                     <span>{stage.icon}</span>
@@ -327,7 +327,7 @@ export default function YieldLossCalculator({
             <>
               {/* 투입→산출 모드 */}
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.inputWeight')} (g)</label>
+                <label className="block text-xs text-ink-subtle mb-1">{t('components.yieldLoss.inputWeight')} (g)</label>
                 <input
                   type="number"
                   value={externalInputWeight ?? internalInputWeight}
@@ -337,10 +337,10 @@ export default function YieldLossCalculator({
                 />
               </div>
               <div className="flex items-center pt-5">
-                <span className="text-gray-400">→</span>
+                <span className="text-ink-disabled">→</span>
               </div>
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">
+                <label className="block text-xs text-ink-subtle mb-1">
                   {t('components.yieldLoss.expectedOutput')} (g)
                   {selectedCount < 6 && <span className="text-orange-500 ml-1">*{selectedCount}{t('components.yieldLoss.processes')}</span>}
                 </label>
@@ -353,7 +353,7 @@ export default function YieldLossCalculator({
             <>
               {/* 산출→투입 모드 (역산) */}
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.targetOutput')} (g)</label>
+                <label className="block text-xs text-ink-subtle mb-1">{t('components.yieldLoss.targetOutput')} (g)</label>
                 <input
                   type="number"
                   value={targetOutput}
@@ -362,10 +362,10 @@ export default function YieldLossCalculator({
                 />
               </div>
               <div className="flex items-center pt-5">
-                <span className="text-gray-400">←</span>
+                <span className="text-ink-disabled">←</span>
               </div>
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.requiredInput')} (g)</label>
+                <label className="block text-xs text-ink-subtle mb-1">{t('components.yieldLoss.requiredInput')} (g)</label>
                 <div className="px-2 py-1.5 text-sm bg-green-50 border border-green-200 rounded text-right font-mono font-semibold text-green-700">
                   {requiredInput.toLocaleString()}
                 </div>
@@ -376,10 +376,10 @@ export default function YieldLossCalculator({
 
         {/* 수율 요약 */}
         {mode === 'forward' && result && (
-          <div className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded">
+          <div className="flex items-center justify-between px-3 py-2 bg-surface-muted rounded">
             <div className="flex items-center gap-2">
-              <Scale className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{t('components.yieldLoss.yield')}</span>
+              <Scale className="w-4 h-4 text-ink-subtle" />
+              <span className="text-sm text-ink-muted">{t('components.yieldLoss.yield')}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-lg font-bold text-blue-600">{result.yieldPercent}%</span>
@@ -394,7 +394,7 @@ export default function YieldLossCalculator({
         {!externalEnvironment && (
           <button
             onClick={() => setShowEnvironment(!showEnvironment)}
-            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+            className="flex items-center gap-1 text-xs text-ink-subtle hover:text-ink-muted"
           >
             {showEnvironment ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             {t('components.yieldLoss.envSettings')}
@@ -403,9 +403,9 @@ export default function YieldLossCalculator({
 
         {/* 환경 설정 */}
         {showEnvironment && !externalEnvironment && (
-          <div className="grid grid-cols-2 gap-2 p-2 bg-gray-50 rounded">
+          <div className="grid grid-cols-2 gap-2 p-2 bg-surface-muted rounded">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.humidity')} (%)</label>
+              <label className="block text-xs text-ink-subtle mb-1">{t('components.yieldLoss.humidity')} (%)</label>
               <input
                 type="number"
                 value={humidity}
@@ -416,7 +416,7 @@ export default function YieldLossCalculator({
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('components.yieldLoss.roomTemp')} (°C)</label>
+              <label className="block text-xs text-ink-subtle mb-1">{t('components.yieldLoss.roomTemp')} (°C)</label>
               <input
                 type="number"
                 value={temperature}
@@ -449,10 +449,10 @@ export default function YieldLossCalculator({
         {/* 공정별 손실 상세 */}
         {showDetails && mode === 'forward' && result && (
           <div className="space-y-2">
-            <div className="text-xs text-gray-500 mb-2">{t('components.yieldLoss.processDetailsDesc')}</div>
+            <div className="text-xs text-ink-subtle mb-2">{t('components.yieldLoss.processDetailsDesc')}</div>
             {result.processLosses.map((loss, idx) => (
               <div key={idx} className="flex items-center text-sm">
-                <div className="w-12 text-gray-600">{loss.stage}</div>
+                <div className="w-12 text-ink-muted">{loss.stage}</div>
                 <div className="flex-1 mx-2">
                   <div className="h-2 bg-gray-200 rounded overflow-hidden">
                     <div
@@ -461,9 +461,9 @@ export default function YieldLossCalculator({
                     />
                   </div>
                 </div>
-                <div className="w-16 text-right text-gray-500">-{loss.lossPercent}%</div>
-                <div className="w-20 text-right font-mono text-gray-600">-{loss.lossWeight}g</div>
-                <div className="w-24 text-right font-mono text-gray-400">→ {loss.remainingWeight.toLocaleString()}g</div>
+                <div className="w-16 text-right text-ink-subtle">-{loss.lossPercent}%</div>
+                <div className="w-20 text-right font-mono text-ink-muted">-{loss.lossWeight}g</div>
+                <div className="w-24 text-right font-mono text-ink-disabled">→ {loss.remainingWeight.toLocaleString()}g</div>
               </div>
             ))}
           </div>

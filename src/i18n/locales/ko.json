@@ -15,7 +15,7 @@
     "environment": "환경",
     "environmentDesc": "온도, 습도, 고도 설정",
     "method": "제법",
-    "methodDesc": "중종법, 폴리쉬, 비가, 르방 등",
+    "methodDesc": "중종법, 폴리시, 비가, 르방 등",
     "yieldLoss": "수율",
     "yieldLossDesc": "공정별 손실률 설정",
     "ingredient": "재료",
@@ -116,7 +116,7 @@
       "methods": {
         "straight": "스트레이트법",
         "sponge": "중종법",
-        "poolish": "폴리쉬법",
+        "poolish": "폴리시법",
         "biga": "비가법",
         "coldFermentation": "저온숙성법",
         "noTime": "노타임법"
@@ -160,14 +160,14 @@
       "methods": {
         "straight": "스트레이트법",
         "sponge": "중종법",
-        "poolish": "폴리쉬법",
+        "poolish": "폴리시법",
         "biga": "비가법",
         "coldFermentation": "저온숙성법",
         "noTime": "노타임법"
       },
       "fermentation": {
         "sponge": "중종 발효: ",
-        "poolish": "폴리쉬 발효: ",
+        "poolish": "폴리시 발효: ",
         "biga": "비가 발효: ",
         "mainDough": "본반죽 발효: ",
         "cold": "저온 발효: ",
@@ -176,7 +176,7 @@
       },
       "doughTypes": {
         "sponge": "중종",
-        "poolish": "폴리쉬",
+        "poolish": "폴리시",
         "biga": "비가",
         "mainDough": "본반죽"
       }
@@ -635,7 +635,7 @@
       "method": "제법",
       "methods": {
         "straight": "직반죽",
-        "sponge": "스펀지법",
+        "sponge": "중종법",
         "poolish": "폴리시법",
         "biga": "비가법",
         "overnight": "냉장 숙성"
@@ -681,8 +681,8 @@
           "time": "3-4시간"
         },
         "sponge": {
-          "name": "스펀지법",
-          "desc": "밀가루 30-60% + 물 + 이스트로 스펀지 발효 후 본반죽",
+          "name": "중종법",
+          "desc": "밀가루 30-60% + 물 + 이스트로 중종 발효 후 본반죽",
           "time": "6-8시간"
         },
         "poolish": {
@@ -732,7 +732,7 @@
       "methodNames": {
         "straight": "스트레이트법",
         "sponge": "중종법",
-        "poolish": "폴리쉬법",
+        "poolish": "폴리시법",
         "biga": "비가법",
         "coldFermentation": "저온숙성법",
         "noTime": "노타임법",
@@ -745,13 +745,13 @@
       "reset": "초기화",
       "conversionResult": "변환 결과",
       "sponge": "중종",
-      "poolish": "폴리쉬",
+      "poolish": "폴리시",
       "biga": "비가",
       "mainDough": "본반죽",
       "fermentationTime": "발효 시간:",
       "fermentationLabels": {
         "sponge": "중종 발효: ",
-        "poolish": "폴리쉬 발효: ",
+        "poolish": "폴리시 발효: ",
         "biga": "비가 발효: ",
         "mainDough": "본반죽 발효: ",
         "cold": "저온 발효: ",
@@ -811,7 +811,7 @@
       "currentMethod": "현재 제법:",
       "fermentationTime": "발효 시간:",
       "preFerment": "전발효 {{time}}분",
-      "poolish": "폴리쉬 {{time}}분",
+      "poolish": "폴리시 {{time}}분",
       "biga": "비가 {{time}}분",
       "mainDough": "본반죽 {{time}}분",
       "total": "총 {{time}}분",
@@ -828,7 +828,7 @@
         "flexibility": "작업 유연성:",
         "flexibilityMethod": "저온숙성법",
         "basic": "기본 제법:",
-        "basicMethod": "중종법, 폴리쉬법"
+        "basicMethod": "중종법, 폴리시법"
       }
     },
     "panSelector": {
@@ -1094,7 +1094,7 @@
     "type": "제법 종류",
     "straight": "스트레이트",
     "sponge": "중종법",
-    "poolish": "폴리쉬",
+    "poolish": "폴리시",
     "biga": "비가",
     "tangzhong": "탕종법",
     "autolyse": "오토리즈",
@@ -1500,7 +1500,7 @@
           "desc": "밀가루 60%로 중종 반죽 후 본반죽"
         },
         "poolish": {
-          "name": "폴리쉬",
+          "name": "폴리시",
           "desc": "밀가루:물 = 1:1 비율의 액종 (프랑스식)"
         },
         "biga": {
@@ -2113,7 +2113,7 @@
     "panScaling": "팬 기반 스케일링",
     "panScalingDesc": "팬 크기와 비용적 계산으로 정확한 레시피 배율 자동 계산",
     "methodConversion": "제법 변환",
-    "methodConversionDesc": "스트레이트, 중종법, 탕종법, 폴리쉬 등 다양한 제법 간 자동 변환",
+    "methodConversionDesc": "스트레이트, 중종법, 탕종법, 폴리시 등 다양한 제법 간 자동 변환",
     "ddtCalc": "DDT 계산기",
     "ddtCalcDesc": "목표 반죽 온도 달성을 위한 물 온도 자동 계산",
     "noRecipesYet": "아직 저장된 레시피가 없어요",
@@ -2193,7 +2193,7 @@
   "phase": {
     "tangzhong": "탕종",
     "preferment": "사전반죽",
-    "poolish": "폴리쉬",
+    "poolish": "폴리시",
     "biga": "비가",
     "sponge": "중종",
     "levain": "르방",
@@ -2583,7 +2583,7 @@
         "title": "제법 변환",
         "intro": "스트레이트법을 다른 제법으로 변환할 수 있습니다:",
         "sponge": "중종법: 30% 전발효",
-        "poolish": "폴리쉬법: 50% 전발효, 100% 수화율",
+        "poolish": "폴리시법: 50% 전발효, 100% 수화율",
         "biga": "비가법: 60% 전발효, 50% 수화율",
         "overnight": "저온숙성법: 이스트 30% 감소",
         "notime": "노타임법: 이스트 50% 증가",

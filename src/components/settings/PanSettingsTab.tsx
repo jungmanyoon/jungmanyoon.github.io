@@ -319,7 +319,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
         {(isRound || isChiffon) ? (
           <>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">
+              <label className="block text-xs text-ink-subtle mb-1">
                 {isChiffon ? t('settings.pan.outerDiameter') : t('settings.pan.diameter')} (cm)
               </label>
               <input
@@ -336,7 +336,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             </div>
             {isChiffon && (
               <div>
-                <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.innerDiameter')} (cm)</label>
+                <label className="block text-xs text-ink-subtle mb-1">{t('settings.pan.innerDiameter')} (cm)</label>
                 <input
                   type="number"
                   value={dimensions.innerDiameter || ''}
@@ -351,7 +351,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               </div>
             )}
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.height')} (cm)</label>
+              <label className="block text-xs text-ink-subtle mb-1">{t('settings.pan.height')} (cm)</label>
               <input
                 type="number"
                 value={dimensions.height || ''}
@@ -368,7 +368,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
         ) : (
           <>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.length')} (cm)</label>
+              <label className="block text-xs text-ink-subtle mb-1">{t('settings.pan.length')} (cm)</label>
               <input
                 type="number"
                 value={dimensions.length || ''}
@@ -382,7 +382,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.width')} (cm)</label>
+              <label className="block text-xs text-ink-subtle mb-1">{t('settings.pan.width')} (cm)</label>
               <input
                 type="number"
                 value={dimensions.width || ''}
@@ -396,7 +396,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">{t('settings.pan.height')} (cm)</label>
+              <label className="block text-xs text-ink-subtle mb-1">{t('settings.pan.height')} (cm)</label>
               <input
                 type="number"
                 value={dimensions.height || ''}
@@ -444,20 +444,20 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
       <div
         key={panItem.id}
         className={`border rounded-lg overflow-hidden transition-all ${
-          panItem.isFavorite ? 'border-yellow-300 bg-yellow-50/30' : 'border-gray-200 bg-white'
+          panItem.isFavorite ? 'border-yellow-300 bg-yellow-50/30' : 'border-line bg-surface-paper'
         }`}
       >
         {/* 팬 헤더 - 모든 정보를 한 줄에 표시 */}
         <div
-          className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+          className="flex items-center justify-between p-3 cursor-pointer hover:bg-surface-muted"
           onClick={() => setExpandedPanId(isExpanded ? null : panItem.id)}
         >
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <Box className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <Box className="w-4 h-4 text-ink-disabled flex-shrink-0" />
 
             {/* 팬 이름 */}
             <div className="flex items-center gap-2 min-w-0">
-              <span className="font-medium text-gray-800 truncate">{getPanDisplayName(panItem)}</span>
+              <span className="font-medium text-ink truncate">{getPanDisplayName(panItem)}</span>
               {panItem.isFavorite && (
                 <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
               )}
@@ -465,7 +465,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
             {/* 사이즈 정보 - 바로 표시 */}
             {dimensionStr && (
-              <span className="text-sm text-gray-500 font-mono flex-shrink-0">
+              <span className="text-sm text-ink-subtle font-mono flex-shrink-0">
                 {dimensionStr}
               </span>
             )}
@@ -477,7 +477,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
             {/* 메모 (있으면) */}
             {panItem.notes && (
-              <span className="text-xs text-gray-400 truncate hidden sm:inline">
+              <span className="text-xs text-ink-disabled truncate hidden sm:inline">
                 {panItem.notes}
               </span>
             )}
@@ -489,40 +489,40 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 e.stopPropagation()
                 togglePanFavorite(panItem.id)
               }}
-              className={`p-1.5 rounded hover:bg-gray-100 ${
-                panItem.isFavorite ? 'text-yellow-500' : 'text-gray-400'
+              className={`p-1.5 rounded hover:bg-surface-muted ${
+                panItem.isFavorite ? 'text-yellow-500' : 'text-ink-disabled'
               }`}
               title={t('settings.pan.favorites')}
             >
               <Star className={`w-4 h-4 ${panItem.isFavorite ? 'fill-current' : ''}`} />
             </button>
             {isExpanded ? (
-              <ChevronUp className="w-4 h-4 text-gray-400" />
+              <ChevronUp className="w-4 h-4 text-ink-disabled" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <ChevronDown className="w-4 h-4 text-ink-disabled" />
             )}
           </div>
         </div>
 
         {/* 팬 상세 (확장됨) - 편집/삭제 버튼만 */}
         {isExpanded && editingId !== panItem.id && (
-          <div className="px-3 pb-3 border-t border-gray-100">
+          <div className="px-3 pb-3 border-t border-line-soft">
             <div className="pt-3 flex flex-wrap items-center gap-3">
               {/* 카테고리 뱃지 */}
-              <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
+              <span className="px-2 py-0.5 text-xs bg-surface-muted text-ink-muted rounded">
                 {getCategoryLabel(panItem.category)}
               </span>
 
               {/* 충전율 (있으면) */}
               {panItem.fillRatio && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-ink-subtle">
                   {t('settings.pan.fillRatio')}: {(panItem.fillRatio * 100).toFixed(0)}%
                 </span>
               )}
 
               {/* 메모 (모바일에서도 표시) */}
               {panItem.notes && (
-                <span className="text-xs text-gray-500 italic sm:hidden">
+                <span className="text-xs text-ink-subtle italic sm:hidden">
                   {panItem.notes}
                 </span>
               )}
@@ -540,7 +540,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               </button>
               <button
                 onClick={() => duplicatePan(panItem)}
-                className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded hover:bg-gray-100"
+                className="flex items-center gap-1 px-2 py-1 text-xs bg-surface-muted text-ink-muted rounded hover:bg-surface-muted"
               >
                 <Copy className="w-3 h-3" />
                 {t('settings.pan.duplicate')}
@@ -564,16 +564,16 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
         {editingId === panItem.id && showForm && (
           <div className="p-4 border-t border-orange-200 bg-orange-50/50">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-medium text-gray-800">{t('settings.pan.editPan')}</h4>
-              <button onClick={resetForm} className="p-1 hover:bg-gray-100 rounded">
-                <X className="w-4 h-4 text-gray-500" />
+              <h4 className="font-medium text-ink">{t('settings.pan.editPan')}</h4>
+              <button onClick={resetForm} className="p-1 hover:bg-surface-muted rounded">
+                <X className="w-4 h-4 text-ink-subtle" />
               </button>
             </div>
 
             <div className="space-y-4">
               {/* 이름 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink-muted mb-1">
                   {t('settings.pan.nameOptional')}
                 </label>
                 <input
@@ -588,7 +588,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               {/* 종류 및 타입 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-ink-muted mb-1">
                     {t('settings.pan.category')}
                   </label>
                   <select
@@ -602,7 +602,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-ink-muted mb-1">
                     {t('settings.pan.subType')}
                   </label>
                   <select
@@ -619,7 +619,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
               {/* 치수 입력 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink-muted mb-1">
                   {t('settings.pan.dimensions')}
                 </label>
                 {renderDimensionInputs()}
@@ -646,7 +646,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
               {/* 충전율 (선택) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink-muted mb-1">
                   {t('settings.pan.fillRatioOptional')}
                 </label>
                 <div className="flex items-center gap-2">
@@ -662,7 +662,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                     }))}
                     className="flex-1"
                   />
-                  <span className="w-12 text-sm text-gray-600 font-mono">
+                  <span className="w-12 text-sm text-ink-muted font-mono">
                     {formData.fillRatio ? `${(formData.fillRatio * 100).toFixed(0)}%` : '70%'}
                   </span>
                 </div>
@@ -670,7 +670,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
               {/* 메모 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink-muted mb-1">
                   {t('settings.pan.notesOptional')}
                 </label>
                 <textarea
@@ -688,10 +688,10 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                   type="checkbox"
                   checked={formData.isFavorite}
                   onChange={(e) => setFormData(prev => ({ ...prev, isFavorite: e.target.checked }))}
-                  className="rounded border-gray-300"
+                  className="rounded border-line"
                 />
-                <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'}`} />
-                <span className="text-sm text-gray-700">{t('settings.pan.addToFavorites')}</span>
+                <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-yellow-500 fill-yellow-500' : 'text-ink-disabled'}`} />
+                <span className="text-sm text-ink-muted">{t('settings.pan.addToFavorites')}</span>
               </label>
 
               {/* 저장 버튼 */}
@@ -706,7 +706,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 </button>
                 <button
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-line rounded-lg hover:bg-surface-muted transition-colors"
                 >
                   {t('common.cancel')}
                 </button>
@@ -723,8 +723,8 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">{t('settings.pan.title')}</h3>
-          <p className="text-sm text-gray-500">
+          <h3 className="text-lg font-semibold text-ink">{t('settings.pan.title')}</h3>
+          <p className="text-sm text-ink-subtle">
             {t('settings.pan.titleDesc')}
           </p>
         </div>
@@ -743,7 +743,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
       {/* 검색 및 필터 */}
       <div className="flex flex-wrap gap-2">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-disabled" />
           <input
             type="text"
             value={searchQuery}
@@ -767,7 +767,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
           className={`flex items-center gap-1 px-3 py-2 text-sm border rounded-lg transition-colors ${
             showFavoritesOnly
               ? 'bg-yellow-50 border-yellow-300 text-yellow-700'
-              : 'hover:bg-gray-50'
+              : 'hover:bg-surface-muted'
           }`}
         >
           <Star className={`w-4 h-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
@@ -779,18 +779,18 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
       {showForm && !editingId && (
         <div className="p-4 border border-orange-200 bg-orange-50/50 rounded-lg">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-medium text-gray-800">
+            <h4 className="font-medium text-ink">
               {editingId ? t('settings.pan.editPan') : t('settings.pan.newPan')}
             </h4>
-            <button onClick={resetForm} className="p-1 hover:bg-gray-100 rounded">
-              <X className="w-4 h-4 text-gray-500" />
+            <button onClick={resetForm} className="p-1 hover:bg-surface-muted rounded">
+              <X className="w-4 h-4 text-ink-subtle" />
             </button>
           </div>
 
           <div className="space-y-4">
             {/* 이름 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink-muted mb-1">
                 {t('settings.pan.nameOptional')}
               </label>
               <input
@@ -805,7 +805,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             {/* 종류 및 타입 */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink-muted mb-1">
                   {t('settings.pan.category')}
                 </label>
                 <select
@@ -819,7 +819,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink-muted mb-1">
                   {t('settings.pan.subType')}
                 </label>
                 <select
@@ -836,7 +836,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
             {/* 치수 입력 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink-muted mb-1">
                 {t('settings.pan.dimensions')}
               </label>
               {renderDimensionInputs()}
@@ -863,7 +863,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
             {/* 충전율 (선택) */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink-muted mb-1">
                 {t('settings.pan.fillRatioOptional')}
               </label>
               <div className="flex items-center gap-2">
@@ -879,18 +879,18 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                   }))}
                   className="flex-1"
                 />
-                <span className="w-12 text-sm text-gray-600 font-mono">
+                <span className="w-12 text-sm text-ink-muted font-mono">
                   {formData.fillRatio ? `${(formData.fillRatio * 100).toFixed(0)}%` : '70%'}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-ink-subtle mt-1">
                 {t('settings.pan.fillRatioDesc')}
               </p>
             </div>
 
             {/* 메모 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink-muted mb-1">
                 {t('settings.pan.notesOptional')}
               </label>
               <textarea
@@ -908,10 +908,10 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 type="checkbox"
                 checked={formData.isFavorite}
                 onChange={(e) => setFormData(prev => ({ ...prev, isFavorite: e.target.checked }))}
-                className="rounded border-gray-300"
+                className="rounded border-line"
               />
-              <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'}`} />
-              <span className="text-sm text-gray-700">{t('settings.pan.addToFavorites')}</span>
+              <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-yellow-500 fill-yellow-500' : 'text-ink-disabled'}`} />
+              <span className="text-sm text-ink-muted">{t('settings.pan.addToFavorites')}</span>
             </label>
 
             {/* 저장 버튼 */}
@@ -926,7 +926,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               </button>
               <button
                 onClick={resetForm}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-line rounded-lg hover:bg-surface-muted transition-colors"
               >
                 {t('common.cancel')}
               </button>
@@ -938,7 +938,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
       {/* 팬 목록 */}
       <div className="space-y-2">
         {filteredPans.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 border border-dashed rounded-lg">
+          <div className="p-8 text-center text-ink-subtle border border-dashed rounded-lg">
             {pan.myPans.length === 0 ? (
               <>
                 <Box className="w-12 h-12 mx-auto mb-3 text-gray-300" />
@@ -964,7 +964,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
       {/* 통계 */}
       {pan.myPans.length > 0 && (
-        <div className="text-xs text-gray-400 pt-2 border-t">
+        <div className="text-xs text-ink-disabled pt-2 border-t">
           {t('settings.pan.totalPans', { count: pan.myPans.length })}
           {pan.myPans.filter(p => p.isFavorite).length > 0 && (
             <> · {t('settings.pan.favoritesCount', { count: pan.myPans.filter(p => p.isFavorite).length })}</>

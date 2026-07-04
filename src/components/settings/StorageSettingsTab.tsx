@@ -210,25 +210,25 @@ export default function StorageSettingsTab() {
   return (
     <div className="space-y-6">
       {/* 저장소 타입 선택 */}
-      <section className="bg-white rounded-lg border border-gray-200 p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+      <section className="bg-surface-paper rounded-lg border border-line p-4">
+        <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
           <HardDrive className="w-5 h-5 text-amber-600" />
           {t('settings.storage.title')}
         </h3>
 
         <div className="space-y-4">
           {/* 현재 상태 */}
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-surface-muted rounded-lg">
             {storage.type === 'filesystem' && isInitialized ? (
               <>
                 <div className="p-2 bg-green-100 rounded-full">
                   <Check className="w-5 h-5 text-green-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-800">
+                  <p className="font-medium text-ink">
                     {t('settings.storage.localFolder')}: {storage.directoryName}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-ink-subtle">
                     {t('settings.storage.lastSaved')}: {lastSavedText}
                   </p>
                 </div>
@@ -245,10 +245,10 @@ export default function StorageSettingsTab() {
                   <AlertTriangle className="w-5 h-5 text-yellow-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-800">
+                  <p className="font-medium text-ink">
                     {t('settings.storage.folderNeeded')}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-ink-subtle">
                     {t('settings.storage.permissionExpired')}
                   </p>
                 </div>
@@ -259,10 +259,10 @@ export default function StorageSettingsTab() {
                   <Cloud className="w-5 h-5 text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-800">
+                  <p className="font-medium text-ink">
                     {t('settings.storage.browserStorage')}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-ink-subtle">
                     {t('settings.storage.browserStorageDesc')}
                   </p>
                 </div>
@@ -322,16 +322,16 @@ export default function StorageSettingsTab() {
           )}
 
           {/* 자동 저장 옵션 */}
-          <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer">
+          <label className="flex items-center gap-3 p-3 bg-surface-muted rounded-lg cursor-pointer">
             <input
               type="checkbox"
               checked={storage.autoSave}
               onChange={(e) => setAutoSave(e.target.checked)}
-              className="w-5 h-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              className="w-5 h-5 rounded border-line text-amber-600 focus:ring-amber-500"
             />
             <div>
-              <p className="font-medium text-gray-800">{t('settings.storage.autoSave')}</p>
-              <p className="text-sm text-gray-500">
+              <p className="font-medium text-ink">{t('settings.storage.autoSave')}</p>
+              <p className="text-sm text-ink-subtle">
                 {t('settings.storage.autoSaveDesc')}
               </p>
             </div>
@@ -340,13 +340,13 @@ export default function StorageSettingsTab() {
       </section>
 
       {/* 수동 백업/복원 */}
-      <section className="bg-white rounded-lg border border-gray-200 p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+      <section className="bg-surface-paper rounded-lg border border-line p-4">
+        <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
           <Download className="w-5 h-5 text-amber-600" />
           {t('settings.storage.backupRestore')}
         </h3>
 
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-ink-muted mb-4">
           {t('settings.storage.backupRestoreDesc')}
         </p>
 
@@ -362,7 +362,7 @@ export default function StorageSettingsTab() {
           <button
             onClick={handleExportJson}
             disabled={recipes.length === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Download className="w-4 h-4" />
             {t('settings.storage.exportJson')}
@@ -370,7 +370,7 @@ export default function StorageSettingsTab() {
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-gray-200 transition-colors"
           >
             <Upload className="w-4 h-4" />
             {t('settings.storage.importJson')}
@@ -378,14 +378,14 @@ export default function StorageSettingsTab() {
 
           <button
             onClick={handleResetToSamples}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-gray-200 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             {t('settings.storage.loadSamples')}
           </button>
         </div>
 
-        <p className="text-xs text-gray-400 mt-3">
+        <p className="text-xs text-ink-disabled mt-3">
           {t('settings.storage.currentRecipes')}: {recipes.length}
         </p>
       </section>

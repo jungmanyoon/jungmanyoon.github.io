@@ -23,7 +23,14 @@ import {
   ChevronDown,
   ChevronUp,
   RefreshCw,
-  Filter
+  Filter,
+  Droplet,
+  Coins,
+  Flame,
+  RotateCcw,
+  BookOpen,
+  Pencil,
+  Lightbulb
 } from 'lucide-react'
 
 // 재료 카테고리 (키와 아이콘만 정의, 라벨은 번역 사용)
@@ -410,14 +417,14 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
             <Apple className="w-5 h-5 text-green-500" />
             {t('settings.ingredient.title')}
-            <span className="text-sm font-normal text-gray-500">
+            <span className="text-sm font-normal text-ink-subtle">
               ({t('settings.ingredient.databaseCount', { dbCount: INGREDIENT_DATABASE.length, customCount: ingredient.customIngredients.length })})
             </span>
           </h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-ink-subtle mt-1">
             {t('settings.ingredient.titleDesc')}
           </p>
         </div>
@@ -434,9 +441,9 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       {showCustomForm && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="font-medium text-gray-800">{t('settings.ingredient.newIngredient')}</h4>
-            <button onClick={() => setShowCustomForm(false)} className="p-1 hover:bg-white rounded">
-              <X className="w-4 h-4 text-gray-500" />
+            <h4 className="font-medium text-ink">{t('settings.ingredient.newIngredient')}</h4>
+            <button onClick={() => setShowCustomForm(false)} className="p-1 hover:bg-surface-paper rounded">
+              <X className="w-4 h-4 text-ink-subtle" />
             </button>
           </div>
           <div className="grid grid-cols-4 gap-3">
@@ -483,7 +490,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
               </button>
               <button
                 onClick={() => setShowCustomForm(false)}
-                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                className="px-3 py-2 border border-line rounded-lg hover:bg-surface-muted text-sm"
               >
                 {t('settings.ingredient.buttons.cancel')}
               </button>
@@ -495,7 +502,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       {/* 검색 및 필터 */}
       <div className="flex gap-3 items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-disabled" />
           <input
             type="text"
             value={search}
@@ -521,7 +528,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
           className={`flex items-center gap-1 px-3 py-2 border rounded-lg text-sm ${
             showOnlyModified
               ? 'bg-amber-100 border-amber-300 text-amber-700'
-              : 'hover:bg-gray-50'
+              : 'hover:bg-surface-muted'
           }`}
         >
           <Filter className="w-4 h-4" />
@@ -533,24 +540,24 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       <div className="border rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-surface-muted border-b">
               <tr>
-                <th className="px-3 py-2 text-left font-medium text-gray-600 w-10"></th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600 min-w-[140px]">{t('settings.ingredient.table.name')}</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600 w-24">{t('settings.ingredient.table.category')}</th>
-                <th className="px-3 py-2 text-center font-medium text-gray-600 w-20">
-                  <span className="flex items-center justify-center gap-1">💧 {t('settings.ingredient.table.moisture')}</span>
+                <th className="px-3 py-2 text-left font-medium text-ink-muted w-10"></th>
+                <th className="px-3 py-2 text-left font-medium text-ink-muted min-w-[140px]">{t('settings.ingredient.table.name')}</th>
+                <th className="px-3 py-2 text-left font-medium text-ink-muted w-24">{t('settings.ingredient.table.category')}</th>
+                <th className="px-3 py-2 text-center font-medium text-ink-muted w-20">
+                  <span className="flex items-center justify-center gap-1"><Droplet size={14} className="text-ink-muted" /> {t('settings.ingredient.table.moisture')}</span>
                 </th>
-                <th className="px-3 py-2 text-center font-medium text-gray-600 w-28">
-                  <span className="flex items-center justify-center gap-1">💰 {t('settings.ingredient.table.cost')}</span>
+                <th className="px-3 py-2 text-center font-medium text-ink-muted w-28">
+                  <span className="flex items-center justify-center gap-1"><Coins size={14} className="text-ink-muted" /> {t('settings.ingredient.table.cost')}</span>
                 </th>
-                <th className="px-3 py-2 text-center font-medium text-gray-600 w-24">
-                  <span className="flex items-center justify-center gap-1">🔥 {t('settings.ingredient.table.calories')}</span>
+                <th className="px-3 py-2 text-center font-medium text-ink-muted w-24">
+                  <span className="flex items-center justify-center gap-1"><Flame size={14} className="text-ink-muted" /> {t('settings.ingredient.table.calories')}</span>
                 </th>
-                <th className="px-3 py-2 text-center font-medium text-gray-600 w-20">
-                  <span className="flex items-center justify-center gap-1">🔄 {t('settings.ingredient.table.substitutes')}</span>
+                <th className="px-3 py-2 text-center font-medium text-ink-muted w-20">
+                  <span className="flex items-center justify-center gap-1"><RotateCcw size={14} className="text-ink-muted" /> {t('settings.ingredient.table.substitutes')}</span>
                 </th>
-                <th className="px-3 py-2 text-center font-medium text-gray-600 w-16">{t('settings.ingredient.table.edit')}</th>
+                <th className="px-3 py-2 text-center font-medium text-ink-muted w-16">{t('settings.ingredient.table.edit')}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -564,7 +571,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                   <React.Fragment key={ing.name}>
                   <tr
                     className={`
-                      ${hasModifications ? 'bg-amber-50' : 'hover:bg-gray-50'}
+                      ${hasModifications ? 'bg-amber-50' : 'hover:bg-surface-muted'}
                       ${isEditing ? 'bg-blue-50' : ''}
                     `}
                   >
@@ -576,9 +583,9 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           className="p-1 hover:bg-gray-200 rounded"
                         >
                           {isExpanded ? (
-                            <ChevronUp className="w-4 h-4 text-gray-500" />
+                            <ChevronUp className="w-4 h-4 text-ink-subtle" />
                           ) : (
-                            <ChevronDown className="w-4 h-4 text-gray-500" />
+                            <ChevronDown className="w-4 h-4 text-ink-subtle" />
                           )}
                         </button>
                       )}
@@ -589,7 +596,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                       <div className="flex items-center gap-2">
                         <span>{catInfo.icon}</span>
                         <div>
-                          <span className="font-medium text-gray-800">{getIngredientDisplayName(ing.name)}</span>
+                          <span className="font-medium text-ink">{getIngredientDisplayName(ing.name)}</span>
                           {ing.isCustom && (
                             <span className="ml-1 px-1 py-0.5 bg-green-100 text-green-700 text-xs rounded">
                               {t('settings.ingredient.custom')}
@@ -598,7 +605,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           {(() => {
                             const alias = getIngredientAlias(ing.name, ing.originalData?.aliases)
                             return alias && (
-                              <div className="text-xs text-gray-400 truncate max-w-[120px]">
+                              <div className="text-xs text-ink-disabled truncate max-w-[120px]">
                                 {alias}
                               </div>
                             )
@@ -608,7 +615,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                     </td>
 
                     {/* 카테고리 */}
-                    <td className="px-3 py-2 text-gray-600">
+                    <td className="px-3 py-2 text-ink-muted">
                       <span className="text-xs">{t(`settings.ingredient.categories.${ing.category}`)}</span>
                     </td>
 
@@ -651,7 +658,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           ₩{(ing.cost.retailPrice || ing.cost.wholesalePrice || ing.cost.bulkPrice || 0).toLocaleString()}
                         </span>
                       ) : (
-                        <span className="text-gray-400 text-xs">-</span>
+                        <span className="text-ink-disabled text-xs">-</span>
                       )}
                     </td>
 
@@ -673,11 +680,11 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           {ing.nutrition.calories}
                         </span>
                       ) : ing.defaultNutrition?.calories ? (
-                        <span className="text-xs font-mono text-gray-600" title={t('settings.ingredient.defaultTooltip', { protein: ing.defaultNutrition.protein, carbs: ing.defaultNutrition.carbohydrates, fat: ing.defaultNutrition.fat })}>
+                        <span className="text-xs font-mono text-ink-muted" title={t('settings.ingredient.defaultTooltip', { protein: ing.defaultNutrition.protein, carbs: ing.defaultNutrition.carbohydrates, fat: ing.defaultNutrition.fat })}>
                           {ing.defaultNutrition.calories}
                         </span>
                       ) : (
-                        <span className="text-gray-400 text-xs">-</span>
+                        <span className="text-ink-disabled text-xs">-</span>
                       )}
                     </td>
 
@@ -706,7 +713,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                               setSubForm({ original: ing.name, substitute: '', ratio: 1, notes: '' })
                               setShowSubForm(ing.name)
                             }}
-                            className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs hover:bg-gray-200"
+                            className="px-2 py-0.5 bg-surface-muted text-ink-subtle rounded text-xs hover:bg-gray-200"
                           >
                             +
                           </button>
@@ -727,7 +734,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="p-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                            className="p-1 bg-gray-300 text-ink-muted rounded hover:bg-gray-400"
                             title={t('settings.ingredient.buttons.cancel')}
                           >
                             <X className="w-3 h-3" />
@@ -737,7 +744,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                         <div className="flex gap-1 justify-center">
                           <button
                             onClick={() => handleStartEdit(ing.name)}
-                            className="p-1 text-gray-500 hover:bg-gray-200 rounded"
+                            className="p-1 text-ink-subtle hover:bg-gray-200 rounded"
                             title={t('settings.ingredient.buttons.edit')}
                           >
                             <Edit3 className="w-3 h-3" />
@@ -778,7 +785,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           {/* 기본 대체규칙 */}
                           {ing.defaultSubstitutions.length > 0 && (
                             <div className="flex flex-wrap gap-2 items-center">
-                              <span className="text-xs text-blue-600 font-medium mr-2">📚 {t('settings.ingredient.defaultRules')}</span>
+                              <span className="inline-flex items-center gap-1 text-xs text-blue-600 font-medium mr-2"><BookOpen size={14} /> {t('settings.ingredient.defaultRules')}</span>
                               {ing.defaultSubstitutions.map((rule, idx) => (
                                 <div
                                   key={`default-${idx}`}
@@ -806,16 +813,16 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           <div className="flex flex-wrap gap-2 items-center">
                             {ing.substitutions.length > 0 && (
                               <>
-                                <span className="text-xs text-orange-600 font-medium mr-2">✏️ {t('settings.ingredient.userRules')}</span>
+                                <span className="inline-flex items-center gap-1 text-xs text-orange-600 font-medium mr-2"><Pencil size={14} /> {t('settings.ingredient.userRules')}</span>
                                 {ing.substitutions.map(sub => (
                                   <div
                                     key={sub.id}
-                                    className="flex items-center gap-1 px-2 py-1 bg-white border border-orange-200 rounded text-xs"
+                                    className="flex items-center gap-1 px-2 py-1 bg-surface-paper border border-orange-200 rounded text-xs"
                                   >
-                                    <ArrowRight className="w-3 h-3 text-gray-400" />
+                                    <ArrowRight className="w-3 h-3 text-ink-disabled" />
                                     <span className="font-medium text-orange-700">{getIngredientDisplayName(sub.substitute)}</span>
-                                    <span className="text-gray-500 font-mono">×{sub.ratio}</span>
-                                    {sub.notes && <span className="text-gray-400 italic">({currentLang === 'en' ? translateBakingNote(sub.notes, 'en') : sub.notes})</span>}
+                                    <span className="text-ink-subtle font-mono">×{sub.ratio}</span>
+                                    {sub.notes && <span className="text-ink-disabled italic">({currentLang === 'en' ? translateBakingNote(sub.notes, 'en') : sub.notes})</span>}
                                     <button
                                       onClick={() => {
                                         if (confirm(t('settings.ingredient.alerts.deleteSubConfirm'))) {
@@ -855,20 +862,20 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       {/* 대체재료 추가 폼 (플로팅) */}
       {showSubForm && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-4 w-96 space-y-4">
+          <div className="bg-surface-paper rounded-lg shadow-xl p-4 w-96 space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="font-medium text-gray-800">
-                🔄 {t('settings.ingredient.substitution.title', { name: getIngredientDisplayName(showSubForm) })}
+              <h4 className="font-medium text-ink flex items-center gap-1">
+                <RotateCcw size={16} className="text-ink-muted" /> {t('settings.ingredient.substitution.title', { name: getIngredientDisplayName(showSubForm) })}
               </h4>
-              <button onClick={() => setShowSubForm(null)} className="p-1 hover:bg-gray-100 rounded">
-                <X className="w-4 h-4 text-gray-500" />
+              <button onClick={() => setShowSubForm(null)} className="p-1 hover:bg-surface-muted rounded">
+                <X className="w-4 h-4 text-ink-subtle" />
               </button>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-700">{getIngredientDisplayName(showSubForm)}</span>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <span className="font-medium text-ink-muted">{getIngredientDisplayName(showSubForm)}</span>
+                <ArrowRight className="w-4 h-4 text-ink-disabled" />
                 <input
                   type="text"
                   value={subForm.substitute}
@@ -879,7 +886,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
               </div>
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-xs text-gray-500 mb-1">{t('settings.ingredient.substitution.ratio')}</label>
+                  <label className="block text-xs text-ink-subtle mb-1">{t('settings.ingredient.substitution.ratio')}</label>
                   <input
                     type="number"
                     value={subForm.ratio}
@@ -891,7 +898,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-xs text-gray-500 mb-1">{t('settings.ingredient.substitution.notes')}</label>
+                  <label className="block text-xs text-ink-subtle mb-1">{t('settings.ingredient.substitution.notes')}</label>
                   <input
                     type="text"
                     value={subForm.notes || ''}
@@ -913,7 +920,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
               </button>
               <button
                 onClick={() => setShowSubForm(null)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border border-line rounded-lg hover:bg-surface-muted"
               >
                 {t('settings.ingredient.buttons.cancel')}
               </button>
@@ -924,15 +931,15 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
 
       {/* 결과 없음 */}
       {filteredIngredients.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-ink-subtle">
           <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
           <p>{t('settings.ingredient.noResults')}</p>
         </div>
       )}
 
       {/* 하단 안내 */}
-      <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-        <p className="font-medium mb-1">💡 {t('settings.ingredient.tips.title')}</p>
+      <div className="text-xs text-ink-subtle bg-surface-muted p-3 rounded-lg">
+        <p className="font-medium mb-1 flex items-center gap-1"><Lightbulb size={14} className="text-ink-muted" /> {t('settings.ingredient.tips.title')}</p>
         <ul className="space-y-0.5">
           <li>• {t('settings.ingredient.tips.edit')}</li>
           <li>• {t('settings.ingredient.tips.subs')}</li>

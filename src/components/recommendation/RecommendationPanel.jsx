@@ -91,8 +91,8 @@ const RecommendationPanel = ({
 
   if (!recipes || recipes.length === 0) {
     return (
-      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
-        <div className="text-center text-gray-500">
+      <div className={`bg-surface-paper rounded-lg shadow-sm border border-line p-6 ${className}`}>
+        <div className="text-center text-ink-subtle">
           <Sparkles className="w-12 h-12 mx-auto mb-3 opacity-50" />
           <p>추천할 레시피가 없습니다</p>
           <p className="text-sm mt-1">레시피를 추가해보세요</p>
@@ -102,15 +102,15 @@ const RecommendationPanel = ({
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
+    <div className={`bg-surface-paper rounded-lg shadow-sm border border-line ${className}`}>
       {/* 헤더 */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-line">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
             <Sparkles className="w-5 h-5 mr-2 text-purple-600" />
-            <h3 className="text-lg font-semibold text-gray-900">AI 추천</h3>
+            <h3 className="text-lg font-semibold text-ink">AI 추천</h3>
           </div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-ink-subtle">
             {recommendations.length}개 추천
           </div>
         </div>
@@ -128,7 +128,7 @@ const RecommendationPanel = ({
                 className={`flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   isSelected
                     ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
+                    : 'bg-surface-muted text-ink-muted hover:bg-gray-200 border border-line'
                 }`}
                 title={type.description}
               >
@@ -157,7 +157,7 @@ const RecommendationPanel = ({
             ))}
           </div>
         ) : recommendations.length === 0 ? (
-          <div className="text-center py-6 text-gray-500">
+          <div className="text-center py-6 text-ink-subtle">
             <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">추천할 수 있는 레시피가 없습니다</p>
             <p className="text-xs mt-1">다른 추천 타입을 선택해보세요</p>
@@ -168,7 +168,7 @@ const RecommendationPanel = ({
               <div
                 key={recipe.id}
                 onClick={() => handleRecipeClick(recipe)}
-                className="flex items-center p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all cursor-pointer group"
+                className="flex items-center p-3 rounded-lg border border-line hover:border-purple-300 hover:bg-purple-50 transition-all cursor-pointer group"
                 role="button"
                 aria-label={`추천 레시피 ${recipe.name}`}
               >
@@ -176,9 +176,9 @@ const RecommendationPanel = ({
                 <div className="flex-shrink-0 mr-3">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                     index === 0 ? 'bg-yellow-100 text-yellow-800' :
-                    index === 1 ? 'bg-gray-100 text-gray-700' :
+                    index === 1 ? 'bg-surface-muted text-ink-muted' :
                     index === 2 ? 'bg-orange-100 text-orange-700' :
-                    'bg-gray-50 text-gray-600'
+                    'bg-surface-muted text-ink-muted'
                   }`}>
                     {index + 1}
                   </div>
@@ -188,21 +188,21 @@ const RecommendationPanel = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 truncate group-hover:text-purple-700 transition-colors">
+                      <h4 className="font-medium text-ink truncate group-hover:text-purple-700 transition-colors">
                         {getLocalizedRecipeName(recipe)}
                       </h4>
                       
                       {/* 추천 이유 */}
                       {recipe.recommendationReasons && recipe.recommendationReasons.length > 0 && (
                         <div className="mt-1">
-                          <p className="text-xs text-gray-600 line-clamp-2">
+                          <p className="text-xs text-ink-muted line-clamp-2">
                             {recipe.recommendationReasons.join(' • ')}
                           </p>
                         </div>
                       )}
                       
                       {/* 레시피 기본 정보 */}
-                      <div className="flex items-center mt-2 text-xs text-gray-500 space-x-3">
+                      <div className="flex items-center mt-2 text-xs text-ink-subtle space-x-3">
                         <div className="flex items-center">
                           <Clock className="w-3 h-3 mr-1" />
                           {((recipe.prepTime || 0) + (recipe.bakingTime || 0))}분
@@ -231,14 +231,14 @@ const RecommendationPanel = ({
                           <div className="text-xs font-medium text-purple-600">
                             {Math.round(recipe.recommendationScore)}%
                           </div>
-                          <div className="text-xs text-gray-500">매치</div>
+                          <div className="text-xs text-ink-subtle">매치</div>
                         </div>
                       )}
                       
                       {/* 좋아요 버튼 */}
                       <button
                         onClick={(e) => handleLike(recipe, e)}
-                        className={`p-1.5 rounded-full transition-colors opacity-0 group-hover:opacity-100 ${likedIds.has(recipe.id) ? 'bg-red-100 text-red-500' : 'hover:bg-red-100 text-gray-400 hover:text-red-500'}`}
+                        className={`p-1.5 rounded-full transition-colors opacity-0 group-hover:opacity-100 ${likedIds.has(recipe.id) ? 'bg-red-100 text-red-500' : 'hover:bg-red-100 text-ink-disabled hover:text-red-500'}`}
                         title="좋아요"
                         aria-pressed={likedIds.has(recipe.id)}
                         aria-label="좋아요"
@@ -271,8 +271,8 @@ const RecommendationPanel = ({
 
       {/* 푸터 */}
       {recommendations.length > 0 && (
-        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-          <p className="text-xs text-gray-600 text-center">
+        <div className="px-4 py-3 border-t border-line bg-surface-muted">
+          <p className="text-xs text-ink-muted text-center">
             AI가 당신의 선호도를 학습하여 더 나은 추천을 제공합니다
           </p>
         </div>

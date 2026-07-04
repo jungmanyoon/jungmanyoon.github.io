@@ -89,24 +89,24 @@ const PWAInstallPrompt = () => {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:w-96">
-      <div className="bg-white rounded-lg shadow-2xl border border-gray-200 p-4">
+      <div className="bg-surface-paper rounded-lg shadow-2xl border border-line p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center">
-            <div className="bg-amber-100 rounded-full p-2 mr-3">
-              <Smartphone className="w-5 h-5 text-amber-600" />
+            <div className="bg-surface-muted rounded-full p-2 mr-3">
+              <Smartphone className="w-5 h-5 text-ink-muted" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">
+              <h3 className="font-semibold text-ink text-sm">
                 앱으로 설치하기
               </h3>
-              <p className="text-xs text-gray-600 mt-1">
+              <p className="text-xs text-ink-muted mt-1">
                 더 빠르고 편리하게 사용하세요
               </p>
             </div>
           </div>
           <button
             onClick={handleDismiss}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-ink-disabled hover:text-ink-muted transition-colors"
             aria-label="닫기"
           >
             <X className="w-4 h-4" />
@@ -123,7 +123,7 @@ const PWAInstallPrompt = () => {
           </button>
           <button
             onClick={handleDismiss}
-            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-3 rounded-md transition-colors"
+            className="flex-1 bg-surface-muted hover:bg-gray-200 text-ink-muted text-sm font-medium py-2 px-3 rounded-md transition-colors"
           >
             나중에
           </button>

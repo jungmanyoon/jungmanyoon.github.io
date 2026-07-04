@@ -9,7 +9,7 @@
 
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react'
+import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react'
 import type { Recipe, Ingredient, IngredientPhase, PhaseType } from '@/types/recipe.types'
 
 // 단계 타입별 메타데이터 (라벨은 i18n으로 동적 처리)
@@ -186,15 +186,15 @@ export default function PhaseIngredientsView({
             >
               <div className="flex items-center gap-2">
                 {isExpanded ? (
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                  <ChevronDown className="w-4 h-4 text-ink-subtle" />
                 ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
+                  <ChevronRight className="w-4 h-4 text-ink-subtle" />
                 )}
                 <span className="text-lg">{meta.icon}</span>
                 <span className={`font-semibold ${getColorClasses(meta.color, 'text')} ${compact ? 'text-xs' : 'text-sm'}`}>
                   {phase.nameKo || phase.name || t(`components.phaseIngredients.phases.${meta.labelKey}`)}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-ink-subtle">
                   ({t('components.phaseIngredients.ingredientCount', { count: phase.ingredients.length })})
                 </span>
               </div>
@@ -202,8 +202,8 @@ export default function PhaseIngredientsView({
               <div className="flex items-center gap-2 text-xs">
                 {showConversion && multiplier !== 1 ? (
                   <>
-                    <span className="text-gray-500">{phase.totalOriginal}g</span>
-                    <span className="text-gray-400">→</span>
+                    <span className="text-ink-subtle">{phase.totalOriginal}g</span>
+                    <span className="text-ink-disabled">→</span>
                     <span className={`font-semibold ${getColorClasses(meta.color, 'text')}`}>
                       {phase.totalConverted}g
                     </span>
@@ -258,15 +258,15 @@ export default function PhaseIngredientsView({
                               <span className="ml-1 text-[10px] text-blue-500">({t('components.phaseIngredients.reference')})</span>
                             )}
                           </td>
-                          <td className="px-2 py-1.5 text-right text-xs font-mono text-gray-500">
+                          <td className="px-2 py-1.5 text-right text-xs font-mono text-ink-subtle">
                             {bakersPercent > 0 ? `${bakersPercent}%` : '-'}
                           </td>
                           {showConversion && multiplier !== 1 ? (
                             <>
-                              <td className="px-2 py-1.5 text-right text-xs font-mono text-gray-500">
+                              <td className="px-2 py-1.5 text-right text-xs font-mono text-ink-subtle">
                                 {ing.amount}g
                               </td>
-                              <td className="px-2 py-1.5 text-center text-gray-400">→</td>
+                              <td className="px-2 py-1.5 text-center text-ink-disabled">→</td>
                               <td className={`px-2 py-1.5 text-right text-sm font-mono font-semibold ${getColorClasses(meta.color, 'text')}`}>
                                 {ing.convertedAmount}g
                               </td>
@@ -288,26 +288,27 @@ export default function PhaseIngredientsView({
       })}
 
       {/* Total Summary */}
-      <div className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2">
+      <div className="rounded-lg border border-line bg-surface-muted px-4 py-2">
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-gray-700">
-            📊 {t('components.phaseIngredients.totalSummary')}
+          <span className="font-semibold text-ink-muted inline-flex items-center gap-1">
+            <BarChart3 size={16} className="text-ink-muted" />
+            {t('components.phaseIngredients.totalSummary')}
           </span>
           <div className="flex items-center gap-3">
             {showConversion && multiplier !== 1 ? (
               <>
-                <span className="text-gray-500">{totals.original}g</span>
-                <span className="text-gray-400">→</span>
-                <span className="font-bold text-gray-900 text-lg">{totals.converted}g</span>
+                <span className="text-ink-subtle">{totals.original}g</span>
+                <span className="text-ink-disabled">→</span>
+                <span className="font-bold text-ink text-lg">{totals.converted}g</span>
                 {renderChangeIndicator(totals.changePercent)}
               </>
             ) : (
-              <span className="font-bold text-gray-900 text-lg">{totals.original}g</span>
+              <span className="font-bold text-ink text-lg">{totals.original}g</span>
             )}
           </div>
         </div>
         {multiplier !== 1 && (
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-xs text-ink-subtle mt-1">
             {t('components.phaseIngredients.multiplier')}: ×{multiplier.toFixed(2)}
           </div>
         )}

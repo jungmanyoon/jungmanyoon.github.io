@@ -14,11 +14,11 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
+      <div className="bg-surface-paper rounded-lg shadow-sm p-6 md:p-8">
         {onBack && (
           <button
             onClick={onBack}
-            className="mb-6 text-bread-600 hover:text-bread-700 flex items-center gap-2"
+            className="mb-6 text-ink-muted hover:text-ink flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -27,20 +27,20 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
           </button>
         )}
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('legal.terms.title')}</h1>
-        <p className="text-gray-500 mb-8">{t('legal.lastUpdated')}</p>
+        <h1 className="text-3xl font-bold text-ink mb-2">{t('legal.terms.title')}</h1>
+        <p className="text-ink-subtle mb-8">{t('legal.lastUpdated')}</p>
 
         <div className="prose prose-bread max-w-none space-y-8">
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article1Title')}</h2>
-            <p className="text-gray-600 leading-relaxed">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article1Title')}</h2>
+            <p className="text-ink-muted leading-relaxed">
               {t('legal.terms.article1Content')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article2Title')}</h2>
-            <ul className="list-decimal list-inside text-gray-600 space-y-2">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article2Title')}</h2>
+            <ul className="list-decimal list-inside text-ink-muted space-y-2">
               <li>{t('legal.terms.article2Item1')}</li>
               <li>{t('legal.terms.article2Item2')}</li>
               <li>{t('legal.terms.article2Item3')}</li>
@@ -48,11 +48,11 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article3Title')}</h2>
-            <p className="text-gray-600 leading-relaxed mb-3">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article3Title')}</h2>
+            <p className="text-ink-muted leading-relaxed mb-3">
               {t('legal.terms.article3Intro')}
             </p>
-            <ul className="list-disc list-inside text-gray-600 space-y-2">
+            <ul className="list-disc list-inside text-ink-muted space-y-2">
               <li>{t('legal.terms.article3Item1')}</li>
               <li>{t('legal.terms.article3Item2')}</li>
               <li>{t('legal.terms.article3Item3')}</li>
@@ -63,8 +63,8 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article4Title')}</h2>
-            <ul className="list-decimal list-inside text-gray-600 space-y-2">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article4Title')}</h2>
+            <ul className="list-decimal list-inside text-ink-muted space-y-2">
               <li>{t('legal.terms.article4Item1')}</li>
               <li>{t('legal.terms.article4Item2')}</li>
               <li>{t('legal.terms.article4Item3')}</li>
@@ -93,8 +93,8 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article6Title')}</h2>
-            <ul className="list-decimal list-inside text-gray-600 space-y-2">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article6Title')}</h2>
+            <ul className="list-decimal list-inside text-ink-muted space-y-2">
               <li>{t('legal.terms.article6Item1')}</li>
               <li>{t('legal.terms.article6Item2')}</li>
               <li>{t('legal.terms.article6Item3')}</li>
@@ -102,11 +102,11 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article7Title')}</h2>
-            <p className="text-gray-600 leading-relaxed mb-3">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article7Title')}</h2>
+            <p className="text-ink-muted leading-relaxed mb-3">
               {t('legal.terms.article7Intro')}
             </p>
-            <ul className="list-disc list-inside text-gray-600 space-y-2">
+            <ul className="list-disc list-inside text-ink-muted space-y-2">
               <li>{t('legal.terms.article7Item1')}</li>
               <li>{t('legal.terms.article7Item2')}</li>
               <li>{t('legal.terms.article7Item3')}</li>
@@ -116,15 +116,15 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article8Title')}</h2>
-            <p className="text-gray-600 leading-relaxed">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article8Title')}</h2>
+            <p className="text-ink-muted leading-relaxed">
               {t('legal.terms.article8Content')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article9Title')}</h2>
-            <ul className="list-decimal list-inside text-gray-600 space-y-2">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article9Title')}</h2>
+            <ul className="list-decimal list-inside text-ink-muted space-y-2">
               <li>{t('legal.terms.article9Item1')}</li>
               <li>{t('legal.terms.article9Item2')}</li>
               <li>{t('legal.terms.article9Item3')}</li>
@@ -132,22 +132,22 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article10Title')}</h2>
-            <p className="text-gray-600 leading-relaxed">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article10Title')}</h2>
+            <p className="text-ink-muted leading-relaxed">
               {t('legal.terms.article10Content')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.article11Title')}</h2>
-            <p className="text-gray-600 leading-relaxed">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.article11Title')}</h2>
+            <p className="text-ink-muted leading-relaxed">
               {t('legal.terms.article11Content')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-gray-800 mb-3">{t('legal.terms.appendixTitle')}</h2>
-            <p className="text-gray-600 leading-relaxed">
+            <h2 className="text-xl font-semibold text-ink mb-3">{t('legal.terms.appendixTitle')}</h2>
+            <p className="text-ink-muted leading-relaxed">
               {t('legal.terms.appendixContent')}
             </p>
           </section>

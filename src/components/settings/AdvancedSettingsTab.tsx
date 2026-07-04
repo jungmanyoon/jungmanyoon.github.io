@@ -75,11 +75,11 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <Settings className="w-5 h-5 text-gray-500" />
+          <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
+            <Settings className="w-5 h-5 text-ink-subtle" />
             {t('settings.advanced.title')}
           </h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-ink-subtle mt-1">
             {t('settings.advanced.titleDesc')}
           </p>
         </div>
@@ -89,7 +89,7 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
               resetToDefaults('advanced')
             }
           }}
-          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          className="flex items-center gap-1 text-sm text-ink-subtle hover:text-ink-muted"
         >
           <RotateCcw className="w-4 h-4" />
           {t('settings.advanced.resetToDefault')}
@@ -100,12 +100,12 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
       <div className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-lg">
         <label className="flex items-center justify-between cursor-pointer">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-white rounded-lg shadow-sm">
+            <div className="p-2 bg-surface-paper rounded-lg shadow-sm">
               <Eye className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <div className="font-medium text-gray-800">{t('settings.advanced.expertMode.title')}</div>
-              <div className="text-xs text-gray-500">
+              <div className="font-medium text-ink">{t('settings.advanced.expertMode.title')}</div>
+              <div className="text-xs text-ink-subtle">
                 {t('settings.advanced.expertMode.description')}
               </div>
             </div>
@@ -117,7 +117,7 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
             onClick={() => setExpertMode(!advanced.expertMode)}
           >
             <div
-              className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+              className={`absolute top-1 w-5 h-5 bg-surface-paper rounded-full shadow transition-transform ${
                 advanced.expertMode ? 'translate-x-8' : 'translate-x-1'
               }`}
             />
@@ -135,11 +135,11 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="font-medium text-gray-700 flex items-center gap-2">
+            <h4 className="font-medium text-ink-muted flex items-center gap-2">
               <Zap className="w-4 h-4 text-amber-500" />
               {t('settings.advanced.mixer.title')}
             </h4>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-ink-subtle mt-0.5">
               {t('settings.advanced.mixer.titleDesc')}
             </p>
           </div>
@@ -172,13 +172,13 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
             return (
               <div
                 key={mixer.key}
-                className="p-4 border rounded-lg bg-white border-gray-200"
+                className="p-4 border rounded-lg bg-surface-paper border-line"
               >
-                <div className="flex items-center gap-2 mb-2 text-gray-600">
+                <div className="flex items-center gap-2 mb-2 text-ink-muted">
                   {mixer.icon}
                   <span className="font-medium text-sm">{t(`settings.advanced.mixer.types.${mixer.key}.name`)}</span>
                 </div>
-                <p className="text-xs text-gray-500 mb-3">{t(`settings.advanced.mixer.types.${mixer.key}.description`)}</p>
+                <p className="text-xs text-ink-subtle mb-3">{t(`settings.advanced.mixer.types.${mixer.key}.description`)}</p>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -188,12 +188,12 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
                     max="40"
                     className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono"
                   />
-                  <span className="text-sm text-gray-500">°C</span>
+                  <span className="text-sm text-ink-subtle">°C</span>
                 </div>
                 {currentValue !== mixer.defaultValue && (
                   <button
                     onClick={() => handleMixerChange(mixer.key, mixer.defaultValue)}
-                    className="text-xs text-gray-400 hover:text-gray-600 mt-1"
+                    className="text-xs text-ink-disabled hover:text-ink-muted mt-1"
                   >
                     {t('settings.advanced.mixer.defaultValue', { value: mixer.defaultValue })}
                   </button>
@@ -205,12 +205,12 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
 
         {/* 커스텀 믹서 */}
         {advanced.expertMode && (
-          <div className="p-4 border border-dashed border-gray-300 rounded-lg">
+          <div className="p-4 border border-dashed border-line rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <Settings className="w-4 h-4 text-gray-400" />
-              <span className="font-medium text-sm text-gray-600">{t('settings.advanced.mixer.custom')}</span>
+              <Settings className="w-4 h-4 text-ink-disabled" />
+              <span className="font-medium text-sm text-ink-muted">{t('settings.advanced.mixer.custom')}</span>
             </div>
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-ink-subtle mb-3">
               {t('settings.advanced.mixer.customDesc')}
             </p>
             <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
                 max="40"
                 className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono"
               />
-              <span className="text-sm text-gray-500">°C</span>
+              <span className="text-sm text-ink-subtle">°C</span>
             </div>
           </div>
         )}
@@ -231,15 +231,15 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
 
       {/* 단위 설정 */}
       <div className="space-y-4">
-        <h4 className="font-medium text-gray-700 flex items-center gap-2">
+        <h4 className="font-medium text-ink-muted flex items-center gap-2">
           <Scale className="w-4 h-4 text-blue-500" />
           {t('settings.advanced.units.title')}
         </h4>
 
         <div className="grid grid-cols-3 gap-4">
           {/* 무게 단위 */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="p-4 bg-surface-muted rounded-lg">
+            <label className="block text-sm font-medium text-ink-muted mb-2">
               {t('settings.advanced.units.weight')}
             </label>
             <div className="space-y-2">
@@ -249,7 +249,7 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
                   className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
                     advanced.units.weight === opt
                       ? 'bg-blue-100 text-blue-700'
-                      : 'hover:bg-gray-100'
+                      : 'hover:bg-surface-muted'
                   }`}
                 >
                   <input
@@ -264,11 +264,11 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
                     className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                       advanced.units.weight === opt
                         ? 'border-blue-500 bg-blue-500'
-                        : 'border-gray-300'
+                        : 'border-line'
                     }`}
                   >
                     {advanced.units.weight === opt && (
-                      <div className="w-2 h-2 bg-white rounded-full" />
+                      <div className="w-2 h-2 bg-surface-paper rounded-full" />
                     )}
                   </div>
                   <span className="text-sm">{t(`settings.advanced.units.options.${opt}`)}</span>
@@ -278,8 +278,8 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
           </div>
 
           {/* 부피 단위 */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="p-4 bg-surface-muted rounded-lg">
+            <label className="block text-sm font-medium text-ink-muted mb-2">
               {t('settings.advanced.units.volume')}
             </label>
             <div className="space-y-2">
@@ -289,7 +289,7 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
                   className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
                     advanced.units.volume === opt
                       ? 'bg-blue-100 text-blue-700'
-                      : 'hover:bg-gray-100'
+                      : 'hover:bg-surface-muted'
                   }`}
                 >
                   <input
@@ -304,11 +304,11 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
                     className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                       advanced.units.volume === opt
                         ? 'border-blue-500 bg-blue-500'
-                        : 'border-gray-300'
+                        : 'border-line'
                     }`}
                   >
                     {advanced.units.volume === opt && (
-                      <div className="w-2 h-2 bg-white rounded-full" />
+                      <div className="w-2 h-2 bg-surface-paper rounded-full" />
                     )}
                   </div>
                   <span className="text-sm">{t(`settings.advanced.units.options.${opt}`)}</span>
@@ -318,8 +318,8 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
           </div>
 
           {/* 온도 단위 */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+          <div className="p-4 bg-surface-muted rounded-lg">
+            <label className="block text-sm font-medium text-ink-muted mb-2 flex items-center gap-1">
               <Thermometer className="w-4 h-4" />
               {t('settings.advanced.units.temperature')}
             </label>
@@ -330,7 +330,7 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
                   className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
                     advanced.units.temperature === opt
                       ? 'bg-blue-100 text-blue-700'
-                      : 'hover:bg-gray-100'
+                      : 'hover:bg-surface-muted'
                   }`}
                 >
                   <input
@@ -345,11 +345,11 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
                     className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                       advanced.units.temperature === opt
                         ? 'border-blue-500 bg-blue-500'
-                        : 'border-gray-300'
+                        : 'border-line'
                     }`}
                   >
                     {advanced.units.temperature === opt && (
-                      <div className="w-2 h-2 bg-white rounded-full" />
+                      <div className="w-2 h-2 bg-surface-paper rounded-full" />
                     )}
                   </div>
                   <span className="text-sm">{t(`settings.advanced.units.options.${opt}`)}</span>
@@ -362,7 +362,7 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
 
       {/* 정밀도 설정 */}
       <div className="space-y-4">
-        <h4 className="font-medium text-gray-700">{t('settings.advanced.precision.title')}</h4>
+        <h4 className="font-medium text-ink-muted">{t('settings.advanced.precision.title')}</h4>
 
         <div className="space-y-2">
           {PRECISION_OPTIONS.map(opt => (
@@ -371,7 +371,7 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
               className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all ${
                 advanced.precision === opt
                   ? 'border-green-500 bg-green-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-line hover:border-line'
               }`}
             >
               <div className="flex items-center gap-3">
@@ -379,16 +379,16 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                     advanced.precision === opt
                       ? 'border-green-500 bg-green-500'
-                      : 'border-gray-300'
+                      : 'border-line'
                   }`}
                 >
                   {advanced.precision === opt && (
-                    <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                    <div className="w-2.5 h-2.5 bg-surface-paper rounded-full" />
                   )}
                 </div>
                 <div>
-                  <div className="font-medium text-gray-800">{t(`settings.advanced.precision.options.${opt}.label`)}</div>
-                  <div className="text-xs text-gray-500">{t(`settings.advanced.precision.options.${opt}.description`)}</div>
+                  <div className="font-medium text-ink">{t(`settings.advanced.precision.options.${opt}.label`)}</div>
+                  <div className="text-xs text-ink-subtle">{t(`settings.advanced.precision.options.${opt}.description`)}</div>
                 </div>
               </div>
               <input
@@ -405,11 +405,11 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
       </div>
 
       {/* 팁 */}
-      <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
+      <div className="p-4 bg-surface-muted border border-line rounded-lg text-sm text-ink-muted">
         <div className="flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 mt-0.5 text-gray-400" />
+          <AlertCircle className="w-4 h-4 mt-0.5 text-ink-disabled" />
           <div>
-            <p className="font-medium text-gray-700">{t('settings.advanced.tips.title')}</p>
+            <p className="font-medium text-ink-muted">{t('settings.advanced.tips.title')}</p>
             <ul className="text-xs mt-1 space-y-1">
               <li>• {t('settings.advanced.tips.mixer')}</li>
               <li>• {t('settings.advanced.tips.hand')}</li>

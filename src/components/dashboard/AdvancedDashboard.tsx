@@ -1098,6 +1098,9 @@ const AdvancedDashboard: React.FC = () => {
   // 변환표 베이커스 % 파생용 밀가루 총량 (배수는 균일 적용이라 원본 비율과 동일한 값이 나옴)
   const convertedFlourTotal = useMemo(() => flourTotal * effectiveMultiplier, [flourTotal, effectiveMultiplier]);
 
+  // 표시용 반죽량 포맷: 10g 이상은 정수(가정용 저울 단위), 10g 미만만 소수 0.1g까지
+  const formatWeight = (g: number) => (Math.abs(g) >= 10 ? Math.round(g) : Math.round(g * 10) / 10);
+
   // 팬 충전율 계산: 변환 반죽량 ÷ 팬 권장량 × 100 (100%≈적정, >110%=과충전 주의)
   const panFillRate = useMemo(() => {
     if (panTotalWeight === 0) return 0;
@@ -2775,8 +2778,8 @@ const AdvancedDashboard: React.FC = () => {
                       <tr className={`text-ink-subtle ${dynamicStyles.fontSize}`}>
                         <th className="px-1.5 py-1 text-left w-16">{t('advDashboard.category')}</th>
                         <th className="px-1.5 py-1 text-left">{t('advDashboard.ingredients')}</th>
-                        <th className="px-1.5 py-1 text-left w-20">{t('advDashboard.process')}</th>
-                        <th className="px-1.5 py-1 text-right w-10">{t('advDashboard.tableHeaderPercent')}</th>
+                        <th className="px-1.5 py-1 text-left w-20 hidden sm:table-cell">{t('advDashboard.process')}</th>
+                        <th className="px-1.5 py-1 text-right w-10 hidden sm:table-cell">{t('advDashboard.tableHeaderPercent')}</th>
                         <th className="px-1.5 py-1 text-right w-14">{t('advDashboard.tableHeaderGram')}</th>
                         <th className="w-5"></th>
                       </tr>
@@ -2809,13 +2812,13 @@ const AdvancedDashboard: React.FC = () => {
                                 // key: 원본 재료 id는 전역 고유하지만 단계(phase) 스코프를 prefix로
                                 // 추가해 단계 재배치 시에도 안정적이고 고유한 키를 보장
                                 <tr key={`${phase}-${ing.id}`} className={`border-b border-line-soft hover:bg-surface-muted ${dynamicStyles.rowHeight}`}>
-                                  <td className="px-1.5">
+                                  <td className="px-1.5 rounded focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-inset">
                                     <select value={ing.category} onChange={(e) => updateIngredient(ing.id, 'category', e.target.value)}
                                       className="w-full text-xs border-0 bg-transparent p-0 focus:outline-none appearance-none cursor-pointer">
                                       {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                                     </select>
                                   </td>
-                                  <td className="px-1.5">
+                                  <td className="px-1.5 rounded focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-inset">
                                     <AutocompleteInput
                                       value={ing.name}
                                       onChange={(value) => updateIngredient(ing.id, 'name', value)}
@@ -2839,7 +2842,7 @@ const AdvancedDashboard: React.FC = () => {
                                       maxSuggestions={6}
                                     />
                                   </td>
-                                  <td className="px-1.5">
+                                  <td className="px-1.5 rounded focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-inset hidden sm:table-cell">
                                     <select
                                       value={ing.phase || 'main'}
                                       onChange={(e) => updateIngredient(ing.id, 'phase', e.target.value)}
@@ -2855,8 +2858,8 @@ const AdvancedDashboard: React.FC = () => {
                                       })}
                                     </select>
                                   </td>
-                                  <td className="px-1.5 text-right font-mono text-ink-subtle text-xs">{flourTotal > 0 ? Math.round((ing.amount / flourTotal) * 1000) / 10 : 0}</td>
-                                  <td className="px-1.5">
+                                  <td className="px-1.5 text-right font-mono text-ink-subtle text-xs hidden sm:table-cell">{flourTotal > 0 ? Math.round((ing.amount / flourTotal) * 1000) / 10 : 0}</td>
+                                  <td className="px-1.5 rounded focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-inset">
                                     <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
                                       className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm" />
                                   </td>
@@ -2881,17 +2884,17 @@ const AdvancedDashboard: React.FC = () => {
 
               {/* 변환 레시피 (단계별 구분선 포함) — 배수가 1이면 원본과 동일하므로 숨김 */}
               {isConverted && (
-              <div className="bg-surface-paper rounded shadow-sm border border-blue-200 flex flex-col overflow-hidden min-w-0">
-                <div className="bg-blue-50 border-b border-blue-200 px-2 py-1 flex items-center justify-between flex-shrink-0 gap-2">
-                  <span className="font-semibold text-blue-700 flex items-center gap-1 text-xs">
+              <div className="bg-surface-paper rounded shadow-sm border border-info-200 flex flex-col overflow-hidden min-w-0">
+                <div className="bg-info-50 border-b border-info-200 px-2 py-1 flex items-center justify-between flex-shrink-0 gap-2">
+                  <span className="font-semibold text-info-700 flex items-center gap-1 text-xs">
                     <ThermometerSun className="w-3 h-3 flex-shrink-0" />{t('advDashboard.convertedRecipe')}
                   </span>
-                  {effectiveMultiplier !== 1 && <span className="text-xs bg-blue-200 text-blue-700 px-1.5 py-0.5 rounded font-medium flex-shrink-0">×{effectiveMultiplier}</span>}
+                  {effectiveMultiplier !== 1 && <span className="text-xs bg-info-200 text-info-700 px-1.5 py-0.5 rounded font-medium flex-shrink-0">×{effectiveMultiplier}</span>}
                 </div>
                 <div className="flex-1 overflow-auto">
                   <table className="w-full">
-                    <thead className="bg-blue-50 sticky top-0">
-                      <tr className={`text-blue-700 ${dynamicStyles.fontSize}`}>
+                    <thead className="bg-info-50 sticky top-0">
+                      <tr className={`text-info-700 ${dynamicStyles.fontSize}`}>
                         <th className="px-2 py-1 text-left">{t('advDashboard.category')}</th>
                         <th className="px-2 py-1 text-left">{t('advDashboard.ingredients')}</th>
                         <th className="px-2 py-1 text-right w-12">%</th>
@@ -2911,6 +2914,7 @@ const AdvancedDashboard: React.FC = () => {
                                     <span>{phaseMeta.icon}</span>
                                     <span>{t(phaseMeta.labelKey)}</span>
                                     <span className="text-xs font-normal opacity-70">({t('advDashboard.itemCount', { count: items.length })})</span>
+                                    <span className="ml-auto font-mono font-semibold">{t('advDashboard.subtotal', { defaultValue: '소계' })} {formatWeight(items.reduce((s: number, i: any) => s + (i.convertedAmount || 0), 0))}g</span>
                                   </span>
                                 </td>
                               </tr>
@@ -2920,11 +2924,11 @@ const AdvancedDashboard: React.FC = () => {
                                 (스트레이트법 합산 경로에서 liquid/other 이름이 같으면 ing.id가
                                  'straight-${name}' 형태로 충돌할 수 있어 phase 스코프로 격리) */}
                             {items.map((ing: any, ingIndex: number) => (
-                              <tr key={`${phase}-${ing.category}-${ing.id}-${ingIndex}`} className={`border-b border-blue-100 ${dynamicStyles.rowHeight}`}>
-                                <td className="px-2 text-blue-600">{CATEGORY_LABELS[ing.category as keyof typeof CATEGORY_LABELS]}</td>
+                              <tr key={`${phase}-${ing.category}-${ing.id}-${ingIndex}`} className={`border-b border-info-100 ${dynamicStyles.rowHeight}`}>
+                                <td className="px-2 text-info-600">{CATEGORY_LABELS[ing.category as keyof typeof CATEGORY_LABELS]}</td>
                                 <td className="px-2">{translateIngredient(ing.name)}</td>
                                 <td className="px-2 text-right font-mono text-ink-subtle">{convertedFlourTotal > 0 ? Math.round((ing.convertedAmount / convertedFlourTotal) * 1000) / 10 : 0}</td>
-                                <td className="px-2 text-right font-mono font-medium text-blue-700">{ing.convertedAmount}</td>
+                                <td className="px-2 text-right font-mono text-sm font-semibold text-info-700">{formatWeight(ing.convertedAmount)}</td>
                               </tr>
                             ))}
                           </React.Fragment>
@@ -2933,8 +2937,8 @@ const AdvancedDashboard: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
-                <div className="bg-blue-50 border-t border-blue-200 px-2 py-1 text-xs flex-shrink-0">
-                  <span className="text-blue-700">{t('advDashboard.total')}: <b>{Math.round(prefermentTotal + mainDoughTotal)}g</b></span>
+                <div className="bg-info-50 border-t border-info-200 px-2 py-1 text-xs flex-shrink-0">
+                  <span className="text-info-700">{t('advDashboard.total')}: <b>{formatWeight(prefermentTotal + mainDoughTotal)}g</b></span>
                 </div>
               </div>
               )}

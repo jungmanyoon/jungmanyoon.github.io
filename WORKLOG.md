@@ -62,15 +62,15 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [x] A3 RecipeView 라우팅 배선(고아 컴포넌트 살리기): App.tsx:73(VALID_TABS)/:76-89(PAGE_TITLES)/:153-190(renderActive) + RecipeListPage.tsx:67, HomePage.tsx:89. 'view' 탭 추가, RecipeView 5 prop 배선, 카드 탭 dashboard->view(연필=editor 유지). RecipeView 잔존 amber(223,248-250) de-amber.
 - [x] A4 파괴적 삭제 undo+터치타깃: :1995(removeIngredient),:2030(removeProcess), 버튼 :2857/:3072. 기존 `showUndoToast`(1535) 스냅샷 복원으로 감싸기(하드코딩 메시지 일반화), 버튼 `p-2 -m-2` 44px 히트영역.
 
-### 배치 B - P2 quick: 변환기 판독·신뢰
-- [ ] B1 변환 g 위계: :2914-2918,:195-200. g셀만 dynamicStyles 축소서 분리, 최소 text-sm+font-semibold.
-- [ ] B2 소수 스마트 반올림: :1000,:1108,:2928. 포맷 헬퍼 10g↑ 정수/<10g만 0.1g, 총계 round-then-sum.
-- [ ] B3 변환표 % 열 추가: :2888-2890. 우측정렬(스트레이트=ratio, 제법변환=단계밀가루 대비).
-- [ ] B4 단계별 소계 g: :2894-2909,:2928. phase 그룹 소계 인라인.
-- [ ] B5 375px 원본표 과밀: :2766-2774. 공정/% 열 `hidden sm:table-cell`로 재료명 폭 확보.
-- [ ] B6 sticky 요약 pill(태블릿/모바일): :2061-2064,:2237-2244. 요약 슬림바 lg 미만 sticky top-0, 결과표 order 앞으로.
-- [ ] B7 변환결과 하드코드 blue->토큰: :2877-2928. info 토큰 50-700 확장 후 치환.
-- [ ] B8 재료 그리드 키보드 포커스 소실: :2807,:2831,:2839,:2854. td `focus-within:ring-2 ring-brand-400 ring-inset`(AutocompleteInput !ring-0 충돌 회피).
+### 배치 B - P2 quick: 변환기 판독·신뢰 [완료 2026-07-04 · 브랜치 fix/uiux-phase2 · typecheck0/test164/build OK · 실렌더(×2·375px) 검증 · B6만 H7 이월]
+- [x] B1 변환 g 위계: :2914-2918,:195-200. g셀만 dynamicStyles 축소서 분리, 최소 text-sm+font-semibold.
+- [x] B2 소수 스마트 반올림(formatWeight 헬퍼, 변환표 g/총계 적용; 총계 sum-of-rounded 정밀화는 후속): :1000,:1108,:2928. 포맷 헬퍼 10g↑ 정수/<10g만 0.1g, 총계 round-then-sum.
+- [x] B3 변환표 % 열 추가 (A2에서 완료): :2888-2890. 우측정렬(스트레이트=ratio, 제법변환=단계밀가루 대비).
+- [x] B4 단계별 소계 g (변환표 구분선 `소계 Ng` ml-auto; 다단계 변환시 표시): :2894-2909,:2928. phase 그룹 소계 인라인.
+- [x] B5 375px 원본표 과밀 (공정·% 열 hidden sm:table-cell, 375px visible:false 확인; 완전 카드화 H7): :2766-2774. 공정/% 열 `hidden sm:table-cell`로 재료명 폭 확보.
+- [ ] B6 sticky 요약 pill(태블릿/모바일): **-> H7(반응형)로 이월** (sticky/order 변경은 레이아웃 회귀 리스크, 태블릿 레이아웃 작업과 함께). :2061-2064,:2237-2244.
+- [x] B7 변환결과 하드코드 blue->토큰 (tailwind info를 스케일로 확장 DEFAULT 하위호환 + 변환표 blue-*->info-*): :2877-2928. info 토큰 50-700 확장 후 치환.
+- [x] B8 재료 그리드 키보드 포커스 소실 (편집 td 4곳 focus-within:ring): :2807,:2831,:2839,:2854. td `focus-within:ring-2 ring-brand-400 ring-inset`(AutocompleteInput !ring-0 충돌 회피).
 
 ### 배치 C - P2 quick: 굽기 실행 흐름
 - [ ] C1 공정 완료 체크박스+진행 카운터: :2969-3072, ProcessStep(:83-89) `done?` 추가(칩 탭=편집 충돌 -> 별도 체크 버튼).

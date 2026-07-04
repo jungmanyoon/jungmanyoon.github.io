@@ -112,7 +112,7 @@ export default function AdvancedSettingsTab({ className = '' }: AdvancedSettings
           </div>
           <div
             className={`w-14 h-7 rounded-full transition-colors ${
-              advanced.expertMode ? 'bg-purple-500' : 'bg-gray-300'
+              advanced.expertMode ? 'bg-purple-500' : 'bg-line-strong'
             } relative cursor-pointer`}
             onClick={() => setExpertMode(!advanced.expertMode)}
           >

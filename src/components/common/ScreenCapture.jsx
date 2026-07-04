@@ -341,7 +341,7 @@ const ScreenCapture = () => {
                   setCapturedBlob(null);
                   setCustomFileName('레시피');
                 }}
-                className="w-full px-4 py-2 bg-gray-300 text-ink-muted rounded-lg hover:bg-gray-400 transition-colors"
+                className="w-full px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-line transition-colors"
               >
                 취소 (ESC)
               </button>

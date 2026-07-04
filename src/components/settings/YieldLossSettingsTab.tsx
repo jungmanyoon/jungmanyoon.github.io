@@ -247,7 +247,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
           </div>
           <div
             className={`w-12 h-6 rounded-full transition-colors ${
-              yieldLoss.enableEnvironmentAdjustment ? 'bg-blue-500' : 'bg-gray-300'
+              yieldLoss.enableEnvironmentAdjustment ? 'bg-blue-500' : 'bg-line-strong'
             } relative cursor-pointer`}
             onClick={() => setEnvironmentAdjustment(!yieldLoss.enableEnvironmentAdjustment)}
           >

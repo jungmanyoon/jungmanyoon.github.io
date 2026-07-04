@@ -2269,7 +2269,7 @@ const AdvancedDashboard: React.FC = () => {
                   <div className="flex text-xs">
                     <button
                       onClick={() => updateOriginalPan('mode', 'pan')}
-                      className={`px-2 py-0.5 rounded-l border ${originalPan.mode === 'pan' ? 'bg-gray-500 text-white border-gray-500' : 'bg-surface-paper text-ink-muted border-line'}`}
+                      className={`px-2 py-0.5 rounded-l border ${originalPan.mode === 'pan' ? 'bg-ink-subtle text-white border-ink-subtle' : 'bg-surface-paper text-ink-muted border-line'}`}
                     >🍞 {t('advDashboard.panMode')}</button>
                     <button
                       onClick={() => updateOriginalPan('mode', 'count')}
@@ -2928,7 +2928,7 @@ const AdvancedDashboard: React.FC = () => {
                                 <td className="px-2 text-info-600">{CATEGORY_LABELS[ing.category as keyof typeof CATEGORY_LABELS]}</td>
                                 <td className="px-2">{translateIngredient(ing.name)}</td>
                                 <td className="px-2 text-right font-mono text-ink-subtle">{convertedFlourTotal > 0 ? Math.round((ing.convertedAmount / convertedFlourTotal) * 1000) / 10 : 0}</td>
-                                <td className="px-2 text-right font-mono text-sm font-semibold text-info-700">{formatWeight(ing.convertedAmount)}</td>
+                                <td className="px-2 text-right font-mono text-sm font-semibold text-info-700"><span key={ing.convertedAmount} className="inline-block px-1 rounded animate-valueFlash">{formatWeight(ing.convertedAmount)}</span></td>
                               </tr>
                             ))}
                           </React.Fragment>

@@ -7,17 +7,17 @@
     @apply bg-surface-canvas text-ink;
   }
   
-  /* 제목 위계는 색이 아니라 크기/굵기로 표현한다. 주황(brand)은 액센트에만 남긴다. */
+  /* 제목 위계는 색이 아니라 크기/굵기로 표현한다(타입스케일 토큰 h1/h2/h3). 색은 ink로 통일, 주황(brand)은 액센트에만. */
   h1 {
-    @apply text-2xl font-bold text-slate-900;
+    @apply text-h1 text-ink;
   }
 
   h2 {
-    @apply text-xl font-semibold text-slate-800;
+    @apply text-h2 text-ink;
   }
 
   h3 {
-    @apply text-lg font-medium text-slate-700;
+    @apply text-h3 text-ink;
   }
 }
 
@@ -37,6 +37,11 @@
 
   .input {
     @apply border border-line rounded-md px-3 py-2 bg-surface-paper focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-400;
+  }
+
+  /* 포커스 링 단일화: 키보드 포커스에만 브랜드 링(brand-400) 노출. 아이콘 버튼/링크 등에 롤아웃. */
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-1;
   }
   
   .line-clamp-2 {

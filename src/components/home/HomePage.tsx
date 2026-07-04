@@ -22,7 +22,7 @@ import {
   Sparkles,
   ArrowRight,
   Wheat,
-  TrendingUp,
+  Cookie,
   Lightbulb
 } from 'lucide-react'
 
@@ -55,20 +55,15 @@ export default function HomePage() {
   // 통계 계산
   const stats = useMemo(() => {
     const categoryCount: Record<string, number> = {}
-    let totalIngredients = 0
 
     recipes.forEach(recipe => {
       const cat = recipe.category || 'other'
       categoryCount[cat] = (categoryCount[cat] || 0) + 1
-      totalIngredients += recipe.ingredients?.length || 0
     })
 
     return {
       totalRecipes: recipes.length,
-      categoryCount,
-      avgIngredients: recipes.length > 0
-        ? Math.round(totalIngredients / recipes.length)
-        : 0
+      categoryCount
     }
   }, [recipes])
 
@@ -153,10 +148,12 @@ export default function HomePage() {
             </div>
             <div className="bg-surface-paper border border-line rounded-xl px-3 py-2">
               <div className="flex items-center gap-1.5 text-ink-subtle text-xs">
-                <TrendingUp className="w-3.5 h-3.5 text-brand-500" />
-                {t('home.avgIngredients')}
+                <Cookie className="w-3.5 h-3.5 text-brand-500" />
+                {t('home.pastryRecipes')}
               </div>
-              <div className="text-2xl font-bold text-ink">{stats.avgIngredients}</div>
+              <div className="text-2xl font-bold text-ink">
+                {(stats.categoryCount['pastry'] || 0) + (stats.categoryCount['cookie'] || 0) + (stats.categoryCount['confectionery'] || 0) + (stats.categoryCount['savory'] || 0)}
+              </div>
             </div>
           </div>
         </div>

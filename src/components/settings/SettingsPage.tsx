@@ -449,7 +449,7 @@ export default function SettingsPage({
                   <button
                     onClick={handleImport}
                     disabled={!importData.trim()}
-                    className="flex items-center justify-center gap-1 min-h-[44px] px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="flex items-center justify-center gap-1 min-h-[44px] px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:bg-line-strong disabled:cursor-not-allowed"
                   >
                     <Upload className="w-4 h-4" />
                     {t('common.import')}

@@ -362,7 +362,7 @@ export default function StorageSettingsTab() {
           <button
             onClick={handleExportJson}
             disabled={recipes.length === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-line disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Download className="w-4 h-4" />
             {t('settings.storage.exportJson')}
@@ -370,7 +370,7 @@ export default function StorageSettingsTab() {
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-line transition-colors"
           >
             <Upload className="w-4 h-4" />
             {t('settings.storage.importJson')}
@@ -378,7 +378,7 @@ export default function StorageSettingsTab() {
 
           <button
             onClick={handleResetToSamples}
-            className="flex items-center gap-2 px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-surface-muted text-ink-muted rounded-lg hover:bg-line transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             {t('settings.storage.loadSamples')}

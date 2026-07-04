@@ -164,7 +164,7 @@ const TimerManager = ({ isOpen, onClose }) => {
               <button
                 onClick={handleAddTimer}
                 disabled={!newTimerName.trim() || !newTimerMinutes}
-                className="w-full flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white text-sm font-medium rounded-md transition-colors"
+                className="w-full flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-line-strong text-white text-sm font-medium rounded-md transition-colors"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 타이머 추가

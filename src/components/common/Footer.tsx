@@ -16,7 +16,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-gray-800 text-gray-300 mt-auto">
+    <footer className="bg-slate-800 text-slate-300 mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* 서비스 정보 */}
@@ -24,10 +24,10 @@ export default function Footer() {
             <h3 className="text-white font-bold text-lg mb-3">
               {t('footer.appName')}
             </h3>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-slate-400 mb-4">
               {t('footer.description')}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-500">
               {t('footer.copyright')}
             </p>
           </div>
@@ -117,8 +117,8 @@ export default function Footer() {
         </div>
 
         {/* 면책 조항 */}
-        <div className="border-t border-gray-700 mt-8 pt-6">
-          <p className="text-xs text-gray-500 text-center">
+        <div className="border-t border-slate-700 mt-8 pt-6">
+          <p className="text-xs text-slate-500 text-center">
             ⚠️ {t('footer.disclaimer')}
           </p>
         </div>

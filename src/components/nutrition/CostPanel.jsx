@@ -169,7 +169,7 @@ const CostPanel = ({ recipe }) => {
           <div className="space-y-2">
             <div className="flex items-center">
               <span className="w-16 text-sm text-ink-muted mr-2">재료비</span>
-              <div className="flex-1 bg-gray-200 rounded-full h-3 mr-2">
+              <div className="flex-1 bg-line rounded-full h-3 mr-2">
                 <div
                   className="h-3 rounded-full bg-blue-500"
                   style={{ width: `${total.costBreakdown.ingredientsPercent}%` }}
@@ -182,7 +182,7 @@ const CostPanel = ({ recipe }) => {
             
             <div className="flex items-center">
               <span className="w-16 text-sm text-ink-muted mr-2">인건비</span>
-              <div className="flex-1 bg-gray-200 rounded-full h-3 mr-2">
+              <div className="flex-1 bg-line rounded-full h-3 mr-2">
                 <div
                   className="h-3 rounded-full bg-green-500"
                   style={{ width: `${total.costBreakdown.laborPercent}%` }}
@@ -195,7 +195,7 @@ const CostPanel = ({ recipe }) => {
             
             <div className="flex items-center">
               <span className="w-16 text-sm text-ink-muted mr-2">간접비</span>
-              <div className="flex-1 bg-gray-200 rounded-full h-3 mr-2">
+              <div className="flex-1 bg-line rounded-full h-3 mr-2">
                 <div
                   className="h-3 rounded-full bg-orange-500"
                   style={{ width: `${total.costBreakdown.overheadPercent}%` }}

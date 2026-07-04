@@ -60,3 +60,15 @@
     @apply text-base font-semibold mb-2;
   }
 }
+
+/* 인쇄/PDF (C4): 앱 네비 등 크롬을 숨기고, 대시보드의 고정 높이·스크롤 컨테이너를
+   펼쳐 내용이 한 화면에 잘리지 않도록 한다. (아이콘 등 svg 크기는 건드리지 않음) */
+@media print {
+  header { display: none !important; }
+  .print-hide { display: none !important; }
+  /* overflow 유틸이 걸린 스크롤 컨테이너와 인라인 고정 높이(사이드바/공정패널)를 해제 */
+  [class*="overflow-"] { overflow: visible !important; }
+  [style*="height"] { max-height: none !important; height: auto !important; }
+  .card, [class*="shadow"] { box-shadow: none !important; }
+  body { background: #fff !important; }
+}

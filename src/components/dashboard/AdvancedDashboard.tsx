@@ -28,8 +28,10 @@ import {
   ChevronDown, ChevronRight, ChevronUp, Plus, Minus, X,
   Save, Flame, Scale, Wheat, Droplets, TrendingDown,
   Cookie, Layers, ThermometerSun, Link, Unlink,
-  Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText, Pin, Info
+  Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText, Pin, Info,
+  Printer, CheckSquare, Square, Timer, Play
 } from 'lucide-react';
+import TimerManager from '@/components/pwa/TimerManager.jsx';
 import { SourceType } from '@/types/recipe.types';
 
 // ============================================
@@ -1971,6 +1973,40 @@ const AdvancedDashboard: React.FC = () => {
 
   // 일괄 입력 모달 상태
   const [isBulkInputOpen, setIsBulkInputOpen] = useState(false);
+  // 실행 모드(굽기) 상태 - 레시피에 저장하지 않는 ephemeral UI 상태
+  const [isTimerOpen, setIsTimerOpen] = useState(false);            // C3 타이머 모달
+  const [timerSeed, setTimerSeed] = useState<{ name: string; minutes: number } | null>(null); // C3 공정칩 -> 타이머 프리필
+  const [completedProcesses, setCompletedProcesses] = useState<Set<string>>(new Set()); // C1 공정 완료 체크
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());  // C2 계량 체크리스트
+
+  // C1: 공정 완료 토글 (칩 탭=편집과 충돌하지 않도록 별도 체크 버튼에서 호출)
+  const toggleProcessDone = useCallback((id: string) => {
+    setCompletedProcesses(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  // C2: 계량(미장플라스) 체크 토글 (복합키 phase-cat-id-idx)
+  const toggleIngredientChecked = useCallback((key: string) => {
+    setCheckedIngredients(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }, []);
+
+  // C3: 공정칩 시간 -> 타이머 프리필 후 모달 열기
+  const startTimerFromProcess = useCallback((name: string, minutes: number) => {
+    setTimerSeed({ name: name || '공정 타이머', minutes });
+    setIsTimerOpen(true);
+  }, []);
+
+  // C2: 배수/팬이 바뀌면 변환량이 달라지므로 계량 체크를 초기화
+  useEffect(() => {
+    setCheckedIngredients(new Set());
+  }, [effectiveMultiplier]);
 
   const addIngredient = useCallback(() => {
     const newOrder = Math.max(...ingredients.map(i => i.order), 0) + 1;
@@ -2209,7 +2245,7 @@ const AdvancedDashboard: React.FC = () => {
             <span className="text-line-strong">|</span>
             <span className="cursor-help" title="반죽량 ÷ 팬 권장량 (100%≈적정 충전, 110%↑ 과충전 주의)">{t('advDashboard.panFillRate')}:<b className={`ml-1 ${panFillRate > 110 ? 'text-danger' : panFillRate < 85 ? 'text-warning' : 'text-success'}`}>{panFillRate}%</b></span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 print-hide">
             <button
               onClick={resetAllConversion}
               className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-muted text-ink-muted rounded hover:bg-line border border-line"
@@ -2237,6 +2273,20 @@ const AdvancedDashboard: React.FC = () => {
               title={t('advDashboard.exportJson')}
             >
               <FileText className="w-4 h-4" />{t('advDashboard.json')}
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-paper text-ink-muted border border-line rounded hover:bg-surface-muted"
+              title={t('advDashboard.print', { defaultValue: '인쇄 / PDF 저장' })}
+            >
+              <Printer className="w-4 h-4" />{t('advDashboard.printShort', { defaultValue: '인쇄' })}
+            </button>
+            <button
+              onClick={() => { setTimerSeed(null); setIsTimerOpen(true); }}
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-paper text-ink-muted border border-line rounded hover:bg-surface-muted"
+              title={t('advDashboard.timer', { defaultValue: '타이머' })}
+            >
+              <Timer className="w-4 h-4" />{t('advDashboard.timer', { defaultValue: '타이머' })}
             </button>
           </div>
         </div>
@@ -2895,6 +2945,7 @@ const AdvancedDashboard: React.FC = () => {
                   <table className="w-full">
                     <thead className="bg-info-50 sticky top-0">
                       <tr className={`text-info-700 ${dynamicStyles.fontSize}`}>
+                        <th className="w-6 px-1 py-1 print-hide" title={t('advDashboard.miseEnPlace', { defaultValue: '계량 체크' })}></th>
                         <th className="px-2 py-1 text-left">{t('advDashboard.category')}</th>
                         <th className="px-2 py-1 text-left">{t('advDashboard.ingredients')}</th>
                         <th className="px-2 py-1 text-right w-12">%</th>
@@ -2909,7 +2960,7 @@ const AdvancedDashboard: React.FC = () => {
                             {/* 단계 구분선 (2개 이상 단계가 있을 때만 표시) */}
                             {convertedHasMultiplePhases && (
                               <tr className={`${phaseMeta.bgColor} ${phaseMeta.borderColor} border-y-2`}>
-                                <td colSpan={4} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs`}>
+                                <td colSpan={5} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs`}>
                                   <span className="flex items-center gap-1">
                                     <span>{phaseMeta.icon}</span>
                                     <span>{t(phaseMeta.labelKey)}</span>
@@ -2923,14 +2974,28 @@ const AdvancedDashboard: React.FC = () => {
                             {/* key: 단계(phase) + 카테고리 + id + index 복합 키로 중복 방지
                                 (스트레이트법 합산 경로에서 liquid/other 이름이 같으면 ing.id가
                                  'straight-${name}' 형태로 충돌할 수 있어 phase 스코프로 격리) */}
-                            {items.map((ing: any, ingIndex: number) => (
-                              <tr key={`${phase}-${ing.category}-${ing.id}-${ingIndex}`} className={`border-b border-info-100 ${dynamicStyles.rowHeight}`}>
+                            {items.map((ing: any, ingIndex: number) => {
+                              const rowKey = `${phase}-${ing.category}-${ing.id}-${ingIndex}`;
+                              const isChecked = checkedIngredients.has(rowKey);
+                              return (
+                              <tr key={rowKey} className={`border-b border-info-100 ${dynamicStyles.rowHeight} ${isChecked ? 'opacity-50 line-through' : ''}`}>
+                                <td className="px-1 text-center print-hide">
+                                  <button
+                                    onClick={() => toggleIngredientChecked(rowKey)}
+                                    className="text-ink-disabled hover:text-success align-middle"
+                                    title={t('advDashboard.toggleWeighed', { defaultValue: '계량 완료' })}
+                                    aria-pressed={isChecked}
+                                  >
+                                    {isChecked ? <CheckSquare className="w-3.5 h-3.5 text-success" /> : <Square className="w-3.5 h-3.5" />}
+                                  </button>
+                                </td>
                                 <td className="px-2 text-info-600">{CATEGORY_LABELS[ing.category as keyof typeof CATEGORY_LABELS]}</td>
                                 <td className="px-2">{translateIngredient(ing.name)}</td>
                                 <td className="px-2 text-right font-mono text-ink-subtle">{convertedFlourTotal > 0 ? Math.round((ing.convertedAmount / convertedFlourTotal) * 1000) / 10 : 0}</td>
                                 <td className="px-2 text-right font-mono text-sm font-semibold text-info-700"><span key={ing.convertedAmount} className="inline-block px-1 rounded animate-valueFlash">{formatWeight(ing.convertedAmount)}</span></td>
                               </tr>
-                            ))}
+                              );
+                            })}
                           </React.Fragment>
                         );
                       })}
@@ -2974,20 +3039,36 @@ const AdvancedDashboard: React.FC = () => {
                 <span className="text-xs font-normal text-ink-subtle ml-1">
                   {t('advDashboard.totalMinutes', { minutes: processes.reduce((s, p) => s + (p.time || 0), 0) })}
                 </span>
+                {processes.length > 0 && (
+                  <span className="text-xs font-normal text-ink-subtle ml-1 inline-flex items-center gap-0.5">
+                    <CheckSquare className="w-3 h-3" />
+                    {t('advDashboard.doneCount', { defaultValue: '완료 {{done}}/{{total}}', done: completedProcesses.size, total: processes.length })}
+                  </span>
+                )}
               </span>
-              <button onClick={addProcess} className="text-xs text-amber-600 hover:text-amber-700 font-medium">{t('advDashboard.addProcess')}</button>
+              <button onClick={addProcess} className="text-xs text-amber-600 hover:text-amber-700 font-medium print-hide">{t('advDashboard.addProcess')}</button>
             </div>
             <div className="flex-1 overflow-auto px-2 py-1.5">
-              <div className="flex gap-1.5 flex-wrap items-start">
+              <div className="flex flex-col gap-1.5 lg:flex-row lg:flex-wrap lg:items-start">
                 {processes.map((proc, idx) => {
                   const itemSize = getProcessItemSize(proc.id);
                   const displayText = editingProcessId === proc.id ? proc.description : translateProcessStep(proc.description || '');
+                  const isDone = completedProcesses.has(proc.id);
                   return (
                   <div
                     key={proc.id}
-                    className="flex items-center gap-1 bg-surface-muted border rounded px-1.5 py-1 text-xs group hover:bg-surface-muted relative"
+                    className={`flex items-start gap-1 bg-surface-muted border rounded px-1.5 py-1 text-xs group hover:bg-surface-muted relative transition-opacity ${isDone ? 'opacity-60' : ''}`}
                     style={{ minWidth: itemSize.width || 200, maxWidth: '100%' }}
                   >
+                    {/* C1: 완료 체크(실행 모드) - 칩 탭(편집)과 충돌 않도록 별도 버튼 */}
+                    <button
+                      onClick={() => toggleProcessDone(proc.id)}
+                      className="flex-shrink-0 mt-0.5 text-ink-disabled hover:text-success print-hide"
+                      title={t('advDashboard.toggleDone', { defaultValue: '완료 표시' })}
+                      aria-pressed={isDone}
+                    >
+                      {isDone ? <CheckSquare className="w-4 h-4 text-success" /> : <Square className="w-4 h-4" />}
+                    </button>
                     {/* 순서 변경 버튼 */}
                     <div className="flex flex-col opacity-100 lg:opacity-0 lg:group-hover:opacity-100 flex-shrink-0">
                       <button
@@ -3014,14 +3095,14 @@ const AdvancedDashboard: React.FC = () => {
                         onChange={(e) => updateProcess(proc.id, 'description', e.target.value)}
                         onBlur={() => setEditingProcessId(null)}
                         autoFocus
-                        className="bg-transparent border-0 p-0 focus:outline-none text-xs flex-1 min-w-0 resize-none leading-relaxed"
+                        className="bg-transparent border-0 p-0 focus:outline-none text-sm flex-1 min-w-0 resize-none leading-relaxed"
                         placeholder={t('advDashboard.processPlaceholder')}
                         rows={3}
                       />
                     ) : (
                       <div
                         onClick={() => setEditingProcessId(proc.id)}
-                        className="flex-1 min-w-0 cursor-text leading-relaxed whitespace-pre-wrap"
+                        className={`flex-1 min-w-0 cursor-text leading-relaxed whitespace-pre-wrap text-sm ${isDone ? 'line-through text-ink-subtle' : ''}`}
                       >
                         {displayText || <span className="text-ink-disabled">{t('advDashboard.processPlaceholder')}</span>}
                       </div>
@@ -3038,8 +3119,15 @@ const AdvancedDashboard: React.FC = () => {
                         />
                         <span className="text-xs flex-shrink-0">{t('units.minute')}</span>
                         <button
+                          onClick={() => startTimerFromProcess(translateProcessStep(proc.description || '') || t('advDashboard.processStepN', { defaultValue: '공정 {{n}}', n: idx + 1 }), proc.time || 0)}
+                          className="text-blue-500 hover:text-blue-700 ml-0.5 flex-shrink-0 print-hide"
+                          title={t('advDashboard.startTimer', { defaultValue: '이 시간으로 타이머 시작' })}
+                        >
+                          <Play className="w-3 h-3" />
+                        </button>
+                        <button
                           onClick={() => updateProcess(proc.id, 'time', undefined)}
-                          className="text-blue-400 hover:text-blue-600 opacity-100 lg:opacity-0 lg:group-hover/time:opacity-100 ml-0.5 flex-shrink-0"
+                          className="text-blue-400 hover:text-blue-600 opacity-100 lg:opacity-0 lg:group-hover/time:opacity-100 ml-0.5 flex-shrink-0 print-hide"
                           title={t('advDashboard.deleteTime')}
                         >
                           <X className="w-2.5 h-2.5" />
@@ -3085,9 +3173,9 @@ const AdvancedDashboard: React.FC = () => {
                     <button onClick={() => removeProcess(proc.id)} className="p-2 -m-2 text-ink-subtle hover:text-danger opacity-100 lg:opacity-0 lg:group-hover:opacity-100" title={t('advDashboard.removeProcess', { defaultValue: '공정 삭제' })}>
                       <X className="w-3.5 h-3.5" />
                     </button>
-                    {/* 너비 조절 핸들 */}
+                    {/* 너비 조절 핸들 (데스크톱 전용 - 모바일 세로 1열에선 불필요) */}
                     <div
-                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize opacity-0 group-hover:opacity-100 hover:bg-blue-400 transition-colors"
+                      className="hidden lg:block absolute right-0 top-0 bottom-0 w-1 cursor-col-resize opacity-0 group-hover:opacity-100 hover:bg-blue-400 transition-colors print-hide"
                       onMouseDown={(e) => {
                         e.preventDefault();
                         const startX = e.clientX;
@@ -3143,6 +3231,13 @@ const AdvancedDashboard: React.FC = () => {
         isOpen={isBulkInputOpen}
         onClose={() => setIsBulkInputOpen(false)}
         onImport={handleBulkImport}
+      />
+
+      {/* 타이머 관리 모달 (C3: 고아 컴포넌트 배선) - 공정칩 시간에서 프리필 가능 */}
+      <TimerManager
+        isOpen={isTimerOpen}
+        onClose={() => setIsTimerOpen(false)}
+        seed={timerSeed}
       />
     </div>
   );

@@ -3,7 +3,7 @@
  * "박ㄹ" → "박력분" 같은 초성 검색 가능
  */
 
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useRef, useEffect, useCallback, useMemo, useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { searchIngredients, sortByRelevance } from '@/utils/hangul'
 import { findIngredientInfo } from '@/data/ingredientDatabase'
@@ -36,6 +36,7 @@ export default function AutocompleteInput({
 }: AutocompleteInputProps) {
   const { t } = useTranslation()
   const resolvedPlaceholder = placeholder ?? t('components.autocomplete.placeholder')
+  const listboxId = useId()
   // 설정 스토어에서 통합 재료 목록 가져오기 (커스텀 목록이 없을 때만)
   const getAllIngredientNames = useSettingsStore(state => state.getAllIngredientNames)
   // 커스텀 재료 배열을 구독해 변경 시에만 재계산(매 렌더 새 배열 생성으로 인한 useMemo 무력화 방지)
@@ -202,6 +203,11 @@ export default function AutocompleteInput({
       <input
         ref={inputRef}
         type="text"
+        role="combobox"
+        aria-expanded={isOpen && filteredSuggestions.length > 0}
+        aria-controls={listboxId}
+        aria-autocomplete="list"
+        aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-opt-${highlightedIndex}` : undefined}
         value={shownValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
@@ -211,7 +217,7 @@ export default function AutocompleteInput({
         disabled={disabled}
         autoFocus={autoFocus}
         className={`w-full px-3 py-2 border border-line rounded-lg
-          focus:ring-2 focus:ring-amber-500 focus:border-amber-500
+          focus:ring-2 focus:ring-brand-400 focus:border-brand-400
           disabled:bg-surface-muted disabled:cursor-not-allowed
           ${className}`}
         autoComplete="off"
@@ -221,21 +227,26 @@ export default function AutocompleteInput({
       {isOpen && filteredSuggestions.length > 0 && (
         <ul
           ref={listRef}
+          role="listbox"
+          id={listboxId}
           className="absolute z-50 w-full mt-1 bg-surface-paper border border-line
             rounded-lg shadow-lg max-h-60 overflow-auto"
         >
           {!value.trim() && recentIngredients.length > 0 && (
-            <li className="px-3 py-1 text-xs text-ink-subtle bg-surface-muted border-b">
+            <li role="presentation" className="px-3 py-1 text-xs text-ink-subtle bg-surface-muted border-b">
               {t('components.autocomplete.recentlyUsed')}
             </li>
           )}
           {filteredSuggestions.map((item, index) => (
             <li
               key={item}
+              id={`${listboxId}-opt-${index}`}
+              role="option"
+              aria-selected={index === highlightedIndex}
               onClick={() => handleSelect(item)}
               className={`px-3 py-2 cursor-pointer flex items-center gap-2
                 ${index === highlightedIndex
-                  ? 'bg-amber-100 text-amber-900'
+                  ? 'bg-brand-100 text-brand-900'
                   : 'hover:bg-surface-muted'
                 }`}
             >

@@ -87,11 +87,11 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [x] D4 푸터 미번역 키 노출 (Footer nav.dashboard -> nav.converter): Footer.tsx:44 -> t('nav.converter') 또는 nav.dashboard 키 추가 + i18n missing 핸들러.
 - [ ] D5 모바일 nav 라벨 없음: **-> H(반응형)로 이월** (하단 고정 탭바 재설계. 라벨만 노출하면 375px 오버플로/스크롤이라 반쪽; 바텀바가 정답). Header.jsx:11-16,:70.
 
-### 배치 E - P2 quick: 접근성·일관성
-- [ ] E1 ink-disabled(2.6:1)->ink-subtle(4.76:1) 4곳: :2851, HomePage.tsx:261, IngredientSettingsTab.tsx:608·825. (A2/변환기 %열과 겹침-함께)
-- [ ] E2 포커스 링 단일화: `.focus-ring` 유틸(focus-visible:shadow-focus 토큰 사용), Header:25·41/RecipeCard:168/SearchBar:67 등 치환. tailwind shadow-focus 토큰 활용.
-- [ ] E3 combobox ARIA: AutocompleteInput.tsx:200-249. role=combobox/listbox/option + aria-expanded/activedescendant/selected.
-- [ ] E4 토스트 aria-live 이중 낭독: ToastContainer.tsx:24-27 래퍼 aria-live 제거(role/label 유지, 낭독은 개별 Toast.tsx:100-102에 위임).
+### 배치 E - P2 quick: 접근성·일관성 [완료 2026-07-04 · typecheck0/test164/build OK · E2는 부분(유틸 롤아웃 후속)]
+- [x] E1 ink-disabled(2.6:1)->ink-subtle(4.76:1) 4곳 (:2851 A2 + HomePage:261 + IngredientSettingsTab:608·825): :2851, HomePage.tsx:261, IngredientSettingsTab.tsx:608·825. (A2/변환기 %열과 겹침-함께)
+- [~] E2 포커스 링 단일화 (부분: AutocompleteInput amber-500->brand-400 정합. 전면 `.focus-ring` 유틸 롤아웃 Header/RecipeCard/SearchBar는 후속-저위험 cosmetic).
+- [x] E3 combobox ARIA (AutocompleteInput: useId, role=combobox/listbox/option + aria-expanded/controls/autocomplete/activedescendant/selected, recent 헤더 role=presentation).
+- [x] E4 토스트 aria-live 이중 낭독 (ToastContainer 래퍼 aria-live 제거, role=region/label 유지, 낭독은 개별 Toast에 위임).
 
 ### 배치 F - P2 quick: 카드/편집/DDT
 - [ ] F1 카드 출처색 아이콘 국한: RecipeCard.tsx:53-61,:173-177,:230-234. 텍스트는 ink-subtle.

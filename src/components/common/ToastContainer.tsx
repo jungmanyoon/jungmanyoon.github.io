@@ -19,10 +19,9 @@ export const ToastContainer: React.FC = () => {
 
   return (
     <div
-      // 접근성: 알림 영역 표식 + 일반 알림은 polite로 보조기기에 전달
-      // (error 토스트는 개별 Toast에서 role="alert"/assertive로 즉시 안내)
+      // 접근성: 알림 "영역" 표식만 유지. 실제 낭독(aria-live)은 개별 Toast가 담당
+      // (일반=polite / error=assertive를 Toast에서 직접 지정 → 컨테이너 중복 live region 제거)
       role="region"
-      aria-live="polite"
       aria-label="알림"
       className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"
     >

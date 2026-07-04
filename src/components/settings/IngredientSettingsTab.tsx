@@ -605,7 +605,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           {(() => {
                             const alias = getIngredientAlias(ing.name, ing.originalData?.aliases)
                             return alias && (
-                              <div className="text-xs text-ink-disabled truncate max-w-[120px]">
+                              <div className="text-xs text-ink-subtle truncate max-w-[120px]">
                                 {alias}
                               </div>
                             )
@@ -822,7 +822,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                                     <ArrowRight className="w-3 h-3 text-ink-disabled" />
                                     <span className="font-medium text-orange-700">{getIngredientDisplayName(sub.substitute)}</span>
                                     <span className="text-ink-subtle font-mono">×{sub.ratio}</span>
-                                    {sub.notes && <span className="text-ink-disabled italic">({currentLang === 'en' ? translateBakingNote(sub.notes, 'en') : sub.notes})</span>}
+                                    {sub.notes && <span className="text-ink-subtle italic">({currentLang === 'en' ? translateBakingNote(sub.notes, 'en') : sub.notes})</span>}
                                     <button
                                       onClick={() => {
                                         if (confirm(t('settings.ingredient.alerts.deleteSubConfirm'))) {

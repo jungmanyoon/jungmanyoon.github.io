@@ -258,7 +258,7 @@ export default function HomePage() {
                           </span>
                         </div>
                         {recipe.source?.name && (
-                          <p className="text-xs text-ink-disabled truncate">
+                          <p className="text-xs text-ink-subtle truncate">
                             {t('home.source')}: {recipe.source.name}
                           </p>
                         )}

@@ -93,13 +93,13 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [x] E3 combobox ARIA (AutocompleteInput: useId, role=combobox/listbox/option + aria-expanded/controls/autocomplete/activedescendant/selected, recent 헤더 role=presentation).
 - [x] E4 토스트 aria-live 이중 낭독 (ToastContainer 래퍼 aria-live 제거, role=region/label 유지, 낭독은 개별 Toast에 위임).
 
-### 배치 F - P2 quick: 카드/편집/DDT
-- [ ] F1 카드 출처색 아이콘 국한: RecipeCard.tsx:53-61,:173-177,:230-234. 텍스트는 ink-subtle.
-- [ ] F2 카드 터치타깃 44px: RecipeCard.tsx:185,194,241,250.
-- [ ] F3 IngredientTable 삭제 아이콘화(세로깨짐): IngredientTable.jsx:166-173. lucide Trash2 ghost(aria-label).
-- [ ] F4 IngredientTable AutocompleteInput 전환: IngredientTable.jsx:84-114. type<->category 매핑, Enter/Tab 셀이동 passthrough.
-- [ ] F5 일괄입력 phase 파싱: BulkIngredientInput.tsx:51-128, :1979-1990. ParsedIngredient에 phase 추가+모달 단계 드롭다운.
-- [ ] F6 DDT 연결/컨텍스트/환경값: DDTCalculator.tsx:160-173, App.tsx:173-174. 변환기 'DDT로' 버튼(setCurrentRecipe), 상단 컨텍스트 배지, environment prop 전달(현재 실온 22 고정).
+### 배치 F - P2 quick: 카드/편집/DDT [F1~F3 완료 2026-07-04 · typecheck0/test164/build OK · F4/F5/F6는 신중 패스 이월]
+- [x] F1 카드 출처색 아이콘 국한 (compact+기본 카드: sourceInfo.color를 아이콘 className으로, 텍스트는 ink-subtle; 색 위계 반전 해소).
+- [x] F2 카드 터치타깃 44px (compact 36->44, 기본 40->44, 삭제 hover red-500->danger 토큰).
+- [x] F3 IngredientTable 삭제 아이콘화 (텍스트 danger Button -> lucide Trash2 ghost 버튼 aria-label/title; 375px '삭/제' 세로깨짐 해소). +bread-500->brand-500 포커스링 정합.
+- [ ] F4 IngredientTable AutocompleteInput 전환: **-> 신중 패스 이월** (type<->category 매핑+Enter/Tab passthrough, 편집표 회귀 리스크). IngredientTable.jsx:84-114.
+- [ ] F5 일괄입력 phase 파싱: **-> 신중 패스 이월** (ParsedIngredient phase+모달 드롭다운). BulkIngredientInput.tsx:51-128.
+- [ ] F6 DDT 연결/컨텍스트/환경값: **-> 신중 패스 이월** (대시보드 로컬 재료 state를 Recipe로 변환해 setCurrentRecipe 필요 = 구조작업). DDTCalculator.tsx:160-173, App.tsx:173-174.
 
 ### 배치 G - P3 polish
 - [ ] G1 gray-* -> line-* 잔재 치환(22파일 59회). :2193-2199 등. base==hover 회피.

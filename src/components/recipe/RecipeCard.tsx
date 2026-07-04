@@ -165,14 +165,14 @@ const RecipeCard = memo<RecipeCardProps>(({
                   type="button"
                   onClick={handleSelect}
                   aria-label={getLocalizedRecipeName(recipe)}
-                  className="block w-full truncate text-left cursor-pointer rounded-lg after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500"
+                  className="block w-full truncate text-left cursor-pointer rounded-lg after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                 >
                   {getLocalizedRecipeName(recipe)}
                 </button>
               </h3>
               {sourceInfo && (
-                <div className={`relative z-10 flex items-center gap-1 mt-0.5 ${sourceInfo.color}`}>
-                  <sourceInfo.Icon size={10} />
+                <div className="relative z-10 flex items-center gap-1 mt-0.5 text-ink-subtle">
+                  <sourceInfo.Icon size={10} className={sourceInfo.color} />
                   <span className="text-[10px] truncate">{sourceInfo.name}</span>
                 </div>
               )}
@@ -182,7 +182,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             {onEdit && (
               <button
                 onClick={handleEdit}
-                className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[36px] min-h-[36px]"
+                className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px]"
                 aria-label={t('recipeList.editRecipe')}
                 type="button"
               >
@@ -191,7 +191,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             )}
             <button
               onClick={handleDelete}
-              className="text-ink-disabled hover:text-red-500 transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[36px] min-h-[36px]"
+              className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px]"
               aria-label={t('recipeList.deleteRecipe')}
               type="button"
             >
@@ -222,14 +222,14 @@ const RecipeCard = memo<RecipeCardProps>(({
               type="button"
               onClick={handleSelect}
               aria-label={getLocalizedRecipeName(recipe)}
-              className="block w-full text-left break-words cursor-pointer rounded-lg after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500"
+              className="block w-full text-left break-words cursor-pointer rounded-lg after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             >
               {getLocalizedRecipeName(recipe)}
             </button>
           </h3>
           {sourceInfo && (
-            <div className={`relative z-10 flex items-center gap-1 mt-1 ${sourceInfo.color}`}>
-              <sourceInfo.Icon size={12} />
+            <div className="relative z-10 flex items-center gap-1 mt-1 text-ink-subtle">
+              <sourceInfo.Icon size={12} className={sourceInfo.color} />
               <span className="text-xs">{sourceInfo.name}</span>
             </div>
           )}
@@ -238,7 +238,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           {onEdit && (
             <button
               onClick={handleEdit}
-              className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[40px] min-h-[40px]"
+              className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px]"
               aria-label={t('recipeList.editRecipe')}
               type="button"
             >
@@ -247,7 +247,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           )}
           <button
             onClick={handleDelete}
-            className="text-ink-disabled hover:text-red-500 transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[40px] min-h-[40px]"
+            className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px]"
             aria-label={t('recipeList.deleteRecipe')}
             type="button"
           >

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
 import Input from '../common/Input.jsx'
 import { COMMON_INGREDIENTS } from '../../constants/ingredients.js'
+import { Trash2 } from 'lucide-react'
 
 // 편집 행 재정렬/삽입/삭제 시 React key 안정성을 위한 고유 키 생성기
 let ingredientRowKeySeq = 0
@@ -164,13 +165,15 @@ function IngredientTable({ ingredients = [], onChange }) {
                 {calculateBakersPercentage(parseFloat(ingredient.amount) || 0)}%
               </td>
               <td className="py-1">
-                <Button
-                  variant="danger"
-                  size="small"
+                <button
+                  type="button"
                   onClick={() => removeIngredient(index)}
+                  className="p-2 -m-1 text-ink-subtle hover:text-danger transition-colors inline-flex items-center justify-center min-w-[36px] min-h-[36px]"
+                  aria-label={t('ingredientTable.delete')}
+                  title={t('ingredientTable.delete')}
                 >
-                  {t('ingredientTable.delete')}
-                </Button>
+                  <Trash2 size={16} />
+                </button>
               </td>
             </tr>
           ))}

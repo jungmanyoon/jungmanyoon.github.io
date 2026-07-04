@@ -1218,7 +1218,7 @@ const le = "recipe-book-v2.0", C = "static-v2.0", k = "dynamic-v2.0", I = "api-v
   "/manifest.json",
   "/icon.svg"
 ];
-oe([{"revision":null,"url":"assets/index-CkYNrauH.css"},{"revision":null,"url":"assets/js/AdvancedDashboard.tsx-Bqo8N_Vn.js"},{"revision":null,"url":"assets/js/Help.jsx-nKzhpUVT.js"},{"revision":null,"url":"assets/js/HomePage.tsx-C6xKzMbj.js"},{"revision":null,"url":"assets/js/icons-CzeiPySl.js"},{"revision":null,"url":"assets/js/index-B4QJ45kW.js"},{"revision":null,"url":"assets/js/react-vendor-ClheY0Qu.js"},{"revision":null,"url":"assets/js/RecipeEditor.jsx-CUZeYHMi.js"},{"revision":null,"url":"assets/js/RecipeListPage.tsx-BO9dHCmM.js"},{"revision":null,"url":"assets/js/SettingsPage.tsx-C1OIBnz5.js"},{"revision":null,"url":"assets/js/state-i18n-BFJVx-5a.js"},{"revision":null,"url":"assets/js/vendor-CoKanYz2.js"},{"revision":"308302341673021577934d4f02132706","url":"index.html"},{"revision":"31c1079f79e8f9cf0e81ddf8e68e73f1","url":"offline.html"},{"revision":"1872c500de691dce40960bb85481de07","url":"registerSW.js"},{"revision":"6490b2c635bbf985325480d4bc7ed190","url":"favicon.ico"},{"revision":"9e9d14d8012b9a3d089a3cbb4a57ff66","url":"icon.svg"},{"revision":"0de617adf85dbf478e2ab62314204f2c","url":"manifest.webmanifest"}]);
+oe([{"revision":null,"url":"assets/index-D3dqarjB.css"},{"revision":null,"url":"assets/js/AdvancedDashboard.tsx-BVmTB6GZ.js"},{"revision":null,"url":"assets/js/Help.jsx-DSnNznEd.js"},{"revision":null,"url":"assets/js/HomePage.tsx-Bir36YC1.js"},{"revision":null,"url":"assets/js/icons-DAuRzLj-.js"},{"revision":null,"url":"assets/js/index-Dwc83vsb.js"},{"revision":null,"url":"assets/js/react-vendor-ClheY0Qu.js"},{"revision":null,"url":"assets/js/RecipeEditor.jsx-BTLaXQjp.js"},{"revision":null,"url":"assets/js/RecipeListPage.tsx-BbGV_LOl.js"},{"revision":null,"url":"assets/js/SettingsPage.tsx-MyiPqGih.js"},{"revision":null,"url":"assets/js/state-i18n-Bt8XeFzT.js"},{"revision":null,"url":"assets/js/vendor-CoKanYz2.js"},{"revision":"63bf9b73c300034daee4802bac522e75","url":"index.html"},{"revision":"811522855b142e738abdd2ef285e2bab","url":"offline.html"},{"revision":"1872c500de691dce40960bb85481de07","url":"registerSW.js"},{"revision":"6490b2c635bbf985325480d4bc7ed190","url":"favicon.ico"},{"revision":"822207078da3cd4b7e6c4c5bd8a88369","url":"icon.svg"},{"revision":"ee5d7ca522117f94cc671836ee18b938","url":"manifest.webmanifest"}]);
 self.addEventListener("install", (a) => {
   a.waitUntil(
     caches.open(C).then((e) => e.addAll(A)).then(() => self.skipWaiting())
@@ -1314,4 +1314,3 @@ self.addEventListener("message", (a) => {
   var e;
   ((e = a.data) == null ? void 0 : e.type) === "SKIP_WAITING" && self.skipWaiting();
 });
-//# sourceMappingURL=sw.js.map

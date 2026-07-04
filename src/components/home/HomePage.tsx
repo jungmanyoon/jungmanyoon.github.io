@@ -48,7 +48,7 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 
 export default function HomePage() {
   const { t } = useTranslation()
-  const { recipes, setCurrentRecipe } = useRecipeStore()
+  const { recipes, setCurrentRecipe, addRecipe } = useRecipeStore()
   const { setActiveTab } = useAppStore()
   const { getLocalizedRecipeName } = useLocalization()
 
@@ -89,9 +89,23 @@ export default function HomePage() {
     setActiveTab('dashboard')
   }
 
-  // 새 레시피 시작
+  // 새 레시피 시작: 빈 레시피를 만들어 로드 (예시 자동주입 없이 빈 상태로 시작)
+  // RecipeListPage.createNewRecipe와 동일 패턴 — 대시보드가 빈 재료 1행 + 안내배너로 시작
   const handleNewRecipe = () => {
-    setCurrentRecipe(null)
+    const newRecipe = {
+      id: `recipe-${Date.now()}`,
+      name: t('recipe.newRecipe'),
+      description: '',
+      category: 'bread',
+      method: 'straight',
+      servings: 1,
+      ingredients: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      tags: []
+    } as any
+    addRecipe(newRecipe)
+    setCurrentRecipe(newRecipe)
     setActiveTab('dashboard')
   }
 

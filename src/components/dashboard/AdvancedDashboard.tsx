@@ -254,6 +254,36 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 };
 
 // ============================================
+// 새 레시피 기본값 / 예시 데이터
+// ============================================
+
+// 새 레시피는 빈 재료 1행으로 시작 (예시는 "예시 불러오기"로만 주입)
+const createStarterIngredients = (): IngredientEntry[] => [
+  { id: 'ing-1', order: 1, category: 'flour', subCategory: '가루', name: '', ratio: 0, amount: 0, note: '' },
+];
+
+// 예시 데이터: 기본 식빵(강력분 기준). "예시 불러오기" 버튼으로만 주입됨.
+const SAMPLE_INGREDIENTS: IngredientEntry[] = [
+  { id: '1', order: 1, category: 'flour', subCategory: '가루', name: '강력분', ratio: 100, amount: 500, note: '' },
+  { id: '2', order: 2, category: 'liquid', subCategory: '수분', name: '물', ratio: 70, amount: 350, note: '' },
+  { id: '3', order: 3, category: 'other', subCategory: '기타', name: '소금', ratio: 2, amount: 10, note: '' },
+  { id: '4', order: 4, category: 'other', subCategory: '기타', name: '이스트', ratio: 1, amount: 5, note: '' },
+  { id: '5', order: 5, category: 'other', subCategory: '기타', name: '설탕', ratio: 6, amount: 30, note: '' },
+  { id: '6', order: 6, category: 'wetOther', subCategory: '유지', name: '버터', ratio: 10, amount: 50, note: '' },
+];
+
+const SAMPLE_PROCESSES: ProcessStep[] = [
+  { id: '1', order: 1, description: '재료 계량', time: 10 },
+  { id: '2', order: 2, description: '1차 믹싱 (저속 3분 → 중속 5분)', time: 8 },
+  { id: '3', order: 3, description: '1차 발효 (27°C, 75%)', time: 60, temp: 27 },
+  { id: '4', order: 4, description: '분할 및 둥글리기' },
+  { id: '5', order: 5, description: '중간 발효', time: 15 },
+  { id: '6', order: 6, description: '성형 및 패닝' },
+  { id: '7', order: 7, description: '2차 발효 (35°C, 85%)', time: 50, temp: 35 },
+  { id: '8', order: 8, description: '굽기', time: 24, temp: 200 },
+];
+
+// ============================================
 // 메인 컴포넌트
 // ============================================
 
@@ -414,30 +444,17 @@ const AdvancedDashboard: React.FC = () => {
   });
   const [usePreferment, setUsePreferment] = useState(false);
 
-  // 재료 (기본 예시: 식빵 레시피)
-  const [ingredients, setIngredients] = useState<IngredientEntry[]>([
-    { id: '1', order: 1, category: 'flour', subCategory: '가루', name: '강력분', ratio: 100, amount: 500, note: '' },
-    { id: '2', order: 2, category: 'liquid', subCategory: '수분', name: '물', ratio: 70, amount: 350, note: '' },
-    { id: '3', order: 3, category: 'other', subCategory: '기타', name: '소금', ratio: 2, amount: 10, note: '' },
-    { id: '4', order: 4, category: 'other', subCategory: '기타', name: '이스트', ratio: 1, amount: 5, note: '' },
-    { id: '5', order: 5, category: 'other', subCategory: '기타', name: '설탕', ratio: 6, amount: 30, note: '' },
-    { id: '6', order: 6, category: 'wetOther', subCategory: '유지', name: '버터', ratio: 10, amount: 50, note: '' },
-  ]);
+  // 재료 (새 레시피는 빈 1행으로 시작, 예시는 "예시 불러오기"로 주입)
+  const [ingredients, setIngredients] = useState<IngredientEntry[]>(createStarterIngredients);
 
-  // 공정 (프로세스)
-  const [processes, setProcesses] = useState<ProcessStep[]>([
-    { id: '1', order: 1, description: '재료 계량', time: 10 },
-    { id: '2', order: 2, description: '1차 믹싱 (저속 3분 → 중속 5분)', time: 8 },
-    { id: '3', order: 3, description: '1차 발효 (27°C, 75%)', time: 60, temp: 27 },
-    { id: '4', order: 4, description: '분할 및 둥글리기' },
-    { id: '5', order: 5, description: '중간 발효', time: 15 },
-    { id: '6', order: 6, description: '성형 및 패닝' },
-    { id: '7', order: 7, description: '2차 발효 (35°C, 85%)', time: 50, temp: 35 },
-    { id: '8', order: 8, description: '굽기', time: 24, temp: 200 },
-  ]);
+  // 공정 (새 레시피는 비어서 시작)
+  const [processes, setProcesses] = useState<ProcessStep[]>([]);
 
   // 메모
   const [memo, setMemo] = useState('');
+
+  // 예시 데이터 로드 여부 (상단 "예시 데이터" 배지 표시용). 실제 레시피 로드 시 해제.
+  const [exampleLoaded, setExampleLoaded] = useState(false);
 
   // 현재 편집 중인 공정 ID (편집 중일 때는 원본 표시, 아닐 때는 번역 표시)
   const [editingProcessId, setEditingProcessId] = useState<string | null>(null);
@@ -579,7 +596,14 @@ const AdvancedDashboard: React.FC = () => {
 
       if (loadedIngredients.length > 0) {
         setIngredients(loadedIngredients);
+      } else {
+        // 빈(새) 레시피: 예시 자동주입 금지 -> 빈 재료 1행 + 공정/메모 초기화
+        setIngredients(createStarterIngredients());
+        setProcesses([]);
+        setMemo('');
       }
+      // 실제 레시피를 로드했으므로 예시 배지 해제
+      setExampleLoaded(false);
 
       // 공정 로드
       if (currentRecipe.steps && Array.isArray(currentRecipe.steps)) {
@@ -981,6 +1005,12 @@ const AdvancedDashboard: React.FC = () => {
 
   // 변환 여부: 배수가 1이면(부동소수 안전) 원본=변환이 동일하므로 변환표를 숨기고 원본표를 전체폭으로
   const isConverted = Math.abs(effectiveMultiplier - 1) >= 0.0001;
+
+  // 재료가 사실상 비어있는지(새 레시피) — 안내 배너/예시 버튼 노출 판단
+  const isEmptyRecipe = useMemo(
+    () => ingredients.every(i => !i.name?.trim() && !i.amount),
+    [ingredients]
+  );
 
   // 비용적(convertedProduct) 변경 시 팬 모드인 팬만 panWeight 재계산
   useEffect(() => {
@@ -1966,6 +1996,16 @@ const AdvancedDashboard: React.FC = () => {
     setIngredients(prev => prev.filter(i => i.id !== id));
   }, []);
 
+  // 예시 데이터(기본 식빵) 불러오기 — 새 레시피 빈 상태에서 사용자가 명시적으로 호출
+  const loadExample = useCallback(() => {
+    setIngredients(SAMPLE_INGREDIENTS.map(i => ({ ...i })));
+    setProcesses(SAMPLE_PROCESSES.map(p => ({ ...p })));
+    setProductName('기본 식빵 (예시)');
+    setUsePreferment(false);
+    setExampleLoaded(true);
+    addToast({ type: 'success', message: t('advDashboard.exampleLoaded', { defaultValue: '예시 레시피를 불러왔습니다.' }) });
+  }, [addToast, t]);
+
   const updateIngredient = useCallback((id: string, field: keyof IngredientEntry, value: any) => {
     setIngredients(prev => prev.map(ing => {
       if (ing.id !== id) return ing;
@@ -2032,6 +2072,11 @@ const AdvancedDashboard: React.FC = () => {
             className="text-lg font-bold w-36 min-h-[44px] lg:min-h-0 border-b border-transparent hover:border-line focus:border-amber-500 focus:outline-none"
             placeholder={t('advDashboard.productName')}
           />
+          {exampleLoaded && (
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-brand-100 text-brand-700 font-medium flex-shrink-0">
+              {t('advDashboard.exampleBadge', { defaultValue: '예시 데이터' })}
+            </span>
+          )}
           {/* 제품 타입 선택 */}
           <div className="flex items-center gap-1 border-l pl-3">
             <button
@@ -2686,6 +2731,21 @@ const AdvancedDashboard: React.FC = () => {
 
         {/* ===== 중앙: 레시피 테이블 (컴팩트) ===== */}
         <div className="flex-1 flex flex-col overflow-visible lg:overflow-hidden min-h-0">
+          {/* 새 레시피 안내: 빈 상태일 때 직접 입력 또는 예시 불러오기 유도 */}
+          {isEmptyRecipe && (
+            <div className="mx-1 mt-1 rounded-md bg-brand-50 border border-brand-200 px-3 py-2 flex items-center justify-between gap-2 flex-wrap flex-shrink-0">
+              <span className="text-xs text-ink-muted flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5 text-brand-600 flex-shrink-0" />
+                {t('advDashboard.emptyRecipeHint', { defaultValue: '새 레시피입니다. 재료를 직접 입력하거나 예시를 불러와 시작하세요.' })}
+              </span>
+              <button
+                onClick={loadExample}
+                className="text-xs font-medium px-2.5 py-1 rounded-md bg-brand-500 text-white hover:bg-brand-600 transition-colors flex-shrink-0"
+              >
+                {t('advDashboard.loadExample', { defaultValue: '예시 불러오기' })}
+              </button>
+            </div>
+          )}
           <div className="flex-1 overflow-auto p-1 min-h-0">
             {/* 모바일: 원본/변환을 세로 스택(grid-cols-1)으로 가로 스크롤 방지 / 데스크톱(lg): 변환 시에만 2열, 미변환 시 원본표 전체폭 */}
             <div className={`grid gap-1 h-full grid-cols-1 ${isConverted ? 'lg:grid-cols-2' : ''}`}>

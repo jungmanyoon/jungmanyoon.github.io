@@ -37,7 +37,15 @@ export default {
         'success': '#10B981',
         'warning': '#F59E0B',
         'danger': '#F43F5E',
-        'info': '#3B82F6',
+        // info: 변환/결과 강조용 블루 스케일(변환표 등). flat 사용처는 DEFAULT로 하위호환.
+        'info': {
+          DEFAULT: '#3B82F6',
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          600: '#2563EB',
+          700: '#1D4ED8',
+        },
         // 뉴트럴(surface/line/ink) - 화면 대부분(80%+)을 담당. brand(amber)는 CTA/활성/강조 액센트로만.
         // Codex(gpt-5.5)와 협의한 슬레이트 기반 의미 토큰. bread/brand는 그대로 두고 "추가만" 함.
         'surface': {

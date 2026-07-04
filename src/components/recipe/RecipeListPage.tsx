@@ -63,8 +63,8 @@ const RecipeListPage: React.FC = () => {
 
   const handleSelect = useCallback((recipe: any) => {
     setCurrentRecipe(recipe)
-    // 대시보드로 이동 (converter 탭 삭제됨)
-    setTimeout(() => setActiveTab('dashboard'), 0)
+    // 카드 선택 = 읽기 전용 상세 뷰로 이동 (편집/변환은 뷰 내부 버튼에서)
+    setTimeout(() => setActiveTab('view'), 0)
   }, [setCurrentRecipe, setActiveTab])
 
   const handleDelete = useCallback((id: string) => {

@@ -38,11 +38,11 @@ function Header() {
           {/* Logo - 터치영역 44px, 좁은 화면에서 줄어들지 않도록 shrink-0. 브랜드색은 아이콘에만. */}
           <button
             onClick={() => setActiveTab('home')}
-            className="flex items-center space-x-2 min-h-[44px] shrink-0 rounded-lg px-1 hover:bg-surface-muted focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors"
+            className="flex items-center space-x-2 min-h-[44px] min-w-0 rounded-lg px-1 hover:bg-surface-muted focus:outline-none focus:ring-2 focus:ring-brand-400 transition-colors"
           >
-            <Wheat className="w-5 h-5 text-brand-600" />
-            {/* 앱 이름: 모바일 text-base, sm 이상 기존 text-lg 보존 */}
-            <h1 className="text-base sm:text-lg font-bold text-ink">{t('app.name')}</h1>
+            <Wheat className="w-5 h-5 text-brand-600 shrink-0" />
+            {/* 앱 이름: 긴 캐논명이 nav를 밀지 않도록 truncate (모바일 text-base, sm 이상 text-lg) */}
+            <h1 className="text-base sm:text-lg font-bold text-ink truncate">{t('app.name')}</h1>
           </button>
 
           {/* Navigation
@@ -56,7 +56,8 @@ function Header() {
             {/* Main Navigation */}
             {navTabs.map(tab => {
               const Icon = tab.icon
-              const active = activeTab === tab.id
+              // #workspace(레거시 별칭)도 변환기 탭을 활성으로 표시
+              const active = activeTab === tab.id || (tab.id === 'dashboard' && activeTab === 'workspace')
               return (
                 <button
                   key={tab.id}

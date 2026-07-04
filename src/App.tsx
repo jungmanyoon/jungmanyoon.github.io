@@ -45,6 +45,7 @@ import HomePageDirect from '@components/home/HomePage'
 import AdvancedDashboardDirect from '@components/dashboard/AdvancedDashboard'
 import RecipeListDirect from '@components/recipe/RecipeListPage'
 import RecipeEditorDirect from '@components/recipe/RecipeEditor.jsx'
+import RecipeViewDirect from '@components/recipe/RecipeView.jsx'
 import DDTCalculatorDirect from '@components/conversion/DDTCalculator'
 import SettingsPageDirect from '@components/settings/SettingsPage'
 import HelpDirect from '@components/help/Help.jsx'
@@ -56,6 +57,7 @@ const HomePageLazy = lazy(() => import('@components/home/HomePage'))
 const AdvancedDashboardLazy = lazy(() => import('@components/dashboard/AdvancedDashboard'))
 const RecipeListLazy = lazy(() => import('@components/recipe/RecipeListPage'))
 const RecipeEditorLazy = lazy(() => import('@components/recipe/RecipeEditor.jsx'))
+const RecipeViewLazy = lazy(() => import('@components/recipe/RecipeView.jsx'))
 const DDTCalculatorLazy = lazy(() => import('@components/conversion/DDTCalculator'))
 const SettingsPageLazy = lazy(() => import('@components/settings/SettingsPage'))
 const HelpLazy = lazy(() => import('@components/help/Help.jsx'))
@@ -65,12 +67,13 @@ const HomePage = isDev ? HomePageDirect : HomePageLazy
 const AdvancedDashboard = isDev ? AdvancedDashboardDirect : AdvancedDashboardLazy
 const RecipeList = isDev ? RecipeListDirect : RecipeListLazy
 const RecipeEditor = isDev ? RecipeEditorDirect : RecipeEditorLazy
+const RecipeView = isDev ? RecipeViewDirect : RecipeViewLazy
 const DDTCalculator = isDev ? DDTCalculatorDirect : DDTCalculatorLazy
 const SettingsPage = isDev ? SettingsPageDirect : SettingsPageLazy
 const Help = isDev ? HelpDirect : HelpLazy
 
 // 유효한 탭 목록
-const VALID_TABS = ['home', 'dashboard', 'workspace', 'recipes', 'editor', 'calculator', 'settings', 'help', 'privacy', 'terms', 'guide', 'contact']
+const VALID_TABS = ['home', 'dashboard', 'workspace', 'recipes', 'view', 'editor', 'calculator', 'settings', 'help', 'privacy', 'terms', 'guide', 'contact']
 
 // 페이지별 타이틀 매핑 (SEO 최적화)
 const PAGE_TITLES: Record<string, string> = {
@@ -78,6 +81,7 @@ const PAGE_TITLES: Record<string, string> = {
     dashboard: 'seo.titles.dashboard',
     workspace: 'seo.titles.dashboard',
     recipes: 'seo.titles.recipes',
+    view: 'seo.titles.recipes',
     editor: 'seo.titles.editor',
     calculator: 'seo.titles.calculator',
     settings: 'seo.titles.settings',
@@ -88,13 +92,13 @@ const PAGE_TITLES: Record<string, string> = {
     contact: 'seo.titles.contact'
 }
 
-const BASE_TITLE = '레시피북'
+const BASE_TITLE = '제과제빵 레시피 변환기'
 
 // 메인 앱 컴포넌트
 function App() {
     const { t } = useTranslation()
     const { activeTab, setActiveTab } = useAppStore()
-    const { currentRecipe, updateRecipe, setCurrentRecipe } = useRecipeStore()
+    const { currentRecipe, updateRecipe, setCurrentRecipe, deleteRecipe } = useRecipeStore()
 
     // 로컬 폴더 자동 저장 (레시피/설정 변경 시 자동 동기화)
     useAutoSave()
@@ -159,6 +163,20 @@ function App() {
                 return <AdvancedDashboard />
             case 'recipes':
                 return <RecipeList />
+            case 'view':
+                return (
+                    <RecipeView
+                        recipe={currentRecipe}
+                        onBack={() => setActiveTab('recipes')}
+                        onEdit={() => setActiveTab('editor')}
+                        onConvert={() => setActiveTab('dashboard')}
+                        onDelete={() => {
+                            if (currentRecipe?.id) deleteRecipe(currentRecipe.id)
+                            setCurrentRecipe(null)
+                            setActiveTab('recipes')
+                        }}
+                    />
+                )
             case 'editor':
                 return (
                     <RecipeEditor

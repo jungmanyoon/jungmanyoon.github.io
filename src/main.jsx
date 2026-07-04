@@ -40,7 +40,7 @@ function initSampleRecipes() {
   // app-store가 없으면 초기화
   if (!localStorage.getItem('app-store')) {
     localStorage.setItem('app-store', JSON.stringify({
-      state: { activeTab: 'workspace' },
+      state: { activeTab: 'recipes' },
       version: 0
     }))
   }

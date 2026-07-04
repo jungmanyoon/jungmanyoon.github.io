@@ -580,7 +580,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                       {(ing.substitutions.length > 0 || ing.defaultSubstitutions.length > 0) && (
                         <button
                           onClick={() => toggleRowExpand(ing.name)}
-                          className="p-1 hover:bg-gray-200 rounded"
+                          className="p-1 hover:bg-line rounded"
                         >
                           {isExpanded ? (
                             <ChevronUp className="w-4 h-4 text-ink-subtle" />
@@ -713,7 +713,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                               setSubForm({ original: ing.name, substitute: '', ratio: 1, notes: '' })
                               setShowSubForm(ing.name)
                             }}
-                            className="px-2 py-0.5 bg-surface-muted text-ink-subtle rounded text-xs hover:bg-gray-200"
+                            className="px-2 py-0.5 bg-surface-muted text-ink-subtle rounded text-xs hover:bg-line"
                           >
                             +
                           </button>
@@ -734,7 +734,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="p-1 bg-gray-300 text-ink-muted rounded hover:bg-gray-400"
+                            className="p-1 bg-surface-muted text-ink-muted rounded hover:bg-line"
                             title={t('settings.ingredient.buttons.cancel')}
                           >
                             <X className="w-3 h-3" />
@@ -744,7 +744,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
                         <div className="flex gap-1 justify-center">
                           <button
                             onClick={() => handleStartEdit(ing.name)}
-                            className="p-1 text-ink-subtle hover:bg-gray-200 rounded"
+                            className="p-1 text-ink-subtle hover:bg-line rounded"
                             title={t('settings.ingredient.buttons.edit')}
                           >
                             <Edit3 className="w-3 h-3" />
@@ -932,7 +932,7 @@ export default function IngredientSettingsTab({ className = '' }: IngredientSett
       {/* 결과 없음 */}
       {filteredIngredients.length === 0 && (
         <div className="text-center py-8 text-ink-subtle">
-          <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+          <Search className="w-12 h-12 mx-auto mb-3 text-line-strong" />
           <p>{t('settings.ingredient.noResults')}</p>
         </div>
       )}

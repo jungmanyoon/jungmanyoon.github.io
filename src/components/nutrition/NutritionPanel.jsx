@@ -90,7 +90,7 @@ const NutritionPanel = ({ recipe, servings }) => {
             <span className="text-sm font-medium text-ink-muted">영양 점수</span>
             <span className="text-sm text-ink-muted">{density.healthScore}/100</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full bg-line rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all duration-300 ${
                 density.healthScore >= 70 ? 'bg-green-500' :
@@ -220,7 +220,7 @@ const NutritionPanel = ({ recipe, servings }) => {
                 ].map((nutrient, index) => (
                   <div key={index} className="flex items-center">
                     <span className="w-16 text-sm text-ink-muted mr-2">{nutrient.name}</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                    <div className="flex-1 bg-line rounded-full h-2 mr-2">
                       <div
                         className={`h-2 rounded-full ${nutrient.color}`}
                         style={{ width: `${Math.min(nutrient.value, 100)}%` }}

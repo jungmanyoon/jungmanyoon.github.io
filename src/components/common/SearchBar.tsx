@@ -64,7 +64,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             border border-line rounded-lg
             bg-surface-paper
             text-ink placeholder-ink-disabled
-            focus:outline-none focus:ring-2 focus:ring-bread-500 focus:border-transparent
+            focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent
             transition-all duration-200
             hover:border-line
           "
@@ -78,7 +78,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               w-5 h-5
               text-ink-disabled hover:text-ink-muted
               transition-colors duration-200
-              focus:outline-none focus:ring-2 focus:ring-bread-500 rounded
+              focus:outline-none focus:ring-2 focus:ring-brand-400 rounded
             "
           >
             <X className="w-full h-full" />

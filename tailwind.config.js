@@ -82,6 +82,16 @@ export default {
         'modal': '0 20px 40px -8px rgb(0 0 0 / 0.20), 0 8px 16px -8px rgb(0 0 0 / 0.12)',
         'focus': '0 0 0 3px rgb(245 158 11 / 0.35)',
       },
+      keyframes: {
+        // 변환 값이 바뀔 때 셀을 은은한 블루(info-100)로 짧게 강조 -> 무엇이 갱신됐는지 시선 유도
+        valueFlash: {
+          '0%': { backgroundColor: '#DBEAFE' },
+          '100%': { backgroundColor: 'transparent' },
+        },
+      },
+      animation: {
+        valueFlash: 'valueFlash 0.6s ease-out',
+      },
       fontSize: {
         // 타이포 스케일 토큰
         'display': ['1.875rem', { lineHeight: '2.25rem', fontWeight: '700', letterSpacing: '-0.02em' }],

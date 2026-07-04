@@ -123,7 +123,7 @@ const PWAInstallPrompt = () => {
           </button>
           <button
             onClick={handleDismiss}
-            className="flex-1 bg-surface-muted hover:bg-gray-200 text-ink-muted text-sm font-medium py-2 px-3 rounded-md transition-colors"
+            className="flex-1 bg-surface-muted hover:bg-line text-ink-muted text-sm font-medium py-2 px-3 rounded-md transition-colors"
           >
             나중에
           </button>

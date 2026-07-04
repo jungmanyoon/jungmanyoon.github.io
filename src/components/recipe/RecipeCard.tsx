@@ -57,7 +57,7 @@ const SOURCE_CONFIG: Record<SourceType, { icon: React.ElementType; color: string
   website: { icon: Globe, color: 'text-green-600', bgColor: 'bg-green-50' },
   personal: { icon: User, color: 'text-purple-600', bgColor: 'bg-purple-50' },
   school: { icon: GraduationCap, color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
-  other: { icon: Globe, color: 'text-gray-600', bgColor: 'bg-gray-50' }
+  other: { icon: Globe, color: 'text-ink-muted', bgColor: 'bg-surface-muted' }
 } as const
 
 // RecipeCard 컴포넌트 최적화
@@ -90,6 +90,16 @@ const RecipeCard = memo<RecipeCardProps>(({
     const key = METHOD_KEYS[recipe.method as BreadMethod] || 'method.straight';
     return t(key);
   }, [recipe.method, t])
+
+  // 제과(pastry)는 제빵 제법(스트레이트법 등)이 대체로 무의미 -> 카드에서 제법 표기 숨김.
+  // 단, 슈톨렌처럼 straight가 아닌 제법을 실제로 가진 예외 제과는 계속 노출.
+  const showMethod = useMemo(() => {
+    if (recipe.productType !== 'pastry') return true
+    const methodType = (typeof recipe.method === 'object' && recipe.method !== null)
+      ? ((recipe.method as any).method || (recipe.method as any).type)
+      : recipe.method
+    return !!methodType && methodType !== 'straight'
+  }, [recipe.productType, recipe.method])
 
   // 카테고리 이름 메모이제이션
   const categoryName = useMemo(() => {
@@ -182,7 +192,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             {onEdit && (
               <button
                 onClick={handleEdit}
-                className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px]"
+                className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
                 aria-label={t('recipeList.editRecipe')}
                 type="button"
               >
@@ -191,7 +201,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             )}
             <button
               onClick={handleDelete}
-              className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px]"
+              className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
               aria-label={t('recipeList.deleteRecipe')}
               type="button"
             >
@@ -201,7 +211,7 @@ const RecipeCard = memo<RecipeCardProps>(({
         </div>
 
         <div className="flex justify-between items-center text-xs text-ink-subtle">
-          <span>{methodName}</span>
+          {showMethod ? <span>{methodName}</span> : <span />}
           <span>{t('recipeList.ingredientCount', { count: ingredientCount })}</span>
         </div>
       </div>
@@ -238,7 +248,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           {onEdit && (
             <button
               onClick={handleEdit}
-              className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px]"
+              className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
               aria-label={t('recipeList.editRecipe')}
               type="button"
             >
@@ -247,7 +257,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           )}
           <button
             onClick={handleDelete}
-            className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px]"
+            className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
             aria-label={t('recipeList.deleteRecipe')}
             type="button"
           >
@@ -260,9 +270,11 @@ const RecipeCard = memo<RecipeCardProps>(({
         <span className="text-xs px-2 py-1 bg-surface-muted text-ink-muted rounded">
           {categoryName}
         </span>
-        <span className="text-xs px-2 py-1 bg-surface-muted text-ink-muted rounded">
-          {methodName}
-        </span>
+        {showMethod && (
+          <span className="text-xs px-2 py-1 bg-surface-muted text-ink-muted rounded">
+            {methodName}
+          </span>
+        )}
         {sourceInfo && (
           <span className={`text-xs px-2 py-1 ${sourceInfo.bgColor} ${sourceInfo.color} rounded flex items-center gap-1`}>
             <sourceInfo.Icon size={10} />

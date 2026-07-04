@@ -144,7 +144,7 @@ export default function PhaseIngredientsView({
       rose: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-700', header: 'bg-rose-100' },
       indigo: { bg: 'bg-indigo-50', border: 'border-indigo-200', text: 'text-indigo-700', header: 'bg-indigo-100' },
       cyan: { bg: 'bg-cyan-50', border: 'border-cyan-200', text: 'text-cyan-700', header: 'bg-cyan-100' },
-      gray: { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-700', header: 'bg-gray-100' },
+      gray: { bg: 'bg-surface-muted', border: 'border-line', text: 'text-ink', header: 'bg-line-soft' },
     }
     return colors[color]?.[variant] || colors.gray[variant]
   }

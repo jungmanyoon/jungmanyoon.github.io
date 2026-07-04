@@ -222,7 +222,7 @@ export default function BulkIngredientInput({
               <label className="text-sm font-medium text-ink-muted">{t('components.bulkInput.ingredientList')}</label>
               <button
                 onClick={handlePaste}
-                className="text-xs flex items-center gap-1 px-2 py-1 bg-surface-muted hover:bg-gray-200 rounded"
+                className="text-xs flex items-center gap-1 px-2 py-1 bg-surface-muted hover:bg-line rounded"
               >
                 <Upload className="w-3 h-3" />
                 {t('common.pasteFromClipboard')}
@@ -299,7 +299,7 @@ export default function BulkIngredientInput({
         <div className="flex items-center justify-between px-4 py-3 border-t bg-surface-muted">
           <button
             onClick={handleReset}
-            className="px-3 py-1.5 text-sm text-ink-muted hover:bg-gray-200 rounded"
+            className="px-3 py-1.5 text-sm text-ink-muted hover:bg-line rounded"
           >
             {t('common.reset')}
           </button>

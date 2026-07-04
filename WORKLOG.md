@@ -8,16 +8,23 @@
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
 
-**UI/UX Phase 2: quick-win 배치 A/B/D/E/F1-3/G 완료 + main 머지 + 배포 완료 (2026-07-04). 다음: 이월분(신중 패스)을 별도 브랜치로.**
+**[2026-07-04 세션 B] 기계적 후속 폴리시 + A3 도메인 버그 완료 (브랜치 `fix/uiux-phase2-polish`, PR 예정). 다음: 실행모드 C / 반응형 / redesign H.**
+
+- 완료: **A3**(제과/제빵 지표 게이팅) · **G1**(gray 48개소->토큰, grep 0) · **G2**(헤딩 h1/h2/h3 타입스케일 토큰) · **G3**(변환 g셀 valueFlash 애니메이션) · **G5**(홈 히어로 '평균 재료 수'->'페이스트리·쿠키' 카테고리 집계) · **E2**(.focus-ring 유틸 정의 + SearchBar bread-500->brand-400 + RecipeCard 아이콘버튼 포커스링). 3종검증(typecheck0/test164/build OK) + 실렌더 스크린샷 검증(제과 요거트롤=수화율/반죽수율/제법 숨김·총무게만 / 제빵 우유식빵=수화율70%/반죽수율/제법 유지 / 목록 제법칩 제과만 숨김 / 홈 새카드 / 설정 토큰).
+- **도메인 확정(사용자 지적 반영)**: 수화율·반죽수율·제법은 밀가루-반죽 기반 **제빵** 지표라 **제과**(스펀지·거품형 케이크·쿠키 등)엔 대체로 무의미(녹차롤 "수화율 338%"의 원인 = 제과에 제빵지표 표시). 대시보드는 이미 제법을 제빵 전용 게이팅(:2668)했으나 RecipeView/RecipeCard만 누락 -> `productType==='pastry'`면 숨김. **슈톨렌 예외**: straight가 아닌 실제 제법을 가진 제과는 계속 노출(`!isPastry || methodType!=='straight'`). => 아래 "A3 배선 후속" hydration 버그 해소됨.
+- **이월(신중)**: **G6**(공정 열접기·moderate·'사전반죽 추가' 어포던스가 제빵 도메인과 얽혀 별도 판단) / **G7**(React key경고·이번 세션 흐름 home/list/view/settings/변환버튼에선 재현 안 됨(WebGL 경고만), 대시보드 변환표 특정 상호작용 repro 필요). 실행모드 C 전부·반응형 B6/D5/H7·redesign H는 그대로.
+- (참고·후속 판단) 제과 재료표 BP%(베이커스%)는 여전히 전 레시피 표시됨 — 제과엔 관례상 안 쓰나 계산상 오도는 아님(renderIngredientTable 공유 컴포넌트라 게이팅 시 회귀범위 큼).
+
+**[2026-07-04 세션 A] UI/UX Phase 2: quick-win 배치 A/B/D/E/F1-3/G 완료 + main 머지 + 배포 완료.**
 
 - PR #5(`fix/uiux-phase2` -> `main`) 머지 완료(머지커밋 `25bd5a8`). `npm run deploy`로 gh-pages 배포 완료, https://jungmanyoon.github.io/ 라이브 200 확인.
 - 완료 커밋: A `e00b90c`(P1 4건) / B `51a737b` / D `1143f3b` / E `4304984` / F1-3 `01b9f9f` / G `061a2f1`. 각 3종검증(typecheck0/test164/build OK) + 주요 P1은 실렌더 스크린샷 검증.
 - **남은 이월분(다음 세션, 신중 패스 필요)**: 아래 체크리스트에서 미체크 항목.
   - **실행모드 패스**(상태/상호작용 무거움): 배치 C 전부(C1 공정 체크박스·C2 미장플라스·C3 타이머 배선·C5 모바일 공정), F4(편집표 AutocompleteInput), F5(일괄 phase), F6(DDT 연결). H1(베이킹 모드)과 함께.
   - **반응형 패스**: B6(sticky 요약)·D5(모바일 하단 탭바)·H7(태블릿 결과우선 레이아웃).
-  - **기계적 후속**: E2 전면(focus-ring 유틸 롤아웃)·G1 나머지 파일 gray 스윕·G2 헤딩 타입토큰·G3 값 flash·G5 히어로 지표·G6 열접기·G7 key경고(런타임 핀포인트).
+  - **기계적 후속**: ~~E2·G1·G2·G3·G5~~ **완료(세션 B)**. 잔여는 G6 열접기·G7 key경고(런타임 핀포인트)만.
   - **redesign 배치 H**: 레시피 이미지/카테고리 헤더밴드(+Recipe.image), 카드 SSOT, 공정-phase 타임라인, 덮어쓰기 ConfirmModal+사본저장, 설정 9탭 그룹화.
-- **A3 배선으로 드러난 후속**: RecipeView 수화율이 계란·생크림·식용유까지 liquid 합산해 과대치(녹차롤 338%) -> hydration 분류 교정 필요.
+- **A3 배선으로 드러난 후속**: ~~RecipeView 수화율이 계란·생크림·식용유까지 liquid 합산해 과대치(녹차롤 338%)~~ **해소(세션 B)** - 제과에 제빵지표(수화율/반죽수율/제법) 표시 자체를 게이팅. hydration 재분류가 아니라 "제과엔 안 보임"이 도메인 정답.
 - 감사 원본: 이 파일 "## [UI/UX Phase 2 감사 체크리스트 (2026-07-04)]" 절(배치 A~H, 근거 file:line 포함).
 
 **[Phase 1 완료 이력] Phase 1 완료 + main 머지 + 배포 완료 (2026-07-04).**
@@ -93,9 +100,9 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [x] D4 푸터 미번역 키 노출 (Footer nav.dashboard -> nav.converter): Footer.tsx:44 -> t('nav.converter') 또는 nav.dashboard 키 추가 + i18n missing 핸들러.
 - [ ] D5 모바일 nav 라벨 없음: **-> H(반응형)로 이월** (하단 고정 탭바 재설계. 라벨만 노출하면 375px 오버플로/스크롤이라 반쪽; 바텀바가 정답). Header.jsx:11-16,:70.
 
-### 배치 E - P2 quick: 접근성·일관성 [완료 2026-07-04 · typecheck0/test164/build OK · E2는 부분(유틸 롤아웃 후속)]
+### 배치 E - P2 quick: 접근성·일관성 [완료 2026-07-04 · typecheck0/test164/build OK · E2 세션 B 완결]
 - [x] E1 ink-disabled(2.6:1)->ink-subtle(4.76:1) 4곳 (:2851 A2 + HomePage:261 + IngredientSettingsTab:608·825): :2851, HomePage.tsx:261, IngredientSettingsTab.tsx:608·825. (A2/변환기 %열과 겹침-함께)
-- [~] E2 포커스 링 단일화 (부분: AutocompleteInput amber-500->brand-400 정합. 전면 `.focus-ring` 유틸 롤아웃 Header/RecipeCard/SearchBar는 후속-저위험 cosmetic).
+- [x] E2 포커스 링 단일화 (세션 B: index.css `.focus-ring` 유틸 정의 + SearchBar `bread-500`->`brand-400`(레거시 앰버 잔재 2곳) + RecipeCard 아이콘버튼(편집/삭제 compact·basic 4개)에 `focus-ring`. Header/카드 메인버튼은 이미 brand 링 보유라 미변경).
 - [x] E3 combobox ARIA (AutocompleteInput: useId, role=combobox/listbox/option + aria-expanded/controls/autocomplete/activedescendant/selected, recent 헤더 role=presentation).
 - [x] E4 토스트 aria-live 이중 낭독 (ToastContainer 래퍼 aria-live 제거, role=region/label 유지, 낭독은 개별 Toast에 위임).
 
@@ -107,14 +114,14 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [ ] F5 일괄입력 phase 파싱: **-> 신중 패스 이월** (ParsedIngredient phase+모달 드롭다운). BulkIngredientInput.tsx:51-128.
 - [ ] F6 DDT 연결/컨텍스트/환경값: **-> 신중 패스 이월** (대시보드 로컬 재료 state를 Recipe로 변환해 setCurrentRecipe 필요 = 구조작업). DDTCalculator.tsx:160-173, App.tsx:173-174.
 
-### 배치 G - P3 polish [G1부분·G4 완료 2026-07-04 · typecheck0/test164/build OK · G2/G3/G5/G6/G7 후속]
-- [~] G1 gray-* -> line-* (부분: AdvancedDashboard hover:bg-gray-200->hover:bg-line 6곳 + text-gray-300->text-line-strong 5곳. 나머지 파일 잔재는 후속 기계적 스윕).
-- [ ] G2 타입스케일 토큰 적용: tailwind:77-85 정의만-미사용. index.css:11-21 헤딩 @apply text-h1/h2/h3 text-ink.
-- [ ] G3 변환 값 flash: g셀 key={convertedAmount}+valueFlash keyframe, 진입 fade-in.
+### 배치 G - P3 polish [G1/G2/G3/G4/G5 완료 · G6/G7 이월 · typecheck0/test164/build OK]
+- [x] G1 gray-* -> line/ink/surface 토큰 (세션 B 완결: 잔여 48개소/22파일 전부, 서브에이전트 20파일 46치환 + AdvancedDashboard:2272(bg-gray-500->bg-ink-subtle)·RecipeCard:60(text-gray-600/bg-gray-50->ink-muted/surface-muted). Footer 다크섹션은 gray->slate 유지. grep 0 확인).
+- [x] G2 타입스케일 토큰 적용 (세션 B: index.css 헤딩 h1/h2/h3 -> @apply text-h1/h2/h3 text-ink. h2/h3 색 slate-800/700->ink 통일, h3 굵기 500->600. 실렌더로 과대 대비 없음 확인).
+- [x] G3 변환 값 flash (세션 B: tailwind keyframes.valueFlash(info-100 #DBEAFE->transparent 0.6s) + animation, 변환표 g셀 값 `<span key={convertedAmount} className="animate-valueFlash">`. 값 바뀔 때 리마운트로 재생).
 - [x] G4 compact 카드 이름 위계 (이름 text-sm/medium -> text-base/semibold, 메타 ink-muted -> ink-subtle).
-- [ ] G5 홈 히어로 배니티 지표('평균 재료 수') 교체: HomePage.tsx:154-160 -> '오늘의 레시피'/카테고리 칩.
-- [ ] G6 단일제법 '공정' 열 접기(moderate): :2771,:2835-2850,:956. hasMultiplePhases=false면 열 접고 '사전반죽 추가' 어포던스.
-- [ ] G7 (별건) React unique key 경고: **-> 후속(런타임 핀포인트 필요)**. 원본 :303 근사치는 내 편집으로 이동, dev 콘솔에서 정확한 map 위치 재현 후 key 부여.
+- [x] G5 홈 히어로 배니티 지표 교체 (세션 B: '평균 재료 수'(avgIngredients, TrendingUp) -> '페이스트리·쿠키'(Cookie 아이콘, cookie+pastry+confectionery+savory 카테고리 합). i18n home.pastryRecipes ko/en 추가. 죽은 avgIngredients 계산 제거. 1번 카드가 이미 전체수라 중복 회피).
+- [ ] G6 단일제법 '공정' 열 접기(moderate): :2771,:2835-2850,:956. hasMultiplePhases=false면 열 접고 '사전반죽 추가' 어포던스. **-> 이월(moderate·'사전반죽'은 제빵 도메인 전용이라 게이팅 설계 필요, 실행모드/redesign과 함께)**.
+- [ ] G7 (별건) React unique key 경고: **-> 이월(런타임 핀포인트 필요)**. 세션 B에서 home/list/view/settings/변환버튼 흐름 콘솔에 key 경고 미발생(WebGL 폴백 경고만) -> 대시보드 변환표 배수변경 등 특정 상호작용에서 repro 후 정확한 map에 key 부여.
 
 ### 배치 H - Larger redesign (별도 서브프로젝트, 신중히 / 기존 Phase 2 백로그와 통합)
 - [ ] H1 전용 '베이킹 모드'(Wake Lock+전체화면 큰 글씨 단계 뷰): :2952-3124. navigator.wakeLock try/catch.

@@ -67,9 +67,9 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
     >
       {/* 시각적 힌트 */}
       {direction === 'horizontal' ? (
-        <div className="w-0.5 h-8 bg-gray-300 group-hover:bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="w-0.5 h-8 bg-line-strong group-hover:bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
       ) : (
-        <div className="h-0.5 w-8 bg-gray-300 group-hover:bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="h-0.5 w-8 bg-line-strong group-hover:bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
       )}
     </div>
   );

@@ -699,7 +699,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 <button
                   onClick={handleSave}
                   disabled={!calculatedVolume}
-                  className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-line-strong disabled:cursor-not-allowed transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   {t('common.save')}
@@ -919,7 +919,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               <button
                 onClick={handleSave}
                 disabled={!calculatedVolume}
-                className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-line-strong disabled:cursor-not-allowed transition-colors"
               >
                 <Save className="w-4 h-4" />
                 {editingId ? t('common.save') : t('common.add')}
@@ -941,7 +941,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
           <div className="p-8 text-center text-ink-subtle border border-dashed rounded-lg">
             {pan.myPans.length === 0 ? (
               <>
-                <Box className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <Box className="w-12 h-12 mx-auto mb-3 text-line-strong" />
                 <p className="font-medium">{t('settings.pan.noPans')}</p>
                 <p className="text-sm mt-1">
                   {t('settings.pan.noPansDesc')}
@@ -949,7 +949,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               </>
             ) : (
               <>
-                <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <Search className="w-12 h-12 mx-auto mb-3 text-line-strong" />
                 <p className="font-medium">{t('settings.pan.noResults')}</p>
                 <p className="text-sm mt-1">
                   {t('settings.pan.noResultsDesc')}

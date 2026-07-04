@@ -44,6 +44,16 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
     return method || t('components.recipeView.methods.straight')
   }
 
+  // 제과(pastry) vs 제빵(bread): 수화율/반죽수율/제법은 밀가루-반죽 기반 제빵 지표라
+  // 제과(스펀지·거품형 케이크, 쿠키 등)에는 대체로 무의미하다(예: 녹차롤 "수화율 338%").
+  // 단, 슈톨렌처럼 straight가 아닌 제법을 실제로 가진 예외 제과는 제법을 계속 노출한다.
+  const isPastry = recipe.productType === 'pastry'
+  const rawMethodType = (typeof recipe.method === 'object' && recipe.method !== null)
+    ? (recipe.method.method || recipe.method.type)
+    : recipe.method
+  const showBreadMetrics = !isPastry
+  const showMethod = !isPastry || (rawMethodType && rawMethodType !== 'straight')
+
   // 재료 테이블 렌더링 함수
   const renderIngredientTable = (ingredients, title) => {
     const flourTotal = ingredients.filter(ing => isCategory(ing, 'flour')).reduce((sum, ing) => sum + parseFloat(ing.amount || 0), 0)
@@ -127,9 +137,11 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
             <span className="inline-block px-3 py-1 bg-surface-muted text-ink-muted rounded-full text-sm">
               {recipe.category}
             </span>
-            <p className="text-sm text-ink-subtle mt-2">
-              {getMethodName(recipe.method)}
-            </p>
+            {showMethod && (
+              <p className="text-sm text-ink-subtle mt-2">
+                {getMethodName(recipe.method)}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -184,30 +196,44 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
           <div className="card">
             <h2 className="text-base font-semibold mb-2">{t('components.recipeView.nutritionInfo')}</h2>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between py-1 border-b border-line-soft">
-                <span>{t('components.recipeView.hydration')}</span>
-                <span className="font-medium">
-                  {(() => {
-                    const flour = recipe.ingredients.filter(ing => isCategory(ing, 'flour')).reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
-                    const liquid = recipe.ingredients.filter(ing => isCategory(ing, 'liquid')).reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
-                    return flour > 0 ? ((liquid / flour) * 100).toFixed(1) : 0
-                  })()}%
-                </span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-line-soft">
-                <span>{t('components.recipeView.doughYield')}</span>
-                <span className="font-medium">
-                  {(() => {
-                    const flour = recipe.ingredients.filter(ing => isCategory(ing, 'flour')).reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
-                    const total = recipe.ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
-                    return flour > 0 ? ((total / flour) * 100).toFixed(1) : 0
-                  })()}%
-                </span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-line-soft">
-                <span>{t('components.recipeView.methodLabel')}</span>
-                <span className="font-medium">{getMethodName(recipe.method)}</span>
-              </div>
+              {showBreadMetrics && (
+                <>
+                  <div className="flex justify-between py-1 border-b border-line-soft">
+                    <span>{t('components.recipeView.hydration')}</span>
+                    <span className="font-medium">
+                      {(() => {
+                        const flour = recipe.ingredients.filter(ing => isCategory(ing, 'flour')).reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
+                        const liquid = recipe.ingredients.filter(ing => isCategory(ing, 'liquid')).reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
+                        return flour > 0 ? ((liquid / flour) * 100).toFixed(1) : 0
+                      })()}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-line-soft">
+                    <span>{t('components.recipeView.doughYield')}</span>
+                    <span className="font-medium">
+                      {(() => {
+                        const flour = recipe.ingredients.filter(ing => isCategory(ing, 'flour')).reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
+                        const total = recipe.ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0)
+                        return flour > 0 ? ((total / flour) * 100).toFixed(1) : 0
+                      })()}%
+                    </span>
+                  </div>
+                </>
+              )}
+              {isPastry && (
+                <div className="flex justify-between py-1 border-b border-line-soft">
+                  <span>{t('components.recipeView.totalWeight')}</span>
+                  <span className="font-medium">
+                    {recipe.ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0).toFixed(1)}g
+                  </span>
+                </div>
+              )}
+              {showMethod && (
+                <div className="flex justify-between py-1 border-b border-line-soft">
+                  <span>{t('components.recipeView.methodLabel')}</span>
+                  <span className="font-medium">{getMethodName(recipe.method)}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

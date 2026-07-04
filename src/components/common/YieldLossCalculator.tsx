@@ -286,7 +286,7 @@ export default function YieldLossCalculator({
                   </button>
                   <button
                     onClick={() => handleSelectAll(false)}
-                    className="px-2 py-0.5 text-xs bg-gray-200 text-ink-muted rounded hover:bg-gray-300"
+                    className="px-2 py-0.5 text-xs bg-surface-muted text-ink-muted rounded hover:bg-line"
                   >
                     {t('components.yieldLoss.deselectAll')}
                   </button>
@@ -454,7 +454,7 @@ export default function YieldLossCalculator({
               <div key={idx} className="flex items-center text-sm">
                 <div className="w-12 text-ink-muted">{loss.stage}</div>
                 <div className="flex-1 mx-2">
-                  <div className="h-2 bg-gray-200 rounded overflow-hidden">
+                  <div className="h-2 bg-line rounded overflow-hidden">
                     <div
                       className={`h-full ${loss.lossPercent >= 10 ? 'bg-red-400' : loss.lossPercent >= 5 ? 'bg-orange-400' : 'bg-yellow-400'}`}
                       style={{ width: `${Math.min(loss.lossPercent * 5, 100)}%` }}

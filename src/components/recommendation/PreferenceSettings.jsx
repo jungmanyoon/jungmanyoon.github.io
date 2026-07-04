@@ -274,7 +274,7 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                 hasChanges
                   ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                  : 'bg-gray-300 text-ink-subtle cursor-not-allowed'
+                  : 'bg-line-strong text-ink-subtle cursor-not-allowed'
               }`}
             >
               저장

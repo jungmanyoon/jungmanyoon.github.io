@@ -128,7 +128,7 @@ const RecommendationPanel = ({
                 className={`flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   isSelected
                     ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                    : 'bg-surface-muted text-ink-muted hover:bg-gray-200 border border-line'
+                    : 'bg-surface-muted text-ink-muted hover:bg-line border border-line'
                 }`}
                 title={type.description}
               >
@@ -147,10 +147,10 @@ const RecommendationPanel = ({
             {[1, 2, 3].map(i => (
               <div key={i} className="animate-pulse">
                 <div className="flex items-center space-x-3">
-                  <div className="w-16 h-16 bg-gray-200 rounded-lg" />
+                  <div className="w-16 h-16 bg-line rounded-lg" />
                   <div className="flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    <div className="h-4 bg-line rounded w-3/4 mb-2" />
+                    <div className="h-3 bg-line rounded w-1/2" />
                   </div>
                 </div>
               </div>
@@ -256,7 +256,7 @@ const RecommendationPanel = ({
                             aria-label={`${star}점`}
                             onClick={(e) => { e.stopPropagation(); handleCooked(recipe, star) }}
                           >
-                            <Star className={`w-3.5 h-3.5 ${((ratings[recipe.id] || 0) >= star) ? 'text-yellow-500 fill-yellow-400' : 'text-gray-300'}`} />
+                            <Star className={`w-3.5 h-3.5 ${((ratings[recipe.id] || 0) >= star) ? 'text-yellow-500 fill-yellow-400' : 'text-line-strong'}`} />
                           </button>
                         ))}
                       </div>

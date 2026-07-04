@@ -594,7 +594,7 @@ export default function ProductSettingsTab({ className = '' }: ProductSettingsTa
             </div>
           ) : (
             <div className="text-center p-8 text-ink-subtle border border-dashed rounded-lg">
-              <Scale className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <Scale className="w-12 h-12 mx-auto mb-3 text-line-strong" />
               <p>{t('settings.product.custom.emptyState')}</p>
             </div>
           )}

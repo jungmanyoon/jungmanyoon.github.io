@@ -220,7 +220,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
 
           {/* 발효 시간 정보 */}
           {recipe.conversionDetails.fermentationTime && (
-            <div className="mb-2 p-2 bg-yellow-50 rounded">
+            <div className="mb-2 p-2 bg-surface-muted rounded">
               <p className="font-medium mb-1 text-sm">{t('components.recipeView.fermentationTime')}</p>
               {Object.entries(recipe.conversionDetails.fermentationTime).map(([key, value]) => (
                 <p key={key} className="text-xs">
@@ -245,8 +245,8 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
 
           {/* 참고사항 */}
           {recipe.conversionDetails.notes && (
-            <div className="p-2 bg-amber-50 border border-amber-200 rounded">
-              <p className="text-xs text-amber-800">
+            <div className="p-2 bg-surface-muted border border-line rounded">
+              <p className="text-xs text-ink-muted">
                 <strong>{t('components.recipeView.noteLabel')}</strong> {recipe.conversionDetails.notes}
               </p>
             </div>

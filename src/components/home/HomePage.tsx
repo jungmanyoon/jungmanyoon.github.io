@@ -86,7 +86,7 @@ export default function HomePage() {
   // 레시피 선택 핸들러
   const handleRecipeClick = (recipe: any) => {
     setCurrentRecipe(recipe)
-    setActiveTab('dashboard')
+    setActiveTab('view')
   }
 
   // 새 레시피 시작: 빈 레시피를 만들어 로드 (예시 자동주입 없이 빈 상태로 시작)

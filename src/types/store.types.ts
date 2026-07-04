@@ -31,6 +31,7 @@ export type TabType =
   | 'pan-converter'
   | 'method-converter'
   | 'recipes'
+  | 'view'
   | 'editor'
   | 'settings'
   | 'help'

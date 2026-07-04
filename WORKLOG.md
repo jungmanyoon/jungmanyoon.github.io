@@ -8,7 +8,13 @@
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
 
-**UI/UX 개선 Phase 1 완료 + main 머지 + 배포 완료 (2026-07-04). 다음은 Phase 2 논의부터.**
+**UI/UX 2차 전문가 감사 완료 (2026-07-04). 확정 50건(P0 0 / P1 4 / P2 39 / P3 7). 다음: 아래 "[UI/UX Phase 2 감사 체크리스트]"의 배치 A(P1)부터 착수.**
+
+- 감사 방법: 61 에이전트 병렬 워크플로(실제 렌더링 21장 캡처[375/768/1440] + 베이킹 8렌즈 + 발견별 적대적 검증). 체크리스트/근거는 이 파일 "## [UI/UX Phase 2 감사 체크리스트 (2026-07-04)]" 절.
+- 실행 전략(사용자 합의): 한 번에 전부 X. 배치 A(P1, 전부 quick) -> 배치 B~G(P2/P3 quick wins) -> 배치 H(redesign 7건 = 기존 Phase 2 백로그와 통합, 신중히). 각 배치 = 브랜치 `fix/uiux-phase2` -> 배치별 커밋 -> 3종검증(typecheck/test:run/build). 무관파일 커밋 제외.
+- 별건 버그: dev 콘솔에 AdvancedDashboard.tsx:303 부근 React "unique key prop" 경고 1건(런타임 에러 아님) -> 배치 중 함께 해소.
+
+**[Phase 1 완료 이력] Phase 1 완료 + main 머지 + 배포 완료 (2026-07-04).**
 
 - PR #4(`fix/uiux-phase1` -> `main`) 머지 완료(머지커밋 `efff849`). `npm run deploy`로 gh-pages 배포 완료, https://jungmanyoon.github.io/ 라이브 반영 확인(스크린샷 검증).
 - 근본원인 확정: 뉴트럴 팔레트 토큰을 tailwind에 정의만 하고 화면에 미적용(gray 879회·bread 잔존). "안 바뀐" 진짜 이유.
@@ -41,6 +47,78 @@
 
 ### 뉴트럴 팔레트 토큰(추가됨, 앞으로 활용)
 tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #F1F5F9), `line`(DEFAULT #E2E8F0 / soft #F1F5F9 / strong #CBD5E1), `ink`(DEFAULT #0F172A / muted #475569 / subtle #64748B / disabled #94A3B8 / inverse #FFFFFF). brand(amber)는 액센트로만. bread는 하위호환 유지.
+
+---
+
+## [UI/UX Phase 2 감사 체크리스트 (2026-07-04)]
+
+> 2차 전문가 감사(61 에이전트, 실렌더 21캡처+베이킹 8렌즈+적대적 검증) 확정 50건. 체크박스 완료 표기하며 진행. 위치는 미표기시 `src/components/dashboard/AdvancedDashboard.tsx` 기준.
+> 핵심 진단: 계산은 맞으나 "그 숫자를 믿고 읽기 어렵다"는 신뢰·판독층에 문제 집중. 새 기능보다 이미 만든 자산(RecipeView/TimerManager) 배선 + 핵심 출력숫자(변환 g·베이커스%) 위계·대비·의미 교정이 우선.
+
+### 배치 A - P1 (최우선, 전부 quick / 브랜치 시작점) [완료 2026-07-04 · 브랜치 fix/uiux-phase2 · typecheck0/test164/build OK · 실렌더 검증]
+> 부수효과: A2로 E1(:2851 ink-disabled) 이미 해소. A3로 RecipeView가 노출되며 발견 -> RecipeView 수화율이 계란·생크림·식용유까지 liquid로 합산해 과대치(녹차롤 338%). 별도 후속 필요(RecipeView hydration 분류 교정, H/후속 배치).
+- [x] A1 '손실률'->'팬 충전율': :1099-1102(계산),:2200(라벨/툴팁/색). 계산식 `convertedTotal/panTotalWeight`로 뒤집고 i18n '팬 충전율', 색 임계 >110 danger/85-110 success/<85 warning. 진짜 굽기손실은 yieldLoss로 별도 칩. (현재 라벨·계산·색 축이 서로 달라 정상 굽기손실을 경고색으로 오도)
+- [x] A2 베이커스 % 열 로드직후 0 -> amount 파생: :2851(셀),:587(로드),:2015-2019(갱신). `flourTotal` useMemo로 `flour>0?amount/flour*100:0` 전 재료 동일식. 변환표(:2886-2890)에도 % 셀 추가. IngredientTable.jsx:73-80 로직 재사용.
+- [x] A3 RecipeView 라우팅 배선(고아 컴포넌트 살리기): App.tsx:73(VALID_TABS)/:76-89(PAGE_TITLES)/:153-190(renderActive) + RecipeListPage.tsx:67, HomePage.tsx:89. 'view' 탭 추가, RecipeView 5 prop 배선, 카드 탭 dashboard->view(연필=editor 유지). RecipeView 잔존 amber(223,248-250) de-amber.
+- [x] A4 파괴적 삭제 undo+터치타깃: :1995(removeIngredient),:2030(removeProcess), 버튼 :2857/:3072. 기존 `showUndoToast`(1535) 스냅샷 복원으로 감싸기(하드코딩 메시지 일반화), 버튼 `p-2 -m-2` 44px 히트영역.
+
+### 배치 B - P2 quick: 변환기 판독·신뢰
+- [ ] B1 변환 g 위계: :2914-2918,:195-200. g셀만 dynamicStyles 축소서 분리, 최소 text-sm+font-semibold.
+- [ ] B2 소수 스마트 반올림: :1000,:1108,:2928. 포맷 헬퍼 10g↑ 정수/<10g만 0.1g, 총계 round-then-sum.
+- [ ] B3 변환표 % 열 추가: :2888-2890. 우측정렬(스트레이트=ratio, 제법변환=단계밀가루 대비).
+- [ ] B4 단계별 소계 g: :2894-2909,:2928. phase 그룹 소계 인라인.
+- [ ] B5 375px 원본표 과밀: :2766-2774. 공정/% 열 `hidden sm:table-cell`로 재료명 폭 확보.
+- [ ] B6 sticky 요약 pill(태블릿/모바일): :2061-2064,:2237-2244. 요약 슬림바 lg 미만 sticky top-0, 결과표 order 앞으로.
+- [ ] B7 변환결과 하드코드 blue->토큰: :2877-2928. info 토큰 50-700 확장 후 치환.
+- [ ] B8 재료 그리드 키보드 포커스 소실: :2807,:2831,:2839,:2854. td `focus-within:ring-2 ring-brand-400 ring-inset`(AutocompleteInput !ring-0 충돌 회피).
+
+### 배치 C - P2 quick: 굽기 실행 흐름
+- [ ] C1 공정 완료 체크박스+진행 카운터: :2969-3072, ProcessStep(:83-89) `done?` 추가(칩 탭=편집 충돌 -> 별도 체크 버튼).
+- [ ] C2 변환결과 계량 체크리스트(미장플라스): :2914-2920. 행별 체크박스(복합키 phase-cat-id-idx), line-through, 배수변경 초기화.
+- [ ] C3 TimerManager 배선(고아): 툴바/PWAStatus 토글, 공정칩 time '시작'. 배선시 하드코딩 orange 뉴트럴화.
+- [ ] C4 인쇄/PDF: 툴바 Printer 버튼 window.print(), 셸 print:hidden, 결과영역 @media print.
+- [ ] C5 공정 지시문 12px->세로 numbered: :2967-3014,:2975. 본문 text-sm, 모바일 세로 1열, 폭핸들 lg 전용.
+- [ ] C6 단계칩 오탭 삭제 undo: :2967-3074,:3072-3074. removeProcess를 showUndoToast로 order 복원(A4와 함께).
+
+### 배치 D - P2 quick: 전역 IA/내비/브랜드
+- [ ] D1 dashboard/workspace 중복 통합: App.tsx:73·158-159, main.jsx:43, Header.jsx:59. canonical 'dashboard'.
+- [ ] D2 랜딩 탭 단일화: useAppStore.ts:47, main.jsx:41-46, App.tsx:116-121. 기본 'home' 권장.
+- [ ] D3 앱 이름 정렬(4곳): ko.json:3·2098, App.tsx:91(BASE_TITLE), footer. 캐논 1개('계산기' 배제, DDT탭과 중복).
+- [ ] D4 푸터 미번역 키 노출: Footer.tsx:44 -> t('nav.converter') 또는 nav.dashboard 키 추가 + i18n missing 핸들러.
+- [ ] D5 모바일 nav 라벨 없음: Header.jsx:11-16,:70. 하단 고정 탭바(아이콘+text-[10px]) 또는 변환기 탭 텍스트 병기.
+
+### 배치 E - P2 quick: 접근성·일관성
+- [ ] E1 ink-disabled(2.6:1)->ink-subtle(4.76:1) 4곳: :2851, HomePage.tsx:261, IngredientSettingsTab.tsx:608·825. (A2/변환기 %열과 겹침-함께)
+- [ ] E2 포커스 링 단일화: `.focus-ring` 유틸(focus-visible:shadow-focus 토큰 사용), Header:25·41/RecipeCard:168/SearchBar:67 등 치환. tailwind shadow-focus 토큰 활용.
+- [ ] E3 combobox ARIA: AutocompleteInput.tsx:200-249. role=combobox/listbox/option + aria-expanded/activedescendant/selected.
+- [ ] E4 토스트 aria-live 이중 낭독: ToastContainer.tsx:24-27 래퍼 aria-live 제거(role/label 유지, 낭독은 개별 Toast.tsx:100-102에 위임).
+
+### 배치 F - P2 quick: 카드/편집/DDT
+- [ ] F1 카드 출처색 아이콘 국한: RecipeCard.tsx:53-61,:173-177,:230-234. 텍스트는 ink-subtle.
+- [ ] F2 카드 터치타깃 44px: RecipeCard.tsx:185,194,241,250.
+- [ ] F3 IngredientTable 삭제 아이콘화(세로깨짐): IngredientTable.jsx:166-173. lucide Trash2 ghost(aria-label).
+- [ ] F4 IngredientTable AutocompleteInput 전환: IngredientTable.jsx:84-114. type<->category 매핑, Enter/Tab 셀이동 passthrough.
+- [ ] F5 일괄입력 phase 파싱: BulkIngredientInput.tsx:51-128, :1979-1990. ParsedIngredient에 phase 추가+모달 단계 드롭다운.
+- [ ] F6 DDT 연결/컨텍스트/환경값: DDTCalculator.tsx:160-173, App.tsx:173-174. 변환기 'DDT로' 버튼(setCurrentRecipe), 상단 컨텍스트 배지, environment prop 전달(현재 실온 22 고정).
+
+### 배치 G - P3 polish
+- [ ] G1 gray-* -> line-* 잔재 치환(22파일 59회). :2193-2199 등. base==hover 회피.
+- [ ] G2 타입스케일 토큰 적용: tailwind:77-85 정의만-미사용. index.css:11-21 헤딩 @apply text-h1/h2/h3 text-ink.
+- [ ] G3 변환 값 flash: g셀 key={convertedAmount}+valueFlash keyframe, 진입 fade-in.
+- [ ] G4 compact 카드 이름 위계: RecipeCard.tsx:162,:203-206. 이름 text-base font-semibold, 메타 ink-subtle.
+- [ ] G5 홈 히어로 배니티 지표('평균 재료 수') 교체: HomePage.tsx:154-160 -> '오늘의 레시피'/카테고리 칩.
+- [ ] G6 단일제법 '공정' 열 접기(moderate): :2771,:2835-2850,:956. hasMultiplePhases=false면 열 접고 '사전반죽 추가' 어포던스.
+- [ ] G7 (별건) React unique key 경고: :303 부근 key 부여.
+
+### 배치 H - Larger redesign (별도 서브프로젝트, 신중히 / 기존 Phase 2 백로그와 통합)
+- [ ] H1 전용 '베이킹 모드'(Wake Lock+전체화면 큰 글씨 단계 뷰): :2952-3124. navigator.wakeLock try/catch.
+- [ ] H2 레시피북 완성품 이미지/카테고리 헤더밴드 + Recipe.image 필드: RecipeCard/RecipeList, recipe.types.ts. gradient 헤더밴드+대형아이콘(필수)/optional imageUrl(선택).
+- [ ] H3 홈·목록 카드 SSOT 통합: HomePage.tsx:235-268 <- RecipeCard compact.
+- [ ] H4 공정-phase 타임라인 연계: ProcessStep phase 추가 + PHASE_META 그룹핑.
+- [ ] H5 저장 덮어쓰기 ConfirmModal + '사본으로 저장': :1743(현재 window.confirm). 3버튼[덮어쓰기/사본으로/취소].
+- [ ] H6 설정 9탭 그룹화 + 모바일 스크롤 어포던스: SettingsPage.tsx:41-125,:301. group 필드+소제목+edge-fade.
+- [ ] H7 태블릿/모바일 변환기 결과우선 레이아웃(B6 확장).
+- (기존 백로그 통합: AdvancedDashboard 3063줄 컴포넌트 분해, 변환기 간단/전문가 2모드, 좌우표 완전 단일화 - H와 함께 계획)
 
 ---
 

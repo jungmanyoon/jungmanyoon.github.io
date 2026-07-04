@@ -2244,7 +2244,7 @@
     "original": "원량",
     "converted": "변환",
     "hydration": "수화율",
-    "lossRate": "손실률",
+    "panFillRate": "팬 충전율",
     "reset": "초기화",
     "resetConversion": "변환 설정 전체 초기화 (원본 레시피는 유지)",
     "save": "저장",

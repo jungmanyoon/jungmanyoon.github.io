@@ -1095,10 +1095,13 @@ const AdvancedDashboard: React.FC = () => {
 
   const convertedTotal = useMemo(() => Math.round(totalWeight * effectiveMultiplier), [totalWeight, effectiveMultiplier]);
 
-  // 손실률 계산
-  const lossRate = useMemo(() => {
-    if (convertedTotal === 0) return 0;
-    return Math.round((panTotalWeight / convertedTotal) * 1000) / 10;
+  // 변환표 베이커스 % 파생용 밀가루 총량 (배수는 균일 적용이라 원본 비율과 동일한 값이 나옴)
+  const convertedFlourTotal = useMemo(() => flourTotal * effectiveMultiplier, [flourTotal, effectiveMultiplier]);
+
+  // 팬 충전율 계산: 변환 반죽량 ÷ 팬 권장량 × 100 (100%≈적정, >110%=과충전 주의)
+  const panFillRate = useMemo(() => {
+    if (panTotalWeight === 0) return 0;
+    return Math.round((convertedTotal / panTotalWeight) * 1000) / 10;
   }, [panTotalWeight, convertedTotal]);
 
   // 변환된 재료
@@ -1532,10 +1535,10 @@ const AdvancedDashboard: React.FC = () => {
   // ===== 초기화 함수들 =====
   // [C-7] 초기화 직후 되돌리기(Undo) 토스트를 띄우는 공통 헬퍼
   // 스냅샷을 클로저에 보관해 두고, 사용자가 '되돌리기'를 누르면 그대로 복원한다.
-  const showUndoToast = useCallback((restore: () => void) => {
+  const showUndoToast = useCallback((restore: () => void, message: string = '변환 설정을 초기화했습니다') => {
     addToast({
       type: 'info',
-      message: '변환 설정을 초기화했습니다',
+      message,
       duration: 6000,  // 5~7초 제공
       action: { label: '되돌리기', onClick: restore },
     });
@@ -1993,8 +1996,10 @@ const AdvancedDashboard: React.FC = () => {
   }, [ingredients, addToast]);
 
   const removeIngredient = useCallback((id: string) => {
+    const snapshot = ingredients;
     setIngredients(prev => prev.filter(i => i.id !== id));
-  }, []);
+    showUndoToast(() => setIngredients(snapshot), t('advDashboard.ingredientRemoved', { defaultValue: '재료를 삭제했습니다' }));
+  }, [ingredients, showUndoToast, t]);
 
   // 예시 데이터(기본 식빵) 불러오기 — 새 레시피 빈 상태에서 사용자가 명시적으로 호출
   const loadExample = useCallback(() => {
@@ -2028,8 +2033,10 @@ const AdvancedDashboard: React.FC = () => {
   }, [processes]);
 
   const removeProcess = useCallback((id: string) => {
+    const snapshot = processes;
     setProcesses(prev => prev.filter(p => p.id !== id));
-  }, []);
+    showUndoToast(() => setProcesses(snapshot), t('advDashboard.processRemoved', { defaultValue: '공정 단계를 삭제했습니다' }));
+  }, [processes, showUndoToast, t]);
 
   const updateProcess = useCallback((id: string, field: keyof ProcessStep, value: any) => {
     setProcesses(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
@@ -2197,7 +2204,7 @@ const AdvancedDashboard: React.FC = () => {
             <span className="text-gray-300">|</span>
             <span className="cursor-help" title="팬 부피를 기준으로 권장되는 반죽량">{t('advDashboard.pan')}:<b className="ml-1">{panTotalWeight}g</b></span>
             <span className="text-gray-300">|</span>
-            <span className="cursor-help" title="굽기까지 예상되는 무게(수분) 손실 비율">{t('advDashboard.lossRate')}:<b className={`ml-1 ${lossRate > 100 ? 'text-red-500' : lossRate < 95 ? 'text-orange-500' : 'text-green-600'}`}>{lossRate}%</b></span>
+            <span className="cursor-help" title="반죽량 ÷ 팬 권장량 (100%≈적정 충전, 110%↑ 과충전 주의)">{t('advDashboard.panFillRate')}:<b className={`ml-1 ${panFillRate > 110 ? 'text-danger' : panFillRate < 85 ? 'text-warning' : 'text-success'}`}>{panFillRate}%</b></span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <button
@@ -2848,13 +2855,13 @@ const AdvancedDashboard: React.FC = () => {
                                       })}
                                     </select>
                                   </td>
-                                  <td className="px-1.5 text-right font-mono text-ink-disabled text-xs">{ing.ratio}</td>
+                                  <td className="px-1.5 text-right font-mono text-ink-subtle text-xs">{flourTotal > 0 ? Math.round((ing.amount / flourTotal) * 1000) / 10 : 0}</td>
                                   <td className="px-1.5">
                                     <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
                                       className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm" />
                                   </td>
                                   <td className="px-0.5">
-                                    <button onClick={() => removeIngredient(ing.id)} className="text-red-300 hover:text-red-500">
+                                    <button onClick={() => removeIngredient(ing.id)} className="p-2 -m-2 text-ink-subtle hover:text-danger" title={t('advDashboard.removeIngredient', { defaultValue: '재료 삭제' })}>
                                       <X className="w-3.5 h-3.5" />
                                     </button>
                                   </td>
@@ -2887,6 +2894,7 @@ const AdvancedDashboard: React.FC = () => {
                       <tr className={`text-blue-700 ${dynamicStyles.fontSize}`}>
                         <th className="px-2 py-1 text-left">{t('advDashboard.category')}</th>
                         <th className="px-2 py-1 text-left">{t('advDashboard.ingredients')}</th>
+                        <th className="px-2 py-1 text-right w-12">%</th>
                         <th className="px-2 py-1 text-right w-16">{t('advDashboard.tableHeaderGram')}</th>
                       </tr>
                     </thead>
@@ -2898,7 +2906,7 @@ const AdvancedDashboard: React.FC = () => {
                             {/* 단계 구분선 (2개 이상 단계가 있을 때만 표시) */}
                             {convertedHasMultiplePhases && (
                               <tr className={`${phaseMeta.bgColor} ${phaseMeta.borderColor} border-y-2`}>
-                                <td colSpan={3} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs`}>
+                                <td colSpan={4} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs`}>
                                   <span className="flex items-center gap-1">
                                     <span>{phaseMeta.icon}</span>
                                     <span>{t(phaseMeta.labelKey)}</span>
@@ -2915,6 +2923,7 @@ const AdvancedDashboard: React.FC = () => {
                               <tr key={`${phase}-${ing.category}-${ing.id}-${ingIndex}`} className={`border-b border-blue-100 ${dynamicStyles.rowHeight}`}>
                                 <td className="px-2 text-blue-600">{CATEGORY_LABELS[ing.category as keyof typeof CATEGORY_LABELS]}</td>
                                 <td className="px-2">{translateIngredient(ing.name)}</td>
+                                <td className="px-2 text-right font-mono text-ink-subtle">{convertedFlourTotal > 0 ? Math.round((ing.convertedAmount / convertedFlourTotal) * 1000) / 10 : 0}</td>
                                 <td className="px-2 text-right font-mono font-medium text-blue-700">{ing.convertedAmount}</td>
                               </tr>
                             ))}
@@ -3069,7 +3078,7 @@ const AdvancedDashboard: React.FC = () => {
                         <ThermometerSun className="w-3 h-3" />
                       </button>
                     )}
-                    <button onClick={() => removeProcess(proc.id)} className="text-red-300 hover:text-red-500 opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
+                    <button onClick={() => removeProcess(proc.id)} className="p-2 -m-2 text-ink-subtle hover:text-danger opacity-100 lg:opacity-0 lg:group-hover:opacity-100" title={t('advDashboard.removeProcess', { defaultValue: '공정 삭제' })}>
                       <X className="w-3.5 h-3.5" />
                     </button>
                     {/* 너비 조절 핸들 */}

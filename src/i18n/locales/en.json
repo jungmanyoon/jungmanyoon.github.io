@@ -2244,7 +2244,7 @@
     "original": "Original",
     "converted": "Converted",
     "hydration": "Hydration",
-    "lossRate": "Loss Rate",
+    "panFillRate": "Pan Fill",
     "reset": "Reset",
     "resetConversion": "Reset all conversion settings (recipe preserved)",
     "save": "Save",

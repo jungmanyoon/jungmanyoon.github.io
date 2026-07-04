@@ -8,7 +8,14 @@
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
 
-**[2026-07-04 세션 B] 기계적 후속 폴리시 + A3 도메인 버그 완료 (브랜치 `fix/uiux-phase2-polish`, PR 예정). 다음: 실행모드 C / 반응형 / redesign H.**
+**[2026-07-04 세션 C] 실행모드 배치 C 완료 (브랜치 `fix/uiux-phase2-execmode`, PR 예정). 다음: 반응형(B6/D5/H7) / redesign H / G7(정밀 repro).**
+
+- 완료(C1~C6): 공정 완료 체크박스+진행카운터(C1) · 변환표 계량 체크리스트 미장플라스(C2) · **TimerManager 고아 배선(C3) + 배선 중 발견한 무한루프 버그 수정** · 인쇄/PDF(C4, 기본 수준) · 공정 지시문 가독성(C5) · 삭제 undo(C6는 A4에서 이미 완료). 3종검증(typecheck0/test164/build OK) + 실렌더 스크린샷(공정 "완료 2/8" 체크·취소선 / 변환표 ×2 계량 체크 / 타이머 모달 루프없음 / 인쇄 크롬숨김).
+- **TimerManager 버그(중요)**: `useNotifications`가 렌더마다 새 함수 반환 -> TimerManager의 `useEffect(..., [isOpen, getActiveTimers])`가 setActiveTimers를 무한 재호출. 고아(미마운트)라 여태 잠복. deps를 `[isOpen]`로 축소해 해결. (다른 곳에서 TimerManager/useNotifications 배선 시 동일 주의)
+- **G7 key 경고**: 대시보드 수동 배수(×N) 흐름에서 재현 확인. 단 AdvancedDashboard 가시적 map은 전부 keyed -> 소스 미핀포인트, dev 전용·무해라 재이월. (실행모드 C 코드가 추가한 것 아님)
+- ephemeral 원칙: C1 completedProcesses / C2 checkedIngredients는 **레시피에 저장 안 함**(실행 세션 전용 Set). C2는 배수 변경 시 초기화.
+
+**[2026-07-04 세션 B] 기계적 후속 폴리시 + A3 도메인 버그 완료 (브랜치 `fix/uiux-phase2-polish`, PR #6 머지·배포 완료). 다음: 실행모드 C / 반응형 / redesign H.**
 
 - 완료: **A3**(제과/제빵 지표 게이팅) · **G1**(gray 48개소->토큰, grep 0) · **G2**(헤딩 h1/h2/h3 타입스케일 토큰) · **G3**(변환 g셀 valueFlash 애니메이션) · **G5**(홈 히어로 '평균 재료 수'->'페이스트리·쿠키' 카테고리 집계) · **E2**(.focus-ring 유틸 정의 + SearchBar bread-500->brand-400 + RecipeCard 아이콘버튼 포커스링). 3종검증(typecheck0/test164/build OK) + 실렌더 스크린샷 검증(제과 요거트롤=수화율/반죽수율/제법 숨김·총무게만 / 제빵 우유식빵=수화율70%/반죽수율/제법 유지 / 목록 제법칩 제과만 숨김 / 홈 새카드 / 설정 토큰).
 - **도메인 확정(사용자 지적 반영)**: 수화율·반죽수율·제법은 밀가루-반죽 기반 **제빵** 지표라 **제과**(스펀지·거품형 케이크·쿠키 등)엔 대체로 무의미(녹차롤 "수화율 338%"의 원인 = 제과에 제빵지표 표시). 대시보드는 이미 제법을 제빵 전용 게이팅(:2668)했으나 RecipeView/RecipeCard만 누락 -> `productType==='pastry'`면 숨김. **슈톨렌 예외**: straight가 아닌 실제 제법을 가진 제과는 계속 노출(`!isPastry || methodType!=='straight'`). => 아래 "A3 배선 후속" hydration 버그 해소됨.
@@ -85,13 +92,15 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [x] B7 변환결과 하드코드 blue->토큰 (tailwind info를 스케일로 확장 DEFAULT 하위호환 + 변환표 blue-*->info-*): :2877-2928. info 토큰 50-700 확장 후 치환.
 - [x] B8 재료 그리드 키보드 포커스 소실 (편집 td 4곳 focus-within:ring): :2807,:2831,:2839,:2854. td `focus-within:ring-2 ring-brand-400 ring-inset`(AutocompleteInput !ring-0 충돌 회피).
 
-### 배치 C - P2 quick: 굽기 실행 흐름
-- [ ] C1 공정 완료 체크박스+진행 카운터: :2969-3072, ProcessStep(:83-89) `done?` 추가(칩 탭=편집 충돌 -> 별도 체크 버튼).
-- [ ] C2 변환결과 계량 체크리스트(미장플라스): :2914-2920. 행별 체크박스(복합키 phase-cat-id-idx), line-through, 배수변경 초기화.
-- [ ] C3 TimerManager 배선(고아): 툴바/PWAStatus 토글, 공정칩 time '시작'. 배선시 하드코딩 orange 뉴트럴화.
-- [ ] C4 인쇄/PDF: 툴바 Printer 버튼 window.print(), 셸 print:hidden, 결과영역 @media print.
-- [ ] C5 공정 지시문 12px->세로 numbered: :2967-3014,:2975. 본문 text-sm, 모바일 세로 1열, 폭핸들 lg 전용.
-- [ ] C6 단계칩 오탭 삭제 undo: :2967-3074,:3072-3074. removeProcess를 showUndoToast로 order 복원(A4와 함께).
+### 배치 C - P2 quick: 굽기 실행 흐름 [완료 2026-07-04 · 브랜치 fix/uiux-phase2-execmode · typecheck0/test164/build OK · 실렌더 검증]
+> 부수: C3 배선으로 TimerManager 잠복 **무한루프 버그** 발견·수정(useNotifications가 렌더마다 새 함수 반환 -> `useEffect [isOpen, getActiveTimers]`가 setActiveTimers 재호출 무한루프. deps를 `[isOpen]`으로 축소). 고아라 여태 안 드러남.
+- [x] C1 공정 완료 체크박스+진행 카운터 (ephemeral `completedProcesses:Set` - 레시피에 저장 안 함. 칩 좌측 별도 CheckSquare 버튼, 완료 시 opacity-60+취소선, 패널 헤더 "완료 N/M" 카운터. 실렌더 "완료 2/8" 확인).
+- [x] C2 변환결과 계량 체크리스트(미장플라스) (ephemeral `checkedIngredients:Set`, 복합키 `phase-cat-id-idx`. 변환표 좌측 체크박스 열(thead th+소계 colSpan 4->5), 체크 시 행 opacity-50+취소선. `effectiveMultiplier` 변경 useEffect로 초기화. 실렌더 ×2에서 확인).
+- [x] C3 TimerManager 배선(고아 살리기) (툴바 Timer 토글 버튼 + 모달 렌더(`seed` prop 추가, 공정칩 시간 Play 버튼->프리필 후 열기) + 위 무한루프 수정. CTA `bg-orange->bg-brand`, focus `orange->brand-400` 정합. orange/green 카테고리 점은 heat/발효 의미색이라 유지).
+- [x] C4 인쇄/PDF (툴바 Printer 버튼 window.print() + index.css `@media print`: `header`/`.print-hide` 숨김 + `[class*=overflow-]`/`[style*=height]` 해제로 고정높이·스크롤 컨테이너 펼침 + shadow 제거. 툴바 액션·리사이즈핸들·체크버튼에 print-hide. 실렌더 print 에뮬레이트로 크롬 숨김·내용 펼침 확인. **기본 수준** - 배수칩/재료 삭제X는 아직 인쇄됨, 후속 폴리시 여지).
+- [x] C5 공정 지시문 가독성 (본문 text-xs->text-sm, 칩 컨테이너 모바일 세로 1열(`flex-col lg:flex-row lg:flex-wrap`), 폭조절 핸들 `hidden lg:block`. C1과 함께).
+- [x] C6 단계칩 오탭 삭제 undo (**A4에서 이미 완료** - removeProcess가 이미 showUndoToast로 order 복원 감쌈. :2038-2042).
+- [ ] **(잔여) G7 key 경고**: C3 배선 검증 중 대시보드 수동 배수(×N) 흐름에서 재현됨("unique key" @ div @ AdvancedDashboard). 단 AdvancedDashboard의 모든 가시적 JSX `.map`은 전부 keyed임을 확인 -> keyless 소스가 파생/전이 렌더 경로로 추정, 정밀 핀포인트 실패. dev 전용·기능 무해라 재이월(내 C 코드가 추가한 것 아님).
 
 ### 배치 D - P2 quick: 전역 IA/내비/브랜드 [완료 2026-07-04 · typecheck0/test164/build OK · 사용자 결정: 앱명="제과제빵 레시피 변환기", 랜딩=recipes · D5는 H 이월]
 - [x] D1 dashboard/workspace 중복 통합 (Header active에 workspace 별칭; 'workspace' 라우트는 하위호환 유지): App.tsx:73·158-159, main.jsx:43, Header.jsx:59. canonical 'dashboard'.

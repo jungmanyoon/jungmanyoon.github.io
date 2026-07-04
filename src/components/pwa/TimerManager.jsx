@@ -2,11 +2,20 @@ import React, { useState, useEffect } from 'react'
 import { Clock, Play, Pause, X, Plus, Timer } from 'lucide-react'
 import { useNotifications } from '../../utils/pwa/notificationManager'
 
-const TimerManager = ({ isOpen, onClose }) => {
+const TimerManager = ({ isOpen, onClose, seed = null }) => {
   const [activeTimers, setActiveTimers] = useState([])
   const [newTimerName, setNewTimerName] = useState('')
   const [newTimerMinutes, setNewTimerMinutes] = useState('')
   const [newTimerType, setNewTimerType] = useState('baking')
+
+  // 공정 등에서 넘어온 프리필(seed)로 새 타이머 입력폼을 채움 (모달 열릴 때)
+  useEffect(() => {
+    if (isOpen && seed) {
+      setNewTimerName(seed.name || '')
+      setNewTimerMinutes(seed.minutes ? String(seed.minutes) : '')
+      setNewTimerType('baking')
+    }
+  }, [isOpen, seed])
   
   const {
     setBakingTimer,
@@ -31,7 +40,10 @@ const TimerManager = ({ isOpen, onClose }) => {
     const interval = setInterval(updateTimers, 1000)
 
     return () => clearInterval(interval)
-  }, [isOpen, getActiveTimers])
+    // getActiveTimers는 useNotifications가 렌더마다 새 참조를 반환하므로 의존성에서 제외한다.
+    // (포함 시 setActiveTimers -> 리렌더 -> 새 getActiveTimers -> 재실행의 무한 루프가 됨)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
   const handleAddTimer = async () => {
     if (!newTimerName.trim() || !newTimerMinutes) return
@@ -126,7 +138,7 @@ const TimerManager = ({ isOpen, onClose }) => {
                   value={newTimerName}
                   onChange={(e) => setNewTimerName(e.target.value)}
                   placeholder="예: 바게트 굽기"
-                  className="w-full px-3 py-2 border border-line rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
                 />
               </div>
 
@@ -142,7 +154,7 @@ const TimerManager = ({ isOpen, onClose }) => {
                     placeholder="30"
                     min="1"
                     max="1440"
-                    className="w-full px-3 py-2 border border-line rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-line rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
                   />
                 </div>
 
@@ -153,7 +165,7 @@ const TimerManager = ({ isOpen, onClose }) => {
                   <select
                     value={newTimerType}
                     onChange={(e) => setNewTimerType(e.target.value)}
-                    className="w-full px-3 py-2 border border-line rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-line rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
                   >
                     <option value="baking">베이킹</option>
                     <option value="fermentation">발효</option>
@@ -164,7 +176,7 @@ const TimerManager = ({ isOpen, onClose }) => {
               <button
                 onClick={handleAddTimer}
                 disabled={!newTimerName.trim() || !newTimerMinutes}
-                className="w-full flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-line-strong text-white text-sm font-medium rounded-md transition-colors"
+                className="w-full flex items-center justify-center px-4 py-2 bg-brand-500 hover:bg-brand-600 disabled:bg-line-strong text-white text-sm font-medium rounded-md transition-colors"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 타이머 추가

@@ -8,18 +8,19 @@
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
 
-**현재 작업: UI/UX 개선 Phase 1 - de-amber + 좌우표통합 + #4~#6 완료. PR 준비 단계.**
+**UI/UX 개선 Phase 1 완료 + main 머지 + 배포 완료 (2026-07-04). 다음은 Phase 2 논의부터.**
 
-- 브랜치: `fix/uiux-phase1`. 커밋 `9cde235`(Phase 1b de-amber+좌우표, 47파일) 완료. #4~#6은 후속 커밋 예정.
+- PR #4(`fix/uiux-phase1` -> `main`) 머지 완료(머지커밋 `efff849`). `npm run deploy`로 gh-pages 배포 완료, https://jungmanyoon.github.io/ 라이브 반영 확인(스크린샷 검증).
 - 근본원인 확정: 뉴트럴 팔레트 토큰을 tailwind에 정의만 하고 화면에 미적용(gray 879회·bread 잔존). "안 바뀐" 진짜 이유.
-- **Phase 1b(완료·커밋 9cde235, 2026-07-04):** de-amber 전면(기반4파일 직접+병렬 12그룹, 색상1196·이모지19) + #3 좌우표 통합(isConverted, ×1 단일표+힌트, 변환시 2열). 휴지=뉴트럴, 앰버는 CTA/활성/포커스링/핵심숫자만.
-- **#4~#6(완료·미커밋, 2026-07-04):**
+- **Phase 1b(커밋 9cde235):** de-amber 전면(기반4파일 직접+병렬 12그룹, 색상1196·이모지19) + #3 좌우표 통합(isConverted, ×1 단일표+힌트, 변환시 2열). 휴지=뉴트럴, 앰버는 CTA/활성/포커스링/핵심숫자만.
+- **Phase 1c(커밋 027bf49):**
   - #4 필터 접기: FilterControls productType 드롭다운 제거(카테고리칩이 단일 소스) + 난이도/시간/태그를 "필터" 토글 뒤로 접힘(기본 접힘·배지는 숨은필터만 카운트). 정렬은 항상 노출.
-  - #5 새 레시피 빈 시작: 대시보드 useState 기본을 빈 재료1행/빈 공정으로, 로드이펙트에 빈-레시피 리셋(else) 추가. HomePage "새 레시피"도 빈 레시피 생성으로 통일(setCurrentRecipe(null) 버그 수정). "예시 불러오기" 버튼+안내배너(빈 상태) + "예시 데이터" 배지(로드 후). 스샷 검증 완료.
-  - #6 용어 통일: ko.json에서 폴리쉬→폴리시 15건, 스펀지법→중종법 2건+발효 1건(스펀지케이크 보존). preferment는 이미 사전반죽. 제법설정 화면 검증.
+  - #5 새 레시피 빈 시작: 대시보드 useState 기본을 빈 재료1행/빈 공정으로, 로드이펙트에 빈-레시피 리셋(else) 추가. HomePage "새 레시피"도 빈 레시피 생성으로 통일(setCurrentRecipe(null) 버그 수정). "예시 불러오기" 버튼+안내배너(빈 상태) + "예시 데이터" 배지(로드 후).
+  - #6 용어 통일: ko.json에서 폴리쉬→폴리시 15건, 스펀지법→중종법 2건+발효 1건(스펀지케이크 보존). preferment는 이미 사전반죽.
   - 검증 3종 통과: typecheck 0 / test 164 / build(PWA) OK.
 - **UI 후속(선택·보류):** 데이터맵 이모지(PHASE_META.icon 📦, CATEGORY_ICONS 🍞🎂, 공정칩 ⏱🌡) → lucide 통일은 데이터구조 리팩터 필요. 설정 탭 섹션헤더 이모지 일부 잔존. #6 전문용어 툴팁(영문병기로 일부 갈음됨).
-- 다음: #4~#6 커밋 -> 사용자 확인 -> Codex 최종 리뷰 -> 하나의 PR로 main 머지. 무관파일(.claude/settings.local.json·DEPLOYMENT_GUIDE.md·diag-*.py) 커밋 제외.
+- **Phase 2 (다음, 주 단위):** AdvancedDashboard 3063줄 컴포넌트 분해, 변환기 간단/전문가 2모드, 모바일 결과우선 탭/바텀시트, 좌우표 완전 단일화(원본g|변환g 인라인 컬럼) - 하단 [보류 항목] 절 참고.
+- 로컬 `fix/uiux-phase1` 브랜치는 머지 후 삭제됨(원격은 이 저장소 관행대로 유지). 무관파일(.claude/settings.local.json·DEPLOYMENT_GUIDE.md·diag-*.py)은 계속 커밋 제외.
 
 ### 다음 4개 항목 상세 + Codex(gpt-5.5) 확정 접근
 1. **#4 필터 접기** (src/components/recipe/FilterControls.tsx, RecipeListPage.tsx)

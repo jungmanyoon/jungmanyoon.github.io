@@ -101,14 +101,14 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [ ] F5 일괄입력 phase 파싱: **-> 신중 패스 이월** (ParsedIngredient phase+모달 드롭다운). BulkIngredientInput.tsx:51-128.
 - [ ] F6 DDT 연결/컨텍스트/환경값: **-> 신중 패스 이월** (대시보드 로컬 재료 state를 Recipe로 변환해 setCurrentRecipe 필요 = 구조작업). DDTCalculator.tsx:160-173, App.tsx:173-174.
 
-### 배치 G - P3 polish
-- [ ] G1 gray-* -> line-* 잔재 치환(22파일 59회). :2193-2199 등. base==hover 회피.
+### 배치 G - P3 polish [G1부분·G4 완료 2026-07-04 · typecheck0/test164/build OK · G2/G3/G5/G6/G7 후속]
+- [~] G1 gray-* -> line-* (부분: AdvancedDashboard hover:bg-gray-200->hover:bg-line 6곳 + text-gray-300->text-line-strong 5곳. 나머지 파일 잔재는 후속 기계적 스윕).
 - [ ] G2 타입스케일 토큰 적용: tailwind:77-85 정의만-미사용. index.css:11-21 헤딩 @apply text-h1/h2/h3 text-ink.
 - [ ] G3 변환 값 flash: g셀 key={convertedAmount}+valueFlash keyframe, 진입 fade-in.
-- [ ] G4 compact 카드 이름 위계: RecipeCard.tsx:162,:203-206. 이름 text-base font-semibold, 메타 ink-subtle.
+- [x] G4 compact 카드 이름 위계 (이름 text-sm/medium -> text-base/semibold, 메타 ink-muted -> ink-subtle).
 - [ ] G5 홈 히어로 배니티 지표('평균 재료 수') 교체: HomePage.tsx:154-160 -> '오늘의 레시피'/카테고리 칩.
 - [ ] G6 단일제법 '공정' 열 접기(moderate): :2771,:2835-2850,:956. hasMultiplePhases=false면 열 접고 '사전반죽 추가' 어포던스.
-- [ ] G7 (별건) React unique key 경고: :303 부근 key 부여.
+- [ ] G7 (별건) React unique key 경고: **-> 후속(런타임 핀포인트 필요)**. 원본 :303 근사치는 내 편집으로 이동, dev 콘솔에서 정확한 map 위치 재현 후 key 부여.
 
 ### 배치 H - Larger redesign (별도 서브프로젝트, 신중히 / 기존 Phase 2 백로그와 통합)
 - [ ] H1 전용 '베이킹 모드'(Wake Lock+전체화면 큰 글씨 단계 뷰): :2952-3124. navigator.wakeLock try/catch.

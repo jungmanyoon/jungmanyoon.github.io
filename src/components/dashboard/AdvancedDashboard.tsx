@@ -2094,7 +2094,7 @@ const AdvancedDashboard: React.FC = () => {
               className={`px-3 py-1 min-h-[44px] lg:min-h-0 text-xs rounded-l ${
                 productType === 'bread'
                   ? 'bg-amber-500 text-white font-medium'
-                  : 'bg-surface-muted text-ink-muted hover:bg-gray-200'
+                  : 'bg-surface-muted text-ink-muted hover:bg-line'
               }`}
               title={t('advDashboard.productTypeBread')}
             >
@@ -2105,7 +2105,7 @@ const AdvancedDashboard: React.FC = () => {
               className={`px-3 py-1 min-h-[44px] lg:min-h-0 text-xs rounded-r ${
                 productType === 'pastry'
                   ? 'bg-amber-500 text-white font-medium'
-                  : 'bg-surface-muted text-ink-muted hover:bg-gray-200'
+                  : 'bg-surface-muted text-ink-muted hover:bg-line'
               }`}
               title={t('advDashboard.productTypePastry')}
             >
@@ -2186,7 +2186,7 @@ const AdvancedDashboard: React.FC = () => {
                   className={`px-2.5 py-1.5 lg:px-1.5 lg:py-0.5 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${
                     multiplier === m
                       ? 'bg-amber-500 text-white'
-                      : 'bg-surface-muted hover:bg-gray-200 text-ink-muted'
+                      : 'bg-surface-muted hover:bg-line text-ink-muted'
                   }`}
                 >
                   {m < 1 ? `1/${Math.round(1/m)}` : `×${m}`}
@@ -2200,19 +2200,19 @@ const AdvancedDashboard: React.FC = () => {
         <div className="flex items-center flex-wrap gap-2 lg:gap-4">
           <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-ink-subtle bg-surface-muted px-3 py-1.5 rounded">
             <span className="cursor-help" title="원본 레시피의 총 반죽량">{t('advDashboard.original')}:<b className="text-ink-muted ml-1">{totalWeight}g</b></span>
-            <span className="text-gray-300">→</span>
+            <span className="text-line-strong">→</span>
             <span className="cursor-help" title="변환(배수·팬 반영) 후 총 반죽량">{t('advDashboard.converted')}:<b className="text-brand-600 ml-1">{convertedTotal}g</b></span>
-            <span className="text-gray-300">|</span>
+            <span className="text-line-strong">|</span>
             <span className="cursor-help" title="밀가루 대비 수분 비율입니다 (60~80% 권장)">{t('advDashboard.hydration')}:<b className="ml-1">{hydration}%</b></span>
-            <span className="text-gray-300">|</span>
+            <span className="text-line-strong">|</span>
             <span className="cursor-help" title="팬 부피를 기준으로 권장되는 반죽량">{t('advDashboard.pan')}:<b className="ml-1">{panTotalWeight}g</b></span>
-            <span className="text-gray-300">|</span>
+            <span className="text-line-strong">|</span>
             <span className="cursor-help" title="반죽량 ÷ 팬 권장량 (100%≈적정 충전, 110%↑ 과충전 주의)">{t('advDashboard.panFillRate')}:<b className={`ml-1 ${panFillRate > 110 ? 'text-danger' : panFillRate < 85 ? 'text-warning' : 'text-success'}`}>{panFillRate}%</b></span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <button
               onClick={resetAllConversion}
-              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-muted text-ink-muted rounded hover:bg-gray-200 border border-line"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-muted text-ink-muted rounded hover:bg-line border border-line"
               title={t('advDashboard.resetConversion')}
             >
               <RotateCcw className="w-4 h-4" />{t('advDashboard.reset')}
@@ -2587,7 +2587,7 @@ const AdvancedDashboard: React.FC = () => {
                             }
                             setOven({ ...oven, level: newLevels.join(', ') });
                           }}
-                          className={`w-6 h-6 rounded text-xs font-medium ${isSelected ? 'bg-amber-500 text-white' : 'bg-surface-muted text-ink-muted hover:bg-gray-200'}`}
+                          className={`w-6 h-6 rounded text-xs font-medium ${isSelected ? 'bg-amber-500 text-white' : 'bg-surface-muted text-ink-muted hover:bg-line'}`}
                         >
                           {level}
                         </button>
@@ -2678,7 +2678,7 @@ const AdvancedDashboard: React.FC = () => {
                 <div className="grid grid-cols-5 gap-1">
                   {Object.entries(METHOD_KEYS).map(([key, labelKey]) => (
                     <button key={key} onClick={() => handleMethodChange(key)}
-                      className={`px-1.5 py-1 text-xs rounded ${method.type === key ? 'bg-amber-500 text-white' : 'bg-surface-muted hover:bg-gray-200'}`}>
+                      className={`px-1.5 py-1 text-xs rounded ${method.type === key ? 'bg-amber-500 text-white' : 'bg-surface-muted hover:bg-line'}`}>
                       {t(labelKey)}
                     </button>
                   ))}
@@ -3113,7 +3113,7 @@ const AdvancedDashboard: React.FC = () => {
                       }}
                       title={t('advDashboard.resizeWidth')}
                     >
-                      <GripVertical className="w-2 h-full text-gray-300 group-hover:text-blue-400" />
+                      <GripVertical className="w-2 h-full text-line-strong group-hover:text-blue-400" />
                     </div>
                   </div>
                   );

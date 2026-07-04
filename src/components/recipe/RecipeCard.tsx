@@ -159,7 +159,7 @@ const RecipeCard = memo<RecipeCardProps>(({
               {categoryIcon}
             </span>
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-sm text-ink">
+              <h3 className="font-semibold text-base text-ink">
                 {/* 카드 전체를 클릭 영역으로 확장하는 stretched button (중첩 인터랙티브 해소) */}
                 <button
                   type="button"
@@ -200,7 +200,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           </div>
         </div>
 
-        <div className="flex justify-between items-center text-xs text-ink-muted">
+        <div className="flex justify-between items-center text-xs text-ink-subtle">
           <span>{methodName}</span>
           <span>{t('recipeList.ingredientCount', { count: ingredientCount })}</span>
         </div>

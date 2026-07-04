@@ -8,8 +8,9 @@
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
 
-**UI/UX Phase 2: quick-win 배치 A/B/D/E/F1-3/G 완료·커밋 (브랜치 `fix/uiux-phase2`, 2026-07-04). 다음: PR 리뷰/머지 후, 이월분(신중 패스)을 별도 브랜치로.**
+**UI/UX Phase 2: quick-win 배치 A/B/D/E/F1-3/G 완료 + main 머지 + 배포 완료 (2026-07-04). 다음: 이월분(신중 패스)을 별도 브랜치로.**
 
+- PR #5(`fix/uiux-phase2` -> `main`) 머지 완료(머지커밋 `25bd5a8`). `npm run deploy`로 gh-pages 배포 완료, https://jungmanyoon.github.io/ 라이브 200 확인.
 - 완료 커밋: A `e00b90c`(P1 4건) / B `51a737b` / D `1143f3b` / E `4304984` / F1-3 `01b9f9f` / G `061a2f1`. 각 3종검증(typecheck0/test164/build OK) + 주요 P1은 실렌더 스크린샷 검증.
 - **남은 이월분(다음 세션, 신중 패스 필요)**: 아래 체크리스트에서 미체크 항목.
   - **실행모드 패스**(상태/상호작용 무거움): 배치 C 전부(C1 공정 체크박스·C2 미장플라스·C3 타이머 배선·C5 모바일 공정), F4(편집표 AutocompleteInput), F5(일괄 phase), F6(DDT 연결). H1(베이킹 모드)과 함께.

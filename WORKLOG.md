@@ -8,7 +8,12 @@
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
 
-**[2026-07-04 세션 C] 실행모드 배치 C 완료 (브랜치 `fix/uiux-phase2-execmode`, PR 예정). 다음: 반응형(B6/D5/H7) / redesign H / G7(정밀 repro).**
+**[2026-07-04 세션 D] 반응형 배치 완료 (브랜치 `fix/uiux-phase2-responsive`, PR 예정). 다음: redesign H / 잔여(B6·G6·G7·C4폴리시).**
+
+- 완료: **D5**(모바일 하단 고정 탭바 `BottomNav.jsx` 신규 - 홈/변환기/레시피/DDT/설정 아이콘+라벨, Header 주요 nav는 데스크톱 전용화) · **H7**(변환 시 모바일/태블릿에서 변환표 먼저=결과우선, `order-first lg:order-none`. 데스크톱 좌우 2열 불변). 3종검증(typecheck0/test164/build OK) + 실렌더(375px 하단바·클리어런스 / 모바일 변환표 Y<원본 Y / 데스크톱 좌우 유지).
+- **B6 이월(리스크)**: 요약 pill sticky는 세로로 긴 대시보드 헤더 밖으로 pill을 빼내는 리팩터 필요(sticky는 부모 박스 내에서만 유지) = 회귀 리스크. 총량은 이미 표 합계 푸터에 노출 -> 우선순위 낮음.
+
+**[2026-07-04 세션 C] 실행모드 배치 C 완료 (브랜치 `fix/uiux-phase2-execmode`, PR #7 머지·배포 완료). 다음: 반응형(B6/D5/H7) / redesign H / G7(정밀 repro).**
 
 - 완료(C1~C6): 공정 완료 체크박스+진행카운터(C1) · 변환표 계량 체크리스트 미장플라스(C2) · **TimerManager 고아 배선(C3) + 배선 중 발견한 무한루프 버그 수정** · 인쇄/PDF(C4, 기본 수준) · 공정 지시문 가독성(C5) · 삭제 undo(C6는 A4에서 이미 완료). 3종검증(typecheck0/test164/build OK) + 실렌더 스크린샷(공정 "완료 2/8" 체크·취소선 / 변환표 ×2 계량 체크 / 타이머 모달 루프없음 / 인쇄 크롬숨김).
 - **TimerManager 버그(중요)**: `useNotifications`가 렌더마다 새 함수 반환 -> TimerManager의 `useEffect(..., [isOpen, getActiveTimers])`가 setActiveTimers를 무한 재호출. 고아(미마운트)라 여태 잠복. deps를 `[isOpen]`로 축소해 해결. (다른 곳에서 TimerManager/useNotifications 배선 시 동일 주의)
@@ -88,7 +93,7 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [x] B3 변환표 % 열 추가 (A2에서 완료): :2888-2890. 우측정렬(스트레이트=ratio, 제법변환=단계밀가루 대비).
 - [x] B4 단계별 소계 g (변환표 구분선 `소계 Ng` ml-auto; 다단계 변환시 표시): :2894-2909,:2928. phase 그룹 소계 인라인.
 - [x] B5 375px 원본표 과밀 (공정·% 열 hidden sm:table-cell, 375px visible:false 확인; 완전 카드화 H7): :2766-2774. 공정/% 열 `hidden sm:table-cell`로 재료명 폭 확보.
-- [ ] B6 sticky 요약 pill(태블릿/모바일): **-> H7(반응형)로 이월** (sticky/order 변경은 레이아웃 회귀 리스크, 태블릿 레이아웃 작업과 함께). :2061-2064,:2237-2244.
+- [ ] B6 sticky 요약 pill(태블릿/모바일): **-> 이월(세션 D 판단)**. 요약만 sticky하려면 세로로 긴 대시보드 헤더(flex-shrink-0) 밖으로 pill을 빼내야 함(sticky는 부모 박스 내에서만 유지 -> 헤더 스크롤 시 함께 사라짐). = 헤더 분리 리팩터=회귀 리스크. 총량은 이미 각 표 `합계 Ng` 푸터에 노출되어 우선순위 낮음. :2237-2246.
 - [x] B7 변환결과 하드코드 blue->토큰 (tailwind info를 스케일로 확장 DEFAULT 하위호환 + 변환표 blue-*->info-*): :2877-2928. info 토큰 50-700 확장 후 치환.
 - [x] B8 재료 그리드 키보드 포커스 소실 (편집 td 4곳 focus-within:ring): :2807,:2831,:2839,:2854. td `focus-within:ring-2 ring-brand-400 ring-inset`(AutocompleteInput !ring-0 충돌 회피).
 
@@ -107,7 +112,7 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [x] D2 랜딩 탭 단일화 (useAppStore 기본 이미 recipes + main.jsx 시드 workspace->recipes): useAppStore.ts:47, main.jsx:41-46, App.tsx:116-121. 기본 'home' 권장.
 - [x] D3 앱 이름 정렬 -> "제과제빵 레시피 변환기" (app.name/footer.appName ko·en + BASE_TITLE; home.title는 이미 일치): ko.json:3·2098, App.tsx:91(BASE_TITLE), footer. 캐논 1개('계산기' 배제, DDT탭과 중복).
 - [x] D4 푸터 미번역 키 노출 (Footer nav.dashboard -> nav.converter): Footer.tsx:44 -> t('nav.converter') 또는 nav.dashboard 키 추가 + i18n missing 핸들러.
-- [ ] D5 모바일 nav 라벨 없음: **-> H(반응형)로 이월** (하단 고정 탭바 재설계. 라벨만 노출하면 375px 오버플로/스크롤이라 반쪽; 바텀바가 정답). Header.jsx:11-16,:70.
+- [x] D5 모바일 nav 라벨 없음 (세션 D: `BottomNav.jsx` 신규 - 모바일 전용 하단 고정 탭바(홈/변환기/레시피/DDT/설정, 아이콘+라벨, 활성 brand). App.tsx 렌더+main `pb-16 sm:pb-0` 클리어런스. Header 주요 nav는 `hidden sm:flex`로 데스크톱 전용화(설정/도움말만 모바일 상단 유지). 실렌더 375px 검증).
 
 ### 배치 E - P2 quick: 접근성·일관성 [완료 2026-07-04 · typecheck0/test164/build OK · E2 세션 B 완결]
 - [x] E1 ink-disabled(2.6:1)->ink-subtle(4.76:1) 4곳 (:2851 A2 + HomePage:261 + IngredientSettingsTab:608·825): :2851, HomePage.tsx:261, IngredientSettingsTab.tsx:608·825. (A2/변환기 %열과 겹침-함께)
@@ -139,7 +144,7 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [ ] H4 공정-phase 타임라인 연계: ProcessStep phase 추가 + PHASE_META 그룹핑.
 - [ ] H5 저장 덮어쓰기 ConfirmModal + '사본으로 저장': :1743(현재 window.confirm). 3버튼[덮어쓰기/사본으로/취소].
 - [ ] H6 설정 9탭 그룹화 + 모바일 스크롤 어포던스: SettingsPage.tsx:41-125,:301. group 필드+소제목+edge-fade.
-- [ ] H7 태블릿/모바일 변환기 결과우선 레이아웃(B6 확장).
+- [x] H7 태블릿/모바일 변환기 결과우선 레이아웃 (세션 D · 저위험판: 변환 시(`isConverted`) 변환표 래퍼에 `order-first lg:order-none` -> 모바일/태블릿(grid-cols-1)에선 변환(결과)표가 원본보다 위, 데스크톱(lg 2열)은 좌우 배치 그대로. 실렌더로 모바일 변환표 Y<원본 Y·데스크톱 좌우 유지 검증. 완전 결과우선 재설계(탭/바텀시트)는 redesign 백로그).
 - (기존 백로그 통합: AdvancedDashboard 3063줄 컴포넌트 분해, 변환기 간단/전문가 2모드, 좌우표 완전 단일화 - H와 함께 계획)
 
 ---

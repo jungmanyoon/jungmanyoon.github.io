@@ -5,6 +5,7 @@ import { useAppStore } from '@stores/useAppStore'
 // i18n 초기화 (앱 시작 시 로드)
 import '@/i18n'
 import Header from '@components/common/Header.jsx'
+import BottomNav from '@components/common/BottomNav.jsx'
 import Footer from '@components/common/Footer'
 import PWAStatus from '@components/pwa/PWAStatus.jsx'
 import PWAInstallPrompt from '@components/pwa/PWAInstallPrompt.jsx'
@@ -221,7 +222,8 @@ function App() {
             <PWAInstallPrompt />
             <ToastContainer />
 
-            <main className={`flex-grow ${isFullWidth ? "" : "container mx-auto px-4 py-6"}`}>
+            {/* 모바일: 하단 고정 탭바(BottomNav) 높이만큼 여백 확보(pb-16) / sm 이상: 여백 없음 */}
+            <main className={`flex-grow pb-16 sm:pb-0 ${isFullWidth ? "" : "container mx-auto px-4 py-6"}`}>
                 {isDev ? content : (
                     <Suspense fallback={<LoadingSpinner />}>
                         {content}
@@ -230,6 +232,9 @@ function App() {
             </main>
 
             {showFooter && <Footer />}
+
+            {/* 모바일 전용 하단 탭바 (sm 이상에서는 자동 숨김) */}
+            <BottomNav />
         </div>
     )
 }

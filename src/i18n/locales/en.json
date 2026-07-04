@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Recipe Calculator",
+    "name": "Baking Recipe Converter",
     "tagline": "Baker's Percentage Based Recipe Converter"
   },
   "settingsTabs": {
@@ -2551,7 +2551,7 @@
     }
   },
   "footer": {
-    "appName": "Recipe Book",
+    "appName": "Baking Recipe Converter",
     "description": "A free recipe conversion tool for professional and home bakers. Easily handle complex calculations like baker's percentage, DDT, and pan size adjustments.",
     "copyright": "© 2024 Recipe Book. All rights reserved.",
     "quickLinks": "Quick Links",

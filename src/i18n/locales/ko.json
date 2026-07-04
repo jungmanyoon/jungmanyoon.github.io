@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "레시피 계산기",
+    "name": "제과제빵 레시피 변환기",
     "tagline": "베이커스 퍼센트 기반 레시피 변환"
   },
   "settingsTabs": {
@@ -2551,7 +2551,7 @@
     }
   },
   "footer": {
-    "appName": "레시피북",
+    "appName": "제과제빵 레시피 변환기",
     "description": "제과제빵 전문가와 홈베이커를 위한 무료 레시피 변환 도구입니다. 베이커스 퍼센트, DDT 계산, 팬 크기 조정 등 복잡한 계산을 쉽게 처리하세요.",
     "copyright": "© 2024 레시피북. All rights reserved.",
     "quickLinks": "바로가기",

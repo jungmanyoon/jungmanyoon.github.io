@@ -92,7 +92,7 @@ const PAGE_TITLES: Record<string, string> = {
     contact: 'seo.titles.contact'
 }
 
-const BASE_TITLE = '레시피북'
+const BASE_TITLE = '제과제빵 레시피 변환기'
 
 // 메인 앱 컴포넌트
 function App() {

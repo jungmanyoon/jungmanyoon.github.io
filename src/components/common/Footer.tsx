@@ -41,7 +41,7 @@ export default function Footer() {
                   onClick={() => handleNavigation('dashboard')}
                   className="hover:text-white transition-colors"
                 >
-                  {t('nav.dashboard')}
+                  {t('nav.converter')}
                 </button>
               </li>
               <li>

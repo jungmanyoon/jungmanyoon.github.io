@@ -80,12 +80,12 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [ ] C5 공정 지시문 12px->세로 numbered: :2967-3014,:2975. 본문 text-sm, 모바일 세로 1열, 폭핸들 lg 전용.
 - [ ] C6 단계칩 오탭 삭제 undo: :2967-3074,:3072-3074. removeProcess를 showUndoToast로 order 복원(A4와 함께).
 
-### 배치 D - P2 quick: 전역 IA/내비/브랜드
-- [ ] D1 dashboard/workspace 중복 통합: App.tsx:73·158-159, main.jsx:43, Header.jsx:59. canonical 'dashboard'.
-- [ ] D2 랜딩 탭 단일화: useAppStore.ts:47, main.jsx:41-46, App.tsx:116-121. 기본 'home' 권장.
-- [ ] D3 앱 이름 정렬(4곳): ko.json:3·2098, App.tsx:91(BASE_TITLE), footer. 캐논 1개('계산기' 배제, DDT탭과 중복).
-- [ ] D4 푸터 미번역 키 노출: Footer.tsx:44 -> t('nav.converter') 또는 nav.dashboard 키 추가 + i18n missing 핸들러.
-- [ ] D5 모바일 nav 라벨 없음: Header.jsx:11-16,:70. 하단 고정 탭바(아이콘+text-[10px]) 또는 변환기 탭 텍스트 병기.
+### 배치 D - P2 quick: 전역 IA/내비/브랜드 [완료 2026-07-04 · typecheck0/test164/build OK · 사용자 결정: 앱명="제과제빵 레시피 변환기", 랜딩=recipes · D5는 H 이월]
+- [x] D1 dashboard/workspace 중복 통합 (Header active에 workspace 별칭; 'workspace' 라우트는 하위호환 유지): App.tsx:73·158-159, main.jsx:43, Header.jsx:59. canonical 'dashboard'.
+- [x] D2 랜딩 탭 단일화 (useAppStore 기본 이미 recipes + main.jsx 시드 workspace->recipes): useAppStore.ts:47, main.jsx:41-46, App.tsx:116-121. 기본 'home' 권장.
+- [x] D3 앱 이름 정렬 -> "제과제빵 레시피 변환기" (app.name/footer.appName ko·en + BASE_TITLE; home.title는 이미 일치): ko.json:3·2098, App.tsx:91(BASE_TITLE), footer. 캐논 1개('계산기' 배제, DDT탭과 중복).
+- [x] D4 푸터 미번역 키 노출 (Footer nav.dashboard -> nav.converter): Footer.tsx:44 -> t('nav.converter') 또는 nav.dashboard 키 추가 + i18n missing 핸들러.
+- [ ] D5 모바일 nav 라벨 없음: **-> H(반응형)로 이월** (하단 고정 탭바 재설계. 라벨만 노출하면 375px 오버플로/스크롤이라 반쪽; 바텀바가 정답). Header.jsx:11-16,:70.
 
 ### 배치 E - P2 quick: 접근성·일관성
 - [ ] E1 ink-disabled(2.6:1)->ink-subtle(4.76:1) 4곳: :2851, HomePage.tsx:261, IngredientSettingsTab.tsx:608·825. (A2/변환기 %열과 겹침-함께)

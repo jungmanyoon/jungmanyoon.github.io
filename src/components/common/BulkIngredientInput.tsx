@@ -192,14 +192,14 @@ export default function BulkIngredientInput({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+      <div className="bg-surface-paper rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
         {/* 헤더 */}
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <h3 className="font-semibold text-lg flex items-center gap-2">
             <FileText className="w-5 h-5 text-amber-600" />
             {t('components.bulkInput.title')}
           </h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
+          <button onClick={onClose} className="p-1 hover:bg-surface-muted rounded">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -207,9 +207,9 @@ export default function BulkIngredientInput({
         {/* 본문 */}
         <div className="flex-1 overflow-auto p-4 space-y-4">
           {/* 입력 안내 */}
-          <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+          <div className="text-sm text-ink-muted bg-surface-muted p-3 rounded-lg">
             <p className="font-medium mb-1">{t('components.bulkInput.supportedFormats')}</p>
-            <ul className="text-xs space-y-0.5 text-gray-500">
+            <ul className="text-xs space-y-0.5 text-ink-subtle">
               <li>• {t('components.bulkInput.formatExample1')}</li>
               <li>• {t('components.bulkInput.formatExample2')}</li>
               <li>• {t('components.bulkInput.formatExample3')}</li>
@@ -219,10 +219,10 @@ export default function BulkIngredientInput({
           {/* 텍스트 입력 영역 */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700">{t('components.bulkInput.ingredientList')}</label>
+              <label className="text-sm font-medium text-ink-muted">{t('components.bulkInput.ingredientList')}</label>
               <button
                 onClick={handlePaste}
-                className="text-xs flex items-center gap-1 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded"
+                className="text-xs flex items-center gap-1 px-2 py-1 bg-surface-muted hover:bg-gray-200 rounded"
               >
                 <Upload className="w-3 h-3" />
                 {t('common.pasteFromClipboard')}
@@ -242,7 +242,7 @@ export default function BulkIngredientInput({
           {/* 파싱 결과 미리보기 */}
           {isParsed && parsedIngredients.length > 0 && (
             <div className="border rounded-lg overflow-hidden">
-              <div className="bg-gray-50 px-3 py-2 border-b flex items-center justify-between">
+              <div className="bg-surface-muted px-3 py-2 border-b flex items-center justify-between">
                 <span className="text-sm font-medium">{t('components.bulkInput.parseResult')}</span>
                 <div className="flex gap-2 text-xs">
                   {validCount > 0 && (
@@ -261,7 +261,7 @@ export default function BulkIngredientInput({
               </div>
               <div className="max-h-48 overflow-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 sticky top-0">
+                  <thead className="bg-surface-muted sticky top-0">
                     <tr>
                       <th className="text-left px-3 py-1.5 font-medium">{t('common.status')}</th>
                       <th className="text-left px-3 py-1.5 font-medium">{t('components.bulkInput.tableName')}</th>
@@ -283,7 +283,7 @@ export default function BulkIngredientInput({
                         <td className="px-3 py-1.5 text-right font-mono">
                           {ing.isValid ? ing.amount : '-'}
                         </td>
-                        <td className="px-3 py-1.5 text-xs text-gray-500">
+                        <td className="px-3 py-1.5 text-xs text-ink-subtle">
                           {ing.error || (findIngredientInfo(ing.name) ? t('components.bulkInput.dbMatched') : '')}
                         </td>
                       </tr>
@@ -296,17 +296,17 @@ export default function BulkIngredientInput({
         </div>
 
         {/* 푸터 */}
-        <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50">
+        <div className="flex items-center justify-between px-4 py-3 border-t bg-surface-muted">
           <button
             onClick={handleReset}
-            className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"
+            className="px-3 py-1.5 text-sm text-ink-muted hover:bg-gray-200 rounded"
           >
             {t('common.reset')}
           </button>
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-1.5 text-sm border rounded hover:bg-gray-100"
+              className="px-4 py-1.5 text-sm border rounded hover:bg-surface-muted"
             >
               {t('common.cancel')}
             </button>

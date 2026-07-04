@@ -34,8 +34,8 @@ const CostPanel = ({ recipe }) => {
 
   if (!costData) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="flex items-center text-gray-500">
+      <div className="bg-surface-paper rounded-lg shadow-sm border border-line p-4">
+        <div className="flex items-center text-ink-subtle">
           <DollarSign className="w-5 h-5 mr-2" />
           <span>원가 정보를 계산할 수 없습니다</span>
         </div>
@@ -48,17 +48,17 @@ const CostPanel = ({ recipe }) => {
   const formatCurrency = (amount) => `₩${amount.toLocaleString()}`
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-surface-paper rounded-lg shadow-sm border border-line">
       {/* 헤더 */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-line">
         <div className="flex items-center">
           <DollarSign className="w-5 h-5 mr-2 text-green-600" />
-          <h3 className="text-lg font-semibold text-gray-900">원가 분석</h3>
+          <h3 className="text-lg font-semibold text-ink">원가 분석</h3>
         </div>
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-ink-disabled hover:text-ink-muted transition-colors"
             title="계산 설정"
           >
             <Settings className="w-4 h-4" />
@@ -75,11 +75,11 @@ const CostPanel = ({ recipe }) => {
       <div className="p-4">
         {/* 설정 패널 */}
         {showSettings && (
-          <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
-            <h4 className="font-medium text-gray-900 mb-3">계산 설정</h4>
+          <div className="mb-4 p-4 bg-surface-muted rounded-lg border">
+            <h4 className="font-medium text-ink mb-3">계산 설정</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="flex items-center text-sm text-gray-700">
+                <label className="flex items-center text-sm text-ink-muted">
                   <input
                     type="checkbox"
                     checked={settings.useWholesalePrice}
@@ -91,7 +91,7 @@ const CostPanel = ({ recipe }) => {
               </div>
               
               <div>
-                <label className="block text-sm text-gray-700 mb-1">손실률 (%)</label>
+                <label className="block text-sm text-ink-muted mb-1">손실률 (%)</label>
                 <input
                   type="number"
                   value={(settings.wasteFactor - 1) * 100}
@@ -104,7 +104,7 @@ const CostPanel = ({ recipe }) => {
               </div>
               
               <div>
-                <label className="block text-sm text-gray-700 mb-1">시급 (원)</label>
+                <label className="block text-sm text-ink-muted mb-1">시급 (원)</label>
                 <input
                   type="number"
                   value={settings.laborRate}
@@ -117,7 +117,7 @@ const CostPanel = ({ recipe }) => {
               </div>
               
               <div>
-                <label className="block text-sm text-gray-700 mb-1">간접비율 (%)</label>
+                <label className="block text-sm text-ink-muted mb-1">간접비율 (%)</label>
                 <input
                   type="number"
                   value={settings.overheadRate * 100}
@@ -135,73 +135,73 @@ const CostPanel = ({ recipe }) => {
         {/* 기본 원가 정보 */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-ink">
               {formatCurrency(total.totalCost)}
             </div>
-            <div className="text-sm text-gray-600">총 원가</div>
+            <div className="text-sm text-ink-muted">총 원가</div>
           </div>
           
           <div className="text-center">
             <div className="text-xl font-semibold text-blue-600">
               {formatCurrency(total.costPerServing)}
             </div>
-            <div className="text-sm text-gray-600">개당 원가</div>
+            <div className="text-sm text-ink-muted">개당 원가</div>
           </div>
           
           <div className="text-center">
             <div className="text-xl font-semibold text-green-600">
               {formatCurrency(selling.sellingPrice)}
             </div>
-            <div className="text-sm text-gray-600">권장 판매가</div>
+            <div className="text-sm text-ink-muted">권장 판매가</div>
           </div>
           
           <div className="text-center">
             <div className="text-xl font-semibold text-amber-600">
               {selling.actualMargin}%
             </div>
-            <div className="text-sm text-gray-600">마진율</div>
+            <div className="text-sm text-ink-muted">마진율</div>
           </div>
         </div>
 
         {/* 원가 구성 */}
         <div className="mb-4">
-          <h4 className="font-medium text-gray-900 mb-2">원가 구성</h4>
+          <h4 className="font-medium text-ink mb-2">원가 구성</h4>
           <div className="space-y-2">
             <div className="flex items-center">
-              <span className="w-16 text-sm text-gray-600 mr-2">재료비</span>
+              <span className="w-16 text-sm text-ink-muted mr-2">재료비</span>
               <div className="flex-1 bg-gray-200 rounded-full h-3 mr-2">
                 <div
                   className="h-3 rounded-full bg-blue-500"
                   style={{ width: `${total.costBreakdown.ingredientsPercent}%` }}
                 />
               </div>
-              <span className="text-sm font-medium text-gray-900 w-20 text-right">
+              <span className="text-sm font-medium text-ink w-20 text-right">
                 {formatCurrency(total.ingredients.totalCost)} ({total.costBreakdown.ingredientsPercent}%)
               </span>
             </div>
             
             <div className="flex items-center">
-              <span className="w-16 text-sm text-gray-600 mr-2">인건비</span>
+              <span className="w-16 text-sm text-ink-muted mr-2">인건비</span>
               <div className="flex-1 bg-gray-200 rounded-full h-3 mr-2">
                 <div
                   className="h-3 rounded-full bg-green-500"
                   style={{ width: `${total.costBreakdown.laborPercent}%` }}
                 />
               </div>
-              <span className="text-sm font-medium text-gray-900 w-20 text-right">
+              <span className="text-sm font-medium text-ink w-20 text-right">
                 {formatCurrency(total.labor.totalLaborCost)} ({total.costBreakdown.laborPercent}%)
               </span>
             </div>
             
             <div className="flex items-center">
-              <span className="w-16 text-sm text-gray-600 mr-2">간접비</span>
+              <span className="w-16 text-sm text-ink-muted mr-2">간접비</span>
               <div className="flex-1 bg-gray-200 rounded-full h-3 mr-2">
                 <div
                   className="h-3 rounded-full bg-orange-500"
                   style={{ width: `${total.costBreakdown.overheadPercent}%` }}
                 />
               </div>
-              <span className="text-sm font-medium text-gray-900 w-20 text-right">
+              <span className="text-sm font-medium text-ink w-20 text-right">
                 {formatCurrency(total.overhead.overheadCost)} ({total.costBreakdown.overheadPercent}%)
               </span>
             </div>
@@ -224,10 +224,10 @@ const CostPanel = ({ recipe }) => {
 
         {/* 상세 정보 */}
         {showDetails && (
-          <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
+          <div className="mt-4 pt-4 border-t border-line space-y-4">
             {/* 재료별 원가 */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">재료별 원가</h4>
+              <h4 className="font-medium text-ink mb-2">재료별 원가</h4>
               <div className="space-y-2">
                 {total.ingredients.items
                   .sort((a, b) => b.adjustedCost - a.adjustedCost)
@@ -235,7 +235,7 @@ const CostPanel = ({ recipe }) => {
                   .map((item, index) => (
                   <div key={index} className="flex justify-between items-center text-sm">
                     <div className="flex items-center">
-                      <span className={item.isEstimated ? 'text-orange-700' : 'text-gray-700'}>
+                      <span className={item.isEstimated ? 'text-orange-700' : 'text-ink-muted'}>
                         {item.name}
                       </span>
                       {item.isEstimated && (
@@ -244,7 +244,7 @@ const CostPanel = ({ recipe }) => {
                     </div>
                     <div className="text-right">
                       <div className="font-medium">{formatCurrency(Math.round(item.adjustedCost))}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-ink-subtle">
                         {item.amount}{item.unit} × {formatCurrency(Math.round(item.pricePerUnit))}
                       </div>
                     </div>
@@ -263,14 +263,14 @@ const CostPanel = ({ recipe }) => {
 
             {/* 판매가 옵션 */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">마진별 판매가</h4>
+              <h4 className="font-medium text-ink mb-2">마진별 판매가</h4>
               <div className="grid grid-cols-2 gap-2">
                 {selling.priceOptions.map((option, index) => (
-                  <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
+                  <div key={index} className="flex justify-between items-center p-2 bg-surface-muted rounded text-sm">
                     <span>{option.margin}% 마진</span>
                     <div className="text-right">
                       <div className="font-medium">{formatCurrency(option.price)}</div>
-                      <div className="text-xs text-gray-500">이익: {formatCurrency(option.profit)}</div>
+                      <div className="text-xs text-ink-subtle">이익: {formatCurrency(option.profit)}</div>
                     </div>
                   </div>
                 ))}
@@ -280,7 +280,7 @@ const CostPanel = ({ recipe }) => {
             {/* 절감 제안 상세 */}
             {reduction.suggestions.length > 0 && (
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">절감 제안</h4>
+                <h4 className="font-medium text-ink mb-2">절감 제안</h4>
                 <div className="space-y-2">
                   {reduction.suggestions.map((suggestion, index) => (
                     <div key={index} className="p-3 bg-blue-50 border border-blue-200 rounded text-sm">
@@ -306,25 +306,25 @@ const CostPanel = ({ recipe }) => {
 
             {/* 작업 시간 분석 */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">작업 시간</h4>
+              <h4 className="font-medium text-ink mb-2">작업 시간</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">준비 시간</span>
+                    <span className="text-ink-muted">준비 시간</span>
                     <span>{recipe.prepTime}분</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">굽기 시간</span>
+                    <span className="text-ink-muted">굽기 시간</span>
                     <span>{recipe.bakingTime}분</span>
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">총 시간</span>
+                    <span className="text-ink-muted">총 시간</span>
                     <span>{total.labor.totalTime}분</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">인건비</span>
+                    <span className="text-ink-muted">인건비</span>
                     <span>{formatCurrency(total.labor.totalLaborCost)}</span>
                   </div>
                 </div>

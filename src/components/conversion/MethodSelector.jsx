@@ -12,8 +12,8 @@ function MethodSelector({ currentMethod, selectedMethod, onMethodChange }) {
     <div>
       <h3 className="mb-4">{t('components.methodSelector.title')}</h3>
 
-      <div className="mb-4 p-4 bg-bread-100 rounded-lg">
-        <p className="text-sm text-bread-700">
+      <div className="mb-4 p-4 bg-surface-muted rounded-lg">
+        <p className="text-sm text-ink-muted">
           {t('components.methodSelector.currentMethod')} <strong>{METHODS[currentMethod]?.name || currentMethod}</strong>
         </p>
       </div>
@@ -26,13 +26,13 @@ function MethodSelector({ currentMethod, selectedMethod, onMethodChange }) {
             className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
               selectedMethod === method.id
                 ? 'border-bread-500 bg-bread-50'
-                : 'border-bread-200 hover:border-bread-300'
+                : 'border-line hover:border-line-strong'
             }`}
           >
-            <h4 className="font-medium text-bread-700 mb-2">{method.name}</h4>
-            <p className="text-sm text-gray-600 mb-3">{method.description}</p>
+            <h4 className="font-medium text-ink mb-2">{method.name}</h4>
+            <p className="text-sm text-ink-muted mb-3">{method.description}</p>
 
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-ink-subtle">
               <p className="mb-1">
                 <strong>{t('components.methodSelector.fermentationTime')}</strong>{' '}
                 {method.fermentationTime.sponge && t('components.methodSelector.preFerment', { time: method.fermentationTime.sponge }) + ', '}

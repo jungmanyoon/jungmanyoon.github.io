@@ -87,16 +87,16 @@ const TimerManager = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden">
+      <div className="bg-surface-paper rounded-lg shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden">
         {/* 헤더 */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center">
             <Timer className="w-5 h-5 mr-2 text-orange-600" />
-            <h2 className="text-lg font-semibold text-gray-900">타이머 관리</h2>
+            <h2 className="text-lg font-semibold text-ink">타이머 관리</h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-ink-disabled hover:text-ink-muted transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -113,12 +113,12 @@ const TimerManager = ({ isOpen, onClose }) => {
           )}
 
           {/* 새 타이머 추가 */}
-          <div className="p-4 border-b bg-gray-50">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">새 타이머 추가</h3>
+          <div className="p-4 border-b bg-surface-muted">
+            <h3 className="text-sm font-medium text-ink-muted mb-3">새 타이머 추가</h3>
             
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="block text-xs font-medium text-ink-muted mb-1">
                   타이머 이름
                 </label>
                 <input
@@ -126,13 +126,13 @@ const TimerManager = ({ isOpen, onClose }) => {
                   value={newTimerName}
                   onChange={(e) => setNewTimerName(e.target.value)}
                   placeholder="예: 바게트 굽기"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
               <div className="flex space-x-2">
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-ink-muted mb-1">
                     시간 (분)
                   </label>
                   <input
@@ -142,18 +142,18 @@ const TimerManager = ({ isOpen, onClose }) => {
                     placeholder="30"
                     min="1"
                     max="1440"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-line rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
                 </div>
 
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-ink-muted mb-1">
                     종류
                   </label>
                   <select
                     value={newTimerType}
                     onChange={(e) => setNewTimerType(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-line rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   >
                     <option value="baking">베이킹</option>
                     <option value="fermentation">발효</option>
@@ -174,12 +174,12 @@ const TimerManager = ({ isOpen, onClose }) => {
 
           {/* 활성 타이머 목록 */}
           <div className="p-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
+            <h3 className="text-sm font-medium text-ink-muted mb-3">
               활성 타이머 ({activeTimers.length}개)
             </h3>
 
             {activeTimers.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-ink-subtle">
                 <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">활성 타이머가 없습니다</p>
               </div>
@@ -188,18 +188,18 @@ const TimerManager = ({ isOpen, onClose }) => {
                 {activeTimers.map((timer) => (
                   <div
                     key={timer.id}
-                    className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg shadow-sm"
+                    className="flex items-center justify-between p-3 bg-surface-paper border border-line rounded-lg shadow-sm"
                   >
                     <div className="flex-1">
                       <div className="flex items-center">
                         <div className={`w-2 h-2 rounded-full mr-2 ${
                           timer.type === 'fermentation' ? 'bg-green-400' : 'bg-orange-400'
                         }`} />
-                        <h4 className="font-medium text-gray-900 text-sm">
+                        <h4 className="font-medium text-ink text-sm">
                           {timer.name}
                         </h4>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-ink-subtle mt-1">
                         남은 시간: {formatTime(timer.remainingMinutes)}
                       </p>
                     </div>
@@ -214,7 +214,7 @@ const TimerManager = ({ isOpen, onClose }) => {
                       </button>
                       <button
                         onClick={() => handleRemoveTimer(timer.id)}
-                        className="text-gray-400 hover:text-red-600 transition-colors"
+                        className="text-ink-disabled hover:text-red-600 transition-colors"
                         title="타이머 제거"
                       >
                         <X className="w-4 h-4" />

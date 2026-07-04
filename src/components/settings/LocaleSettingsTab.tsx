@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocaleStore } from '@/stores/useLocaleStore';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, UnitSystem, UNIT_SYSTEMS } from '@/i18n';
 import { TemperatureUnit, WeightUnit, VolumeUnit, LengthUnit } from '@/utils/unitConverter';
+import { Wheat } from 'lucide-react';
 
 export default function LocaleSettingsTab() {
   const { t } = useTranslation();
@@ -35,12 +36,12 @@ export default function LocaleSettingsTab() {
   return (
     <div className="space-y-8">
       {/* 언어 설정 */}
-      <section className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+        <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
           <span className="text-xl">🌐</span>
           {t('settings.language')}
         </h3>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-ink-subtle mb-4">
           {t('settings.languageDescription')}
         </p>
 
@@ -52,7 +53,7 @@ export default function LocaleSettingsTab() {
               className={`p-4 rounded-lg border-2 transition-all ${
                 language === lang
                   ? 'border-bread-500 bg-bread-50 text-bread-700'
-                  : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                  : 'border-line hover:border-line text-ink-muted'
               }`}
             >
               <div className="text-2xl mb-1">
@@ -65,12 +66,12 @@ export default function LocaleSettingsTab() {
       </section>
 
       {/* 단위 시스템 */}
-      <section className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+        <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
           <span className="text-xl">📏</span>
           {t('settings.unitSystem')}
         </h3>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-ink-subtle mb-4">
           {t('settings.unitSystemDescription')}
         </p>
 
@@ -82,13 +83,13 @@ export default function LocaleSettingsTab() {
               className={`p-4 rounded-lg border-2 transition-all text-left ${
                 unitSystem === system
                   ? 'border-bread-500 bg-bread-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-line hover:border-line'
               }`}
             >
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-ink">
                 {language === 'ko' ? UNIT_SYSTEMS[system].nameKo : UNIT_SYSTEMS[system].name}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-ink-subtle mt-1">
                 {system === 'metric' && 'g, ml, °C'}
                 {system === 'imperial' && 'oz, cups, °F'}
                 {system === 'hybrid' && 'g, ml, °F'}
@@ -99,14 +100,14 @@ export default function LocaleSettingsTab() {
 
         {/* 개별 단위 설정 */}
         <div className="border-t pt-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">
+          <h4 className="text-sm font-medium text-ink-muted mb-3">
             {t('settings.individualUnitSettings')}
           </h4>
 
           <div className="grid grid-cols-2 gap-4">
             {/* 온도 */}
             <div>
-              <label className="block text-sm text-gray-600 mb-1">
+              <label className="block text-sm text-ink-muted mb-1">
                 {t('settings.temperatureUnit')}
               </label>
               <select
@@ -121,7 +122,7 @@ export default function LocaleSettingsTab() {
 
             {/* 무게 */}
             <div>
-              <label className="block text-sm text-gray-600 mb-1">
+              <label className="block text-sm text-ink-muted mb-1">
                 {t('settings.weightUnit')}
               </label>
               <select
@@ -138,7 +139,7 @@ export default function LocaleSettingsTab() {
 
             {/* 부피 */}
             <div>
-              <label className="block text-sm text-gray-600 mb-1">
+              <label className="block text-sm text-ink-muted mb-1">
                 {t('settings.volumeUnit')}
               </label>
               <select
@@ -155,7 +156,7 @@ export default function LocaleSettingsTab() {
 
             {/* 길이 */}
             <div>
-              <label className="block text-sm text-gray-600 mb-1">
+              <label className="block text-sm text-ink-muted mb-1">
                 {t('settings.lengthUnit')}
               </label>
               <select
@@ -172,8 +173,8 @@ export default function LocaleSettingsTab() {
       </section>
 
       {/* 숫자 포맷 */}
-      <section className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+        <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
           <span className="text-xl">🔢</span>
           {t('settings.numberFormat')}
         </h3>
@@ -181,7 +182,7 @@ export default function LocaleSettingsTab() {
         <div className="grid grid-cols-2 gap-4">
           {/* 소수점 구분자 */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1">
+            <label className="block text-sm text-ink-muted mb-1">
               {t('settings.decimalSeparator')}
             </label>
             <div className="flex gap-2">
@@ -190,7 +191,7 @@ export default function LocaleSettingsTab() {
                 className={`flex-1 py-2 px-4 rounded-lg border-2 transition-all ${
                   decimalSeparator === '.'
                     ? 'border-bread-500 bg-bread-50 text-bread-700'
-                    : 'border-gray-200 text-gray-600'
+                    : 'border-line text-ink-muted'
                 }`}
               >
                 {t('settings.dot')}
@@ -200,7 +201,7 @@ export default function LocaleSettingsTab() {
                 className={`flex-1 py-2 px-4 rounded-lg border-2 transition-all ${
                   decimalSeparator === ','
                     ? 'border-bread-500 bg-bread-50 text-bread-700'
-                    : 'border-gray-200 text-gray-600'
+                    : 'border-line text-ink-muted'
                 }`}
               >
                 {t('settings.comma')}
@@ -210,7 +211,7 @@ export default function LocaleSettingsTab() {
 
           {/* 소수점 자릿수 */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1">
+            <label className="block text-sm text-ink-muted mb-1">
               {t('settings.decimalPlaces')}
             </label>
             <select
@@ -228,9 +229,9 @@ export default function LocaleSettingsTab() {
       </section>
 
       {/* 재료 표시 옵션 */}
-      <section className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span className="text-xl">🥖</span>
+      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+        <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
+          <Wheat size={18} className="text-ink-muted" />
           {t('settings.ingredientDisplay')}
         </h3>
 
@@ -239,14 +240,14 @@ export default function LocaleSettingsTab() {
             type="checkbox"
             checked={showIngredientTranslation}
             onChange={(e) => setShowIngredientTranslation(e.target.checked)}
-            className="w-5 h-5 rounded border-gray-300 text-bread-500 focus:ring-bread-500"
+            className="w-5 h-5 rounded border-line text-bread-500 focus:ring-bread-500"
           />
-          <span className="text-gray-700">
+          <span className="text-ink-muted">
             {t('settings.showIngredientTranslation')}
           </span>
         </label>
 
-        <div className="mt-3 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+        <div className="mt-3 p-3 bg-surface-muted rounded-lg text-sm text-ink-muted">
           <div className="font-medium mb-1">
             {t('settings.example')}
           </div>
@@ -257,15 +258,15 @@ export default function LocaleSettingsTab() {
       </section>
 
       {/* 미리보기 */}
-      <section className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+        <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
           <span className="text-xl">👁️</span>
           {t('settings.preview')}
         </h3>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="text-gray-500 mb-1">
+          <div className="p-3 bg-surface-muted rounded-lg">
+            <div className="text-ink-subtle mb-1">
               {t('recipe.bakingTemp')}
             </div>
             <div className="font-medium">
@@ -273,8 +274,8 @@ export default function LocaleSettingsTab() {
             </div>
           </div>
 
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="text-gray-500 mb-1">
+          <div className="p-3 bg-surface-muted rounded-lg">
+            <div className="text-ink-subtle mb-1">
               {t('ingredientCategory.flour')}
             </div>
             <div className="font-medium">
@@ -285,8 +286,8 @@ export default function LocaleSettingsTab() {
             </div>
           </div>
 
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="text-gray-500 mb-1">
+          <div className="p-3 bg-surface-muted rounded-lg">
+            <div className="text-ink-subtle mb-1">
               {t('ingredientCategory.liquid')}
             </div>
             <div className="font-medium">
@@ -297,8 +298,8 @@ export default function LocaleSettingsTab() {
             </div>
           </div>
 
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="text-gray-500 mb-1">
+          <div className="p-3 bg-surface-muted rounded-lg">
+            <div className="text-ink-subtle mb-1">
               {t('settings.panDiameter')}
             </div>
             <div className="font-medium">
@@ -312,7 +313,7 @@ export default function LocaleSettingsTab() {
       <div className="flex justify-end">
         <button
           onClick={resetToDefaults}
-          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 text-sm text-ink-muted hover:text-ink border border-line rounded-lg hover:bg-surface-muted transition-colors"
         >
           {t('common.reset')}
         </button>

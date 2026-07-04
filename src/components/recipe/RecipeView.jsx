@@ -2,6 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
 import RecommendationPanel from '../recommendation/RecommendationPanel.jsx'
+import { ClipboardList, RotateCcw } from 'lucide-react'
 
 function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
   const { t } = useTranslation()
@@ -9,7 +10,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
   if (!recipe) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">{t('components.recipeView.noRecipeSelected')}</p>
+        <p className="text-ink-subtle">{t('components.recipeView.noRecipeSelected')}</p>
       </div>
     )
   }
@@ -49,10 +50,10 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
 
     return (
       <div>
-        {title && <h4 className="font-medium text-bread-600 mb-1 text-sm">{title}</h4>}
+        {title && <h4 className="font-medium text-ink-muted mb-1 text-sm">{title}</h4>}
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-bread-300">
+            <tr className="border-b border-line">
               <th className="text-left py-1">{t('components.recipeView.ingredientName')}</th>
               <th className="text-right py-1">{t('components.recipeView.amount')}</th>
               <th className="text-center py-1">{t('components.recipeView.bakersPercent')}</th>
@@ -60,12 +61,12 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
           </thead>
           <tbody>
             {ingredients.map((ingredient, idx) => (
-              <tr key={idx} className="border-b border-bread-100">
+              <tr key={idx} className="border-b border-line-soft">
                 <td className="py-1">{ingredient.name}</td>
                 <td className="py-1 text-right">
                   {parseFloat(ingredient.amount).toFixed(1)}{ingredient.unit || 'g'}
                 </td>
-                <td className="py-1 text-center text-bread-600">
+                <td className="py-1 text-center text-ink-muted">
                   {flourTotal > 0 ? ((parseFloat(ingredient.amount) / flourTotal) * 100).toFixed(1) : '-'}%
                 </td>
               </tr>
@@ -117,16 +118,16 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
 
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-xl font-bold text-bread-700 mb-1">{recipe.name}</h1>
+            <h1 className="text-xl font-bold text-ink mb-1">{recipe.name}</h1>
             {recipe.description && (
-              <p className="text-gray-600">{recipe.description}</p>
+              <p className="text-ink-muted">{recipe.description}</p>
             )}
           </div>
           <div className="text-right">
-            <span className="inline-block px-3 py-1 bg-bread-200 text-bread-700 rounded-full text-sm">
+            <span className="inline-block px-3 py-1 bg-surface-muted text-ink-muted rounded-full text-sm">
               {recipe.category}
             </span>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-ink-subtle mt-2">
               {getMethodName(recipe.method)}
             </p>
           </div>
@@ -137,12 +138,12 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
       {hasConversion ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* 원본 레시피 */}
-          <div className="card border-2 border-gray-200">
+          <div className="card border-2 border-line">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-lg">📋</span>
+              <ClipboardList size={18} className="text-ink-muted" />
               <h2 className="text-base font-semibold">{t('components.recipeView.originalRecipe')}</h2>
             </div>
-            <p className="text-xs text-gray-600 mb-2">
+            <p className="text-xs text-ink-muted mb-2">
               {t('components.recipeView.method')} {getMethodName(recipe.convertedFrom || 'straight')}
             </p>
             {/* 원본 재료 찾기 - conversionDetails가 있으면 그것을, 없으면 현재 ingredients 사용 */}
@@ -153,12 +154,12 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
           </div>
 
           {/* 변환된 레시피 */}
-          <div className="card border-2 border-bread-300">
+          <div className="card border-2 border-line">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-lg">🔄</span>
+              <RotateCcw size={18} className="text-ink-muted" />
               <h2 className="text-base font-semibold">{t('components.recipeView.convertedRecipe')}</h2>
             </div>
-            <p className="text-xs text-gray-600 mb-2">
+            <p className="text-xs text-ink-muted mb-2">
               {t('components.recipeView.method')} {getMethodName(recipe.method)}
             </p>
             {recipe.conversionDetails ? (
@@ -183,7 +184,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
           <div className="card">
             <h2 className="text-base font-semibold mb-2">{t('components.recipeView.nutritionInfo')}</h2>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between py-1 border-b border-bread-100">
+              <div className="flex justify-between py-1 border-b border-line-soft">
                 <span>{t('components.recipeView.hydration')}</span>
                 <span className="font-medium">
                   {(() => {
@@ -193,7 +194,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
                   })()}%
                 </span>
               </div>
-              <div className="flex justify-between py-1 border-b border-bread-100">
+              <div className="flex justify-between py-1 border-b border-line-soft">
                 <span>{t('components.recipeView.doughYield')}</span>
                 <span className="font-medium">
                   {(() => {
@@ -203,7 +204,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
                   })()}%
                 </span>
               </div>
-              <div className="flex justify-between py-1 border-b border-bread-100">
+              <div className="flex justify-between py-1 border-b border-line-soft">
                 <span>{t('components.recipeView.methodLabel')}</span>
                 <span className="font-medium">{getMethodName(recipe.method)}</span>
               </div>
@@ -259,7 +260,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
           <ol className="space-y-2 text-sm">
             {recipe.instructions.map((instruction, index) => (
               <li key={index} className="flex">
-                <span className="font-medium text-bread-600 mr-3">{index + 1}.</span>
+                <span className="font-medium text-ink-muted mr-3">{index + 1}.</span>
                 <span>{instruction}</span>
               </li>
             ))}
@@ -270,7 +271,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
       {recipe.notes && (
         <div className="card mt-3">
           <h2 className="text-base font-semibold mb-2">{t('components.recipeView.notes')}</h2>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{recipe.notes}</p>
+          <p className="text-sm text-ink-muted whitespace-pre-wrap">{recipe.notes}</p>
         </div>
       )}
 

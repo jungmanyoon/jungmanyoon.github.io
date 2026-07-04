@@ -16,10 +16,10 @@ import { useAutoSave } from '@/hooks/useAutoSave'
 function LoadingSpinner() {
     return (
         <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bread-600 mb-6"></div>
-            <p className="text-gray-600 text-lg mb-4">레시피북을 불러오는 중...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500 mb-6"></div>
+            <p className="text-ink-muted text-lg mb-4">레시피북을 불러오는 중...</p>
             {/* SEO: 검색엔진이 볼 수 있는 콘텐츠 */}
-            <div className="text-gray-500 text-sm text-center max-w-md">
+            <div className="text-ink-subtle text-sm text-center max-w-md">
                 <p className="mb-2">
                     레시피북은 제과제빵 전문가와 홈베이커를 위한 무료 레시피 변환 도구입니다.
                 </p>
@@ -197,7 +197,7 @@ function App() {
     const content = renderActive()
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-surface-canvas flex flex-col">
             <Header />
             <PWAStatus />
             <PWAInstallPrompt />

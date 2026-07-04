@@ -240,9 +240,9 @@ export default function SettingsPage({
   }
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${className}`}>
+    <div className={`min-h-screen bg-surface-muted ${className}`}>
       {/* 헤더 */}
-      <div className="sticky top-0 z-10 bg-white border-b shadow-sm">
+      <div className="sticky top-0 z-10 bg-surface-paper border-b shadow-sm">
         <div className="max-w-6xl mx-auto px-4">
           {/* 모바일: 헤더 버튼이 많아 가로 넘침 방지를 위해 gap 축소, 버튼 라벨은 sm 이상에서만 표시 */}
           <div className="flex items-center justify-between gap-2 h-16">
@@ -250,14 +250,14 @@ export default function SettingsPage({
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="flex items-center justify-center min-w-[44px] min-h-[44px] hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                  className="flex items-center justify-center min-w-[44px] min-h-[44px] hover:bg-surface-muted rounded-lg transition-colors flex-shrink-0"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
               )}
               <div className="flex items-center gap-2 min-w-0">
-                <Settings className="w-6 h-6 text-gray-600 flex-shrink-0" />
-                <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">{t('settings.title')}</h1>
+                <Settings className="w-6 h-6 text-ink-muted flex-shrink-0" />
+                <h1 className="text-lg sm:text-xl font-bold text-ink truncate">{t('settings.title')}</h1>
               </div>
             </div>
 
@@ -266,7 +266,7 @@ export default function SettingsPage({
               <button
                 onClick={() => setShowExportModal(true)}
                 aria-label={t('common.export')}
-                className="flex items-center justify-center gap-1 min-h-[44px] px-2 sm:px-3 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center justify-center gap-1 min-h-[44px] px-2 sm:px-3 text-sm text-ink-muted hover:bg-surface-muted rounded-lg transition-colors"
               >
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('common.export')}</span>
@@ -274,7 +274,7 @@ export default function SettingsPage({
               <button
                 onClick={() => setShowImportModal(true)}
                 aria-label={t('common.import')}
-                className="flex items-center justify-center gap-1 min-h-[44px] px-2 sm:px-3 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center justify-center gap-1 min-h-[44px] px-2 sm:px-3 text-sm text-ink-muted hover:bg-surface-muted rounded-lg transition-colors"
               >
                 <Upload className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('common.import')}</span>
@@ -310,16 +310,16 @@ export default function SettingsPage({
                     className={`flex items-center gap-2 lg:gap-3 min-h-[44px] flex-shrink-0 lg:w-full px-3 lg:px-4 py-2 lg:py-3 rounded-lg text-left whitespace-nowrap lg:whitespace-normal transition-all ${
                       isActive
                         ? `${tab.bgColor} ${tab.borderColor} border-2`
-                        : 'hover:bg-gray-100 border-2 border-transparent'
+                        : 'hover:bg-surface-muted border-2 border-transparent'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? tab.color : 'text-gray-400'}`} />
+                    <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? tab.color : 'text-ink-disabled'}`} />
                     <div className="min-w-0">
-                      <div className={`text-sm font-medium ${isActive ? 'text-gray-800' : 'text-gray-600'}`}>
+                      <div className={`text-sm font-medium ${isActive ? 'text-ink' : 'text-ink-muted'}`}>
                         {t(tab.nameKey)}
                       </div>
                       {/* 설명문은 데스크톱에서만 노출(모바일 가로 탭에서는 폭 절약 위해 숨김) */}
-                      <div className="hidden lg:block text-xs text-gray-500 truncate">
+                      <div className="hidden lg:block text-xs text-ink-subtle truncate">
                         {t(tab.descKey)}
                       </div>
                     </div>
@@ -331,7 +331,7 @@ export default function SettingsPage({
 
           {/* 메인 콘텐츠 - 모바일 전체 폭 */}
           <div className="flex-1 min-w-0">
-            <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
+            <div className="bg-surface-paper rounded-xl shadow-sm border p-4 sm:p-6">
               {renderTabContent()}
             </div>
           </div>
@@ -341,25 +341,25 @@ export default function SettingsPage({
       {/* 내보내기 모달 */}
       {showExportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-modal w-full max-w-md p-5 sm:p-6">
+          <div className="bg-surface-paper rounded-xl shadow-modal w-full max-w-md p-5 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">{t('settings.modal.exportTitle')}</h3>
               <button
                 onClick={() => setShowExportModal(false)}
                 aria-label={t('common.cancel')}
-                className="flex items-center justify-center min-w-[44px] min-h-[44px] -mr-2 hover:bg-gray-100 rounded"
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] -mr-2 hover:bg-surface-muted rounded"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-ink-muted mb-4">
               {t('settings.modal.exportDesc')}
             </p>
             {/* 모바일: 버튼 세로 스택 / 데스크톱: 우측 정렬 가로 배치 보존 */}
             <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
               <button
                 onClick={() => setShowExportModal(false)}
-                className="min-h-[44px] px-4 py-2 border rounded-lg hover:bg-gray-50"
+                className="min-h-[44px] px-4 py-2 border rounded-lg hover:bg-surface-muted"
               >
                 {t('common.cancel')}
               </button>
@@ -378,7 +378,7 @@ export default function SettingsPage({
       {/* 가져오기 모달 */}
       {showImportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-modal w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 sm:p-6">
+          <div className="bg-surface-paper rounded-xl shadow-modal w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">{t('settings.modal.importTitle')}</h3>
               <button
@@ -389,7 +389,7 @@ export default function SettingsPage({
                   setImportSuccess(false)
                 }}
                 aria-label={t('common.cancel')}
-                className="flex items-center justify-center min-w-[44px] min-h-[44px] -mr-2 hover:bg-gray-100 rounded"
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] -mr-2 hover:bg-surface-muted rounded"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -403,19 +403,19 @@ export default function SettingsPage({
             ) : (
               <>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-ink-muted mb-2">
                     {t('settings.modal.selectFile')}
                   </label>
                   <input
                     type="file"
                     accept=".json"
                     onChange={handleFileImport}
-                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100"
+                    className="w-full text-sm text-ink-subtle file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-surface-muted file:text-ink-muted hover:file:bg-surface-muted"
                   />
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-ink-muted mb-2">
                     {t('settings.modal.orPaste')}
                   </label>
                   <textarea
@@ -442,7 +442,7 @@ export default function SettingsPage({
                       setImportData('')
                       setImportError('')
                     }}
-                    className="min-h-[44px] px-4 py-2 border rounded-lg hover:bg-gray-50"
+                    className="min-h-[44px] px-4 py-2 border rounded-lg hover:bg-surface-muted"
                   >
                     {t('common.cancel')}
                   </button>

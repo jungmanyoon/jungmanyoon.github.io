@@ -88,7 +88,7 @@ function IngredientTable({ ingredients = [], onChange }) {
       </datalist>
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-bread-300">
+          <tr className="border-b border-line">
             <th className="text-left py-1">{t('ingredientTable.ingredientName')}</th>
             <th className="text-left py-1">{t('ingredientTable.amount')}</th>
             <th className="text-left py-1">{t('ingredientTable.unit')}</th>
@@ -99,13 +99,13 @@ function IngredientTable({ ingredients = [], onChange }) {
         </thead>
         <tbody>
           {ingredients.map((ingredient, index) => (
-            <tr key={ingredient._key ?? index} className="border-b border-bread-100">
+            <tr key={ingredient._key ?? index} className="border-b border-line-soft">
               <td className="py-1 pr-2">
                 <input
                   type="text"
                   value={ingredient.name}
                   onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                  className="w-full px-2 py-1 border border-bread-200 rounded text-sm"
+                  className="w-full px-2 py-1 border border-line rounded text-sm"
                   placeholder={t('ingredientTable.placeholder')}
                   data-cell={`${index}:name`}
                   onKeyDown={(e) => handleKeyDown(e, index, 'name')}
@@ -118,7 +118,7 @@ function IngredientTable({ ingredients = [], onChange }) {
                   type="number"
                   value={ingredient.amount}
                   onChange={(e) => handleIngredientChange(index, 'amount', e.target.value)}
-                  className="w-full px-2 py-1 border border-bread-200 rounded text-sm"
+                  className="w-full px-2 py-1 border border-line rounded text-sm"
                   placeholder="0"
                   data-cell={`${index}:amount`}
                   onKeyDown={(e) => handleKeyDown(e, index, 'amount')}
@@ -129,7 +129,7 @@ function IngredientTable({ ingredients = [], onChange }) {
                 <select
                   value={ingredient.unit}
                   onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
-                  className="w-full px-2 py-1 border border-bread-200 rounded text-sm"
+                  className="w-full px-2 py-1 border border-line rounded text-sm"
                   data-cell={`${index}:unit`}
                   onKeyDown={(e) => handleKeyDown(e, index, 'unit')}
                   aria-label={`${index + 1} ${t('ingredientTable.unit')}`}
@@ -145,7 +145,7 @@ function IngredientTable({ ingredients = [], onChange }) {
                 <select
                   value={ingredient.type}
                   onChange={(e) => handleIngredientChange(index, 'type', e.target.value)}
-                  className="w-full px-2 py-1 border border-bread-200 rounded text-sm"
+                  className="w-full px-2 py-1 border border-line rounded text-sm"
                   data-cell={`${index}:type`}
                   onKeyDown={(e) => handleKeyDown(e, index, 'type')}
                   aria-label={`${index + 1} ${t('ingredientTable.type')}`}
@@ -160,7 +160,7 @@ function IngredientTable({ ingredients = [], onChange }) {
                   <option value="other">{t('ingredientCategory.other')}</option>
                 </select>
               </td>
-              <td className="py-1 text-center text-bread-600 text-sm">
+              <td className="py-1 text-center text-ink-muted text-sm">
                 {calculateBakersPercentage(parseFloat(ingredient.amount) || 0)}%
               </td>
               <td className="py-1">
@@ -183,8 +183,8 @@ function IngredientTable({ ingredients = [], onChange }) {
         </Button>
       </div>
 
-      <div className="mt-2 p-2 bg-bread-100 rounded">
-        <div className="text-xs text-bread-700">
+      <div className="mt-2 p-2 bg-surface-muted rounded">
+        <div className="text-xs text-ink-muted">
           <p><strong>{t('ingredientTable.totalWeight')}:</strong> {ingredients.reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0).toFixed(1)}g</p>
           <p><strong>{t('ingredientTable.flourTotal')}:</strong> {ingredients.filter(ing => ing.type === 'flour').reduce((sum, ing) => sum + (parseFloat(ing.amount) || 0), 0).toFixed(1)}g</p>
           <p><strong>{t('ingredientTable.hydration')}:</strong> {(() => {

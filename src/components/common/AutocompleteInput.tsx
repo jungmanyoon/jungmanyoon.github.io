@@ -210,9 +210,9 @@ export default function AutocompleteInput({
         placeholder={resolvedPlaceholder}
         disabled={disabled}
         autoFocus={autoFocus}
-        className={`w-full px-3 py-2 border border-gray-300 rounded-lg
+        className={`w-full px-3 py-2 border border-line rounded-lg
           focus:ring-2 focus:ring-amber-500 focus:border-amber-500
-          disabled:bg-gray-100 disabled:cursor-not-allowed
+          disabled:bg-surface-muted disabled:cursor-not-allowed
           ${className}`}
         autoComplete="off"
       />
@@ -221,11 +221,11 @@ export default function AutocompleteInput({
       {isOpen && filteredSuggestions.length > 0 && (
         <ul
           ref={listRef}
-          className="absolute z-50 w-full mt-1 bg-white border border-gray-200
+          className="absolute z-50 w-full mt-1 bg-surface-paper border border-line
             rounded-lg shadow-lg max-h-60 overflow-auto"
         >
           {!value.trim() && recentIngredients.length > 0 && (
-            <li className="px-3 py-1 text-xs text-gray-500 bg-gray-50 border-b">
+            <li className="px-3 py-1 text-xs text-ink-subtle bg-surface-muted border-b">
               {t('components.autocomplete.recentlyUsed')}
             </li>
           )}
@@ -236,13 +236,13 @@ export default function AutocompleteInput({
               className={`px-3 py-2 cursor-pointer flex items-center gap-2
                 ${index === highlightedIndex
                   ? 'bg-amber-100 text-amber-900'
-                  : 'hover:bg-gray-100'
+                  : 'hover:bg-surface-muted'
                 }`}
             >
               <span className="text-sm">{getCategoryEmoji(item)}</span>
               <span className="flex-1">{item}</span>
               {index === highlightedIndex && (
-                <span className="text-xs text-gray-400">Enter</span>
+                <span className="text-xs text-ink-disabled">Enter</span>
               )}
             </li>
           ))}
@@ -251,8 +251,8 @@ export default function AutocompleteInput({
 
       {/* 입력 힌트 */}
       {isOpen && value.trim() && filteredSuggestions.length === 0 && (
-        <div className="absolute z-50 w-full mt-1 px-3 py-2 bg-gray-50
-          border border-gray-200 rounded-lg text-sm text-gray-500">
+        <div className="absolute z-50 w-full mt-1 px-3 py-2 bg-surface-muted
+          border border-line rounded-lg text-sm text-ink-subtle">
           {t('components.autocomplete.noMatch', { value })}
         </div>
       )}

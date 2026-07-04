@@ -28,7 +28,7 @@ import {
   ChevronDown, ChevronRight, ChevronUp, Plus, Minus, X,
   Save, Flame, Scale, Wheat, Droplets, TrendingDown,
   Cookie, Layers, ThermometerSun, Link, Unlink,
-  Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText
+  Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText, Pin, Info
 } from 'lucide-react';
 import { SourceType } from '@/types/recipe.types';
 
@@ -188,7 +188,7 @@ const PHASE_META: Record<string, { icon: string; labelKey: string; bgColor: stri
   filling: { icon: '🎂', labelKey: 'phase.filling', bgColor: 'bg-rose-50', textColor: 'text-rose-700', borderColor: 'border-rose-200' },
   frosting: { icon: '🍰', labelKey: 'phase.frosting', bgColor: 'bg-indigo-50', textColor: 'text-indigo-700', borderColor: 'border-indigo-200' },
   glaze: { icon: '💧', labelKey: 'phase.glaze', bgColor: 'bg-cyan-50', textColor: 'text-cyan-700', borderColor: 'border-cyan-200' },
-  other: { icon: '📦', labelKey: 'ingredientCategory.other', bgColor: 'bg-gray-50', textColor: 'text-gray-700', borderColor: 'border-gray-200' },
+  other: { icon: '📦', labelKey: 'ingredientCategory.other', bgColor: 'bg-surface-muted', textColor: 'text-ink-muted', borderColor: 'border-line' },
 };
 
 // 동적 크기 계산 (20-25개 재료 기준) - v2.2: 컴팩트 버전
@@ -219,11 +219,11 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-gray-200 last:border-b-0">
-      <div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50">
+    <div className="border-b border-line last:border-b-0">
+      <div className="flex items-center justify-between px-3 py-2 hover:bg-surface-muted">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex-1 flex items-center gap-2 text-sm font-semibold text-gray-700 text-left"
+          className="flex-1 flex items-center gap-2 text-sm font-semibold text-ink-muted text-left"
         >
           {icon}
           <span>{title}</span>
@@ -237,14 +237,14 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           {onReset && (
             <button
               onClick={(e) => { e.stopPropagation(); onReset(); }}
-              className="p-1 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+              className="p-1 text-ink-disabled hover:text-amber-600 hover:bg-surface-muted rounded transition-colors"
               title="초기화"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
           )}
           <button onClick={() => setIsOpen(!isOpen)} className="p-1">
-            {isOpen ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
+            {isOpen ? <ChevronDown className="w-4 h-4 text-ink-disabled" /> : <ChevronRight className="w-4 h-4 text-ink-disabled" />}
           </button>
         </div>
       </div>
@@ -978,6 +978,9 @@ const AdvancedDashboard: React.FC = () => {
 
   // 실제 사용할 배수: 연동 시 자동계산, 비연동 시 수동입력
   const effectiveMultiplier = isPanLinked ? autoMultiplier : multiplier;
+
+  // 변환 여부: 배수가 1이면(부동소수 안전) 원본=변환이 동일하므로 변환표를 숨기고 원본표를 전체폭으로
+  const isConverted = Math.abs(effectiveMultiplier - 1) >= 0.0001;
 
   // 비용적(convertedProduct) 변경 시 팬 모드인 팬만 panWeight 재계산
   useEffect(() => {
@@ -2015,10 +2018,10 @@ const AdvancedDashboard: React.FC = () => {
 
   return (
     // 모바일: 세로 스택으로 흐르며 자연 스크롤 허용(min-h-screen) / 데스크톱(lg): 기존 고정 h-screen 보존
-    <div className="min-h-screen lg:h-screen flex flex-col bg-gray-100 text-sm">
+    <div className="min-h-screen lg:h-screen flex flex-col bg-surface-muted text-sm">
       {/* ===== 상단 헤더 ===== */}
       {/* 모바일: 세로 정렬(flex-col)로 컨트롤 줄바꿈 / 데스크톱(lg): 기존 가로 정렬 보존 */}
-      <div className="bg-white border-b shadow-sm px-3 sm:px-4 py-2 flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 flex-shrink-0">
+      <div className="bg-surface-paper border-b shadow-sm px-3 sm:px-4 py-2 flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 flex-shrink-0">
         {/* 좌측: 제품 정보 + 출처 (모바일: 줄바꿈 허용, 데스크톱: 기존 한 줄) */}
         <div className="flex items-center flex-wrap gap-2 lg:gap-3">
           <Cookie className="w-5 h-5 text-amber-600 flex-shrink-0" />
@@ -2026,7 +2029,7 @@ const AdvancedDashboard: React.FC = () => {
             type="text"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
-            className="text-lg font-bold w-36 min-h-[44px] lg:min-h-0 border-b border-transparent hover:border-gray-300 focus:border-amber-500 focus:outline-none"
+            className="text-lg font-bold w-36 min-h-[44px] lg:min-h-0 border-b border-transparent hover:border-line focus:border-amber-500 focus:outline-none"
             placeholder={t('advDashboard.productName')}
           />
           {/* 제품 타입 선택 */}
@@ -2036,7 +2039,7 @@ const AdvancedDashboard: React.FC = () => {
               className={`px-3 py-1 min-h-[44px] lg:min-h-0 text-xs rounded-l ${
                 productType === 'bread'
                   ? 'bg-amber-500 text-white font-medium'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-surface-muted text-ink-muted hover:bg-gray-200'
               }`}
               title={t('advDashboard.productTypeBread')}
             >
@@ -2047,7 +2050,7 @@ const AdvancedDashboard: React.FC = () => {
               className={`px-3 py-1 min-h-[44px] lg:min-h-0 text-xs rounded-r ${
                 productType === 'pastry'
                   ? 'bg-amber-500 text-white font-medium'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-surface-muted text-ink-muted hover:bg-gray-200'
               }`}
               title={t('advDashboard.productTypePastry')}
             >
@@ -2058,7 +2061,7 @@ const AdvancedDashboard: React.FC = () => {
             <select
               value={source.type}
               onChange={(e) => setSource({ ...source, type: e.target.value as SourceType })}
-              className="bg-gray-50 border border-gray-200 rounded px-1.5 py-1 text-xs focus:outline-none focus:border-amber-400"
+              className="bg-surface-muted border border-line rounded px-1.5 py-1 text-xs focus:outline-none focus:border-amber-400"
               title={t('advDashboard.sourceType')}
             >
               <option value="youtube">📺 {t('advDashboard.sourceTypes.youtube')}</option>
@@ -2073,7 +2076,7 @@ const AdvancedDashboard: React.FC = () => {
               type="text"
               value={source.name}
               onChange={(e) => setSource({ ...source, name: e.target.value })}
-              className="w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:border-amber-400"
+              className="w-24 bg-surface-muted border border-line rounded px-2 py-1 text-xs focus:outline-none focus:border-amber-400"
               placeholder={t('advDashboard.sourceName')}
               title={t('advDashboard.sourceNamePlaceholder')}
             />
@@ -2084,13 +2087,13 @@ const AdvancedDashboard: React.FC = () => {
         <div className="flex items-center flex-wrap gap-2 lg:gap-3">
           <button
             onClick={() => setIsPanLinked(!isPanLinked)}
-            className={`p-1.5 min-h-[44px] lg:min-h-0 rounded flex items-center gap-1 ${isPanLinked ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}
+            className={`p-1.5 min-h-[44px] lg:min-h-0 rounded flex items-center gap-1 ${isPanLinked ? 'bg-green-100 text-green-600' : 'bg-surface-muted text-ink-disabled'}`}
             title={isPanLinked ? t('advDashboard.multiplierLinked') : t('advDashboard.multiplierUnlinked')}
           >
             {isPanLinked ? <Link className="w-4 h-4" /> : <Unlink className="w-4 h-4" />}
             <span className="text-xs">{isPanLinked ? t('advDashboard.auto') : t('advDashboard.manual')}</span>
           </button>
-          <span className="text-xs text-gray-500">{t('advDashboard.multiplier')}:</span>
+          <span className="text-xs text-ink-subtle">{t('advDashboard.multiplier')}:</span>
           {isPanLinked ? (
             /* 연동 모드: 자동 계산된 배수 표시 (읽기 전용) */
             <div className="flex items-center border border-green-300 rounded overflow-hidden bg-green-50">
@@ -2100,8 +2103,8 @@ const AdvancedDashboard: React.FC = () => {
             </div>
           ) : (
             /* 수동 모드: 배수 입력 가능 (x2, /2, 1/2 등 다양한 형식) */
-            <div className="flex items-center border rounded overflow-hidden bg-white">
-              <button onClick={() => handleQuickMultiplier(Math.max(0.1, multiplier - 0.5))} className="px-2 py-1 hover:bg-gray-100 border-r">
+            <div className="flex items-center border rounded overflow-hidden bg-surface-paper">
+              <button onClick={() => handleQuickMultiplier(Math.max(0.1, multiplier - 0.5))} className="px-2 py-1 hover:bg-surface-muted border-r">
                 <Minus className="w-4 h-4" />
               </button>
               <input
@@ -2114,7 +2117,7 @@ const AdvancedDashboard: React.FC = () => {
                 placeholder={t('advDashboard.multiplierPlaceholder')}
                 title={t('advDashboard.multiplierHint')}
               />
-              <button onClick={() => handleQuickMultiplier(Math.min(20, multiplier + 0.5))} className="px-2 py-1 hover:bg-gray-100 border-l">
+              <button onClick={() => handleQuickMultiplier(Math.min(20, multiplier + 0.5))} className="px-2 py-1 hover:bg-surface-muted border-l">
                 <Plus className="w-4 h-4" />
               </button>
             </div>
@@ -2128,7 +2131,7 @@ const AdvancedDashboard: React.FC = () => {
                   className={`px-2.5 py-1.5 lg:px-1.5 lg:py-0.5 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${
                     multiplier === m
                       ? 'bg-amber-500 text-white'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      : 'bg-surface-muted hover:bg-gray-200 text-ink-muted'
                   }`}
                 >
                   {m < 1 ? `1/${Math.round(1/m)}` : `×${m}`}
@@ -2140,8 +2143,8 @@ const AdvancedDashboard: React.FC = () => {
 
         {/* 우측: 요약 + 액션 (모바일: 줄바꿈 허용, 데스크톱: 기존 한 줄) */}
         <div className="flex items-center flex-wrap gap-2 lg:gap-4">
-          <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded">
-            <span className="cursor-help" title="원본 레시피의 총 반죽량">{t('advDashboard.original')}:<b className="text-gray-700 ml-1">{totalWeight}g</b></span>
+          <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-ink-subtle bg-surface-muted px-3 py-1.5 rounded">
+            <span className="cursor-help" title="원본 레시피의 총 반죽량">{t('advDashboard.original')}:<b className="text-ink-muted ml-1">{totalWeight}g</b></span>
             <span className="text-gray-300">→</span>
             <span className="cursor-help" title="변환(배수·팬 반영) 후 총 반죽량">{t('advDashboard.converted')}:<b className="text-brand-600 ml-1">{convertedTotal}g</b></span>
             <span className="text-gray-300">|</span>
@@ -2154,7 +2157,7 @@ const AdvancedDashboard: React.FC = () => {
           <div className="flex flex-wrap gap-1.5">
             <button
               onClick={resetAllConversion}
-              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 border border-gray-300"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-muted text-ink-muted rounded hover:bg-gray-200 border border-line"
               title={t('advDashboard.resetConversion')}
             >
               <RotateCcw className="w-4 h-4" />{t('advDashboard.reset')}
@@ -2168,14 +2171,14 @@ const AdvancedDashboard: React.FC = () => {
             </button>
             <button
               onClick={handleCopyAsText}
-              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-white text-slate-700 border border-slate-300 rounded hover:bg-slate-50"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-paper text-ink-muted border border-line rounded hover:bg-surface-muted"
               title={t('advDashboard.copyAsText')}
             >
               <Copy className="w-4 h-4" />{t('advDashboard.copy')}
             </button>
             <button
               onClick={handleExportRecipe}
-              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs text-slate-400 rounded hover:bg-slate-100 hover:text-slate-600"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs text-ink-disabled rounded hover:bg-surface-muted hover:text-ink-muted"
               title={t('advDashboard.exportJson')}
             >
               <FileText className="w-4 h-4" />{t('advDashboard.json')}
@@ -2190,7 +2193,7 @@ const AdvancedDashboard: React.FC = () => {
         {/* ===== 좌측 사이드바 (리사이즈 가능) ===== */}
         {/* 모바일: 전체 너비(w-full)로 상단 배치 / 데스크톱(lg): 인라인 고정폭 적용 (isDesktop일 때만 width 지정해 가로 스크롤 방지) */}
         <div
-          className="bg-white border-r flex-shrink-0 w-full lg:w-auto overflow-y-auto"
+          className="bg-surface-paper border-r flex-shrink-0 w-full lg:w-auto overflow-y-auto"
           style={isDesktop ? { width: layoutSettings.sidebarWidth } : undefined}
         >
 
@@ -2204,18 +2207,18 @@ const AdvancedDashboard: React.FC = () => {
           >
             <div className="space-y-3">
               {/* 원래 팬 (레시피 원본) */}
-              <div className="bg-gray-100 rounded p-2">
+              <div className="bg-surface-muted rounded p-2">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-medium text-gray-600">📋 {t('advDashboard.originalPan')}</span>
+                  <span className="text-xs font-medium text-ink-muted">📋 {t('advDashboard.originalPan')}</span>
                   {/* 팬/개수 모드 토글 */}
                   <div className="flex text-xs">
                     <button
                       onClick={() => updateOriginalPan('mode', 'pan')}
-                      className={`px-2 py-0.5 rounded-l border ${originalPan.mode === 'pan' ? 'bg-gray-500 text-white border-gray-500' : 'bg-white text-gray-600 border-gray-300'}`}
+                      className={`px-2 py-0.5 rounded-l border ${originalPan.mode === 'pan' ? 'bg-gray-500 text-white border-gray-500' : 'bg-surface-paper text-ink-muted border-line'}`}
                     >🍞 {t('advDashboard.panMode')}</button>
                     <button
                       onClick={() => updateOriginalPan('mode', 'count')}
-                      className={`px-2 py-0.5 rounded-r border-l-0 border ${originalPan.mode === 'count' ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-600 border-gray-300'}`}
+                      className={`px-2 py-0.5 rounded-r border-l-0 border ${originalPan.mode === 'count' ? 'bg-green-500 text-white border-green-500' : 'bg-surface-paper text-ink-muted border-line'}`}
                     >🔢 {t('advDashboard.countMode')}</button>
                   </div>
                 </div>
@@ -2225,11 +2228,11 @@ const AdvancedDashboard: React.FC = () => {
                   <>
                     <div className="grid grid-cols-2 gap-1.5 mb-1.5">
                       <select value={originalPan.category} onChange={(e) => updateOriginalPan('category', e.target.value)}
-                        className="text-xs border rounded px-2 py-1 bg-white">
+                        className="text-xs border rounded px-2 py-1 bg-surface-paper">
                         {Object.keys(PAN_DATA).map(cat => <option key={cat} value={cat}>{getLocalizedPanCategory(cat)}</option>)}
                       </select>
                       <select value={originalPan.type} onChange={(e) => updateOriginalPan('type', e.target.value)}
-                        className="text-xs border rounded px-2 py-1 bg-white">
+                        className="text-xs border rounded px-2 py-1 bg-surface-paper">
                         {PAN_DATA[originalPan.category as keyof typeof PAN_DATA]?.map(p =>
                           <option key={p.name} value={p.name}>{getLocalizedPanName(p)}</option>
                         )}
@@ -2237,26 +2240,26 @@ const AdvancedDashboard: React.FC = () => {
                     </div>
                     <div className="grid grid-cols-4 gap-1.5 text-xs">
                       <div>
-                        <label className="text-xs text-gray-500 block">{t('advDashboard.quantity')}</label>
+                        <label className="text-xs text-ink-subtle block">{t('advDashboard.quantity')}</label>
                         <input type="number" value={originalPan.quantity}
                           onChange={(e) => updateOriginalPan('quantity', parseInt(e.target.value) || 1)}
-                          className="w-full border rounded px-1.5 py-1 text-center bg-white" />
+                          className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" />
                       </div>
                       <div>
-                        <label className="text-xs text-gray-500 block">{t('advDashboard.division')}</label>
+                        <label className="text-xs text-ink-subtle block">{t('advDashboard.division')}</label>
                         <input type="number" value={originalPan.divisionCount}
                           onChange={(e) => updateOriginalPan('divisionCount', parseInt(e.target.value) || 1)}
-                          className="w-full border rounded px-1.5 py-1 text-center bg-white" />
+                          className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" />
                       </div>
                       <div>
-                        <label className="text-xs text-gray-500 block">{t('advDashboard.panWeight')}</label>
+                        <label className="text-xs text-ink-subtle block">{t('advDashboard.panWeight')}</label>
                         <input type="number" value={originalPan.panWeight}
                           onChange={(e) => updateOriginalPan('panWeight', parseInt(e.target.value) || 0)}
-                          className="w-full border rounded px-1.5 py-1 text-center bg-white" />
+                          className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" />
                       </div>
                       <div>
-                        <label className="text-xs text-gray-500 block">{t('advDashboard.divisionWeight')}</label>
-                        <div className="text-center py-1 font-mono bg-white rounded border">{originalPan.divisionWeight}</div>
+                        <label className="text-xs text-ink-subtle block">{t('advDashboard.divisionWeight')}</label>
+                        <div className="text-center py-1 font-mono bg-surface-paper rounded border">{originalPan.divisionWeight}</div>
                       </div>
                     </div>
                   </>
@@ -2266,27 +2269,27 @@ const AdvancedDashboard: React.FC = () => {
                 {originalPan.mode === 'count' && (
                   <div className="grid grid-cols-3 gap-1.5 text-xs">
                     <div>
-                      <label className="text-xs text-gray-500 block">{t('advDashboard.count')}</label>
+                      <label className="text-xs text-ink-subtle block">{t('advDashboard.count')}</label>
                       <input type="number" value={originalPan.unitCount || 10}
                         onChange={(e) => updateOriginalPan('unitCount', parseInt(e.target.value) || 0)}
-                        className="w-full border rounded px-1.5 py-1 text-center bg-white" />
+                        className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500 block">{t('advDashboard.weightPerPiece')}</label>
+                      <label className="text-xs text-ink-subtle block">{t('advDashboard.weightPerPiece')}</label>
                       <input type="number" value={originalPan.unitWeight || 50}
                         onChange={(e) => updateOriginalPan('unitWeight', parseInt(e.target.value) || 0)}
-                        className="w-full border rounded px-1.5 py-1 text-center bg-white" />
+                        className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500 block">{t('advDashboard.total')}</label>
-                      <div className="text-center py-1 font-mono bg-white rounded border font-semibold">
+                      <label className="text-xs text-ink-subtle block">{t('advDashboard.total')}</label>
+                      <div className="text-center py-1 font-mono bg-surface-paper rounded border font-semibold">
                         {(originalPan.unitCount || 10) * (originalPan.unitWeight || 50)}g
                       </div>
                     </div>
                   </div>
                 )}
 
-                <div className="text-xs text-gray-500 mt-1 text-right">
+                <div className="text-xs text-ink-subtle mt-1 text-right">
                   {t('advDashboard.total')}: <b>{originalPan.mode === 'count'
                     ? (originalPan.unitCount || 10) * (originalPan.unitWeight || 50)
                     : originalPan.panWeight * originalPan.quantity}g</b>
@@ -2294,7 +2297,7 @@ const AdvancedDashboard: React.FC = () => {
               </div>
 
               {/* 화살표 */}
-              <div className="flex justify-center text-gray-400">
+              <div className="flex justify-center text-ink-disabled">
                 <ChevronDown className="w-5 h-5" />
               </div>
 
@@ -2310,11 +2313,11 @@ const AdvancedDashboard: React.FC = () => {
                         <div className="flex text-xs">
                           <button
                             onClick={() => updatePan(pan.id, 'mode', 'pan')}
-                            className={`px-2 py-0.5 rounded-l border ${pan.mode === 'pan' ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-600 border-gray-300'}`}
+                            className={`px-2 py-0.5 rounded-l border ${pan.mode === 'pan' ? 'bg-blue-500 text-white border-blue-500' : 'bg-surface-paper text-ink-muted border-line'}`}
                           >🍞 {t('advDashboard.panMode')}</button>
                           <button
                             onClick={() => updatePan(pan.id, 'mode', 'count')}
-                            className={`px-2 py-0.5 rounded-r border-l-0 border ${pan.mode === 'count' ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-600 border-gray-300'}`}
+                            className={`px-2 py-0.5 rounded-r border-l-0 border ${pan.mode === 'count' ? 'bg-green-500 text-white border-green-500' : 'bg-surface-paper text-ink-muted border-line'}`}
                           >🔢 {t('advDashboard.countMode')}</button>
                         </div>
                       </div>
@@ -2330,11 +2333,11 @@ const AdvancedDashboard: React.FC = () => {
                       <>
                         <div className="grid grid-cols-2 gap-1.5 mb-1.5">
                           <select value={pan.category} onChange={(e) => updatePan(pan.id, 'category', e.target.value)}
-                            className="text-xs border rounded px-2 py-1 bg-white">
+                            className="text-xs border rounded px-2 py-1 bg-surface-paper">
                             {Object.keys(PAN_DATA).map(cat => <option key={cat} value={cat}>{getLocalizedPanCategory(cat)}</option>)}
                           </select>
                           <select value={pan.type} onChange={(e) => updatePan(pan.id, 'type', e.target.value)}
-                            className="text-xs border rounded px-2 py-1 bg-white">
+                            className="text-xs border rounded px-2 py-1 bg-surface-paper">
                             {PAN_DATA[pan.category as keyof typeof PAN_DATA]?.map(p =>
                               <option key={p.name} value={p.name}>{getLocalizedPanName(p)}</option>
                             )}
@@ -2342,26 +2345,26 @@ const AdvancedDashboard: React.FC = () => {
                         </div>
                         <div className="grid grid-cols-4 gap-1.5 text-xs">
                           <div>
-                            <label className="text-xs text-gray-500 block">{t('advDashboard.quantity')}</label>
+                            <label className="text-xs text-ink-subtle block">{t('advDashboard.quantity')}</label>
                             <input type="number" value={pan.quantity}
                               onChange={(e) => updatePan(pan.id, 'quantity', parseFloat(e.target.value) || 0)}
-                              className="w-full border rounded px-1.5 py-1 text-center bg-white" step="0.5" />
+                              className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" step="0.5" />
                           </div>
                           <div>
-                            <label className="text-xs text-gray-500 block">{t('advDashboard.division')}</label>
+                            <label className="text-xs text-ink-subtle block">{t('advDashboard.division')}</label>
                             <input type="number" value={pan.divisionCount}
                               onChange={(e) => updatePan(pan.id, 'divisionCount', parseInt(e.target.value) || 1)}
-                              className="w-full border rounded px-1.5 py-1 text-center bg-white" />
+                              className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" />
                           </div>
                           <div>
-                            <label className="text-xs text-gray-500 block">{t('advDashboard.panWeight')}</label>
+                            <label className="text-xs text-ink-subtle block">{t('advDashboard.panWeight')}</label>
                             <input type="number" value={pan.panWeight}
                               onChange={(e) => updatePan(pan.id, 'panWeight', parseInt(e.target.value) || 0)}
-                              className="w-full border rounded px-1.5 py-1 text-center bg-white" />
+                              className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" />
                           </div>
                           <div>
-                            <label className="text-xs text-gray-500 block">{t('advDashboard.divisionWeight')}</label>
-                            <div className="text-center py-1 font-mono bg-white rounded border">{pan.divisionWeight}</div>
+                            <label className="text-xs text-ink-subtle block">{t('advDashboard.divisionWeight')}</label>
+                            <div className="text-center py-1 font-mono bg-surface-paper rounded border">{pan.divisionWeight}</div>
                           </div>
                         </div>
                       </>
@@ -2371,20 +2374,20 @@ const AdvancedDashboard: React.FC = () => {
                     {pan.mode === 'count' && (
                       <div className="grid grid-cols-3 gap-1.5 text-xs">
                         <div>
-                          <label className="text-xs text-gray-500 block">{t('advDashboard.count')}</label>
+                          <label className="text-xs text-ink-subtle block">{t('advDashboard.count')}</label>
                           <input type="number" value={pan.unitCount || 10}
                             onChange={(e) => updatePan(pan.id, 'unitCount', parseInt(e.target.value) || 0)}
-                            className="w-full border rounded px-1.5 py-1 text-center bg-white" />
+                            className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500 block">{t('advDashboard.weightPerPiece')}</label>
+                          <label className="text-xs text-ink-subtle block">{t('advDashboard.weightPerPiece')}</label>
                           <input type="number" value={pan.unitWeight || 50}
                             onChange={(e) => updatePan(pan.id, 'unitWeight', parseInt(e.target.value) || 0)}
-                            className="w-full border rounded px-1.5 py-1 text-center bg-white" />
+                            className="w-full border rounded px-1.5 py-1 text-center bg-surface-paper" />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500 block">{t('advDashboard.total')}</label>
-                          <div className="text-center py-1 font-mono bg-white rounded border font-semibold">
+                          <label className="text-xs text-ink-subtle block">{t('advDashboard.total')}</label>
+                          <div className="text-center py-1 font-mono bg-surface-paper rounded border font-semibold">
                             {(pan.unitCount || 10) * (pan.unitWeight || 50)}g
                           </div>
                         </div>
@@ -2411,7 +2414,7 @@ const AdvancedDashboard: React.FC = () => {
           >
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-gray-500 block mb-1">{t('advDashboard.originalProduct')}</label>
+                <label className="text-xs text-ink-subtle block mb-1">{t('advDashboard.originalProduct')}</label>
                 <select value={originalProduct} onChange={(e) => setOriginalProduct(e.target.value)}
                   className="w-full text-xs border rounded px-2 py-1">
                   {productType === 'bread'
@@ -2419,7 +2422,7 @@ const AdvancedDashboard: React.FC = () => {
                     : Object.keys(CAKE_BATTER_SPECIFIC_GRAVITY).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)
                   }
                 </select>
-                <div className="text-xs text-gray-400 mt-1">
+                <div className="text-xs text-ink-disabled mt-1">
                   {productType === 'bread'
                     ? `비용적: ${BREAD_SPECIFIC_VOLUMES[originalProduct] || SPECIFIC_VOLUMES[originalProduct]} cm³/g`
                     : `비중: ${CAKE_BATTER_SPECIFIC_GRAVITY[originalProduct]}`
@@ -2427,7 +2430,7 @@ const AdvancedDashboard: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="text-xs text-gray-500 block mb-1">{t('advDashboard.convertedProduct')}</label>
+                <label className="text-xs text-ink-subtle block mb-1">{t('advDashboard.convertedProduct')}</label>
                 <select value={convertedProduct} onChange={(e) => setConvertedProduct(e.target.value)}
                   className="w-full text-xs border rounded px-2 py-1">
                   {productType === 'bread'
@@ -2435,7 +2438,7 @@ const AdvancedDashboard: React.FC = () => {
                     : Object.keys(CAKE_BATTER_SPECIFIC_GRAVITY).map(p => <option key={p} value={p}>{getLocalizedProductName(p)}</option>)
                   }
                 </select>
-                <div className="text-xs text-gray-400 mt-1">
+                <div className="text-xs text-ink-disabled mt-1">
                   {productType === 'bread'
                     ? `비용적: ${BREAD_SPECIFIC_VOLUMES[convertedProduct] || SPECIFIC_VOLUMES[convertedProduct]} cm³/g`
                     : `비중: ${CAKE_BATTER_SPECIFIC_GRAVITY[convertedProduct]}`
@@ -2504,7 +2507,7 @@ const AdvancedDashboard: React.FC = () => {
               <div className="flex gap-1.5">
                 {(['convection', 'deck', 'airfryer'] as const).map(type => (
                   <button key={type} onClick={() => setOven({ ...oven, type })}
-                    className={`flex-1 px-2 py-1 text-xs rounded ${oven.type === type ? 'bg-amber-500 text-white' : 'bg-gray-100'}`}>
+                    className={`flex-1 px-2 py-1 text-xs rounded ${oven.type === type ? 'bg-amber-500 text-white' : 'bg-surface-muted'}`}>
                     {t(`advDashboard.ovenTypes.${type}`)}
                   </button>
                 ))}
@@ -2512,7 +2515,7 @@ const AdvancedDashboard: React.FC = () => {
               {/* 컨벡션 오븐일 때만 단 선택 표시 */}
               {oven.type === 'convection' && (
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-gray-500">{t('advDashboard.levelSelect')}:</span>
+                  <span className="text-ink-subtle">{t('advDashboard.levelSelect')}:</span>
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map(level => {
                       const levels = oven.level ? oven.level.split(',').map(s => s.trim()) : [];
@@ -2529,7 +2532,7 @@ const AdvancedDashboard: React.FC = () => {
                             }
                             setOven({ ...oven, level: newLevels.join(', ') });
                           }}
-                          className={`w-6 h-6 rounded text-xs font-medium ${isSelected ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                          className={`w-6 h-6 rounded text-xs font-medium ${isSelected ? 'bg-amber-500 text-white' : 'bg-surface-muted text-ink-muted hover:bg-gray-200'}`}
                         >
                           {level}
                         </button>
@@ -2544,15 +2547,15 @@ const AdvancedDashboard: React.FC = () => {
                 {oven.type === 'deck' ? (
                   /* 데크 오븐: 윗불/아랫불 분리 */
                   <div className="grid grid-cols-3 gap-1.5">
-                    <div><label className="text-xs text-gray-500">{t('advDashboard.topHeat')}</label>
+                    <div><label className="text-xs text-ink-subtle">{t('advDashboard.topHeat')}</label>
                       <input type="number" value={oven.firstBake.topTemp}
                         onChange={(e) => setOven({ ...oven, firstBake: { ...oven.firstBake, topTemp: parseInt(e.target.value) || 0 } })}
                         className="w-full text-xs border rounded px-1.5 py-1 text-center" /></div>
-                    <div><label className="text-xs text-gray-500">{t('advDashboard.bottomHeat')}</label>
+                    <div><label className="text-xs text-ink-subtle">{t('advDashboard.bottomHeat')}</label>
                       <input type="number" value={oven.firstBake.bottomTemp}
                         onChange={(e) => setOven({ ...oven, firstBake: { ...oven.firstBake, bottomTemp: parseInt(e.target.value) || 0 } })}
                         className="w-full text-xs border rounded px-1.5 py-1 text-center" /></div>
-                    <div><label className="text-xs text-gray-500">{t('advDashboard.timeMin')}</label>
+                    <div><label className="text-xs text-ink-subtle">{t('advDashboard.timeMin')}</label>
                       <input type="number" value={oven.firstBake.time}
                         onChange={(e) => setOven({ ...oven, firstBake: { ...oven.firstBake, time: parseInt(e.target.value) || 0 } })}
                         className="w-full text-xs border rounded px-1.5 py-1 text-center" /></div>
@@ -2560,22 +2563,22 @@ const AdvancedDashboard: React.FC = () => {
                 ) : (
                   /* 컨벡션/에어프라이: 단일 온도 */
                   <div className="grid grid-cols-2 gap-1.5">
-                    <div><label className="text-xs text-gray-500">{t('advDashboard.temperature')}</label>
+                    <div><label className="text-xs text-ink-subtle">{t('advDashboard.temperature')}</label>
                       <input type="number" value={oven.firstBake.topTemp}
                         onChange={(e) => {
                           const temp = parseInt(e.target.value) || 0;
                           setOven({ ...oven, firstBake: { ...oven.firstBake, topTemp: temp, bottomTemp: temp } });
                         }}
                         className="w-full text-xs border rounded px-1.5 py-1 text-center" /></div>
-                    <div><label className="text-xs text-gray-500">{t('advDashboard.timeMin')}</label>
+                    <div><label className="text-xs text-ink-subtle">{t('advDashboard.timeMin')}</label>
                       <input type="number" value={oven.firstBake.time}
                         onChange={(e) => setOven({ ...oven, firstBake: { ...oven.firstBake, time: parseInt(e.target.value) || 0 } })}
                         className="w-full text-xs border rounded px-1.5 py-1 text-center" /></div>
                   </div>
                 )}
               </div>
-              <div className="bg-gray-50 rounded p-2">
-                <div className="text-xs text-gray-500 mb-1.5">{t('advDashboard.secondBake')}</div>
+              <div className="bg-surface-muted rounded p-2">
+                <div className="text-xs text-ink-subtle mb-1.5">{t('advDashboard.secondBake')}</div>
                 {oven.type === 'deck' ? (
                   /* 데크 오븐: 윗불/아랫불 분리 */
                   <div className="grid grid-cols-3 gap-1.5">
@@ -2614,13 +2617,13 @@ const AdvancedDashboard: React.FC = () => {
               defaultOpen={false}
               icon={<Wheat className="w-4 h-4" />}
               badge={t(METHOD_KEYS[method.type])}
-              badgeColor={method.type === 'straight' ? 'bg-gray-100 text-gray-600' : 'bg-amber-100 text-amber-700'}
+              badgeColor={method.type === 'straight' ? 'bg-surface-muted text-ink-muted' : 'bg-amber-100 text-amber-700'}
             >
               <div className="space-y-2">
                 <div className="grid grid-cols-5 gap-1">
                   {Object.entries(METHOD_KEYS).map(([key, labelKey]) => (
                     <button key={key} onClick={() => handleMethodChange(key)}
-                      className={`px-1.5 py-1 text-xs rounded ${method.type === key ? 'bg-amber-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+                      className={`px-1.5 py-1 text-xs rounded ${method.type === key ? 'bg-amber-500 text-white' : 'bg-surface-muted hover:bg-gray-200'}`}>
                       {t(labelKey)}
                     </button>
                   ))}
@@ -2641,14 +2644,14 @@ const AdvancedDashboard: React.FC = () => {
                 )}
                 {/* 사전반죽이 있는 제법만 비율 조정 표시 (coldFerment/retard 제외) */}
                 {method.type !== 'straight' && method.type !== 'coldFerment' && method.type !== 'retard' && (
-                  <div className="bg-amber-50 rounded p-2">
-                    <div className="text-xs font-medium text-amber-700 mb-1.5">{t('advDashboard.prefermentRatio')}</div>
+                  <div className="bg-surface-muted rounded p-2">
+                    <div className="text-xs font-medium text-ink-muted mb-1.5">{t('advDashboard.prefermentRatio')}</div>
                     <div className="grid grid-cols-2 gap-2">
-                      <div><label className="text-xs text-gray-500">{t('advDashboard.flourPercent')}</label>
+                      <div><label className="text-xs text-ink-subtle">{t('advDashboard.flourPercent')}</label>
                         <input type="number" value={Math.round(method.flourRatio * 100)}
                           onChange={(e) => setMethod({ ...method, flourRatio: (parseFloat(e.target.value) || 0) / 100 })}
                           className="w-full text-xs border rounded px-1.5 py-1 text-center" step="10" /></div>
-                      <div><label className="text-xs text-gray-500">{t('advDashboard.waterPercent')}</label>
+                      <div><label className="text-xs text-ink-subtle">{t('advDashboard.waterPercent')}</label>
                         <input type="number" value={Math.round(method.waterRatio * 100)}
                           onChange={(e) => setMethod({ ...method, waterRatio: (parseFloat(e.target.value) || 0) / 100 })}
                           className="w-full text-xs border rounded px-1.5 py-1 text-center" step="10" /></div>
@@ -2663,7 +2666,7 @@ const AdvancedDashboard: React.FC = () => {
           <div className="p-2 border-t">
             <button
               onClick={resetLayoutSettings}
-              className="w-full flex items-center justify-center gap-1 text-xs text-gray-500 hover:text-gray-700 py-1"
+              className="w-full flex items-center justify-center gap-1 text-xs text-ink-subtle hover:text-ink-muted py-1"
               title={t('advDashboard.layoutReset')}
             >
               <RotateCcw className="w-3 h-3" />
@@ -2684,13 +2687,13 @@ const AdvancedDashboard: React.FC = () => {
         {/* ===== 중앙: 레시피 테이블 (컴팩트) ===== */}
         <div className="flex-1 flex flex-col overflow-visible lg:overflow-hidden min-h-0">
           <div className="flex-1 overflow-auto p-1 min-h-0">
-            {/* 모바일: 원본/변환을 세로 스택(grid-cols-1)으로 가로 스크롤 방지 / 데스크톱(lg): 기존 2열 나란히 보존 */}
-            <div className="grid gap-1 h-full grid-cols-1 lg:grid-cols-2">
+            {/* 모바일: 원본/변환을 세로 스택(grid-cols-1)으로 가로 스크롤 방지 / 데스크톱(lg): 변환 시에만 2열, 미변환 시 원본표 전체폭 */}
+            <div className={`grid gap-1 h-full grid-cols-1 ${isConverted ? 'lg:grid-cols-2' : ''}`}>
 
               {/* 원래 레시피 */}
-              <div className="bg-white rounded shadow-sm border flex flex-col overflow-hidden min-w-0">
-                <div className="bg-gray-50 border-b px-2 py-1 flex items-center justify-between flex-shrink-0 gap-2">
-                  <span className="font-semibold text-gray-700 flex items-center gap-1 text-xs">
+              <div className="bg-surface-paper rounded shadow-sm border flex flex-col overflow-hidden min-w-0">
+                <div className="bg-surface-muted border-b px-2 py-1 flex items-center justify-between flex-shrink-0 gap-2">
+                  <span className="font-semibold text-ink-muted flex items-center gap-1 text-xs">
                     <Droplets className="w-3 h-3 flex-shrink-0" />{t('advDashboard.originalRecipe')}
                   </span>
                   <div className="flex gap-2">
@@ -2701,8 +2704,8 @@ const AdvancedDashboard: React.FC = () => {
                 </div>
                 <div className="flex-1 overflow-auto">
                   <table className="w-full">
-                    <thead className="bg-gray-50 sticky top-0">
-                      <tr className={`text-gray-500 ${dynamicStyles.fontSize}`}>
+                    <thead className="bg-surface-muted sticky top-0">
+                      <tr className={`text-ink-subtle ${dynamicStyles.fontSize}`}>
                         <th className="px-1.5 py-1 text-left w-16">{t('advDashboard.category')}</th>
                         <th className="px-1.5 py-1 text-left">{t('advDashboard.ingredients')}</th>
                         <th className="px-1.5 py-1 text-left w-20">{t('advDashboard.process')}</th>
@@ -2738,7 +2741,7 @@ const AdvancedDashboard: React.FC = () => {
                               return (
                                 // key: 원본 재료 id는 전역 고유하지만 단계(phase) 스코프를 prefix로
                                 // 추가해 단계 재배치 시에도 안정적이고 고유한 키를 보장
-                                <tr key={`${phase}-${ing.id}`} className={`border-b border-gray-100 hover:bg-gray-50 ${dynamicStyles.rowHeight}`}>
+                                <tr key={`${phase}-${ing.id}`} className={`border-b border-line-soft hover:bg-surface-muted ${dynamicStyles.rowHeight}`}>
                                   <td className="px-1.5">
                                     <select value={ing.category} onChange={(e) => updateIngredient(ing.id, 'category', e.target.value)}
                                       className="w-full text-xs border-0 bg-transparent p-0 focus:outline-none appearance-none cursor-pointer">
@@ -2785,7 +2788,7 @@ const AdvancedDashboard: React.FC = () => {
                                       })}
                                     </select>
                                   </td>
-                                  <td className="px-1.5 text-right font-mono text-gray-400 text-xs">{ing.ratio}</td>
+                                  <td className="px-1.5 text-right font-mono text-ink-disabled text-xs">{ing.ratio}</td>
                                   <td className="px-1.5">
                                     <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
                                       className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm" />
@@ -2804,13 +2807,14 @@ const AdvancedDashboard: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
-                <div className="bg-gray-50 border-t px-2 py-1 text-xs flex-shrink-0">
+                <div className="bg-surface-muted border-t px-2 py-1 text-xs flex-shrink-0">
                   <span>{t('advDashboard.total')}: <b>{totalWeight}g</b></span>
                 </div>
               </div>
 
-              {/* 변환 레시피 (단계별 구분선 포함) */}
-              <div className="bg-white rounded shadow-sm border border-blue-200 flex flex-col overflow-hidden min-w-0">
+              {/* 변환 레시피 (단계별 구분선 포함) — 배수가 1이면 원본과 동일하므로 숨김 */}
+              {isConverted && (
+              <div className="bg-surface-paper rounded shadow-sm border border-blue-200 flex flex-col overflow-hidden min-w-0">
                 <div className="bg-blue-50 border-b border-blue-200 px-2 py-1 flex items-center justify-between flex-shrink-0 gap-2">
                   <span className="font-semibold text-blue-700 flex items-center gap-1 text-xs">
                     <ThermometerSun className="w-3 h-3 flex-shrink-0" />{t('advDashboard.convertedRecipe')}
@@ -2864,6 +2868,15 @@ const AdvancedDashboard: React.FC = () => {
                   <span className="text-blue-700">{t('advDashboard.total')}: <b>{Math.round(prefermentTotal + mainDoughTotal)}g</b></span>
                 </div>
               </div>
+              )}
+
+              {/* 변환 없음: 배수/팬을 바꾸면 변환표가 표시된다는 조용한 안내 */}
+              {!isConverted && (
+                <div className="rounded-md bg-surface-muted border border-line px-3 py-2 text-xs text-ink-muted flex items-center gap-1.5 self-start">
+                  <Info className="w-3.5 h-3.5 flex-shrink-0" />
+                  {t('advDashboard.conversionHint', { defaultValue: '배수 또는 팬 크기를 바꾸면 변환 결과가 여기에 표시됩니다.' })}
+                </div>
+              )}
             </div>
           </div>
 
@@ -2879,13 +2892,13 @@ const AdvancedDashboard: React.FC = () => {
           {/* ===== 하단: 공정 패널 (리사이즈 가능) ===== */}
           {/* 모바일: 고정 높이 인라인 style 미적용(내용만큼 자연 확장) / 데스크톱(lg): 기존 리사이즈 높이 보존 */}
           <div
-            className="bg-white border-t flex-shrink-0 overflow-hidden flex flex-col"
+            className="bg-surface-paper border-t flex-shrink-0 overflow-hidden flex flex-col"
             style={isDesktop ? { height: layoutSettings.processPanelHeight } : undefined}
           >
-            <div className="bg-gray-50 border-b px-3 py-1 flex items-center justify-between flex-shrink-0">
-              <span className="font-semibold text-gray-700 flex items-center gap-1.5 text-sm">
+            <div className="bg-surface-muted border-b px-3 py-1 flex items-center justify-between flex-shrink-0">
+              <span className="font-semibold text-ink-muted flex items-center gap-1.5 text-sm">
                 <ListOrdered className="w-4 h-4" />{t('advDashboard.processMemo')}
-                <span className="text-xs font-normal text-gray-500 ml-1">
+                <span className="text-xs font-normal text-ink-subtle ml-1">
                   {t('advDashboard.totalMinutes', { minutes: processes.reduce((s, p) => s + (p.time || 0), 0) })}
                 </span>
               </span>
@@ -2899,14 +2912,14 @@ const AdvancedDashboard: React.FC = () => {
                   return (
                   <div
                     key={proc.id}
-                    className="flex items-center gap-1 bg-gray-50 border rounded px-1.5 py-1 text-xs group hover:bg-gray-100 relative"
+                    className="flex items-center gap-1 bg-surface-muted border rounded px-1.5 py-1 text-xs group hover:bg-surface-muted relative"
                     style={{ minWidth: itemSize.width || 200, maxWidth: '100%' }}
                   >
                     {/* 순서 변경 버튼 */}
                     <div className="flex flex-col opacity-100 lg:opacity-0 lg:group-hover:opacity-100 flex-shrink-0">
                       <button
                         onClick={() => moveProcess(proc.id, 'up')}
-                        className="text-gray-400 hover:text-gray-600 -mb-0.5"
+                        className="text-ink-disabled hover:text-ink-muted -mb-0.5"
                         disabled={idx === 0}
                         title={t('advDashboard.moveUp')}
                       >
@@ -2914,14 +2927,14 @@ const AdvancedDashboard: React.FC = () => {
                       </button>
                       <button
                         onClick={() => moveProcess(proc.id, 'down')}
-                        className="text-gray-400 hover:text-gray-600 -mt-0.5"
+                        className="text-ink-disabled hover:text-ink-muted -mt-0.5"
                         disabled={idx === processes.length - 1}
                         title={t('advDashboard.moveDown')}
                       >
                         <ChevronDown className="w-3 h-3" />
                       </button>
                     </div>
-                    <span className="text-gray-400 font-mono text-xs w-4 flex-shrink-0">{idx + 1}.</span>
+                    <span className="text-ink-disabled font-mono text-xs w-4 flex-shrink-0">{idx + 1}.</span>
                     {editingProcessId === proc.id ? (
                       <textarea
                         value={displayText}
@@ -2937,7 +2950,7 @@ const AdvancedDashboard: React.FC = () => {
                         onClick={() => setEditingProcessId(proc.id)}
                         className="flex-1 min-w-0 cursor-text leading-relaxed whitespace-pre-wrap"
                       >
-                        {displayText || <span className="text-gray-400">{t('advDashboard.processPlaceholder')}</span>}
+                        {displayText || <span className="text-ink-disabled">{t('advDashboard.processPlaceholder')}</span>}
                       </div>
                     )}
                     {/* 시간: 값이 있을 때 뱃지 표시 + 삭제 버튼 */}
@@ -3034,10 +3047,10 @@ const AdvancedDashboard: React.FC = () => {
                 })}
               </div>
               {/* 메모 입력 */}
-              <div className="mt-2 pt-2 border-t border-gray-200">
+              <div className="mt-2 pt-2 border-t border-line">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-medium text-gray-500">📌 {t('advDashboard.memo')}</span>
-                  {memo && <span className="text-xs text-gray-500">({t('advDashboard.memoCharCount', { count: memo.length })})</span>}
+                  <span className="text-xs font-medium text-ink-subtle inline-flex items-center gap-1"><Pin size={12} />{t('advDashboard.memo')}</span>
+                  {memo && <span className="text-xs text-ink-subtle">({t('advDashboard.memoCharCount', { count: memo.length })})</span>}
                 </div>
                 <textarea
                   value={memo}

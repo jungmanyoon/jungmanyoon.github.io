@@ -169,7 +169,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
 
         return (
           <div key={stage.key} className="relative">
-            <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+            <label className="block text-xs text-ink-subtle mb-1 flex items-center gap-1">
               <span>{stage.icon}</span>
               {t(`settings.yieldLoss.stages.${stage.key}.name`)}
               {isOverridden && (
@@ -185,13 +185,13 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                   onChange(stage.key, isNaN(val) ? undefined : val)
                 }}
                 className={`w-full px-2 py-1.5 text-sm border rounded text-right font-mono ${
-                  isOverridden ? 'bg-orange-50 border-orange-200' : 'bg-white'
+                  isOverridden ? 'bg-orange-50 border-orange-200' : 'bg-surface-paper'
                 }`}
                 min="0"
                 max="30"
                 step="0.5"
               />
-              <span className="text-xs text-gray-400">%</span>
+              <span className="text-xs text-ink-disabled">%</span>
             </div>
             {showDiff && isOverridden && (
               <div className={`text-xs mt-0.5 ${
@@ -212,11 +212,11 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
             <TrendingDown className="w-5 h-5 text-orange-500" />
             {t('settings.yieldLoss.title')}
           </h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-ink-subtle mt-1">
             {t('settings.yieldLoss.titleDesc')}
           </p>
         </div>
@@ -226,7 +226,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
               resetToDefaults('yieldLoss')
             }
           }}
-          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          className="flex items-center gap-1 text-sm text-ink-subtle hover:text-ink-muted"
         >
           <RotateCcw className="w-4 h-4" />
           {t('settings.yieldLoss.resetToDefault')}
@@ -239,8 +239,8 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
           <div className="flex items-center gap-3">
             <Settings2 className="w-5 h-5 text-blue-600" />
             <div>
-              <div className="font-medium text-gray-800">{t('settings.yieldLoss.envAdjustment')}</div>
-              <div className="text-xs text-gray-500">
+              <div className="font-medium text-ink">{t('settings.yieldLoss.envAdjustment')}</div>
+              <div className="text-xs text-ink-subtle">
                 {t('settings.yieldLoss.envAdjustmentDesc')}
               </div>
             </div>
@@ -252,7 +252,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
             onClick={() => setEnvironmentAdjustment(!yieldLoss.enableEnvironmentAdjustment)}
           >
             <div
-              className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+              className={`absolute top-1 w-4 h-4 bg-surface-paper rounded-full transition-transform ${
                 yieldLoss.enableEnvironmentAdjustment ? 'translate-x-7' : 'translate-x-1'
               }`}
             />
@@ -268,7 +268,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
 
       {/* 카테고리별 설정 */}
       <div className="space-y-3">
-        <h4 className="font-medium text-gray-700">{t('settings.yieldLoss.categorySettings')}</h4>
+        <h4 className="font-medium text-ink-muted">{t('settings.yieldLoss.categorySettings')}</h4>
 
         {CATEGORIES.map(cat => {
           const isExpanded = expandedCategory === cat.key
@@ -285,7 +285,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                 className="w-full flex items-center justify-between p-3 text-left"
               >
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-800">{t(`settings.yieldLoss.categories.${cat.key}`)}</span>
+                  <span className="font-medium text-ink">{t(`settings.yieldLoss.categories.${cat.key}`)}</span>
                   {hasOverrides && (
                     <span className="px-1.5 py-0.5 text-xs bg-orange-200 text-orange-700 rounded">
                       {t('settings.yieldLoss.custom')}
@@ -306,7 +306,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
 
               {/* 카테고리 상세 */}
               {isExpanded && (
-                <div className="p-4 bg-white border-t space-y-4">
+                <div className="p-4 bg-surface-paper border-t space-y-4">
                   {isEditing ? (
                     // 편집 모드
                     <>
@@ -329,7 +329,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                             setEditingCategory(null)
                             setCategoryEditForm({})
                           }}
-                          className="px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                          className="px-3 py-1.5 border border-line rounded text-sm hover:bg-surface-muted"
                         >
                           {t('common.cancel')}
                         </button>
@@ -351,9 +351,9 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
                     <>
                       <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
                         {PROCESS_STAGES.map(stage => (
-                          <div key={stage.key} className="text-center p-2 bg-gray-50 rounded">
+                          <div key={stage.key} className="text-center p-2 bg-surface-muted rounded">
                             <div className="text-lg">{stage.icon}</div>
-                            <div className="text-xs text-gray-500">{t(`settings.yieldLoss.stages.${stage.key}.name`)}</div>
+                            <div className="text-xs text-ink-subtle">{t(`settings.yieldLoss.stages.${stage.key}.name`)}</div>
                             <div className="font-mono font-medium">{rates[stage.key]}%</div>
                           </div>
                         ))}
@@ -376,7 +376,7 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
       {/* 제품별 오버라이드 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium text-gray-700">{t('settings.yieldLoss.productOverride')}</h4>
+          <h4 className="font-medium text-ink-muted">{t('settings.yieldLoss.productOverride')}</h4>
           <select
             value={selectedProductCategory}
             onChange={(e) => setSelectedProductCategory(e.target.value)}
@@ -399,18 +399,18 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
               <div
                 key={productKey}
                 className={`border rounded-lg p-3 ${
-                  hasOverride ? 'bg-orange-50 border-orange-200' : 'bg-white'
+                  hasOverride ? 'bg-orange-50 border-orange-200' : 'bg-surface-paper'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-800">{t(`settings.yieldLoss.products.${productKey}`)}</span>
+                    <span className="font-medium text-ink">{t(`settings.yieldLoss.products.${productKey}`)}</span>
                     {hasOverride && (
                       <Check className="w-4 h-4 text-orange-500" />
                     )}
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-mono text-gray-600">
+                    <span className="text-sm font-mono text-ink-muted">
                       {totalLoss.toFixed(1)}%
                     </span>
                     {isEditing ? (
@@ -470,20 +470,20 @@ export default function YieldLossSettingsTab({ className = '' }: YieldLossSettin
       </div>
 
       {/* 손실률 가이드 */}
-      <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-        <h4 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
+      <div className="p-4 bg-surface-muted border border-line rounded-lg">
+        <h4 className="font-medium text-ink-muted mb-3 flex items-center gap-2">
           <Info className="w-4 h-4" />
           {t('settings.yieldLoss.guide')}
         </h4>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
           {PROCESS_STAGES.map(stage => (
             <div key={stage.key}>
-              <div className="font-medium text-gray-600 mb-1">{stage.icon} {t(`settings.yieldLoss.stages.${stage.key}.name`)}</div>
-              <div className="text-xs text-gray-500">{t(`settings.yieldLoss.stages.${stage.key}.range`)}</div>
+              <div className="font-medium text-ink-muted mb-1">{stage.icon} {t(`settings.yieldLoss.stages.${stage.key}.name`)}</div>
+              <div className="text-xs text-ink-subtle">{t(`settings.yieldLoss.stages.${stage.key}.range`)}</div>
             </div>
           ))}
         </div>
-        <div className="mt-3 text-xs text-gray-500 flex items-start gap-1">
+        <div className="mt-3 text-xs text-ink-subtle flex items-start gap-1">
           <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
           <span>
             {t('settings.yieldLoss.guideNote')}

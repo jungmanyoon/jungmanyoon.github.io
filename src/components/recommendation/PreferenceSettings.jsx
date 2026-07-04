@@ -50,16 +50,16 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
+      <div className="bg-surface-paper rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
         {/* 헤더 */}
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center">
             <Settings className="w-6 h-6 mr-3 text-purple-600" />
-            <h2 className="text-xl font-semibold text-gray-900">AI 추천 설정</h2>
+            <h2 className="text-xl font-semibold text-ink">AI 추천 설정</h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors text-2xl"
+            className="text-ink-disabled hover:text-ink-muted transition-colors text-2xl"
           >
             ×
           </button>
@@ -69,19 +69,19 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
           {/* 기본 프로필 */}
           <div className="p-6 border-b">
             <div className="flex items-center mb-4">
-              <User className="w-5 h-5 mr-2 text-gray-600" />
-              <h3 className="text-lg font-medium text-gray-900">기본 프로필</h3>
+              <User className="w-5 h-5 mr-2 text-ink-muted" />
+              <h3 className="text-lg font-medium text-ink">기본 프로필</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-ink-muted mb-2">
                   제빵 기술 수준
                 </label>
                 <select
                   value={preferences.skillLevel || 'intermediate'}
                   onChange={(e) => handleSimpleChange('skillLevel', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="beginner">초급 - 기본적인 빵만 만들어봤어요</option>
                   <option value="intermediate">중급 - 여러 종류의 빵을 만들어봤어요</option>
@@ -91,13 +91,13 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-ink-muted mb-2">
                   시간 선호도
                 </label>
                 <select
                   value={preferences.timePreference || 'medium'}
                   onChange={(e) => handleSimpleChange('timePreference', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="short">빠른 제작 (1-2시간)</option>
                   <option value="medium">보통 시간 (3-6시간)</option>
@@ -106,13 +106,13 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-ink-muted mb-2">
                   예산 선호도
                 </label>
                 <select
                   value={preferences.budgetPreference || 'medium'}
                   onChange={(e) => handleSimpleChange('budgetPreference', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="low">경제적 (개당 3,000원 이하)</option>
                   <option value="medium">보통 (개당 3,000-8,000원)</option>
@@ -125,10 +125,10 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
           {/* 카테고리 선호도 */}
           <div className="p-6 border-b">
             <div className="flex items-center mb-4">
-              <ChefHat className="w-5 h-5 mr-2 text-gray-600" />
-              <h3 className="text-lg font-medium text-gray-900">카테고리 선호도</h3>
+              <ChefHat className="w-5 h-5 mr-2 text-ink-muted" />
+              <h3 className="text-lg font-medium text-ink">카테고리 선호도</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">좋아하는 제빵 카테고리를 선택해주세요 (1-5점)</p>
+            <p className="text-sm text-ink-muted mb-4">좋아하는 제빵 카테고리를 선택해주세요 (1-5점)</p>
             
             <div className="space-y-3">
               {[
@@ -141,8 +141,8 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
               ].map(category => (
                 <div key={category.id} className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900">{category.name}</div>
-                    <div className="text-sm text-gray-600">{category.description}</div>
+                    <div className="font-medium text-ink">{category.name}</div>
+                    <div className="text-sm text-ink-muted">{category.description}</div>
                   </div>
                   <div className="flex items-center space-x-2 ml-4">
                     {[1, 2, 3, 4, 5].map(score => (
@@ -156,7 +156,7 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
                         className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium transition-all ${
                           ((preferences.categoryPreferences?.[category.id] || 0.6) * 5) >= score
                             ? 'bg-purple-500 border-purple-500 text-white'
-                            : 'border-gray-300 text-gray-600 hover:border-purple-300'
+                            : 'border-line text-ink-muted hover:border-purple-300'
                         }`}
                       >
                         {score}
@@ -171,10 +171,10 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
           {/* 영양 선호도 */}
           <div className="p-6 border-b">
             <div className="flex items-center mb-4">
-              <Heart className="w-5 h-5 mr-2 text-gray-600" />
-              <h3 className="text-lg font-medium text-gray-900">건강 선호도</h3>
+              <Heart className="w-5 h-5 mr-2 text-ink-muted" />
+              <h3 className="text-lg font-medium text-ink">건강 선호도</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">건강한 레시피를 선호하시나요?</p>
+            <p className="text-sm text-ink-muted mb-4">건강한 레시피를 선호하시나요?</p>
             
             <div className="space-y-3">
               {[
@@ -208,11 +208,11 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
                       pref.id,
                       e.target.checked
                     )}
-                    className="mt-1 mr-3 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    className="mt-1 mr-3 h-4 w-4 text-purple-600 border-line rounded focus:ring-purple-500"
                   />
                   <div>
-                    <div className="font-medium text-gray-900">{pref.name}</div>
-                    <div className="text-sm text-gray-600">{pref.description}</div>
+                    <div className="font-medium text-ink">{pref.name}</div>
+                    <div className="text-sm text-ink-muted">{pref.description}</div>
                   </div>
                 </label>
               ))}
@@ -222,10 +222,10 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
           {/* 보유 재료 */}
           <div className="p-6">
             <div className="flex items-center mb-4">
-              <DollarSign className="w-5 h-5 mr-2 text-gray-600" />
-              <h3 className="text-lg font-medium text-gray-900">자주 사용하는 재료</h3>
+              <DollarSign className="w-5 h-5 mr-2 text-ink-muted" />
+              <h3 className="text-lg font-medium text-ink">자주 사용하는 재료</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-ink-muted mb-4">
               집에 항상 구비하고 있거나 자주 구매하는 재료를 선택해주세요
             </p>
             
@@ -247,9 +247,9 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
                         : current.filter(item => item !== ingredient)
                       handleSimpleChange('availableIngredients', updated)
                     }}
-                    className="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    className="mr-2 h-4 w-4 text-purple-600 border-line rounded focus:ring-purple-500"
                   />
-                  <span className="text-sm text-gray-700">{ingredient}</span>
+                  <span className="text-sm text-ink-muted">{ingredient}</span>
                 </label>
               ))}
             </div>
@@ -257,14 +257,14 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
         </div>
 
         {/* 푸터 */}
-        <div className="flex items-center justify-between p-6 border-t bg-gray-50">
-          <p className="text-sm text-gray-600">
+        <div className="flex items-center justify-between p-6 border-t bg-surface-muted">
+          <p className="text-sm text-ink-muted">
             설정을 저장하면 AI가 더 정확한 추천을 제공합니다
           </p>
           <div className="flex items-center space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-ink-muted bg-surface-paper border border-line rounded-md hover:bg-surface-muted transition-colors"
             >
               취소
             </button>
@@ -274,7 +274,7 @@ const PreferenceSettings = ({ isOpen, onClose }) => {
               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                 hasChanges
                   ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-300 text-ink-subtle cursor-not-allowed'
               }`}
             >
               저장

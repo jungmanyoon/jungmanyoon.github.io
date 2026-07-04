@@ -34,10 +34,10 @@ function Settings({ onClose }) {
     <div className="max-w-2xl mx-auto">
       <div className="card">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-bread-700">설정</h2>
+          <h2 className="text-2xl font-bold text-ink">설정</h2>
           <button 
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-ink-subtle hover:text-ink-muted"
           >
             ✕
           </button>
@@ -45,13 +45,13 @@ function Settings({ onClose }) {
 
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-ink-muted mb-2">
               기본 제법
             </label>
             <select
               value={settings.defaultMethod}
               onChange={(e) => handleChange('defaultMethod', e.target.value)}
-              className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+              className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
             >
               <option value="straight">스트레이트법</option>
               <option value="sponge">중종법</option>
@@ -63,13 +63,13 @@ function Settings({ onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-ink-muted mb-2">
               단위 시스템
             </label>
             <select
               value={settings.defaultUnit}
               onChange={(e) => handleChange('defaultUnit', e.target.value)}
-              className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+              className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
             >
               <option value="metric">미터법 (g, ml)</option>
               <option value="imperial">야드파운드법 (oz, cups)</option>
@@ -84,14 +84,14 @@ function Settings({ onClose }) {
                 onChange={(e) => handleChange('autoSave', e.target.checked)}
                 className="mr-2"
               />
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-ink-muted">
                 자동 저장 활성화
               </span>
             </label>
           </div>
 
           <div>
-            <h3 className="text-lg font-medium text-bread-700 mb-3">데이터 관리</h3>
+            <h3 className="text-lg font-medium text-ink mb-3">데이터 관리</h3>
             <div className="space-y-2">
               <Button 
                 variant="secondary" 

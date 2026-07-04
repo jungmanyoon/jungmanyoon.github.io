@@ -26,7 +26,7 @@ import {
 const METHOD_META: Record<string, { icon: string; color: string }> = {
   straight: {
     icon: '🥖',
-    color: 'bg-gray-100 text-gray-700 border-gray-300'
+    color: 'bg-surface-muted text-ink-muted border-line'
   },
   sponge: {
     icon: '🧪',
@@ -160,8 +160,8 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
 
         {/* 상세 정보 */}
         {isExpanded && (
-          <div className="p-4 bg-white border-t space-y-4">
-            <p className="text-sm text-gray-600 italic">{t(`settings.method.methods.${m.id}.desc`)}</p>
+          <div className="p-4 bg-surface-paper border-t space-y-4">
+            <p className="text-sm text-ink-muted italic">{t(`settings.method.methods.${m.id}.desc`)}</p>
 
             {isEditing ? (
               // 편집 모드
@@ -170,7 +170,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                 {m.id !== 'straight' && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">
+                      <label className="block text-xs text-ink-subtle mb-1">
                         {t('settings.method.flourRatio')}
                       </label>
                       <div className="flex items-center gap-2">
@@ -186,11 +186,11 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                           step="5"
                           className="w-full px-2 py-1.5 text-sm border rounded text-right font-mono"
                         />
-                        <span className="text-sm text-gray-500">%</span>
+                        <span className="text-sm text-ink-subtle">%</span>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">
+                      <label className="block text-xs text-ink-subtle mb-1">
                         {t('settings.method.waterRatio')}
                       </label>
                       <div className="flex items-center gap-2">
@@ -206,7 +206,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                           step="5"
                           className="w-full px-2 py-1.5 text-sm border rounded text-right font-mono"
                         />
-                        <span className="text-sm text-gray-500">%</span>
+                        <span className="text-sm text-ink-subtle">%</span>
                       </div>
                     </div>
                   </div>
@@ -214,7 +214,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
 
                 {/* 이스트 조정 */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
+                  <label className="block text-xs text-ink-subtle mb-1">
                     {t('settings.method.yeastAdjust')}
                   </label>
                   <div className="flex items-center gap-2">
@@ -230,11 +230,11 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                       }))}
                       className="flex-1"
                     />
-                    <span className="w-16 text-sm text-gray-600 font-mono text-right">
+                    <span className="w-16 text-sm text-ink-muted font-mono text-right">
                       {((editForm.yeastAdjustment || 1) * 100).toFixed(0)}%
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-ink-disabled mt-1">
                     {(editForm.yeastAdjustment || 1) === 0
                       ? t('settings.method.yeastNone')
                       : t('settings.method.yeastAmount', { percent: ((editForm.yeastAdjustment || 1) * 100).toFixed(0) })
@@ -245,7 +245,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                 {/* 발효 시간 */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
+                    <label className="block text-xs text-ink-subtle mb-1">
                       {t('settings.method.prefermentTime')}
                     </label>
                     <div className="flex items-center gap-2">
@@ -263,7 +263,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                         step="0.5"
                         min="0"
                       />
-                      <span className="text-gray-400">~</span>
+                      <span className="text-ink-disabled">~</span>
                       <input
                         type="number"
                         value={editForm.prefermentTime?.max || 0}
@@ -281,7 +281,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
+                    <label className="block text-xs text-ink-subtle mb-1">
                       {t('settings.method.prefermentTemp')}
                     </label>
                     <div className="flex items-center gap-2">
@@ -297,7 +297,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                         }))}
                         className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono"
                       />
-                      <span className="text-gray-400">~</span>
+                      <span className="text-ink-disabled">~</span>
                       <input
                         type="number"
                         value={editForm.prefermentTemp?.max || 0}
@@ -325,7 +325,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="px-3 py-1.5 border border-gray-300 rounded hover:bg-gray-50 text-sm"
+                    className="px-3 py-1.5 border border-line rounded hover:bg-surface-muted text-sm"
                   >
                     {t('common.cancel')}
                   </button>
@@ -336,19 +336,19 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
               <div className="space-y-3">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                   {m.flourRatio > 0 && (
-                    <div className="p-2 bg-gray-50 rounded">
-                      <div className="text-xs text-gray-500">{t('settings.method.flour')}</div>
+                    <div className="p-2 bg-surface-muted rounded">
+                      <div className="text-xs text-ink-subtle">{t('settings.method.flour')}</div>
                       <div className="font-mono font-medium">{(m.flourRatio * 100).toFixed(0)}%</div>
                     </div>
                   )}
                   {m.waterRatio > 0 && (
-                    <div className="p-2 bg-gray-50 rounded">
-                      <div className="text-xs text-gray-500">{t('settings.method.water')}</div>
+                    <div className="p-2 bg-surface-muted rounded">
+                      <div className="text-xs text-ink-subtle">{t('settings.method.water')}</div>
                       <div className="font-mono font-medium">{(m.waterRatio * 100).toFixed(0)}%</div>
                     </div>
                   )}
-                  <div className="p-2 bg-gray-50 rounded">
-                    <div className="text-xs text-gray-500">{t('settings.method.yeast')}</div>
+                  <div className="p-2 bg-surface-muted rounded">
+                    <div className="text-xs text-ink-subtle">{t('settings.method.yeast')}</div>
                     <div className="font-mono font-medium">
                       {m.yeastAdjustment === 0
                         ? t('settings.method.none')
@@ -357,8 +357,8 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                     </div>
                   </div>
                   {(m.prefermentTime.min > 0 || m.prefermentTime.max > 0) && (
-                    <div className="p-2 bg-gray-50 rounded">
-                      <div className="text-xs text-gray-500">{t('settings.method.fermentationTime')}</div>
+                    <div className="p-2 bg-surface-muted rounded">
+                      <div className="text-xs text-ink-subtle">{t('settings.method.fermentationTime')}</div>
                       <div className="font-mono font-medium">
                         {m.prefermentTime.min}~{m.prefermentTime.max}h
                       </div>
@@ -367,8 +367,8 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
                 </div>
 
                 {(m.prefermentTemp.min > 0 || m.prefermentTemp.max > 0) && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Thermometer className="w-4 h-4 text-gray-400" />
+                  <div className="flex items-center gap-2 text-sm text-ink-muted">
+                    <Thermometer className="w-4 h-4 text-ink-disabled" />
                     {t('settings.method.fermentationTemp')}: {m.prefermentTemp.min}~{m.prefermentTemp.max}°C
                   </div>
                 )}
@@ -391,11 +391,11 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
     <div className={`space-y-6 ${className}`}>
       {/* 헤더 */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+        <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
           <FlaskConical className="w-5 h-5 text-orange-500" />
           {t('settings.method.title')}
         </h3>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-ink-subtle mt-1">
           {t('settings.method.titleDesc')}
         </p>
       </div>
@@ -411,7 +411,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
         </p>
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs text-gray-500 mb-1">{t('settings.method.freshYeast')}</label>
+            <label className="block text-xs text-ink-subtle mb-1">{t('settings.method.freshYeast')}</label>
             <input
               type="number"
               value={method.yeastConversion.fresh}
@@ -419,11 +419,11 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
               step="0.1"
               min="0.1"
               max="2"
-              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-white"
+              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-surface-paper"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">{t('settings.method.activeDry')}</label>
+            <label className="block text-xs text-ink-subtle mb-1">{t('settings.method.activeDry')}</label>
             <input
               type="number"
               value={method.yeastConversion.activeDry}
@@ -431,11 +431,11 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
               step="0.05"
               min="0.1"
               max="1"
-              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-white"
+              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-surface-paper"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">{t('settings.method.instant')}</label>
+            <label className="block text-xs text-ink-subtle mb-1">{t('settings.method.instant')}</label>
             <input
               type="number"
               value={method.yeastConversion.instant}
@@ -443,7 +443,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
               step="0.05"
               min="0.1"
               max="1"
-              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-white"
+              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-surface-paper"
             />
           </div>
         </div>
@@ -461,7 +461,7 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
         </h4>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs text-gray-500 mb-1">
+            <label className="block text-xs text-ink-subtle mb-1">
               {t('settings.method.baseTemp')}
             </label>
             <input
@@ -470,14 +470,14 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
               onChange={(e) => setBaseTemperature(parseInt(e.target.value) || 26)}
               min="20"
               max="32"
-              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-white"
+              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-surface-paper"
             />
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-ink-disabled mt-1">
               {t('settings.method.baseTempDesc')}
             </p>
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">
+            <label className="block text-xs text-ink-subtle mb-1">
               {t('settings.method.baseSalt')}
             </label>
             <input
@@ -487,9 +487,9 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
               min="0.5"
               max="3"
               step="0.1"
-              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-white"
+              className="w-full px-2 py-1.5 text-sm border rounded text-center font-mono bg-surface-paper"
             />
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-ink-disabled mt-1">
               {t('settings.method.baseSaltDesc')}
             </p>
           </div>
@@ -499,14 +499,14 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
       {/* 제법 목록 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium text-gray-700">{t('settings.method.methodSettings')}</h4>
+          <h4 className="font-medium text-ink-muted">{t('settings.method.methodSettings')}</h4>
           <button
             onClick={() => {
               if (confirm(t('settings.method.resetConfirm'))) {
                 resetToDefaults('method')
               }
             }}
-            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+            className="flex items-center gap-1 text-sm text-ink-subtle hover:text-ink-muted"
           >
             <RotateCcw className="w-4 h-4" />
             {t('settings.method.resetToDefault')}
@@ -517,14 +517,14 @@ export default function MethodSettingsTab({ className = '' }: MethodSettingsTabP
       </div>
 
       {/* 발효 공식 설명 */}
-      <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
-        <h4 className="font-medium text-gray-700 mb-2">{t('settings.method.formulaTitle')}</h4>
+      <div className="p-4 bg-surface-muted border border-line rounded-lg text-sm text-ink-muted">
+        <h4 className="font-medium text-ink-muted mb-2">{t('settings.method.formulaTitle')}</h4>
         <div className="space-y-1 text-xs font-mono">
           <div>{t('settings.method.formulaTempCoef')}</div>
           <div>{t('settings.method.formulaSaltCoef')}</div>
           <div>{t('settings.method.formulaAdjustedTime')}</div>
         </div>
-        <div className="mt-2 text-xs text-gray-500">
+        <div className="mt-2 text-xs text-ink-subtle">
           <AlertCircle className="w-3 h-3 inline mr-1" />
           {t('settings.method.formulaNote')}
         </div>

@@ -151,7 +151,7 @@ const RecipeCard = memo<RecipeCardProps>(({
   if (compact) {
     return (
       <div
-        className="relative bg-white border border-bread-200 rounded-lg p-3 hover:shadow-md hover:border-bread-300 transition-all"
+        className="relative bg-surface-paper border border-line rounded-lg p-3 hover:shadow-md hover:border-line transition-all"
       >
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -159,7 +159,7 @@ const RecipeCard = memo<RecipeCardProps>(({
               {categoryIcon}
             </span>
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-sm text-bread-700">
+              <h3 className="font-medium text-sm text-ink">
                 {/* 카드 전체를 클릭 영역으로 확장하는 stretched button (중첩 인터랙티브 해소) */}
                 <button
                   type="button"
@@ -182,7 +182,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             {onEdit && (
               <button
                 onClick={handleEdit}
-                className="text-gray-400 hover:text-bread-600 transition-colors p-2 -m-1 flex items-center justify-center min-w-[36px] min-h-[36px]"
+                className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[36px] min-h-[36px]"
                 aria-label={t('recipeList.editRecipe')}
                 type="button"
               >
@@ -191,7 +191,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             )}
             <button
               onClick={handleDelete}
-              className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[36px] min-h-[36px]"
+              className="text-ink-disabled hover:text-red-500 transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[36px] min-h-[36px]"
               aria-label={t('recipeList.deleteRecipe')}
               type="button"
             >
@@ -200,7 +200,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           </div>
         </div>
 
-        <div className="flex justify-between items-center text-xs text-gray-600">
+        <div className="flex justify-between items-center text-xs text-ink-muted">
           <span>{methodName}</span>
           <span>{t('recipeList.ingredientCount', { count: ingredientCount })}</span>
         </div>
@@ -216,7 +216,7 @@ const RecipeCard = memo<RecipeCardProps>(({
       <div className="flex justify-between items-start mb-2">
         <div className="flex-1 min-w-0">
           {/* 모바일: text-base(16px), 데스크톱: text-lg(18px) 유지 + 긴 이름 줄바꿈 처리 */}
-          <h3 className="text-base sm:text-lg font-semibold text-bread-700 break-words">
+          <h3 className="text-base sm:text-lg font-semibold text-ink break-words">
             {/* 카드 전체를 클릭 영역으로 확장하는 stretched button (중첩 인터랙티브 해소) */}
             <button
               type="button"
@@ -238,7 +238,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           {onEdit && (
             <button
               onClick={handleEdit}
-              className="text-gray-400 hover:text-bread-600 transition-colors p-2 -m-1 flex items-center justify-center min-w-[40px] min-h-[40px]"
+              className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[40px] min-h-[40px]"
               aria-label={t('recipeList.editRecipe')}
               type="button"
             >
@@ -247,7 +247,7 @@ const RecipeCard = memo<RecipeCardProps>(({
           )}
           <button
             onClick={handleDelete}
-            className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[40px] min-h-[40px]"
+            className="text-ink-disabled hover:text-red-500 transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[40px] min-h-[40px]"
             aria-label={t('recipeList.deleteRecipe')}
             type="button"
           >
@@ -257,10 +257,10 @@ const RecipeCard = memo<RecipeCardProps>(({
       </div>
 
       <div className="flex flex-wrap gap-2 mb-3">
-        <span className="text-xs px-2 py-1 bg-bread-100 text-bread-600 rounded">
+        <span className="text-xs px-2 py-1 bg-surface-muted text-ink-muted rounded">
           {categoryName}
         </span>
-        <span className="text-xs px-2 py-1 bg-bread-100 text-bread-600 rounded">
+        <span className="text-xs px-2 py-1 bg-surface-muted text-ink-muted rounded">
           {methodName}
         </span>
         {sourceInfo && (
@@ -272,12 +272,12 @@ const RecipeCard = memo<RecipeCardProps>(({
       </div>
 
       {recipe.notes && (
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+        <p className="text-sm text-ink-muted mb-3 line-clamp-2">
           {recipe.notes}
         </p>
       )}
 
-      <div className="text-xs text-gray-500 space-y-1">
+      <div className="text-xs text-ink-subtle space-y-1">
         <p>{t('recipeList.ingredients')}: {ingredientCount}</p>
         {recipe.totalTime && (
           <p>{t('recipeList.totalTime')}: {recipe.totalTime}{t('recipeList.minutes')}</p>

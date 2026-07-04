@@ -6,6 +6,7 @@ import { DDTCalculator as DDTCalc, MixerType } from '@utils/calculations/ddtCalc
 import { Recipe } from '@/types/recipe.types'
 import { useCalculatorStore } from '@stores/useCalculatorStore'
 import { useAppStore } from '@stores/useAppStore'
+import { Lightbulb, AlertTriangle } from 'lucide-react'
 
 interface DDTCalculatorProps {
   recipe?: Recipe
@@ -34,13 +35,13 @@ const SelectField = memo<{
   options: Array<{ value: string; label: string }>
 }>(({ label, value, onChange, options }) => (
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
+    <label className="block text-sm font-medium text-ink-muted mb-1">
       {label}
     </label>
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-3 py-2 border border-bread-300 rounded-md focus:ring-2 focus:ring-bread-500 focus:border-bread-500"
+      className="w-full px-3 py-2 border border-line rounded-md focus:ring-2 focus:ring-bread-500 focus:border-bread-500"
     >
       {options.map(option => (
         <option key={option.value} value={option.value}>
@@ -66,11 +67,11 @@ const ResultDisplay = memo<{
 
   return (
     <div className="bg-bread-50 rounded-lg p-4 space-y-3">
-      <h4 className="font-semibold text-bread-700">{t('ddt.calculationResult')}</h4>
+      <h4 className="font-semibold text-ink">{t('ddt.calculationResult')}</h4>
 
       <div className="space-y-2">
         <div className="flex justify-between">
-          <span className="text-sm text-gray-600">{t('ddt.requiredWaterTemp')}:</span>
+          <span className="text-sm text-ink-muted">{t('ddt.requiredWaterTemp')}:</span>
           <span className="font-semibold text-bread-700">
             {waterTemp.toFixed(1)}°C
           </span>
@@ -79,19 +80,19 @@ const ResultDisplay = memo<{
         {useIce && (
           <>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">{t('ddt.ice')}:</span>
+              <span className="text-sm text-ink-muted">{t('ddt.ice')}:</span>
               <span className="font-semibold">{iceAmount}g</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">{t('ddt.coldWater')}:</span>
+              <span className="text-sm text-ink-muted">{t('ddt.coldWater')}:</span>
               <span className="font-semibold">{waterAmount}g</span>
             </div>
           </>
         )}
 
         {predictedTemp && (
-          <div className="flex justify-between pt-2 border-t border-bread-200">
-            <span className="text-sm text-gray-600">{t('ddt.labels.predictedTemp')}:</span>
+          <div className="flex justify-between pt-2 border-t border-line">
+            <span className="text-sm text-ink-muted">{t('ddt.labels.predictedTemp')}:</span>
             <span className="font-semibold text-bread-700">
               {predictedTemp.toFixed(1)}°C
             </span>
@@ -100,14 +101,14 @@ const ResultDisplay = memo<{
       </div>
 
       {waterTemp < 5 && (
-        <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700">
-          💡 {t('ddt.needsCooling')}
+        <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700 flex items-center gap-1.5">
+          <Lightbulb size={16} className="shrink-0" />{t('ddt.needsCooling')}
         </div>
       )}
 
       {waterTemp > 35 && (
-        <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded text-sm text-orange-700">
-          ⚠️ {t('ddt.warnings.tooHot')}
+        <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded text-sm text-orange-700 flex items-center gap-1.5">
+          <AlertTriangle size={16} className="shrink-0" />{t('ddt.warnings.tooHot')}
         </div>
       )}
     </div>
@@ -324,7 +325,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
 
   return (
     <div className="card">
-      <h3 className="mb-4 text-lg font-semibold text-bread-700">
+      <h3 className="mb-4 text-lg font-semibold text-ink">
         {t('ddt.title')}
       </h3>
 
@@ -387,7 +388,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
 
           {/* Friction Factor with Auto-Recommendation (섭씨 °C 단위) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-ink-muted mb-1">
               {t('ddt.labels.mixerFriction')} (°C)
             </label>
             <div className="flex gap-2">
@@ -415,7 +416,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
               </Button>
             </div>
             {useAutoFriction && (
-              <p className="mt-1 text-xs text-bread-600">
+              <p className="mt-1 text-xs text-ink-muted">
                 {t('ddt.labels.recommendedValue')}: {recommendedFriction}°C ({t('ddt.labels.mixingTime')} {localData.mixingTime}{t('ddt.labels.minutes')}, {t('ddt.labels.hydration')} {doughHydration.toFixed(0)}%)
               </p>
             )}
@@ -433,9 +434,9 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
                   handleInputChange('prefermentTemp', null)
                 }
               }}
-              className="rounded border-bread-300 text-bread-600 focus:ring-bread-500"
+              className="rounded border-line text-bread-600 focus:ring-bread-500"
             />
-            <label htmlFor="use-preferment" className="text-sm text-gray-700">
+            <label htmlFor="use-preferment" className="text-sm text-ink-muted">
               {t('ddt.labels.usePreferment')}
             </label>
           </div>
@@ -470,7 +471,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
           />
 
           {/* 마찰계수 참고 정보 (섭씨 물온도 DDT 공식 기준값, C-5 결함 수정) */}
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
+          <div className="mt-4 p-3 bg-surface-muted rounded-lg text-xs text-ink-muted">
             <p className="font-semibold mb-1">{t('ddt.frictionReference.title')} (°C):</p>
             <ul className="space-y-0.5">
               <li>• {t('ddt.mixerTypes.hand')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['hand']}°C</li>

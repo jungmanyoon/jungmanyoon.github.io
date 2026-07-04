@@ -1,6 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
+import { AlertTriangle } from 'lucide-react'
 
 // 번역 로드 실패 시 표시할 기본 한글 콘텐츠
 const DEFAULT_CONTENT = {
@@ -105,13 +106,13 @@ function Help({ onClose }) {
     <div className="max-w-5xl mx-auto">
       <div className="card">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-bread-700">
+          <h2 className="text-2xl font-bold text-ink">
             {getContent(t, 'help.title', DEFAULT_CONTENT.title)}
           </h2>
           <button
             onClick={onClose}
             aria-label={getContent(t, 'help.close', '도움말 닫기')}
-            className="text-gray-500 hover:text-gray-700 text-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded"
+            className="text-ink-subtle hover:text-ink-muted text-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded"
           >
             <span aria-hidden="true">✕</span>
           </button>
@@ -120,10 +121,10 @@ function Help({ onClose }) {
         <div className="space-y-8 max-h-[70vh] overflow-y-auto pr-4">
           {/* 시작하기 */}
           <section>
-            <h3 className="text-lg font-semibold text-bread-600 mb-3">
+            <h3 className="text-lg font-semibold text-ink mb-3">
               {getContent(t, 'help.gettingStarted.title', DEFAULT_CONTENT.gettingStarted.title)}
             </h3>
-            <div className="prose text-gray-700">
+            <div className="prose text-ink-muted">
               <p className="mb-2">
                 {getContent(t, 'help.gettingStarted.intro', DEFAULT_CONTENT.gettingStarted.intro)}
               </p>
@@ -137,15 +138,15 @@ function Help({ onClose }) {
 
           {/* 기본 사용법 */}
           <section>
-            <h3 className="text-lg font-semibold text-bread-600 mb-3">
+            <h3 className="text-lg font-semibold text-ink mb-3">
               {getContent(t, 'help.basicUsage.title', DEFAULT_CONTENT.basicUsage.title)}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-medium text-bread-700 mb-2">
+                <h4 className="font-medium text-ink mb-2">
                   {getContent(t, 'help.basicUsage.newRecipe.title', DEFAULT_CONTENT.basicUsage.newRecipe.title)}
                 </h4>
-                <ol className="list-decimal list-inside text-sm text-gray-700 space-y-1">
+                <ol className="list-decimal list-inside text-sm text-ink-muted space-y-1">
                   <li>{getContent(t, 'help.basicUsage.newRecipe.step1', DEFAULT_CONTENT.basicUsage.newRecipe.step1)}</li>
                   <li>{getContent(t, 'help.basicUsage.newRecipe.step2', DEFAULT_CONTENT.basicUsage.newRecipe.step2)}</li>
                   <li>{getContent(t, 'help.basicUsage.newRecipe.step3', DEFAULT_CONTENT.basicUsage.newRecipe.step3)}</li>
@@ -156,21 +157,21 @@ function Help({ onClose }) {
               </div>
 
               <div>
-                <h4 className="font-medium text-bread-700 mb-2">
+                <h4 className="font-medium text-ink mb-2">
                   {getContent(t, 'help.basicUsage.methodConversion.title', DEFAULT_CONTENT.basicUsage.methodConversion.title)}
                 </h4>
-                <p className="text-sm text-gray-700 mb-2">
+                <p className="text-sm text-ink-muted mb-2">
                   {getContent(t, 'help.basicUsage.methodConversion.intro', DEFAULT_CONTENT.basicUsage.methodConversion.intro)}
                 </p>
-                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                <ul className="list-disc list-inside text-sm text-ink-muted space-y-1">
                   <li>{getContent(t, 'help.basicUsage.methodConversion.sponge', DEFAULT_CONTENT.basicUsage.methodConversion.sponge)}</li>
                   <li>{getContent(t, 'help.basicUsage.methodConversion.poolish', DEFAULT_CONTENT.basicUsage.methodConversion.poolish)}</li>
                   <li>{getContent(t, 'help.basicUsage.methodConversion.biga', DEFAULT_CONTENT.basicUsage.methodConversion.biga)}</li>
                   <li>{getContent(t, 'help.basicUsage.methodConversion.overnight', DEFAULT_CONTENT.basicUsage.methodConversion.overnight)}</li>
                   <li>{getContent(t, 'help.basicUsage.methodConversion.notime', DEFAULT_CONTENT.basicUsage.methodConversion.notime)}</li>
                 </ul>
-                <p className="text-xs text-gray-500 mt-2">
-                  <span aria-hidden="true">⚠️</span> {getContent(t, 'help.basicUsage.methodConversion.warning', DEFAULT_CONTENT.basicUsage.methodConversion.warning)}
+                <p className="text-xs text-ink-subtle mt-2">
+                  <AlertTriangle size={14} className="inline text-warning" aria-hidden="true" /> {getContent(t, 'help.basicUsage.methodConversion.warning', DEFAULT_CONTENT.basicUsage.methodConversion.warning)}
                 </p>
               </div>
             </div>
@@ -178,44 +179,44 @@ function Help({ onClose }) {
 
           {/* 주요 기능 */}
           <section>
-            <h3 className="text-lg font-semibold text-bread-600 mb-3">
+            <h3 className="text-lg font-semibold text-ink mb-3">
               {getContent(t, 'help.features.title', DEFAULT_CONTENT.features.title)}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-bread-50 rounded-lg">
-                <h4 className="font-medium text-bread-700 mb-2">
+              <div className="p-4 bg-surface-muted rounded-lg">
+                <h4 className="font-medium text-ink mb-2">
                   <span aria-hidden="true">📏</span> {getContent(t, 'help.features.panScaling.title', DEFAULT_CONTENT.features.panScaling.title)}
                 </h4>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-ink-muted">
                   {getContent(t, 'help.features.panScaling.desc', DEFAULT_CONTENT.features.panScaling.desc)}
                 </p>
               </div>
 
-              <div className="p-4 bg-bread-50 rounded-lg">
-                <h4 className="font-medium text-bread-700 mb-2">
+              <div className="p-4 bg-surface-muted rounded-lg">
+                <h4 className="font-medium text-ink mb-2">
                   <span aria-hidden="true">✨</span> {getContent(t, 'help.features.advancedPan.title', DEFAULT_CONTENT.features.advancedPan.title)}
                 </h4>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-ink-muted">
                   {getContent(t, 'help.features.advancedPan.desc', DEFAULT_CONTENT.features.advancedPan.desc)}
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="p-4 bg-bread-50 rounded-lg">
-                <h4 className="font-medium text-bread-700 mb-2">
+              <div className="p-4 bg-surface-muted rounded-lg">
+                <h4 className="font-medium text-ink mb-2">
                   <span aria-hidden="true">🌡️</span> {getContent(t, 'help.features.ddtCalc.title', DEFAULT_CONTENT.features.ddtCalc.title)}
                 </h4>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-ink-muted">
                   {getContent(t, 'help.features.ddtCalc.desc', DEFAULT_CONTENT.features.ddtCalc.desc)}
                 </p>
               </div>
 
-              <div className="p-4 bg-bread-50 rounded-lg">
-                <h4 className="font-medium text-bread-700 mb-2">
+              <div className="p-4 bg-surface-muted rounded-lg">
+                <h4 className="font-medium text-ink mb-2">
                   <span aria-hidden="true">🌍</span> {getContent(t, 'help.features.envAdjust.title', DEFAULT_CONTENT.features.envAdjust.title)}
                 </h4>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-ink-muted">
                   {getContent(t, 'help.features.envAdjust.desc', DEFAULT_CONTENT.features.envAdjust.desc)}
                 </p>
               </div>
@@ -224,19 +225,19 @@ function Help({ onClose }) {
 
           {/* 고급 기능 */}
           <section>
-            <h3 className="text-lg font-semibold text-bread-600 mb-3">
+            <h3 className="text-lg font-semibold text-ink mb-3">
               {getContent(t, 'help.advanced.title', DEFAULT_CONTENT.advanced.title)}
             </h3>
 
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium text-bread-700 mb-2">
+                <h4 className="font-medium text-ink mb-2">
                   {getContent(t, 'help.advanced.magicNumber.title', DEFAULT_CONTENT.advanced.magicNumber.title)}
                 </h4>
-                <p className="text-sm text-gray-700 mb-2">
+                <p className="text-sm text-ink-muted mb-2">
                   {getContent(t, 'help.advanced.magicNumber.formula', DEFAULT_CONTENT.advanced.magicNumber.formula)}
                 </p>
-                <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <ul className="list-disc list-inside text-sm text-ink-muted space-y-1">
                   <li>{getContent(t, 'help.advanced.magicNumber.bread', DEFAULT_CONTENT.advanced.magicNumber.bread)}</li>
                   <li>{getContent(t, 'help.advanced.magicNumber.cake', DEFAULT_CONTENT.advanced.magicNumber.cake)}</li>
                   <li>{getContent(t, 'help.advanced.magicNumber.muffin', DEFAULT_CONTENT.advanced.magicNumber.muffin)}</li>
@@ -244,19 +245,19 @@ function Help({ onClose }) {
               </div>
 
               <div>
-                <h4 className="font-medium text-bread-700 mb-2">
+                <h4 className="font-medium text-ink mb-2">
                   {getContent(t, 'help.advanced.multiPan.title', DEFAULT_CONTENT.advanced.multiPan.title)}
                 </h4>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-ink-muted">
                   {getContent(t, 'help.advanced.multiPan.desc', DEFAULT_CONTENT.advanced.multiPan.desc)}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-medium text-bread-700 mb-2">
+                <h4 className="font-medium text-ink mb-2">
                   {getContent(t, 'help.advanced.iceCalc.title', DEFAULT_CONTENT.advanced.iceCalc.title)}
                 </h4>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-ink-muted">
                   {getContent(t, 'help.advanced.iceCalc.desc', DEFAULT_CONTENT.advanced.iceCalc.desc)}
                 </p>
               </div>
@@ -265,14 +266,14 @@ function Help({ onClose }) {
 
           {/* 베이커스 퍼센트 */}
           <section>
-            <h3 className="text-lg font-semibold text-bread-600 mb-3">
+            <h3 className="text-lg font-semibold text-ink mb-3">
               {getContent(t, 'help.bakersPercent.title', DEFAULT_CONTENT.bakersPercent.title)}
             </h3>
-            <div className="p-4 bg-brand-50 rounded-lg">
-              <p className="text-sm text-brand-800 mb-2">
+            <div className="p-4 bg-surface-muted rounded-lg">
+              <p className="text-sm text-ink-muted mb-2">
                 {getContent(t, 'help.bakersPercent.desc', DEFAULT_CONTENT.bakersPercent.desc)}
               </p>
-              <p className="text-sm text-brand-800">
+              <p className="text-sm text-ink-muted">
                 {getContent(t, 'help.bakersPercent.example', DEFAULT_CONTENT.bakersPercent.example)}
               </p>
             </div>
@@ -280,10 +281,10 @@ function Help({ onClose }) {
 
           {/* 참고사항 */}
           <section>
-            <h3 className="text-lg font-semibold text-bread-600 mb-3">
+            <h3 className="text-lg font-semibold text-ink mb-3">
               {getContent(t, 'help.notes.title', DEFAULT_CONTENT.notes.title)}
             </h3>
-            <ul className="list-disc list-inside text-sm text-gray-700 space-y-2">
+            <ul className="list-disc list-inside text-sm text-ink-muted space-y-2">
               <li>{getContent(t, 'help.notes.note1', DEFAULT_CONTENT.notes.note1)}</li>
               <li>{getContent(t, 'help.notes.note2', DEFAULT_CONTENT.notes.note2)}</li>
               <li>{getContent(t, 'help.notes.note3', DEFAULT_CONTENT.notes.note3)}</li>
@@ -294,13 +295,13 @@ function Help({ onClose }) {
 
           {/* 피드백 */}
           <section>
-            <h3 className="text-lg font-semibold text-bread-600 mb-3">
+            <h3 className="text-lg font-semibold text-ink mb-3">
               {getContent(t, 'help.feedback.title', DEFAULT_CONTENT.feedback.title)}
             </h3>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-ink-muted">
               {getContent(t, 'help.feedback.desc', DEFAULT_CONTENT.feedback.desc)}
             </p>
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-sm text-ink-muted mt-2">
               {getContent(t, 'help.feedback.version', DEFAULT_CONTENT.feedback.version)}
             </p>
           </section>

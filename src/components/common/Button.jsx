@@ -10,13 +10,14 @@ function Button({
   fullWidth = false,
   ...props
 }) {
-  const baseClasses = 'font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1'
-  
+  const baseClasses = 'font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1'
+
+  // primary(CTA)만 brand(amber). secondary/outline은 뉴트럴로 de-amber. danger는 의미색 유지.
   const variantClasses = {
-    primary: 'bg-bread-500 text-white hover:bg-bread-600 focus:ring-bread-500',
-    secondary: 'bg-bread-200 text-bread-700 hover:bg-bread-300 focus:ring-bread-400',
-    outline: 'border-2 border-bread-500 text-bread-600 hover:bg-bread-50 focus:ring-bread-500',
-    danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500'
+    primary: 'bg-brand-500 text-white shadow-sm hover:bg-brand-600 focus:ring-brand-500',
+    secondary: 'bg-surface-muted text-ink border border-line hover:bg-line focus:ring-brand-500',
+    outline: 'border border-line text-ink-muted hover:bg-surface-muted hover:text-ink focus:ring-brand-500',
+    danger: 'bg-danger text-white hover:bg-rose-600 focus:ring-danger'
   }
   
   const sizeClasses = {

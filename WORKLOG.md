@@ -8,12 +8,17 @@
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
 
-**현재 작업: UI/UX 개선 Phase 1 (Codex gpt-5.5와 상의하며 진행 중)**
+**현재 작업: UI/UX 개선 Phase 1 - de-amber 전면 적용 + 좌우표 통합 완료 (미커밋)**
 
-- 브랜치: `fix/uiux-phase1` (커밋 `8c0d810` = Phase 1a, **로컬만, 아직 push/PR 안 함**)
-- Phase 1a(완료): 뉴트럴 팔레트 토큰 + 홈 히어로 화이트화
-- **다음 할 일 순서: #4 필터 접기 -> #5 새레시피 빈시작 -> #6 용어통일 -> #3 좌우표 통합**
-- Phase 1 전부 끝나면: 전체 검증(typecheck/test/build) -> Codex 최종 리뷰 -> 하나의 PR로 main 머지
+- 브랜치: `fix/uiux-phase1`. 커밋 `8c0d810`(Phase 1a) 이후 **46개 파일 수정, 아직 커밋/push 안 함**.
+- 근본원인 확정: 뉴트럴 팔레트 토큰을 tailwind에 정의만 하고 화면에 미적용(gray 879회·bread 잔존). "안 바뀐" 진짜 이유.
+- **Phase 1b(완료, 2026-07-04):**
+  - de-amber 전면: 기반 4파일(index.css/.input·.btn-secondary·.card, Input.jsx, Button.jsx, App.tsx) 직접 + 파일별 병렬 워크플로우 12그룹(색상 1196건, 이모지→lucide 19건). 휴지=뉴트럴, 앰버는 CTA/활성/포커스링/핵심숫자만. 잔존 bread는 전부 정당한 KEEP(선택카드/포커스링/카운트배지) 확인.
+  - #3 좌우표 통합(AdvancedDashboard): `isConverted=|배수-1|>=0.0001`. ×1이면 원본표 단일 전체폭+조용한 힌트배너(surface-muted), 변환 시 2열 복원. 데스크톱/모바일/×2 스크린샷 검증 완료.
+  - 검증 3종 통과: typecheck 0 / test 164 / build(PWA 포함) OK.
+- **남은 Phase 1 항목(미착수): #4 필터 접기 -> #5 새레시피 빈시작 -> #6 용어통일** (기존 계획 유지).
+- **UI 후속(선택):** 데이터맵 이모지(PHASE_META.icon 📦, CATEGORY_ICONS 🍞🎂, 공정칩 ⏱🌡) → lucide 통일은 데이터구조 리팩터 필요라 보류. 설정 탭 섹션헤더 이모지 일부 잔존.
+- 다음: 사용자 확인 후 커밋(무관파일 .claude/settings.local.json·DEPLOYMENT_GUIDE.md·diag-*.py 제외) -> #4~#6 -> Codex 리뷰 -> PR.
 
 ### 다음 4개 항목 상세 + Codex(gpt-5.5) 확정 접근
 1. **#4 필터 접기** (src/components/recipe/FilterControls.tsx, RecipeListPage.tsx)

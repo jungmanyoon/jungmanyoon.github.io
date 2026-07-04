@@ -269,7 +269,7 @@ const ScreenCapture = () => {
       {/* 캡처 중 표시 */}
       {isCapturing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
-          <div className="bg-white p-4 rounded-lg shadow-lg">
+          <div className="bg-surface-paper p-4 rounded-lg shadow-lg">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-2 text-sm">캡처 중...</p>
           </div>
@@ -279,7 +279,7 @@ const ScreenCapture = () => {
       {/* 저장 다이얼로그 */}
       {showSaveDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+          <div className="bg-surface-paper p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold mb-4">캡처한 이미지 저장</h3>
             
             <div className="space-y-4">
@@ -304,7 +304,7 @@ const ScreenCapture = () => {
               
               {/* 사용자 정의 파일명 */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-ink-muted">
                   또는 파일명 직접 입력:
                 </label>
                 <div className="flex gap-2">
@@ -317,7 +317,7 @@ const ScreenCapture = () => {
                         saveFile(customFileName.trim());
                       }
                     }}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="파일명 입력"
                   />
                   <button
@@ -341,7 +341,7 @@ const ScreenCapture = () => {
                   setCapturedBlob(null);
                   setCustomFileName('레시피');
                 }}
-                className="w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                className="w-full px-4 py-2 bg-gray-300 text-ink-muted rounded-lg hover:bg-gray-400 transition-colors"
               >
                 취소 (ESC)
               </button>

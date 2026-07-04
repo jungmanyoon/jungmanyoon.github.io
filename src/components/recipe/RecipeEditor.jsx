@@ -110,13 +110,13 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
           />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-ink-muted mb-1">
               {t('components.recipeEditor.category')}
             </label>
             <select
               value={formData.category}
               onChange={(e) => handleInputChange('category', e.target.value)}
-              className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+              className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
             >
               <option value="bread">{t('components.recipeEditor.categories.bread')}</option>
               <option value="cake">{t('components.recipeEditor.categories.cake')}</option>
@@ -127,13 +127,13 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
         </div>
 
         <div className="mt-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-ink-muted mb-1">
             {t('components.recipeEditor.method')}
           </label>
           <select
             value={formData.method}
             onChange={(e) => handleInputChange('method', e.target.value)}
-            className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+            className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
           >
             <option value="straight">{t('components.recipeEditor.methods.straight')}</option>
             <option value="sponge">{t('components.recipeEditor.methods.sponge')}</option>
@@ -145,14 +145,14 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
         </div>
 
         <div className="mt-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-ink-muted mb-1">
             {t('components.recipeEditor.description')}
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
             rows={2}
-            className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+            className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
             placeholder={t('components.recipeEditor.descriptionPlaceholder')}
           />
         </div>
@@ -171,7 +171,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
         <div className="space-y-2">
           {(formData.instructions || []).map((instruction, index) => (
             <div key={index} className="flex gap-2">
-              <span className="text-bread-600 font-medium">{index + 1}.</span>
+              <span className="text-ink-muted font-medium">{index + 1}.</span>
               <input
                 value={instruction}
                 onChange={(e) => {
@@ -179,7 +179,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
                   newInstructions[index] = e.target.value
                   handleInputChange('instructions', newInstructions)
                 }}
-                className="flex-1 px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+                className="flex-1 px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
               />
               <Button
                 variant="danger"
@@ -211,7 +211,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
           value={formData.notes}
           onChange={(e) => handleInputChange('notes', e.target.value)}
           rows={3}
-          className="w-full px-3 py-2 border border-bread-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+          className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
           placeholder={t('components.recipeEditor.notesPlaceholder')}
         />
       </div>

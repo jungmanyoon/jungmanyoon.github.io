@@ -12,6 +12,8 @@ interface FilterControlsProps {
   onClearFilters: () => void
   availableTags?: string[]
   className?: string
+  /** 툴바 좌측에 인라인으로 배치할 슬롯(검색창 등) - 세로 공간 절약 */
+  children?: React.ReactNode
 }
 
 const FilterControls: React.FC<FilterControlsProps> = ({
@@ -21,7 +23,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   onSortChange,
   onClearFilters,
   availableTags = [],
-  className = ''
+  className = '',
+  children
 }) => {
   const { t } = useTranslation()
 
@@ -124,10 +127,11 @@ const FilterControls: React.FC<FilterControlsProps> = ({
     <div
       ref={containerRef}
       onKeyDown={handleDropdownKeyDown}
-      className={`bg-surface-paper border border-line rounded-lg p-3 sm:p-4 ${className}`}
+      className={className}
     >
-      {/* 상단 행: 필터 토글(항상 접힘) + 정렬(항상 표시) + 초기화 */}
-      <div className="flex flex-wrap items-center gap-3">
+      {/* 한 줄 툴바: 검색(children) + 필터 토글 + 정렬 + 초기화 (세로 공간 절약) */}
+      <div className="flex flex-wrap items-center gap-2">
+        {children && <div className="w-full sm:w-auto sm:flex-1 min-w-0">{children}</div>}
         {/* 필터 토글 버튼 - 숨겨진 상세 필터 개수 배지 */}
         <button
           type="button"
@@ -155,8 +159,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({
         </button>
 
         {/* Sort Control (항상 표시) */}
-        <div className="ml-auto flex items-center gap-2">
-          <label htmlFor="sort-select" className="text-sm text-ink-muted flex-none">
+        <div className="flex items-center gap-2">
+          <label htmlFor="sort-select" className="hidden sm:inline text-sm text-ink-muted flex-none">
             {t('filter.sortBy')}:
           </label>
           <select
@@ -204,7 +208,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
 
       {/* 접히는 상세 필터 패널 (기본 접힘) */}
       {isFilterOpen && (
-        <div id="filter-panel" className="mt-3 pt-3 border-t border-line-soft flex flex-wrap items-center gap-2 sm:gap-3">
+        <div id="filter-panel" className="mt-2 pt-2 border-t border-line-soft flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Difficulty Filter */}
           <div className="relative">
             <button
@@ -406,7 +410,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
 
       {/* Active Filters Display */}
       {activeFilterCount > 0 && (
-        <div className="mt-3 pt-3 border-t border-line-soft">
+        <div className="mt-2 pt-2 border-t border-line-soft">
           <div className="flex flex-wrap gap-2">
             {filters.difficulty && filters.difficulty.length > 0 && (
               <div className="inline-flex items-center gap-1 px-2 py-1 bg-surface-muted text-ink-muted text-xs rounded">

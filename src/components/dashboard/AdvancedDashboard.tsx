@@ -32,6 +32,7 @@ import {
   Printer, CheckSquare, Square, Timer, Play
 } from 'lucide-react';
 import TimerManager from '@/components/pwa/TimerManager.jsx';
+import BakingMode from '@/components/pwa/BakingMode';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import { SourceType } from '@/types/recipe.types';
 
@@ -2002,6 +2003,7 @@ const AdvancedDashboard: React.FC = () => {
   const [duplicateModal, setDuplicateModal] = useState<{ open: boolean; existingId: string; name: string }>({ open: false, existingId: '', name: '' });
   // 실행 모드(굽기) 상태 - 레시피에 저장하지 않는 ephemeral UI 상태
   const [isTimerOpen, setIsTimerOpen] = useState(false);            // C3 타이머 모달
+  const [isBakingMode, setIsBakingMode] = useState(false);          // H1 전용 베이킹 모드(전체화면 단계뷰)
   const [timerSeed, setTimerSeed] = useState<{ name: string; minutes: number } | null>(null); // C3 공정칩 -> 타이머 프리필
   const [completedProcesses, setCompletedProcesses] = useState<Set<string>>(new Set()); // C1 공정 완료 체크
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());  // C2 계량 체크리스트
@@ -2243,7 +2245,7 @@ const AdvancedDashboard: React.FC = () => {
             </div>
           )}
           {!isPanLinked && (
-            <div className="flex gap-1 flex-wrap">
+            <div className="flex gap-1 flex-wrap print-hide">
               {[0.25, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5].map(m => (
                 <button
                   key={m}
@@ -2846,7 +2848,7 @@ const AdvancedDashboard: React.FC = () => {
                   <span className="font-semibold text-ink-muted flex items-center gap-1 text-xs">
                     <Droplets className="w-3 h-3 flex-shrink-0" />{t('advDashboard.originalRecipe')}
                   </span>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 print-hide">
                     {/* 가독 최소치 text-xs로 상향 + 모바일 터치영역(py) 확보 */}
                     <button onClick={() => setIsBulkInputOpen(true)} className="text-xs text-blue-600 hover:text-blue-700 font-medium py-1.5 lg:py-0">📋 {t('advDashboard.bulkInput')}</button>
                     <button onClick={addIngredient} className="text-xs text-amber-600 hover:text-amber-700 font-medium py-1.5 lg:py-0">{t('advDashboard.addIngredient')}</button>
@@ -2944,7 +2946,7 @@ const AdvancedDashboard: React.FC = () => {
                                     <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
                                       className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm font-semibold text-ink" />
                                   </td>
-                                  <td className="px-0.5">
+                                  <td className="px-0.5 print-hide">
                                     <button onClick={() => removeIngredient(ing.id)} className="p-2 -m-2 text-ink-subtle hover:text-danger" title={t('advDashboard.removeIngredient', { defaultValue: '재료 삭제' })}>
                                       <X className="w-3.5 h-3.5" />
                                     </button>
@@ -3078,7 +3080,18 @@ const AdvancedDashboard: React.FC = () => {
                   </span>
                 )}
               </span>
-              <button onClick={addProcess} className="text-xs text-amber-600 hover:text-amber-700 font-medium print-hide">{t('advDashboard.addProcess')}</button>
+              <div className="flex items-center gap-3 print-hide">
+                {/* H1: 전용 베이킹 모드 진입 (공정이 있을 때만) */}
+                <button
+                  onClick={() => setIsBakingMode(true)}
+                  disabled={processes.length === 0}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                  title={t('advDashboard.bakingMode.title', { defaultValue: '베이킹 모드' })}
+                >
+                  <Flame className="w-3.5 h-3.5" />{t('advDashboard.bakingMode.title', { defaultValue: '베이킹 모드' })}
+                </button>
+                <button onClick={addProcess} className="text-xs text-amber-600 hover:text-amber-700 font-medium">{t('advDashboard.addProcess')}</button>
+              </div>
             </div>
             <div className="flex-1 overflow-auto px-2 py-1.5">
               <div className="flex flex-col gap-1.5 lg:flex-row lg:flex-wrap lg:items-start">
@@ -3237,7 +3250,7 @@ const AdvancedDashboard: React.FC = () => {
                         <ThermometerSun className="w-3 h-3" />
                       </button>
                     )}
-                    <button onClick={() => removeProcess(proc.id)} className="p-2 -m-2 text-ink-subtle hover:text-danger opacity-100 lg:opacity-0 lg:group-hover:opacity-100" title={t('advDashboard.removeProcess', { defaultValue: '공정 삭제' })}>
+                    <button onClick={() => removeProcess(proc.id)} className="p-2 -m-2 text-ink-subtle hover:text-danger opacity-100 lg:opacity-0 lg:group-hover:opacity-100 print-hide" title={t('advDashboard.removeProcess', { defaultValue: '공정 삭제' })}>
                       <X className="w-3.5 h-3.5" />
                     </button>
                     {/* 너비 조절 핸들 (데스크톱 전용 - 모바일 세로 1열에선 불필요) */}
@@ -3308,6 +3321,17 @@ const AdvancedDashboard: React.FC = () => {
         isOpen={isTimerOpen}
         onClose={() => setIsTimerOpen(false)}
         seed={timerSeed}
+      />
+
+      {/* H1: 전용 베이킹 모드 (전체화면 큰 글씨 단계뷰 + Wake Lock) */}
+      <BakingMode
+        isOpen={isBakingMode}
+        onClose={() => setIsBakingMode(false)}
+        steps={processes}
+        recipeName={productName}
+        translateStep={translateProcessStep}
+        completed={completedProcesses}
+        onToggleDone={toggleProcessDone}
       />
 
       {/* H5: 중복 이름 저장 확인 (덮어쓰기 / 사본으로 / 취소) */}

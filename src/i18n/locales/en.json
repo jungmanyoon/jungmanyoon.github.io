@@ -2360,6 +2360,17 @@
     "saveAsCopy": "Save as copy",
     "copySuffix": "(copy)",
     "processPhase": "Process phase",
+    "bakingMode": {
+      "title": "Baking Mode",
+      "step": "Step",
+      "doneN": "{{n}} done",
+      "prev": "Previous",
+      "next": "Next",
+      "finish": "Finish",
+      "markDone": "Mark done",
+      "undone": "Undo",
+      "noSteps": "No steps yet."
+    },
     "basicInfo": "Basic Info",
     "prefermentIngredients": "Preferment",
     "mainDoughIngredients": "Main Dough",

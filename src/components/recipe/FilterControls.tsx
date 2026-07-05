@@ -236,7 +236,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               bg-surface-paper border border-line rounded-lg shadow-lg
               ${openDropdown === 'difficulty' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
-              z-10
+              z-30
             `}>
               <div className="p-2 space-y-1">
                 {difficultyOptions.map(({ value, labelKey }) => (
@@ -292,7 +292,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               bg-surface-paper border border-line rounded-lg shadow-lg
               ${openDropdown === 'timeRange' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
-              z-10
+              z-30
             `}>
               <div className="p-2 space-y-1">
                 <button
@@ -374,7 +374,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 bg-surface-paper border border-line rounded-lg shadow-lg
                 ${openDropdown === 'tags' ? 'opacity-100 visible' : 'opacity-0 invisible'}
                 transition-all duration-200
-                z-10
+                z-30
                 max-h-64 overflow-y-auto
               `}>
                 <div className="p-2 space-y-1">

@@ -47,9 +47,10 @@ export const RECIPE_CATEGORY_META: Record<RecipeCategory, RecipeCategoryMeta> = 
   },
   cookie: {
     labelKey: 'category.cookie',
+    // 빵(amber)과 구분되도록 구운 비스킷 톤(stone/tan)으로 분리 - 웜톤 군집서 명확히 차별
     Icon: Cookie,
-    gradient: 'bg-gradient-to-br from-yellow-100 to-amber-50',
-    iconTint: 'text-yellow-700',
+    gradient: 'bg-gradient-to-br from-stone-200 to-amber-50',
+    iconTint: 'text-stone-600',
   },
   dessert: {
     labelKey: 'category.dessert',

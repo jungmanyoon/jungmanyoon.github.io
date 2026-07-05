@@ -124,36 +124,39 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
 
   return (
     <div className="max-w-7xl mx-auto px-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-ink">{t('components.recipeList.myRecipes')}</h2>
+      {/* 헤더 툴바: (좌) 제목 + 카테고리 칩(주요 필터) / (우) 새 레시피 액션.
+          세 줄로 흩어지지 않게 한 툴바로 묶고, 좁은 화면에선 자연스럽게 줄바꿈. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-4">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <h2 className="text-xl font-bold text-ink flex-none">{t('components.recipeList.myRecipes')}</h2>
+          {/* 카테고리 탭 - 주요 필터 */}
+          <div className="flex gap-2 overflow-x-auto pb-1 min-w-0">
+            <CategoryTab
+              categoryKey="all"
+              categoryName={t('components.recipeList.allCategory')}
+              count={categoryCounts.all}
+              isSelected={selectedCategory === 'all'}
+              onClick={() => handleCategorySelect('all')}
+            />
+            {Object.entries(categorizedRecipes).map(([key, category]) => (
+              <CategoryTab
+                key={key}
+                categoryKey={key}
+                categoryName={category.name}
+                count={categoryCounts[key]}
+                isSelected={selectedCategory === key}
+                onClick={() => handleCategorySelect(key)}
+              />
+            ))}
+          </div>
+        </div>
         <Button
           onClick={handleNewRecipe}
-          className="flex items-center gap-2 px-4 py-2"
+          className="flex items-center gap-2 px-4 py-2 flex-none"
         >
           <Plus className="w-4 h-4" />
           {t('components.recipeList.newRecipe')}
         </Button>
-      </div>
-
-      {/* 카테고리 탭 - 최적화된 컴포넌트 사용 */}
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-        <CategoryTab
-          categoryKey="all"
-          categoryName={t('components.recipeList.allCategory')}
-          count={categoryCounts.all}
-          isSelected={selectedCategory === 'all'}
-          onClick={() => handleCategorySelect('all')}
-        />
-        {Object.entries(categorizedRecipes).map(([key, category]) => (
-          <CategoryTab
-            key={key}
-            categoryKey={key}
-            categoryName={category.name}
-            count={categoryCounts[key]}
-            isSelected={selectedCategory === key}
-            onClick={() => handleCategorySelect(key)}
-          />
-        ))}
       </div>
 
       {displayRecipes.length === 0 ? (

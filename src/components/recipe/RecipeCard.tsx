@@ -4,26 +4,19 @@ import { Recipe, BreadMethod, SourceType } from '@/types/recipe.types'
 import { Pencil, Youtube, BookOpen, Globe, User, GraduationCap } from 'lucide-react'
 import { toast } from '@utils/toast'
 import { useLocalization } from '@/hooks/useLocalization'
+import { getCategoryMeta } from '@/constants/recipeMeta'
+import CategoryHeaderBand from './CategoryHeaderBand'
 
 interface RecipeCardProps {
   recipe: Recipe
   onSelect: () => void
-  onDelete: () => void
+  onDelete?: () => void
   onEdit?: () => void
   onRestore?: (recipe: Recipe) => void
   compact?: boolean
+  /** 읽기전용 컨텍스트(예: 홈 최근 레시피): 편집/삭제 액션 버튼 숨김 */
+  hideActions?: boolean
 }
-
-// 카테고리 아이콘 상수로 분리
-const CATEGORY_ICONS: Record<string, string> = {
-  bread: '🍞',
-  cake: '🍰',
-  cookie: '🍪',
-  pastry: '🥐',
-  dessert: '🍮',
-  confectionery: '🍬',
-  savory: '🥖'
-} as const
 
 // 제법 키 매핑 (i18n 키로 변환)
 const METHOD_KEYS: Record<BreadMethod, string> = {
@@ -36,17 +29,6 @@ const METHOD_KEYS: Record<BreadMethod, string> = {
   overnight: 'method.retard',
   'no-time': 'method.straight',
   sourdough: 'productType.sourdough'
-} as const
-
-// 카테고리 키 매핑 (i18n 키로 변환)
-const CATEGORY_KEYS: Record<string, string> = {
-  bread: 'dashboard.bread',
-  cake: 'dashboard.cake',
-  cookie: 'productType.cookie',
-  pastry: 'productType.danish',
-  dessert: 'dashboard.cake',
-  confectionery: 'dashboard.cake',
-  savory: 'dashboard.bread'
 } as const
 
 // 출처 타입별 아이콘 및 색상
@@ -67,16 +49,14 @@ const RecipeCard = memo<RecipeCardProps>(({
   onDelete,
   onEdit,
   onRestore,
-  compact = false
+  compact = false,
+  hideActions = false
 }) => {
   const { t } = useTranslation()
   const { getLocalizedSourceName, getLocalizedRecipeName } = useLocalization()
 
-  // 카테고리 아이콘 메모이제이션
-  const categoryIcon = useMemo(() =>
-    CATEGORY_ICONS[recipe.category] || '🍞',
-    [recipe.category]
-  )
+  // 카테고리 메타 (SSOT) - 아이콘/라벨키 단일 소스
+  const categoryMeta = useMemo(() => getCategoryMeta(recipe.category), [recipe.category])
 
   // 제법 이름 메모이제이션 (method가 객체일 수 있음)
   const methodName = useMemo(() => {
@@ -101,11 +81,8 @@ const RecipeCard = memo<RecipeCardProps>(({
     return !!methodType && methodType !== 'straight'
   }, [recipe.productType, recipe.method])
 
-  // 카테고리 이름 메모이제이션
-  const categoryName = useMemo(() => {
-    const key = CATEGORY_KEYS[recipe.category] || 'dashboard.bread';
-    return t(key);
-  }, [recipe.category, t])
+  // 카테고리 이름 메모이제이션 (SSOT labelKey)
+  const categoryName = useMemo(() => t(categoryMeta.labelKey), [categoryMeta, t])
 
   // 출처 정보 메모이제이션
   const sourceInfo = useMemo(() => {
@@ -132,7 +109,7 @@ const RecipeCard = memo<RecipeCardProps>(({
     e.stopPropagation()
     const recipeToRestore = recipe
 
-    onDelete()
+    onDelete?.()
     toast.success(t('message.recipeDeleted'), {
       duration: 5000,
       action: onRestore ? {
@@ -161,20 +138,19 @@ const RecipeCard = memo<RecipeCardProps>(({
   if (compact) {
     return (
       <div
-        className="relative bg-surface-paper border border-line rounded-lg p-3 hover:shadow-md hover:border-line transition-all"
+        className="relative bg-surface-paper border border-line rounded-lg hover:shadow-md hover:border-line transition-all"
       >
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-lg flex-shrink-0" aria-label={categoryName}>
-              {categoryIcon}
-            </span>
+        {/* H2: 카테고리 헤더밴드 (아이콘형) */}
+        <CategoryHeaderBand category={recipe.category} size="sm" className="rounded-t-lg" />
+        <div className="p-3">
+          <div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-base text-ink">
                 {/* 카드 전체를 클릭 영역으로 확장하는 stretched button (중첩 인터랙티브 해소) */}
                 <button
                   type="button"
                   onClick={handleSelect}
-                  aria-label={getLocalizedRecipeName(recipe)}
+                  aria-label={`${getLocalizedRecipeName(recipe)} (${categoryName})`}
                   className="block w-full truncate text-left cursor-pointer rounded-lg after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                 >
                   {getLocalizedRecipeName(recipe)}
@@ -187,32 +163,36 @@ const RecipeCard = memo<RecipeCardProps>(({
                 </div>
               )}
             </div>
-          </div>
-          <div className="flex gap-1 ml-2 relative z-10">
-            {onEdit && (
-              <button
-                onClick={handleEdit}
-                className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
-                aria-label={t('recipeList.editRecipe')}
-                type="button"
-              >
-                <Pencil size={14} />
-              </button>
+            {!hideActions && (
+              <div className="flex gap-1 ml-2 relative z-10">
+                {onEdit && (
+                  <button
+                    onClick={handleEdit}
+                    className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
+                    aria-label={t('recipeList.editRecipe')}
+                    type="button"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={handleDelete}
+                    className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
+                    aria-label={t('recipeList.deleteRecipe')}
+                    type="button"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
             )}
-            <button
-              onClick={handleDelete}
-              className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
-              aria-label={t('recipeList.deleteRecipe')}
-              type="button"
-            >
-              ×
-            </button>
           </div>
-        </div>
 
-        <div className="flex justify-between items-center text-xs text-ink-subtle">
-          {showMethod ? <span>{methodName}</span> : <span />}
-          <span>{t('recipeList.ingredientCount', { count: ingredientCount })}</span>
+          <div className="flex justify-between items-center text-xs text-ink-subtle">
+            {showMethod ? <span>{methodName}</span> : <span />}
+            <span>{t('recipeList.ingredientCount', { count: ingredientCount })}</span>
+          </div>
         </div>
       </div>
     )
@@ -223,6 +203,8 @@ const RecipeCard = memo<RecipeCardProps>(({
     <div
       className="card relative hover:shadow-lg transition-shadow"
     >
+      {/* H2: 카테고리 헤더밴드 (아이콘형) - .card 의 p-4 를 상쇄해 풀블리드 */}
+      <CategoryHeaderBand category={recipe.category} size="md" className="-mx-4 -mt-4 mb-3 rounded-t-xl" />
       <div className="flex justify-between items-start mb-2">
         <div className="flex-1 min-w-0">
           {/* 모바일: text-base(16px), 데스크톱: text-lg(18px) 유지 + 긴 이름 줄바꿈 처리 */}
@@ -231,7 +213,7 @@ const RecipeCard = memo<RecipeCardProps>(({
             <button
               type="button"
               onClick={handleSelect}
-              aria-label={getLocalizedRecipeName(recipe)}
+              aria-label={`${getLocalizedRecipeName(recipe)} (${categoryName})`}
               className="block w-full text-left break-words cursor-pointer rounded-lg after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             >
               {getLocalizedRecipeName(recipe)}
@@ -244,26 +226,30 @@ const RecipeCard = memo<RecipeCardProps>(({
             </div>
           )}
         </div>
-        <div className="flex gap-1 ml-2 relative z-10">
-          {onEdit && (
-            <button
-              onClick={handleEdit}
-              className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
-              aria-label={t('recipeList.editRecipe')}
-              type="button"
-            >
-              <Pencil size={16} />
-            </button>
-          )}
-          <button
-            onClick={handleDelete}
-            className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
-            aria-label={t('recipeList.deleteRecipe')}
-            type="button"
-          >
-            ×
-          </button>
-        </div>
+        {!hideActions && (
+          <div className="flex gap-1 ml-2 relative z-10">
+            {onEdit && (
+              <button
+                onClick={handleEdit}
+                className="text-ink-disabled hover:text-ink-muted transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
+                aria-label={t('recipeList.editRecipe')}
+                type="button"
+              >
+                <Pencil size={16} />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={handleDelete}
+                className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
+                aria-label={t('recipeList.deleteRecipe')}
+                type="button"
+              >
+                ×
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2 mb-3">

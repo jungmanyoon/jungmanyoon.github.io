@@ -232,6 +232,7 @@ export interface RecipeYield {
 export interface ProcessStep {
   id: string;
   order: number;
+  phase?: PhaseType; // 공정-단계 타임라인 그룹핑용 (H4, optional - 미지정 시 본반죽 취급)
   action?: ProcessAction;
   instruction?: string; // 간단한 텍스트 설명
   instructionEn?: string; // English instruction

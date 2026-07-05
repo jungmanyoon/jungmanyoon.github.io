@@ -32,6 +32,7 @@ import {
   Printer, CheckSquare, Square, Timer, Play
 } from 'lucide-react';
 import TimerManager from '@/components/pwa/TimerManager.jsx';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { SourceType } from '@/types/recipe.types';
 
 // ============================================
@@ -88,6 +89,7 @@ interface ProcessStep {
   description: string;
   time?: number;
   temp?: number;
+  phase?: string;  // H4: 공정-단계 타임라인 그룹핑 ('tangzhong','preferment','main','topping' 등)
 }
 
 // ============================================
@@ -615,6 +617,7 @@ const AdvancedDashboard: React.FC = () => {
           description: step.instruction || step.action || step.description || '',
           time: step.duration?.target || step.time,
           temp: step.temperature?.target || step.temp,
+          phase: step.phase || 'main',  // H4: 공정 단계(미지정 시 본반죽)
         }));
         if (loadedProcesses.length > 0) {
           setProcesses(loadedProcesses);
@@ -956,6 +959,27 @@ const AdvancedDashboard: React.FC = () => {
 
   // 단계가 2개 이상인지 (구분선 표시 여부 결정)
   const hasMultiplePhases = ingredientsByPhase.length > 1;
+
+  // H4: 공정(steps)을 재료와 동일한 phase 축으로 그룹화 - 타임라인 표시용.
+  // 재료 phaseOrder 와 동일 순서라 재료표/공정 패널이 같은 흐름으로 정렬된다.
+  const processesByPhase = useMemo(() => {
+    const phaseOrder: Record<string, number> = {
+      tangzhong: 0, preferment: 1, poolish: 1, biga: 1, sponge: 1, levain: 1, autolyse: 2,
+      main: 10, topping: 20, filling: 21, frosting: 22, glaze: 23, other: 99
+    };
+    const grouped = processes.reduce((acc, p) => {
+      const phase = p.phase || 'main';
+      if (!acc[phase]) acc[phase] = [];
+      acc[phase].push(p);
+      return acc;
+    }, {} as Record<string, ProcessStep[]>);
+    return Object.entries(grouped)
+      .sort(([a], [b]) => (phaseOrder[a] ?? 50) - (phaseOrder[b] ?? 50))
+      .map(([phase, items]) => ({ phase, items }));
+  }, [processes]);
+
+  // 공정 단계가 2개 이상일 때만 타임라인 구분선 노출 (단일 단계 = 기존 flat 동작 유지)
+  const hasMultipleProcessPhases = processesByPhase.length > 1;
 
   const hydration = useMemo(() =>
     flourTotal === 0 ? 0 : Math.round(((liquidTotal + wetOtherMoisture) / flourTotal) * 1000) / 10,
@@ -1629,7 +1653,8 @@ const AdvancedDashboard: React.FC = () => {
   }, [resetPanSettings, resetSpecificVolume, resetOvenSettings, pans, isPanLinked, convertedProduct, oven, multiplier, showUndoToast]);
 
   // 레시피 저장 (실제 저장 로직)
-  const saveRecipeData = useCallback((overwriteId?: string) => {
+  // options.asCopy: '사본으로 저장' - currentRecipe 폴백을 끊어 강제로 신규 생성(원본 보존)
+  const saveRecipeData = useCallback((overwriteId?: string, options?: { asCopy?: boolean }) => {
     // 저장할 재료 데이터 - 원래 레시피 그대로 저장 (변환값 아님!)
     const ingredientsToSave = ingredients.map((ing, idx) => ({
       id: ing.id || `ing-${Date.now()}-${idx}`,
@@ -1653,6 +1678,7 @@ const AdvancedDashboard: React.FC = () => {
       instruction: p.description,
       time: p.time,
       temp: p.temp,
+      phase: p.phase || 'main',  // H4: 공정 단계 왕복 보존
     }));
 
     // 저장할 오븐 설정 (로드 형식과 일치하도록)
@@ -1722,18 +1748,25 @@ const AdvancedDashboard: React.FC = () => {
     };
 
     // 덮어쓰기 또는 현재 레시피 업데이트
-    const targetId = overwriteId || currentRecipe?.id;
+    // asCopy 면 currentRecipe 폴백을 끊어 강제 신규(원본 덮어쓰기 방지)
+    const targetId = options?.asCopy ? undefined : (overwriteId || currentRecipe?.id);
     if (targetId) {
       updateRecipe(targetId, recipeData as any);
       addToast({ type: 'success', message: t('advDashboard.recipeUpdated', { name: productName }) });
     } else {
+      // 사본으로 저장: 이름 충돌(모달 재발) 방지를 위해 접미사 부여
+      const copyName = options?.asCopy
+        ? `${recipeData.name} ${t('advDashboard.copySuffix')}`.trim()
+        : recipeData.name;
       const newRecipe = {
         ...recipeData,
+        name: copyName,
+        nameKo: options?.asCopy && recipeData.nameKo ? `${recipeData.nameKo} ${t('advDashboard.copySuffix')}`.trim() : recipeData.nameKo,
         id: `recipe-${Date.now()}`,
         createdAt: new Date(),
       };
       addRecipe(newRecipe as any);
-      addToast({ type: 'success', message: t('advDashboard.recipeSaved', { name: productName }) });
+      addToast({ type: 'success', message: t('advDashboard.recipeSaved', { name: copyName }) });
     }
   }, [productName, productType, source, pans, oven, ingredients, processes, memo, convertedProduct, originalProduct, method, originalPan, multiplier, isPanLinked, yieldStageSelection, currentRecipe, defaultPanType, defaultCategory, addRecipe, updateRecipe, addToast, t]);
 
@@ -1747,21 +1780,13 @@ const AdvancedDashboard: React.FC = () => {
     );
 
     if (existingRecipe) {
-      // 중복 이름 발견 - 사용자에게 선택지 제공
-      const choice = window.confirm(
-        t('advDashboard.duplicateRecipeConfirm', { name: trimmedName })
-      );
-
-      if (choice) {
-        // 덮어쓰기 선택
-        saveRecipeData(existingRecipe.id);
-      }
-      // 취소 선택 시 아무것도 하지 않음
+      // 중복 이름 발견 - ConfirmModal 로 3지선다(덮어쓰기/사본으로/취소) 제공
+      setDuplicateModal({ open: true, existingId: existingRecipe.id, name: trimmedName });
     } else {
       // 중복 없음 - 바로 저장
       saveRecipeData();
     }
-  }, [productName, recipes, currentRecipe?.id, saveRecipeData]);
+  }, [productName, recipes, currentRecipe?.id, saveRecipeData, t]);
 
   // 레시피 내보내기 (JSON)
   const handleExportRecipe = useCallback(() => {
@@ -1973,6 +1998,8 @@ const AdvancedDashboard: React.FC = () => {
 
   // 일괄 입력 모달 상태
   const [isBulkInputOpen, setIsBulkInputOpen] = useState(false);
+  // H5: 중복 이름 저장 확인 모달 (덮어쓰기/사본으로/취소)
+  const [duplicateModal, setDuplicateModal] = useState<{ open: boolean; existingId: string; name: string }>({ open: false, existingId: '', name: '' });
   // 실행 모드(굽기) 상태 - 레시피에 저장하지 않는 ephemeral UI 상태
   const [isTimerOpen, setIsTimerOpen] = useState(false);            // C3 타이머 모달
   const [timerSeed, setTimerSeed] = useState<{ name: string; minutes: number } | null>(null); // C3 공정칩 -> 타이머 프리필
@@ -3051,7 +3078,22 @@ const AdvancedDashboard: React.FC = () => {
             </div>
             <div className="flex-1 overflow-auto px-2 py-1.5">
               <div className="flex flex-col gap-1.5 lg:flex-row lg:flex-wrap lg:items-start">
-                {processes.map((proc, idx) => {
+                {/* H4: 공정을 phase 그룹(타임라인)으로 렌더. 단일 phase면 구분선 없이 기존 flat 동작. */}
+                {processesByPhase.map((group) => {
+                  const groupMeta = PHASE_META[group.phase] || PHASE_META.other;
+                  return (
+                  <React.Fragment key={group.phase}>
+                    {hasMultipleProcessPhases && (
+                      <div className={`w-full lg:basis-full flex items-center gap-1 mt-1 first:mt-0 px-1.5 py-0.5 rounded text-[11px] font-semibold ${groupMeta.bgColor} ${groupMeta.textColor}`}>
+                        <span aria-hidden="true">{groupMeta.icon}</span>
+                        <span>{t(groupMeta.labelKey)}</span>
+                      </div>
+                    )}
+                    {group.items.map((proc) => {
+                  const idx = processes.findIndex(p => p.id === proc.id);
+                  const availablePhases = productType === 'bread'
+                    ? ['main', 'preferment', 'tangzhong', 'autolyse', 'topping', 'other']
+                    : ['main', 'filling', 'frosting', 'topping', 'glaze', 'other'];
                   const itemSize = getProcessItemSize(proc.id);
                   const displayText = editingProcessId === proc.id ? proc.description : translateProcessStep(proc.description || '');
                   const isDone = completedProcesses.has(proc.id);
@@ -3091,15 +3133,35 @@ const AdvancedDashboard: React.FC = () => {
                     </div>
                     <span className="text-ink-disabled font-mono text-xs w-4 flex-shrink-0">{idx + 1}.</span>
                     {editingProcessId === proc.id ? (
-                      <textarea
-                        value={displayText}
-                        onChange={(e) => updateProcess(proc.id, 'description', e.target.value)}
-                        onBlur={() => setEditingProcessId(null)}
-                        autoFocus
-                        className="bg-transparent border-0 p-0 focus:outline-none text-sm flex-1 min-w-0 resize-none leading-relaxed"
-                        placeholder={t('advDashboard.processPlaceholder')}
-                        rows={3}
-                      />
+                      <div
+                        className="flex-1 min-w-0 flex flex-col gap-1"
+                        onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setEditingProcessId(null); }}
+                      >
+                        <textarea
+                          value={displayText}
+                          onChange={(e) => updateProcess(proc.id, 'description', e.target.value)}
+                          autoFocus
+                          className="bg-transparent border-0 p-0 focus:outline-none text-sm w-full resize-none leading-relaxed"
+                          placeholder={t('advDashboard.processPlaceholder')}
+                          rows={3}
+                        />
+                        {/* H4: 이 공정의 phase(단계) 지정 - 타임라인 그룹핑 소스 */}
+                        <select
+                          value={proc.phase || 'main'}
+                          onChange={(e) => updateProcess(proc.id, 'phase', e.target.value)}
+                          className="text-[11px] text-ink-muted border border-line rounded px-1 py-0.5 bg-surface-paper focus:outline-none cursor-pointer"
+                          aria-label={t('advDashboard.processPhase', { defaultValue: '공정 단계' })}
+                        >
+                          {availablePhases.map(phaseKey => {
+                            const m = PHASE_META[phaseKey];
+                            return (
+                              <option key={phaseKey} value={phaseKey}>
+                                {m.icon} {t(m.labelKey)}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </div>
                     ) : (
                       <div
                         onClick={() => setEditingProcessId(proc.id)}
@@ -3206,6 +3268,9 @@ const AdvancedDashboard: React.FC = () => {
                     </div>
                   </div>
                   );
+                    })}
+                  </React.Fragment>
+                  );
                 })}
               </div>
               {/* 메모 입력 */}
@@ -3239,6 +3304,31 @@ const AdvancedDashboard: React.FC = () => {
         isOpen={isTimerOpen}
         onClose={() => setIsTimerOpen(false)}
         seed={timerSeed}
+      />
+
+      {/* H5: 중복 이름 저장 확인 (덮어쓰기 / 사본으로 / 취소) */}
+      <ConfirmModal
+        isOpen={duplicateModal.open}
+        onClose={() => setDuplicateModal(m => ({ ...m, open: false }))}
+        title={t('advDashboard.duplicateRecipeTitle', { defaultValue: '같은 이름의 레시피가 있습니다' })}
+        message={t('advDashboard.duplicateRecipeBody', { name: duplicateModal.name, defaultValue: '"{{name}}" 이름의 레시피가 이미 존재합니다. 어떻게 저장할까요?' })}
+        actions={[
+          {
+            label: t('dashboard.overwrite', { defaultValue: '덮어쓰기' }),
+            variant: 'danger',
+            onClick: () => { saveRecipeData(duplicateModal.existingId); setDuplicateModal(m => ({ ...m, open: false })); },
+          },
+          {
+            label: t('advDashboard.saveAsCopy', { defaultValue: '사본으로 저장' }),
+            variant: 'primary',
+            onClick: () => { saveRecipeData(undefined, { asCopy: true }); setDuplicateModal(m => ({ ...m, open: false })); },
+          },
+          {
+            label: t('common.cancel', { defaultValue: '취소' }),
+            variant: 'ghost',
+            onClick: () => setDuplicateModal(m => ({ ...m, open: false })),
+          },
+        ]}
       />
     </div>
   );

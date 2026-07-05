@@ -11,7 +11,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRecipeStore } from '@/stores/useRecipeStore'
 import { useAppStore } from '@/stores/useAppStore'
-import { useLocalization } from '@/hooks/useLocalization'
+import RecipeCard from '@/components/recipe/RecipeCard'
 import {
   Plus,
   BookOpen,
@@ -26,31 +26,10 @@ import {
   Lightbulb
 } from 'lucide-react'
 
-// 카테고리별 아이콘
-const CATEGORY_ICONS: Record<string, string> = {
-  bread: '🍞',
-  cake: '🎂',
-  pastry: '🥐',
-  cookie: '🍪',
-  dessert: '🍰',
-  confectionery: '🍬',
-  savory: '🥧'
-}
-
-// 난이도 색상 (정보 전달용 의미색: 초급 emerald -> 중급 amber -> 상급 orange -> 전문가 rose)
-// 4단계가 명확히 구분되도록 색상 단계를 벌림. 색만으로 구분되지 않게 텍스트 라벨은 항상 병기.
-const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner: 'bg-emerald-100 text-emerald-700',
-  intermediate: 'bg-amber-100 text-amber-700',
-  advanced: 'bg-orange-100 text-orange-700',
-  professional: 'bg-rose-100 text-rose-700'
-}
-
 export default function HomePage() {
   const { t } = useTranslation()
   const { recipes, setCurrentRecipe, addRecipe } = useRecipeStore()
   const { setActiveTab } = useAppStore()
-  const { getLocalizedRecipeName } = useLocalization()
 
   // 통계 계산
   const stats = useMemo(() => {
@@ -227,44 +206,18 @@ export default function HomePage() {
               </button>
             </div>
 
-            {/* 최근 레시피: 모바일 1열, sm 2열, lg 이상 기존 3열 보존 */}
+            {/* 최근 레시피: 모바일 1열, sm 2열, lg 이상 기존 3열 보존.
+                H3: 카드 마크업을 RecipeCard(compact) 단일 소스로 통합. 홈은 읽기전용(hideActions). */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {recentRecipes.map(recipe => {
-                const categoryIcon = CATEGORY_ICONS[recipe.category || 'bread'] || '📦'
-                const difficultyKey = recipe.difficulty || 'beginner'
-                const difficultyColor = DIFFICULTY_COLORS[difficultyKey] || DIFFICULTY_COLORS.beginner
-
-                return (
-                  <button
-                    key={recipe.id}
-                    onClick={() => handleRecipeClick(recipe)}
-                    className="text-left min-h-[44px] px-3 py-2.5 bg-surface-paper rounded-lg shadow-sm border border-line hover:border-brand-300 hover:shadow transition-all group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="text-2xl flex-shrink-0" aria-hidden="true">{categoryIcon}</div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-ink truncate group-hover:text-brand-600 transition-colors">
-                          {getLocalizedRecipeName(recipe)}
-                        </h3>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className={`px-1.5 py-0.5 rounded text-xs ${difficultyColor}`}>
-                            {t(`filter.${difficultyKey}`)}
-                          </span>
-                          <span className="text-xs text-ink-subtle">
-                            {recipe.ingredients?.length || 0}{t('home.ingredients')}
-                          </span>
-                        </div>
-                        {recipe.source?.name && (
-                          <p className="text-xs text-ink-subtle truncate">
-                            {t('home.source')}: {recipe.source.name}
-                          </p>
-                        )}
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-ink-disabled group-hover:text-brand-500 transition-colors flex-shrink-0" />
-                    </div>
-                  </button>
-                )
-              })}
+              {recentRecipes.map(recipe => (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  onSelect={() => handleRecipeClick(recipe)}
+                  compact
+                  hideActions
+                />
+              ))}
             </div>
           </section>
         )}

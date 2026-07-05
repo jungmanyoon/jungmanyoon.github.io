@@ -5,7 +5,7 @@
  * 적용: --persona-frontend (UX) + --persona-architect (구조 설계)
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/useSettingsStore'
 import PanSettingsTab from './PanSettingsTab'
@@ -37,29 +37,31 @@ import {
   Globe
 } from 'lucide-react'
 
-// 탭 정의 (번역 키 사용)
+// 설정 그룹 정의 (H6: 도메인 정확판 - 일반/계산 설정/시스템). 순서 = 렌더 순서 SSOT.
+const SETTINGS_GROUPS = [
+  { id: 'general', labelKey: 'settingsGroups.general' },
+  { id: 'calc', labelKey: 'settingsGroups.calc' },
+  { id: 'system', labelKey: 'settingsGroups.system' },
+] as const
+
+// 탭 정의 (번역 키 사용). group 기준으로 렌더 시 묶으며, 배열 순서가 각 그룹 내 순서.
+// active=brand, inactive=gray 로 통일.
 const TABS = [
+  // 일반
   {
     id: 'locale',
+    group: 'general',
     nameKey: 'settingsTabs.locale',
     icon: Globe,
-    // 무지개 색상 제거 -> brand 체계로 통일 (active=brand, inactive=gray)
     color: 'text-brand-600',
     bgColor: 'bg-brand-50',
     borderColor: 'border-brand-200',
     descKey: 'settingsTabs.localeDesc'
   },
-  {
-    id: 'storage',
-    nameKey: 'settingsTabs.storage',
-    icon: HardDrive,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.storageDesc'
-  },
+  // 계산 설정 (팬/제품 비용적/환경/제법/수율/재료 - 모두 변환 계산 입력)
   {
     id: 'pan',
+    group: 'calc',
     nameKey: 'settingsTabs.pan',
     icon: Box,
     color: 'text-brand-600',
@@ -69,6 +71,7 @@ const TABS = [
   },
   {
     id: 'product',
+    group: 'calc',
     nameKey: 'settingsTabs.product',
     icon: Scale,
     color: 'text-brand-600',
@@ -78,6 +81,7 @@ const TABS = [
   },
   {
     id: 'environment',
+    group: 'calc',
     nameKey: 'settingsTabs.environment',
     icon: Thermometer,
     color: 'text-brand-600',
@@ -87,6 +91,7 @@ const TABS = [
   },
   {
     id: 'method',
+    group: 'calc',
     nameKey: 'settingsTabs.method',
     icon: FlaskConical,
     color: 'text-brand-600',
@@ -96,6 +101,7 @@ const TABS = [
   },
   {
     id: 'yieldLoss',
+    group: 'calc',
     nameKey: 'settingsTabs.yieldLoss',
     icon: TrendingDown,
     color: 'text-brand-600',
@@ -105,6 +111,7 @@ const TABS = [
   },
   {
     id: 'ingredient',
+    group: 'calc',
     nameKey: 'settingsTabs.ingredient',
     icon: Apple,
     color: 'text-brand-600',
@@ -112,11 +119,22 @@ const TABS = [
     borderColor: 'border-brand-200',
     descKey: 'settingsTabs.ingredientDesc'
   },
+  // 시스템 (저장/데이터, 고급/앱 설정)
+  {
+    id: 'storage',
+    group: 'system',
+    nameKey: 'settingsTabs.storage',
+    icon: HardDrive,
+    color: 'text-brand-600',
+    bgColor: 'bg-brand-50',
+    borderColor: 'border-brand-200',
+    descKey: 'settingsTabs.storageDesc'
+  },
   {
     id: 'advanced',
+    group: 'system',
     nameKey: 'settingsTabs.advanced',
     icon: Cog,
-    // 이미 무채색이었으나 active 시 brand로 통일해 일관성 확보
     color: 'text-brand-600',
     bgColor: 'bg-brand-50',
     borderColor: 'border-brand-200',
@@ -297,35 +315,44 @@ export default function SettingsPage({
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
           {/* 모바일: 상단 가로 스크롤 탭바 / 데스크톱(lg:): 좌측 세로 사이드바 보존 */}
           <div className="w-full lg:w-56 lg:flex-shrink-0">
-            {/* 모바일은 가로 스크롤(overflow-x-auto)로 탭 노출, 데스크톱은 세로 정렬 */}
-            <nav className="flex flex-row lg:flex-col gap-1 lg:space-y-1 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0 lg:sticky lg:top-24">
-              {TABS.map(tab => {
-                const Icon = tab.icon
-                const isActive = activeTab === tab.id
+            {/* H6: 그룹(일반/계산 설정/시스템)별로 묶어 렌더. 모바일 가로 스크롤엔 edge-fade(mask)로
+                더 스크롤 가능함을 암시. 데스크톱은 mask 해제 + 그룹 소제목 노출. */}
+            <nav className="flex flex-row lg:flex-col gap-1 lg:gap-0 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0 lg:sticky lg:top-24 [mask-image:linear-gradient(to_right,transparent,black_1.5rem,black_calc(100%-1.5rem),transparent)] lg:[mask-image:none]">
+              {SETTINGS_GROUPS.map(group => (
+                <Fragment key={group.id}>
+                  {/* 그룹 소제목: 데스크톱 세로 사이드바에서만 (모바일 가로 탭엔 폭 낭비 방지) */}
+                  <div className="hidden lg:block px-4 pt-4 pb-1 first:pt-0 text-[11px] font-semibold uppercase tracking-wide text-ink-subtle">
+                    {t(group.labelKey)}
+                  </div>
+                  {TABS.filter(tab => tab.group === group.id).map(tab => {
+                    const Icon = tab.icon
+                    const isActive = activeTab === tab.id
 
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 lg:gap-3 min-h-[44px] flex-shrink-0 lg:w-full px-3 lg:px-4 py-2 lg:py-3 rounded-lg text-left whitespace-nowrap lg:whitespace-normal transition-all ${
-                      isActive
-                        ? `${tab.bgColor} ${tab.borderColor} border-2`
-                        : 'hover:bg-surface-muted border-2 border-transparent'
-                    }`}
-                  >
-                    <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? tab.color : 'text-ink-disabled'}`} />
-                    <div className="min-w-0">
-                      <div className={`text-sm font-medium ${isActive ? 'text-ink' : 'text-ink-muted'}`}>
-                        {t(tab.nameKey)}
-                      </div>
-                      {/* 설명문은 데스크톱에서만 노출(모바일 가로 탭에서는 폭 절약 위해 숨김) */}
-                      <div className="hidden lg:block text-xs text-ink-subtle truncate">
-                        {t(tab.descKey)}
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center gap-2 lg:gap-3 min-h-[44px] flex-shrink-0 lg:w-full px-3 lg:px-4 py-2 lg:py-3 lg:mb-1 rounded-lg text-left whitespace-nowrap lg:whitespace-normal transition-all ${
+                          isActive
+                            ? `${tab.bgColor} ${tab.borderColor} border-2`
+                            : 'hover:bg-surface-muted border-2 border-transparent'
+                        }`}
+                      >
+                        <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? tab.color : 'text-ink-disabled'}`} />
+                        <div className="min-w-0">
+                          <div className={`text-sm font-medium ${isActive ? 'text-ink' : 'text-ink-muted'}`}>
+                            {t(tab.nameKey)}
+                          </div>
+                          {/* 설명문은 데스크톱에서만 노출(모바일 가로 탭에서는 폭 절약 위해 숨김) */}
+                          <div className="hidden lg:block text-xs text-ink-subtle truncate">
+                            {t(tab.descKey)}
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </Fragment>
+              ))}
             </nav>
           </div>
 

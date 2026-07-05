@@ -379,15 +379,16 @@ export const sampleRecipes = [
     ],
     // 기존 호환용 (평탄화된 공정)
     steps: [
-      { id: 'step-1', order: 1, instruction: '【탕종】 밀가루 20g + 물 100g을 약불에서 65-68°C까지 저어가며 가열' },
-      { id: 'step-2', order: 2, instruction: '【탕종】 랩씌워 냉장 보관 (최소 2시간, 하룻밤 권장)' },
-      { id: 'step-3', order: 3, instruction: '【본반죽】 탕종과 버터 제외 재료 믹싱' },
-      { id: 'step-4', order: 4, instruction: '【본반죽】 탕종과 버터를 넣고 최종단계까지 반죽' },
-      { id: 'step-5', order: 5, instruction: '1차 발효 60-90분' },
-      { id: 'step-6', order: 6, instruction: '분할, 둥글리기, 중간발효 15분' },
-      { id: 'step-7', order: 7, instruction: '성형하여 식빵틀에 넣기' },
-      { id: 'step-8', order: 8, instruction: '2차 발효 50-70분 (틀의 80%까지)' },
-      { id: 'step-9', order: 9, instruction: '175°C에서 35-40분 굽기' }
+      // H4: phase 태깅으로 공정 타임라인(탕종 -> 본반죽) 시연. 텍스트의 【】 태그는 하위호환 유지.
+      { id: 'step-1', order: 1, phase: 'tangzhong', instruction: '【탕종】 밀가루 20g + 물 100g을 약불에서 65-68°C까지 저어가며 가열' },
+      { id: 'step-2', order: 2, phase: 'tangzhong', instruction: '【탕종】 랩씌워 냉장 보관 (최소 2시간, 하룻밤 권장)' },
+      { id: 'step-3', order: 3, phase: 'main', instruction: '【본반죽】 탕종과 버터 제외 재료 믹싱' },
+      { id: 'step-4', order: 4, phase: 'main', instruction: '【본반죽】 탕종과 버터를 넣고 최종단계까지 반죽' },
+      { id: 'step-5', order: 5, phase: 'main', instruction: '1차 발효 60-90분' },
+      { id: 'step-6', order: 6, phase: 'main', instruction: '분할, 둥글리기, 중간발효 15분' },
+      { id: 'step-7', order: 7, phase: 'main', instruction: '성형하여 식빵틀에 넣기' },
+      { id: 'step-8', order: 8, phase: 'main', instruction: '2차 발효 50-70분 (틀의 80%까지)' },
+      { id: 'step-9', order: 9, phase: 'main', instruction: '175°C에서 35-40분 굽기' }
     ],
     createdAt: new Date(),
     updatedAt: new Date()

@@ -2,6 +2,8 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
 import RecommendationPanel from '../recommendation/RecommendationPanel.jsx'
+import CategoryHeaderBand from './CategoryHeaderBand'
+import { getCategoryMeta } from '@/constants/recipeMeta'
 import { ClipboardList, RotateCcw } from 'lucide-react'
 
 function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
@@ -106,6 +108,8 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
       </div>
 
       <div className="card mb-3">
+        {/* H2: 카테고리 헤더밴드 (아이콘형) - .card 의 p-4 를 상쇄해 풀블리드. 인쇄 시 숨김 */}
+        <CategoryHeaderBand category={recipe.category} size="lg" className="-mx-4 -mt-4 mb-3 rounded-t-xl print-hide" />
         <div className="flex justify-between items-center mb-2">
           <div className="flex gap-2 flex-wrap">
             <Button size="small" onClick={onConvert}>{t('components.recipeView.convert')}</Button>
@@ -135,7 +139,7 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
           </div>
           <div className="text-right">
             <span className="inline-block px-3 py-1 bg-surface-muted text-ink-muted rounded-full text-sm">
-              {recipe.category}
+              {t(getCategoryMeta(recipe.category).labelKey)}
             </span>
             {showMethod && (
               <p className="text-sm text-ink-subtle mt-2">

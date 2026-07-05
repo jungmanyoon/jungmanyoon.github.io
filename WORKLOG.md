@@ -8,7 +8,15 @@
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
 
-**[2026-07-04 세션 D] 반응형 배치 완료 (브랜치 `fix/uiux-phase2-responsive`, PR 예정). 다음: redesign H / 잔여(B6·G6·G7·C4폴리시).**
+**[2026-07-05 세션 E] redesign 배치 H(H2~H6) 완료 (브랜치 `fix/uiux-redesign-h`, PR #9 생성 - 머지/배포는 사용자 결정 대기). 다음: H1(베이킹 모드) / 잔여(B6·G6·G7·C4폴리시) / (대형)AdvancedDashboard 분해·간단전문가 2모드.**
+
+- 사용자 디자인 결정(AskUserQuestion): 이미지=**아이콘 헤더밴드만**(Recipe.image 미도입) · 밴드색=**하이브리드 미세 tint**(de-amber 정합) · 홈카드=**읽기전용** · 설정그룹=**도메인 정확판**.
+- 완료: **공유 SSOT**(`src/constants/recipeMeta.ts` RECIPE_CATEGORY_META + `CategoryHeaderBand`, RecipeCard/HomePage 이모지 CATEGORY_ICONS 중복·불일치 제거, `category.*` i18n) · **H2**(카드/뷰 카테고리 헤더밴드, RecipeView raw enum→i18n 교정) · **H3**(HomePage 인라인카드→RecipeCard compact 단일소스, `hideActions` prop 신설·onDelete optional화, 홈 읽기전용) · **H4**(ProcessStep.phase 타입, 대시보드 공정패널 processesByPhase 그룹핑=다단계만 구분선/단일=기존 flat, 로드/저장 왕복+편집모드 phase select, 탕종식빵 시드 태깅) · **H5**(범용 `ConfirmModal` 신설, window.confirm→3버튼[덮어쓰기/사본으로/취소], 사본=강제신규+접미사) · **H6**(설정 9탭 그룹화 일반/계산설정6/시스템2 + 그룹소제목 + 모바일 edge-fade mask).
+- 3종검증(typecheck0/test164/build OK) + 실렌더 스크린샷(목록·홈읽기전용·뷰대형밴드·설정그룹·공정타임라인 탕종/본반죽·중복3버튼모달·모바일 하단탭/edge-fade) 확인.
+- **주의(H4)**: 공정 phase 번호는 전역 저장순서(findIndex) 기반 -> 시드처럼 phase순 정렬된 배열은 1~N 정상. 사용자가 phase를 뒤섞어 지정하면 번호가 저장순서를 따름(honest). 단일 phase는 회귀 없음(기존 flat 동일).
+- **PhaseIngredientsView는 고아(미import) 확인** -> H4에서 손대지 않음(리스크 최소). 대시보드 PHASE_META(이모지)도 그대로 재사용(공정/재료 시각 일치).
+
+**[2026-07-04 세션 D] 반응형 배치 완료 (브랜치 `fix/uiux-phase2-responsive`, PR 머지·배포 완료). 다음: redesign H / 잔여(B6·G6·G7·C4폴리시).**
 
 - 완료: **D5**(모바일 하단 고정 탭바 `BottomNav.jsx` 신규 - 홈/변환기/레시피/DDT/설정 아이콘+라벨, Header 주요 nav는 데스크톱 전용화) · **H7**(변환 시 모바일/태블릿에서 변환표 먼저=결과우선, `order-first lg:order-none`. 데스크톱 좌우 2열 불변). 3종검증(typecheck0/test164/build OK) + 실렌더(375px 하단바·클리어런스 / 모바일 변환표 Y<원본 Y / 데스크톱 좌우 유지).
 - **B6 이월(리스크)**: 요약 pill sticky는 세로로 긴 대시보드 헤더 밖으로 pill을 빼내는 리팩터 필요(sticky는 부모 박스 내에서만 유지) = 회귀 리스크. 총량은 이미 표 합계 푸터에 노출 -> 우선순위 낮음.
@@ -138,12 +146,12 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [ ] G7 (별건) React unique key 경고: **-> 이월(런타임 핀포인트 필요)**. 세션 B에서 home/list/view/settings/변환버튼 흐름 콘솔에 key 경고 미발생(WebGL 폴백 경고만) -> 대시보드 변환표 배수변경 등 특정 상호작용에서 repro 후 정확한 map에 key 부여.
 
 ### 배치 H - Larger redesign (별도 서브프로젝트, 신중히 / 기존 Phase 2 백로그와 통합)
-- [ ] H1 전용 '베이킹 모드'(Wake Lock+전체화면 큰 글씨 단계 뷰): :2952-3124. navigator.wakeLock try/catch.
-- [ ] H2 레시피북 완성품 이미지/카테고리 헤더밴드 + Recipe.image 필드: RecipeCard/RecipeList, recipe.types.ts. gradient 헤더밴드+대형아이콘(필수)/optional imageUrl(선택).
-- [ ] H3 홈·목록 카드 SSOT 통합: HomePage.tsx:235-268 <- RecipeCard compact.
-- [ ] H4 공정-phase 타임라인 연계: ProcessStep phase 추가 + PHASE_META 그룹핑.
-- [ ] H5 저장 덮어쓰기 ConfirmModal + '사본으로 저장': :1743(현재 window.confirm). 3버튼[덮어쓰기/사본으로/취소].
-- [ ] H6 설정 9탭 그룹화 + 모바일 스크롤 어포던스: SettingsPage.tsx:41-125,:301. group 필드+소제목+edge-fade.
+- [ ] H1 전용 '베이킹 모드'(Wake Lock+전체화면 큰 글씨 단계 뷰): :2952-3124. navigator.wakeLock try/catch. **-> 이월(세션 E: 유일 잔여 대형 항목)**.
+- [x] H2 카테고리 헤더밴드 (세션 E · 사용자 결정=아이콘 밴드만, Recipe.image 미도입): `src/constants/recipeMeta.ts` SSOT(RECIPE_CATEGORY_META: lucide 아이콘/하이브리드 미세 tint gradient/iconTint) + `CategoryHeaderBand` 컴포넌트. RecipeCard(compact/기본) 상단 + RecipeView 대형 밴드. RecipeCard/HomePage 이모지 CATEGORY_ICONS 중복·불일치 제거, `category.*` i18n 신설, RecipeView raw enum→i18n 교정.
+- [x] H3 홈·목록 카드 SSOT 통합 (세션 E): HomePage 인라인카드 → `RecipeCard compact` 단일소스. RecipeCard `hideActions` prop 신설(onDelete optional화) → 홈은 읽기전용(편집/삭제 숨김). 난이도배지/ArrowRight 소실 수용(상세뷰서 확인). RecipeList는 현행 유지.
+- [x] H4 공정-phase 타임라인 (세션 E · 대시보드 한정): `ProcessStep.phase`(PhaseType) 타입 + 로컬 타입. 공정 패널 `processesByPhase` 그룹핑(재료 phaseOrder 재사용) = 다단계만 PHASE_META 구분선/단일=기존 flat. 로드/저장 phase 왕복 + 편집모드 phase select. 탕종식빵 시드 steps 태깅. **PhaseIngredientsView는 고아라 미터치, RecipeView steps 신설은 후속 이월**. 번호는 전역 저장순서(findIndex).
+- [x] H5 저장 덮어쓰기 (세션 E): 범용 `src/components/common/ConfirmModal.tsx` 신설(actions 배열/Escape/백드롭/접근성). `saveRecipeData(overwriteId, {asCopy})` 확장 - asCopy는 currentRecipe 폴백 차단(원본보존)+접미사(사본/copy). window.confirm→3버튼 모달[덮어쓰기(danger)/사본으로(primary)/취소(ghost)]. i18n duplicateRecipeTitle/Body/saveAsCopy/copySuffix.
+- [x] H6 설정 9탭 그룹화 (세션 E · 도메인 정확판): 일반{언어} / 계산설정{팬·제품·환경·제법·수율·재료 6} / 시스템{저장·고급 2}. TABS에 group 필드+재정렬, SETTINGS_GROUPS SSOT, Fragment 그룹 렌더 + 그룹소제목(데스크톱) + 모바일 가로탭 edge-fade(`mask-image` linear-gradient, lg 해제). settingsGroups i18n.
 - [x] H7 태블릿/모바일 변환기 결과우선 레이아웃 (세션 D · 저위험판: 변환 시(`isConverted`) 변환표 래퍼에 `order-first lg:order-none` -> 모바일/태블릿(grid-cols-1)에선 변환(결과)표가 원본보다 위, 데스크톱(lg 2열)은 좌우 배치 그대로. 실렌더로 모바일 변환표 Y<원본 Y·데스크톱 좌우 유지 검증. 완전 결과우선 재설계(탭/바텀시트)는 redesign 백로그).
 - (기존 백로그 통합: AdvancedDashboard 3063줄 컴포넌트 분해, 변환기 간단/전문가 2모드, 좌우표 완전 단일화 - H와 함께 계획)
 

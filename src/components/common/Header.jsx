@@ -53,7 +53,8 @@ function Header() {
             // 모바일 가로 스크롤 시 스크롤바 숨김(별도 CSS 클래스 의존 없이 인라인 처리)
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {/* Main Navigation */}
+            {/* 주요 nav: 모바일은 하단 BottomNav로 이동 -> sm 이상에서만 표시 */}
+            <div className="hidden sm:flex items-center gap-0.5 sm:gap-1">
             {navTabs.map(tab => {
               const Icon = tab.icon
               // #workspace(레거시 별칭)도 변환기 탭을 활성으로 표시
@@ -73,10 +74,11 @@ function Header() {
               )
             })}
 
-            {/* Divider - 모바일은 간격 축소 */}
+            {/* Divider */}
             <span className="w-px h-6 bg-line mx-1 sm:mx-2 shrink-0"></span>
+            </div>
 
-            {/* Utility Tabs - 아이콘 only, 터치영역 44px */}
+            {/* Utility Tabs (설정/도움말) - 모바일 상단 유지 */}
             {utilTabs.map(tab => {
               const Icon = tab.icon
               const active = activeTab === tab.id

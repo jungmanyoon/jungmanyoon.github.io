@@ -2933,8 +2933,9 @@ const AdvancedDashboard: React.FC = () => {
               </div>
 
               {/* 변환 레시피 (단계별 구분선 포함) — 배수가 1이면 원본과 동일하므로 숨김 */}
+              {/* H7: 태블릿/모바일에선 변환(결과) 표를 먼저 노출(결과우선). 데스크톱(lg) 2열에선 기존 좌우 배치 유지. */}
               {isConverted && (
-              <div className="bg-surface-paper rounded shadow-sm border border-info-200 flex flex-col overflow-hidden min-w-0">
+              <div className="order-first lg:order-none bg-surface-paper rounded shadow-sm border border-info-200 flex flex-col overflow-hidden min-w-0">
                 <div className="bg-info-50 border-b border-info-200 px-2 py-1 flex items-center justify-between flex-shrink-0 gap-2">
                   <span className="font-semibold text-info-700 flex items-center gap-1 text-xs">
                     <ThermometerSun className="w-3 h-3 flex-shrink-0" />{t('advDashboard.convertedRecipe')}

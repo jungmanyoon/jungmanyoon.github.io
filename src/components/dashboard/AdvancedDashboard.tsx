@@ -2134,9 +2134,11 @@ const AdvancedDashboard: React.FC = () => {
     <div className="min-h-screen lg:h-screen flex flex-col bg-surface-muted text-sm">
       {/* ===== 상단 헤더 ===== */}
       {/* 모바일: 세로 정렬(flex-col)로 컨트롤 줄바꿈 / 데스크톱(lg): 기존 가로 정렬 보존 */}
-      <div className="bg-surface-paper border-b shadow-sm px-3 sm:px-4 py-2 flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 flex-shrink-0">
-        {/* 좌측: 제품 정보 + 출처 (모바일: 줄바꿈 허용, 데스크톱: 기존 한 줄) */}
-        <div className="flex items-center flex-wrap gap-2 lg:gap-3">
+      <div className="bg-surface-paper border-b shadow-sm px-3 sm:px-4 py-2 flex flex-col gap-2 flex-shrink-0">
+        {/* 1줄: 제품 정보(좌) + 배수 조절(우) — 설정 입력 */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 lg:gap-3">
+        {/* 좌측: 제품 정보 + 출처 */}
+        <div className="flex items-center flex-wrap gap-2 lg:gap-3 min-w-0">
           <Cookie className="w-5 h-5 text-amber-600 flex-shrink-0" />
           <input
             type="text"
@@ -2258,9 +2260,10 @@ const AdvancedDashboard: React.FC = () => {
             </div>
           )}
         </div>
+        </div>
 
-        {/* 우측: 요약 + 액션 (모바일: 줄바꿈 허용, 데스크톱: 기존 한 줄) */}
-        <div className="flex items-center flex-wrap gap-2 lg:gap-4">
+        {/* 2줄: 요약 지표(좌) + 액션 버튼(우) — 결과 + 저장/내보내기 */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 lg:gap-3">
           <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-ink-subtle bg-surface-muted px-3 py-1.5 rounded">
             <span className="cursor-help" title="원본 레시피의 총 반죽량">{t('advDashboard.original')}:<b className="text-ink-muted ml-1">{totalWeight}g</b></span>
             <span className="text-line-strong">→</span>

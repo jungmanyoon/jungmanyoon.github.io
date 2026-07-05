@@ -2856,8 +2856,8 @@ const AdvancedDashboard: React.FC = () => {
                         <th className="px-1.5 py-1 text-left w-16">{t('advDashboard.category')}</th>
                         <th className="px-1.5 py-1 text-left">{t('advDashboard.ingredients')}</th>
                         <th className="px-1.5 py-1 text-left w-20 hidden sm:table-cell">{t('advDashboard.process')}</th>
-                        <th className="px-1.5 py-1 text-right w-10 hidden sm:table-cell">{t('advDashboard.tableHeaderPercent')}</th>
-                        <th className="px-1.5 py-1 text-right w-14">{t('advDashboard.tableHeaderGram')}</th>
+                        <th className="px-1.5 py-1 text-right w-14 hidden sm:table-cell">{t('advDashboard.tableHeaderPercent')}</th>
+                        <th className="px-1.5 py-1 text-right w-16 border-l border-line">{t('advDashboard.tableHeaderGram')}</th>
                         <th className="w-5"></th>
                       </tr>
                     </thead>
@@ -2935,10 +2935,10 @@ const AdvancedDashboard: React.FC = () => {
                                       })}
                                     </select>
                                   </td>
-                                  <td className="px-1.5 text-right font-mono text-ink-subtle text-xs hidden sm:table-cell">{flourTotal > 0 ? Math.round((ing.amount / flourTotal) * 1000) / 10 : 0}</td>
-                                  <td className="px-1.5 rounded focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-inset">
+                                  <td className="px-1.5 text-right font-mono text-ink-subtle text-xs hidden sm:table-cell">{flourTotal > 0 ? Math.round((ing.amount / flourTotal) * 1000) / 10 : 0}%</td>
+                                  <td className="px-1.5 border-l border-line rounded focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-inset">
                                     <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
-                                      className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm" />
+                                      className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm font-semibold text-ink" />
                                   </td>
                                   <td className="px-0.5">
                                     <button onClick={() => removeIngredient(ing.id)} className="p-2 -m-2 text-ink-subtle hover:text-danger" title={t('advDashboard.removeIngredient', { defaultValue: '재료 삭제' })}>
@@ -2977,7 +2977,7 @@ const AdvancedDashboard: React.FC = () => {
                         <th className="px-2 py-1 text-left">{t('advDashboard.category')}</th>
                         <th className="px-2 py-1 text-left">{t('advDashboard.ingredients')}</th>
                         <th className="px-2 py-1 text-right w-12">%</th>
-                        <th className="px-2 py-1 text-right w-16">{t('advDashboard.tableHeaderGram')}</th>
+                        <th className="px-2 py-1 text-right w-16 border-l border-info-100">{t('advDashboard.tableHeaderGram')}</th>
                       </tr>
                     </thead>
                     <tbody className={dynamicStyles.fontSize}>
@@ -3019,8 +3019,8 @@ const AdvancedDashboard: React.FC = () => {
                                 </td>
                                 <td className="px-2 text-info-600">{CATEGORY_LABELS[ing.category as keyof typeof CATEGORY_LABELS]}</td>
                                 <td className="px-2">{translateIngredient(ing.name)}</td>
-                                <td className="px-2 text-right font-mono text-ink-subtle">{convertedFlourTotal > 0 ? Math.round((ing.convertedAmount / convertedFlourTotal) * 1000) / 10 : 0}</td>
-                                <td className="px-2 text-right font-mono text-sm font-semibold text-info-700"><span key={ing.convertedAmount} className="inline-block px-1 rounded animate-valueFlash">{formatWeight(ing.convertedAmount)}</span></td>
+                                <td className="px-2 text-right font-mono text-ink-subtle">{convertedFlourTotal > 0 ? Math.round((ing.convertedAmount / convertedFlourTotal) * 1000) / 10 : 0}%</td>
+                                <td className="px-2 text-right font-mono text-sm font-semibold text-info-700 border-l border-info-100"><span key={ing.convertedAmount} className="inline-block px-1 rounded animate-valueFlash">{formatWeight(ing.convertedAmount)}</span></td>
                               </tr>
                               );
                             })}

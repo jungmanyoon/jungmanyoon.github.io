@@ -23,6 +23,11 @@
     "advanced": "Advanced",
     "advancedDesc": "Mixer, units, precision"
   },
+  "settingsGroups": {
+    "general": "General",
+    "calc": "Calculation",
+    "system": "System"
+  },
   "nav": {
     "home": "Home",
     "converter": "Converter",
@@ -2191,6 +2196,15 @@
     "tbsp": "tbsp",
     "tsp": "tsp"
   },
+  "category": {
+    "bread": "Bread",
+    "pastry": "Pastry",
+    "cake": "Cake",
+    "cookie": "Cookie",
+    "dessert": "Dessert",
+    "confectionery": "Confectionery",
+    "savory": "Savory"
+  },
   "phase": {
     "tangzhong": "Tangzhong",
     "preferment": "Preferment",
@@ -2341,6 +2355,22 @@
     "recipeSavedAsText": "Recipe saved as text file.",
     "ingredientsAdded": "{{count}} ingredients added.",
     "duplicateRecipeConfirm": "A recipe named \"{{name}}\" already exists.\n\n[OK] - Overwrite existing recipe\n[Cancel] - Cancel save (rename and try again)",
+    "duplicateRecipeTitle": "A recipe with this name exists",
+    "duplicateRecipeBody": "A recipe named \"{{name}}\" already exists. How would you like to save?",
+    "saveAsCopy": "Save as copy",
+    "copySuffix": "(copy)",
+    "processPhase": "Process phase",
+    "bakingMode": {
+      "title": "Baking Mode",
+      "step": "Step",
+      "doneN": "{{n}} done",
+      "prev": "Previous",
+      "next": "Next",
+      "finish": "Finish",
+      "markDone": "Mark done",
+      "undone": "Undo",
+      "noSteps": "No steps yet."
+    },
     "basicInfo": "Basic Info",
     "prefermentIngredients": "Preferment",
     "mainDoughIngredients": "Main Dough",
@@ -2380,6 +2410,7 @@
     "iceAmount": "Ice Amount",
     "waterAmount": "Water Amount",
     "calculationResult": "Calculation Result",
+    "resultPlaceholder": "Enter values and press [Calculate Water Temp] to see the result here.",
     "requiredWaterTemp": "Required Water Temperature",
     "ice": "Ice",
     "coldWater": "Cold Water",

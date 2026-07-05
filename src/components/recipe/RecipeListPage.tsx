@@ -135,13 +135,10 @@ const RecipeListPage: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       {/* Search and Filter Controls */}
-      {/* 모바일: 패딩 축소(p-3), 데스크톱: 기존 p-4 유지. 가로 스크롤 방지 위해 overflow-x-hidden */}
-      <div className="flex-none space-y-3 p-3 sm:p-4 bg-surface-muted border-b border-line overflow-x-hidden">
-        <SearchBar
-          value={filters.searchQuery || ''}
-          onChange={handleSearchChange}
-          placeholder={t('recipeList.searchPlaceholder')}
-        />
+      {/* relative z-20: 필터 드롭다운(absolute)이 아래 목록 위로 겹쳐 뜨도록 스택 컨텍스트 확보.
+          (이전 overflow-x-hidden 은 CSS 상 overflow-y:auto 를 강제해 드롭다운을 잘라내던 버그 -> 제거) */}
+      <div className="relative z-20 flex-none p-3 sm:p-4 bg-surface-muted border-b border-line">
+        {/* 검색 + 필터 토글 + 정렬을 한 줄 툴바로 (세로 공간 절약). 상세 필터는 펼칠 때만 아래 표시. */}
         <FilterControls
           filters={filters}
           sortBy={sortBy}
@@ -149,7 +146,13 @@ const RecipeListPage: React.FC = () => {
           onSortChange={handleSortChange}
           onClearFilters={handleClearFilters}
           availableTags={availableTags}
-        />
+        >
+          <SearchBar
+            value={filters.searchQuery || ''}
+            onChange={handleSearchChange}
+            placeholder={t('recipeList.searchPlaceholder')}
+          />
+        </FilterControls>
       </div>
 
       {/* Recipe List */}

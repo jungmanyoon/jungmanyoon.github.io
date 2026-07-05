@@ -124,36 +124,38 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
 
   return (
     <div className="max-w-7xl mx-auto px-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-ink">{t('components.recipeList.myRecipes')}</h2>
+      {/* 헤더 툴바: 제목 + 카테고리 칩(주요 필터) + 새 레시피.
+          데스크톱은 한 줄([제목][칩 flex-1][버튼]), 모바일은 [제목 .. 버튼] / [칩] 두 줄로
+          자동 재배치(order + w-full)해 칩이 눌리지 않게 한다. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-4">
+        <h2 className="order-1 flex-none text-xl font-bold text-ink">{t('components.recipeList.myRecipes')}</h2>
         <Button
           onClick={handleNewRecipe}
-          className="flex items-center gap-2 px-4 py-2"
+          className="order-2 sm:order-3 flex-none flex items-center gap-2 px-4 py-2"
         >
           <Plus className="w-4 h-4" />
           {t('components.recipeList.newRecipe')}
         </Button>
-      </div>
-
-      {/* 카테고리 탭 - 최적화된 컴포넌트 사용 */}
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-        <CategoryTab
-          categoryKey="all"
-          categoryName={t('components.recipeList.allCategory')}
-          count={categoryCounts.all}
-          isSelected={selectedCategory === 'all'}
-          onClick={() => handleCategorySelect('all')}
-        />
-        {Object.entries(categorizedRecipes).map(([key, category]) => (
+        {/* 카테고리 탭 - 주요 필터. 모바일: 전체 폭 별도 줄 / 데스크톱: 가운데 flex-1 */}
+        <div className="order-3 sm:order-2 w-full sm:w-auto sm:flex-1 min-w-0 flex gap-2 overflow-x-auto pb-1">
           <CategoryTab
-            key={key}
-            categoryKey={key}
-            categoryName={category.name}
-            count={categoryCounts[key]}
-            isSelected={selectedCategory === key}
-            onClick={() => handleCategorySelect(key)}
+            categoryKey="all"
+            categoryName={t('components.recipeList.allCategory')}
+            count={categoryCounts.all}
+            isSelected={selectedCategory === 'all'}
+            onClick={() => handleCategorySelect('all')}
           />
-        ))}
+          {Object.entries(categorizedRecipes).map(([key, category]) => (
+            <CategoryTab
+              key={key}
+              categoryKey={key}
+              categoryName={category.name}
+              count={categoryCounts[key]}
+              isSelected={selectedCategory === key}
+              onClick={() => handleCategorySelect(key)}
+            />
+          ))}
+        </div>
       </div>
 
       {displayRecipes.length === 0 ? (

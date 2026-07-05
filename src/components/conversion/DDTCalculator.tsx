@@ -34,7 +34,7 @@ const SelectField = memo<{
   onChange: (value: string) => void
   options: Array<{ value: string; label: string }>
 }>(({ label, value, onChange, options }) => (
-  <div>
+  <div className="mb-4">
     <label className="block text-sm font-medium text-ink-muted mb-1">
       {label}
     </label>
@@ -324,143 +324,144 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
   ], [t])
 
   return (
-    <div className="card">
+    <div className="card max-w-4xl mx-auto">
       <h3 className="mb-4 text-lg font-semibold text-ink">
         {t('ddt.title')}
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* 왼쪽: 입력 필드 */}
-        <div className="space-y-4">
-          <SelectField
-            label={t('ddt.labels.season')}
-            value={season}
-            onChange={(value) => setSeason(value as Season)}
-            options={seasonOptions}
-          />
+      {/* 입력: 2열 그리드로 컴팩트 배치 (과폭 입력칸/빈 우측 컬럼 해소) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+        <SelectField
+          label={t('ddt.labels.season')}
+          value={season}
+          onChange={(value) => setSeason(value as Season)}
+          options={seasonOptions}
+        />
 
-          <SelectField
-            label={t('ddt.labels.breadType')}
-            value={breadType}
-            onChange={(value) => setBreadType(value as BreadType)}
-            options={breadOptions}
-          />
+        <SelectField
+          label={t('ddt.labels.breadType')}
+          value={breadType}
+          onChange={(value) => setBreadType(value as BreadType)}
+          options={breadOptions}
+        />
 
-          <Input
-            label={`${t('ddt.labels.ddtValue')} (°C)`}
-            type="number"
-            value={localData.targetTemp}
-            onValueChange={(value: string) => handleInputChange('targetTemp', Number(value))}
-            min={20}
-            max={30}
-            step={0.5}
-            placeholder={t('ddt.labels.ddtValue')}
-          />
+        <Input
+          label={`${t('ddt.labels.ddtValue')} (°C)`}
+          type="number"
+          value={localData.targetTemp}
+          onValueChange={(value: string) => handleInputChange('targetTemp', Number(value))}
+          min={20}
+          max={30}
+          step={0.5}
+          placeholder={t('ddt.labels.ddtValue')}
+        />
 
-          <Input
-            label={`${t('ddt.labels.flourTemp')} (°C)`}
-            type="number"
-            value={localData.flourTemp}
-            onValueChange={(value: string) => handleInputChange('flourTemp', Number(value))}
-            min={-10}
-            max={40}
-            step={0.5}
-            placeholder={t('ddt.labels.flourTemp')}
-          />
+        <Input
+          label={`${t('ddt.labels.flourTemp')} (°C)`}
+          type="number"
+          value={localData.flourTemp}
+          onValueChange={(value: string) => handleInputChange('flourTemp', Number(value))}
+          min={-10}
+          max={40}
+          step={0.5}
+          placeholder={t('ddt.labels.flourTemp')}
+        />
 
-          <Input
-            label={`${t('ddt.labels.roomTemp')} (°C)`}
-            type="number"
-            value={localData.roomTemp}
-            onValueChange={(value: string) => handleInputChange('roomTemp', Number(value))}
-            min={-10}
-            max={40}
-            step={0.5}
-            placeholder={t('ddt.labels.roomTemp')}
-          />
+        <Input
+          label={`${t('ddt.labels.roomTemp')} (°C)`}
+          type="number"
+          value={localData.roomTemp}
+          onValueChange={(value: string) => handleInputChange('roomTemp', Number(value))}
+          min={-10}
+          max={40}
+          step={0.5}
+          placeholder={t('ddt.labels.roomTemp')}
+        />
 
-          <SelectField
-            label={t('ddt.labels.mixerType')}
-            value={localData.mixerType}
-            onChange={(value) => handleInputChange('mixerType', value)}
-            options={mixerOptions}
-          />
+        <SelectField
+          label={t('ddt.labels.mixerType')}
+          value={localData.mixerType}
+          onChange={(value) => handleInputChange('mixerType', value)}
+          options={mixerOptions}
+        />
 
-          {/* Friction Factor with Auto-Recommendation (섭씨 °C 단위) */}
-          <div>
-            <label className="block text-sm font-medium text-ink-muted mb-1">
-              {t('ddt.labels.mixerFriction')} (°C)
-            </label>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                value={localData.frictionFactor}
-                onValueChange={(value: string) => handleInputChange('frictionFactor', Number(value))}
-                min={0}
-                max={15}
-                step={0.5}
-                placeholder={t('ddt.labels.mixerFriction')}
-                disabled={useAutoFriction}
-              />
-              <Button
-                variant={useAutoFriction ? 'primary' : 'secondary'}
-                onClick={() => {
-                  setUseAutoFriction(!useAutoFriction)
-                  if (!useAutoFriction) {
-                    setLocalData(prev => ({ ...prev, frictionFactor: recommendedFriction }))
-                  }
-                }}
-                className="whitespace-nowrap"
-              >
-                {useAutoFriction ? t('ddt.labels.manual') : 'Auto'}
-              </Button>
-            </div>
-            {useAutoFriction && (
-              <p className="mt-1 text-xs text-ink-muted">
-                {t('ddt.labels.recommendedValue')}: {recommendedFriction}°C ({t('ddt.labels.mixingTime')} {localData.mixingTime}{t('ddt.labels.minutes')}, {t('ddt.labels.hydration')} {doughHydration.toFixed(0)}%)
-              </p>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="use-preferment"
-              checked={localData.prefermentTemp !== null}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  handleInputChange('prefermentTemp', 20)
-                } else {
-                  handleInputChange('prefermentTemp', null)
+        {/* Friction Factor with Auto-Recommendation (섭씨 °C 단위) - 전체 폭 */}
+        <div className="sm:col-span-2 mb-4">
+          <label className="block text-sm font-medium text-ink-muted mb-1">
+            {t('ddt.labels.mixerFriction')} (°C)
+          </label>
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              value={localData.frictionFactor}
+              onValueChange={(value: string) => handleInputChange('frictionFactor', Number(value))}
+              min={0}
+              max={15}
+              step={0.5}
+              placeholder={t('ddt.labels.mixerFriction')}
+              disabled={useAutoFriction}
+              className="!mb-0"
+            />
+            <Button
+              variant={useAutoFriction ? 'primary' : 'secondary'}
+              onClick={() => {
+                setUseAutoFriction(!useAutoFriction)
+                if (!useAutoFriction) {
+                  setLocalData(prev => ({ ...prev, frictionFactor: recommendedFriction }))
                 }
               }}
-              className="rounded border-line text-bread-600 focus:ring-bread-500"
-            />
-            <label htmlFor="use-preferment" className="text-sm text-ink-muted">
-              {t('ddt.labels.usePreferment')}
-            </label>
+              className="whitespace-nowrap"
+            >
+              {useAutoFriction ? t('ddt.labels.manual') : 'Auto'}
+            </Button>
           </div>
-
-          {localData.prefermentTemp !== null && (
-            <Input
-              label={`${t('ddt.labels.prefermentTemp')} (°C)`}
-              type="number"
-              value={localData.prefermentTemp}
-              onValueChange={(value: string) => handleInputChange('prefermentTemp', Number(value))}
-              min={0}
-              max={40}
-              step={0.5}
-              placeholder={t('ddt.labels.prefermentTemp')}
-            />
+          {useAutoFriction && (
+            <p className="mt-1 text-xs text-ink-muted">
+              {t('ddt.labels.recommendedValue')}: {recommendedFriction}°C ({t('ddt.labels.mixingTime')} {localData.mixingTime}{t('ddt.labels.minutes')}, {t('ddt.labels.hydration')} {doughHydration.toFixed(0)}%)
+            </p>
           )}
-
-          <Button onClick={handleCalculate} variant="primary" fullWidth>
-            {t('ddt.labels.calculate')}
-          </Button>
         </div>
-        
-        {/* 오른쪽: 결과 표시 */}
-        <div>
+
+        <div className="sm:col-span-2 flex items-center gap-2 mb-4">
+          <input
+            type="checkbox"
+            id="use-preferment"
+            checked={localData.prefermentTemp !== null}
+            onChange={(e) => {
+              if (e.target.checked) {
+                handleInputChange('prefermentTemp', 20)
+              } else {
+                handleInputChange('prefermentTemp', null)
+              }
+            }}
+            className="rounded border-line text-bread-600 focus:ring-bread-500"
+          />
+          <label htmlFor="use-preferment" className="text-sm text-ink-muted">
+            {t('ddt.labels.usePreferment')}
+          </label>
+        </div>
+
+        {localData.prefermentTemp !== null && (
+          <Input
+            label={`${t('ddt.labels.prefermentTemp')} (°C)`}
+            type="number"
+            value={localData.prefermentTemp}
+            onValueChange={(value: string) => handleInputChange('prefermentTemp', Number(value))}
+            min={0}
+            max={40}
+            step={0.5}
+            placeholder={t('ddt.labels.prefermentTemp')}
+          />
+        )}
+      </div>
+
+      <Button onClick={handleCalculate} variant="primary" fullWidth>
+        {t('ddt.labels.calculate')}
+      </Button>
+
+      {/* 결과 + 마찰계수 참고: 하단 2열 (계산 전엔 안내 placeholder 로 빈 공간 방지) */}
+      <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+        {localData.waterTemp ? (
           <ResultDisplay
             waterTemp={localData.waterTemp}
             useIce={localData.useIce}
@@ -469,18 +470,22 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
             predictedTemp={predictedTemp}
             t={t}
           />
-
-          {/* 마찰계수 참고 정보 (섭씨 물온도 DDT 공식 기준값, C-5 결함 수정) */}
-          <div className="mt-4 p-3 bg-surface-muted rounded-lg text-xs text-ink-muted">
-            <p className="font-semibold mb-1">{t('ddt.frictionReference.title')} (°C):</p>
-            <ul className="space-y-0.5">
-              <li>• {t('ddt.mixerTypes.hand')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['hand']}°C</li>
-              <li>• {t('ddt.mixerTypes.spiral')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['spiral']}°C</li>
-              <li>• {t('ddt.mixerTypes.stand')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['stand']}°C</li>
-              <li>• {t('ddt.mixerTypes.planetary')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['planetary']}°C</li>
-              <li>• {t('ddt.mixerTypes.intensive')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['intensive']}°C</li>
-            </ul>
+        ) : (
+          <div className="flex items-center justify-center text-center rounded-lg border border-dashed border-line bg-surface-muted/50 p-4 text-sm text-ink-subtle min-h-[7rem]">
+            {t('ddt.resultPlaceholder')}
           </div>
+        )}
+
+        {/* 마찰계수 참고 정보 (섭씨 물온도 DDT 공식 기준값, C-5 결함 수정) */}
+        <div className="p-3 bg-surface-muted rounded-lg text-xs text-ink-muted">
+          <p className="font-semibold mb-1">{t('ddt.frictionReference.title')} (°C):</p>
+          <ul className="space-y-0.5">
+            <li>• {t('ddt.mixerTypes.hand')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['hand']}°C</li>
+            <li>• {t('ddt.mixerTypes.spiral')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['spiral']}°C</li>
+            <li>• {t('ddt.mixerTypes.stand')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['stand']}°C</li>
+            <li>• {t('ddt.mixerTypes.planetary')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['planetary']}°C</li>
+            <li>• {t('ddt.mixerTypes.intensive')}: {DDTCalc.FRICTION_FACTORS_CELSIUS['intensive']}°C</li>
+          </ul>
         </div>
       </div>
     </div>

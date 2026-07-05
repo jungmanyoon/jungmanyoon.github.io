@@ -23,6 +23,11 @@
     "advanced": "고급",
     "advancedDesc": "믹서, 단위, 정밀도"
   },
+  "settingsGroups": {
+    "general": "일반",
+    "calc": "계산 설정",
+    "system": "시스템"
+  },
   "nav": {
     "home": "홈",
     "converter": "변환기",
@@ -2191,6 +2196,15 @@
     "tbsp": "큰술",
     "tsp": "작은술"
   },
+  "category": {
+    "bread": "빵",
+    "pastry": "페이스트리",
+    "cake": "케이크",
+    "cookie": "쿠키",
+    "dessert": "디저트",
+    "confectionery": "과자",
+    "savory": "식사빵"
+  },
   "phase": {
     "tangzhong": "탕종",
     "preferment": "사전반죽",
@@ -2341,6 +2355,22 @@
     "recipeSavedAsText": "레시피가 텍스트 파일로 저장되었습니다.",
     "ingredientsAdded": "{{count}}개 재료가 추가되었습니다.",
     "duplicateRecipeConfirm": "\"{{name}}\" 이름의 레시피가 이미 존재합니다.\n\n[확인] - 기존 레시피 덮어쓰기\n[취소] - 저장 취소 (다른 이름으로 변경 후 저장하세요)",
+    "duplicateRecipeTitle": "같은 이름의 레시피가 있습니다",
+    "duplicateRecipeBody": "\"{{name}}\" 이름의 레시피가 이미 존재합니다. 어떻게 저장할까요?",
+    "saveAsCopy": "사본으로 저장",
+    "copySuffix": "(사본)",
+    "processPhase": "공정 단계",
+    "bakingMode": {
+      "title": "베이킹 모드",
+      "step": "단계",
+      "doneN": "{{n}} 완료",
+      "prev": "이전",
+      "next": "다음",
+      "finish": "끝내기",
+      "markDone": "완료 표시",
+      "undone": "완료 취소",
+      "noSteps": "등록된 공정이 없습니다."
+    },
     "basicInfo": "기본 정보",
     "prefermentIngredients": "사전반죽",
     "mainDoughIngredients": "본반죽",
@@ -2380,6 +2410,7 @@
     "iceAmount": "얼음량",
     "waterAmount": "물량",
     "calculationResult": "계산 결과",
+    "resultPlaceholder": "값을 입력하고 [물 온도 계산]을 누르면 결과가 여기에 표시됩니다.",
     "requiredWaterTemp": "필요한 물 온도",
     "ice": "얼음",
     "coldWater": "찬물",

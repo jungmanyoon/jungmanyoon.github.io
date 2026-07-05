@@ -2,11 +2,20 @@
 
 > 이 파일 하나에만 모든 작업 진행상황을 기록한다. 새 문서를 여러 개 만들지 않는다.
 > 세션이 바뀌어도 이 파일 맨 위 "다음 세션 재개 지점"부터 이어서 작업한다.
-> 최종 갱신: 2026-07-04
+> 최종 갱신: 2026-07-05
 
 ---
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
+
+**[2026-07-05 세션 F] redesign H + 라이브 폴리시 + H1/C4 전부 완료·PR #9 머지·배포·라이브200. 다음: 잔여 소소(B6 sticky·G6 공정열접기·G7 key경고 dev전용) / (대형)AdvancedDashboard 3063줄 분해·변환기 간단전문가 2모드·좌우표 완전단일화 / F4~F6(편집화면).**
+
+- **PR #9(`fix/uiux-redesign-h`->main) 머지 완료(머지커밋 `bebf904`). `npm run deploy` 배포 완료, https://jungmanyoon.github.io/ 라이브 200 확인.** 로컬 브랜치 삭제.
+- **세션 F 추가 작업(라이브 테스트 피드백 반영)**: 레시피목록 폴리시(필터 드롭다운 overflow 절단 버그 수정=overflow-x-hidden 제거+z-30 / 빵·쿠키 색 구분=쿠키 stone tint / 헤더 툴바 단일화·검색+필터+정렬 한 줄로 공간압축) · DDT 레이아웃 재배치(max-w-4xl+입력 2열+결과/참고 하단 2열, 빈 우측 해소) · 상세뷰 헤더밴드 슬림화 · 변환기 재료표 %/g 구분(% 단위+g 볼드+구분선)·원본표 단계 소계 추가·상단 헤더 의도된 2줄 정돈.
+- **H1 베이킹 모드 완료**: 신규 `src/components/pwa/BakingMode.tsx` - navigator.wakeLock(화면유지, 미지원시 무시)+전체화면 큰글씨 단계뷰(진행바·완료체크·시간/온도 배지·이전/다음·Esc/좌우키). 공정 패널 헤더 진입버튼(공정 있을때만), completedProcesses 연동. bakingMode i18n.
+- **C4 인쇄 폴리시 상향**: 배수칩·재료삭제×·공정삭제×·일괄입력/+재료 버튼 print-hide(소계·표내용 유지).
+- **G6 이월 사유**: 단일 제법 공정열 접기는 phase 생성이 그 열 select에 의존 -> '사전반죽 추가' 어포던스 설계 선행 필요(기능 손실 방지).
+- **G7 재확인**: key 경고 - AdvancedDashboard 가시 JSX map **전부 keyed** 재확인, 컴포넌트 스택도 'at div/AdvancedDashboard'까지만(파생/전이 렌더 추정). dev 전용·무해라 이월.
 
 **[2026-07-05 세션 E] redesign 배치 H(H2~H6) 완료 (브랜치 `fix/uiux-redesign-h`, PR #9 생성 - 머지/배포는 사용자 결정 대기). 다음: H1(베이킹 모드) / 잔여(B6·G6·G7·C4폴리시) / (대형)AdvancedDashboard 분해·간단전문가 2모드.**
 
@@ -146,7 +155,7 @@ tailwind.config.js에 추가: `surface`(canvas #F8FAFC / paper #FFFFFF / muted #
 - [ ] G7 (별건) React unique key 경고: **-> 이월(런타임 핀포인트 필요)**. 세션 B에서 home/list/view/settings/변환버튼 흐름 콘솔에 key 경고 미발생(WebGL 폴백 경고만) -> 대시보드 변환표 배수변경 등 특정 상호작용에서 repro 후 정확한 map에 key 부여.
 
 ### 배치 H - Larger redesign (별도 서브프로젝트, 신중히 / 기존 Phase 2 백로그와 통합)
-- [ ] H1 전용 '베이킹 모드'(Wake Lock+전체화면 큰 글씨 단계 뷰): :2952-3124. navigator.wakeLock try/catch. **-> 이월(세션 E: 유일 잔여 대형 항목)**.
+- [x] H1 전용 '베이킹 모드' (세션 F 완료): 신규 `src/components/pwa/BakingMode.tsx` - navigator.wakeLock(try/catch, 미지원/거부 무시)+전체화면 큰글씨 단계뷰(진행바·완료체크·시간/온도 배지·이전/다음·Esc/좌우키). 공정 패널 헤더 진입버튼(공정 있을때만), completedProcesses/toggleProcessDone 연동. bakingMode i18n(ko/en). 실렌더 확인.
 - [x] H2 카테고리 헤더밴드 (세션 E · 사용자 결정=아이콘 밴드만, Recipe.image 미도입): `src/constants/recipeMeta.ts` SSOT(RECIPE_CATEGORY_META: lucide 아이콘/하이브리드 미세 tint gradient/iconTint) + `CategoryHeaderBand` 컴포넌트. RecipeCard(compact/기본) 상단 + RecipeView 대형 밴드. RecipeCard/HomePage 이모지 CATEGORY_ICONS 중복·불일치 제거, `category.*` i18n 신설, RecipeView raw enum→i18n 교정.
 - [x] H3 홈·목록 카드 SSOT 통합 (세션 E): HomePage 인라인카드 → `RecipeCard compact` 단일소스. RecipeCard `hideActions` prop 신설(onDelete optional화) → 홈은 읽기전용(편집/삭제 숨김). 난이도배지/ArrowRight 소실 수용(상세뷰서 확인). RecipeList는 현행 유지.
 - [x] H4 공정-phase 타임라인 (세션 E · 대시보드 한정): `ProcessStep.phase`(PhaseType) 타입 + 로컬 타입. 공정 패널 `processesByPhase` 그룹핑(재료 phaseOrder 재사용) = 다단계만 PHASE_META 구분선/단일=기존 flat. 로드/저장 phase 왕복 + 편집모드 phase select. 탕종식빵 시드 steps 태깅. **PhaseIngredientsView는 고아라 미터치, RecipeView steps 신설은 후속 이월**. 번호는 전역 저장순서(findIndex).

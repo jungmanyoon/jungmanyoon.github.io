@@ -2874,6 +2874,7 @@ const AdvancedDashboard: React.FC = () => {
                                     <span>{phaseMeta.icon}</span>
                                     <span>{t(phaseMeta.labelKey)}</span>
                                     <span className="text-xs font-normal opacity-70">({t('advDashboard.itemCount', { count: items.length })})</span>
+                                    <span className="ml-auto font-mono font-semibold">{t('advDashboard.subtotal', { defaultValue: '소계' })} {formatWeight(items.reduce((s: number, i: any) => s + (i.amount || 0), 0))}g</span>
                                   </span>
                                 </td>
                               </tr>

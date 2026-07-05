@@ -16,7 +16,8 @@ interface CategoryHeaderBandProps {
 const SIZE_MAP = {
   sm: { band: 'h-14', icon: 'w-7 h-7' },
   md: { band: 'h-20', icon: 'w-10 h-10' },
-  lg: { band: 'h-28 md:h-36', icon: 'w-14 h-14 md:w-16 md:h-16' },
+  // lg(상세뷰): 아이콘만 있는 장식 밴드라 과도한 높이는 공간 낭비 -> 슬림하게
+  lg: { band: 'h-20 md:h-24', icon: 'w-11 h-11 md:w-12 md:h-12' },
 } as const
 
 export default function CategoryHeaderBand({

@@ -2399,6 +2399,7 @@
     "iceAmount": "얼음량",
     "waterAmount": "물량",
     "calculationResult": "계산 결과",
+    "resultPlaceholder": "값을 입력하고 [물 온도 계산]을 누르면 결과가 여기에 표시됩니다.",
     "requiredWaterTemp": "필요한 물 온도",
     "ice": "얼음",
     "coldWater": "찬물",

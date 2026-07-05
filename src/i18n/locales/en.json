@@ -2399,6 +2399,7 @@
     "iceAmount": "Ice Amount",
     "waterAmount": "Water Amount",
     "calculationResult": "Calculation Result",
+    "resultPlaceholder": "Enter values and press [Calculate Water Temp] to see the result here.",
     "requiredWaterTemp": "Required Water Temperature",
     "ice": "Ice",
     "coldWater": "Cold Water",

@@ -17,12 +17,15 @@ interface ProcessItemSize {
   minHeight?: number;
 }
 
+type ConversionMode = 'simple' | 'expert';
+
 interface LayoutSettings {
   sidebarWidth: number;
   recipeContainerHeight: number;  // 레시피 테이블 영역 비율 (0-1)
   processRowHeight: number;       // 공정 행 높이
   processPanelHeight: number;     // 공정 패널 전체 높이
   processItems: Record<string, ProcessItemSize>;  // 공정 ID별 크기
+  conversionMode: ConversionMode; // 변환기 표시 모드 (간단/전문가)
 }
 
 const DEFAULT_SETTINGS: LayoutSettings = {
@@ -31,6 +34,7 @@ const DEFAULT_SETTINGS: LayoutSettings = {
   processRowHeight: 36,
   processPanelHeight: 256,
   processItems: {},
+  conversionMode: 'simple',    // 저장본이 전혀 없는 신규 방문자만 간단 모드로 시작 (기존 사용자는 로더에서 expert로 마이그레이션, 이후 선택은 persist)
 };
 
 export function useLayoutSettings() {
@@ -41,6 +45,12 @@ export function useLayoutSettings() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
+          // 마이그레이션: 이미 레이아웃 저장본이 있는 기존 사용자가 conversionMode 없이 업그레이드된 경우,
+          // 기존 전체 UI(사이드바=팬/오븐/제법 등) 경험을 보존하기 위해 'expert'로 복원한다.
+          // (conversionMode 'simple' 기본값은 저장본이 전혀 없는 신규 방문자에게만 적용)
+          if (parsed.conversionMode === undefined) {
+            parsed.conversionMode = 'expert';
+          }
           return { ...DEFAULT_SETTINGS, ...parsed };
         }
       } catch (e) {
@@ -115,10 +125,14 @@ export function useLayoutSettings() {
     return settings.processItems[id] || { width: 120 };
   }, [settings.processItems]);
 
-  // 설정 초기화
+  // 변환기 표시 모드 (간단/전문가) 변경
+  const setConversionMode = useCallback((mode: ConversionMode) => {
+    setSettings(prev => ({ ...prev, conversionMode: mode }));
+  }, []);
+
+  // 설정 초기화 (레이아웃 크기만 기본값으로 — 표시 모드는 사용자 선택을 보존)
   const resetSettings = useCallback(() => {
-    setSettings(DEFAULT_SETTINGS);
-    localStorage.removeItem(STORAGE_KEY);
+    setSettings(prev => ({ ...DEFAULT_SETTINGS, conversionMode: prev.conversionMode }));
   }, []);
 
   return {
@@ -129,8 +143,9 @@ export function useLayoutSettings() {
     setProcessPanelHeight,
     setProcessItemSize,
     getProcessItemSize,
+    setConversionMode,
     resetSettings,
   };
 }
 
-export type { LayoutSettings, ProcessItemSize };
+export type { LayoutSettings, ProcessItemSize, ConversionMode };

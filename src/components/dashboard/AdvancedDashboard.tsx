@@ -391,8 +391,14 @@ const AdvancedDashboard: React.FC = () => {
     setProcessPanelHeight,
     setProcessItemSize,
     getProcessItemSize,
+    setConversionMode,
     resetSettings: resetLayoutSettings,
   } = useLayoutSettings();
+
+  // 변환기 표시 모드 (간단/전문가) — persist는 useLayoutSettings(localStorage)가 담당.
+  // 순수 조건부 렌더용 값: 상태 강제변이 없이 표시만 토글(저위험).
+  const conversionMode = layoutSettings.conversionMode;
+  const isExpertMode = conversionMode === 'expert';
 
   // 제품 정보
   const [productName, setProductName] = useState(t('advDashboard.defaultRecipeName'));
@@ -2179,6 +2185,8 @@ const AdvancedDashboard: React.FC = () => {
               {t('advDashboard.productTypePastry')}
             </button>
           </div>
+          {/* 출처(source): 메타데이터 — 전문가 모드에서만 노출 */}
+          {isExpertMode && (
           <div className="flex items-center gap-1 text-xs border-l pl-3">
             <select
               value={source.type}
@@ -2203,8 +2211,11 @@ const AdvancedDashboard: React.FC = () => {
               title={t('advDashboard.sourceNamePlaceholder')}
             />
           </div>
+          )}
         </div>
 
+        {/* 우측 그룹: 배수 조절 + 표시 모드 토글 (한 묶음으로 우측 정렬) */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 lg:gap-3">
         {/* 중앙: 배수 조절 (모바일: 줄바꿈 허용, 데스크톱: 기존 한 줄) */}
         <div className="flex items-center flex-wrap gap-2 lg:gap-3">
           <button
@@ -2262,6 +2273,26 @@ const AdvancedDashboard: React.FC = () => {
             </div>
           )}
         </div>
+        {/* 표시 모드 토글 (간단/전문가) — 간단 모드는 사이드바를 숨기므로 항상 보이는 헤더에 상주. 순수 표시 토글이라 계산/상태 변이 없음. */}
+        <div className="flex items-center rounded-md bg-surface-muted p-0.5 print-hide flex-shrink-0 self-start sm:self-auto" role="group" aria-label={t('advDashboard.modeGroupLabel', { defaultValue: '표시 모드' })}>
+          <button
+            onClick={() => setConversionMode('simple')}
+            className={`px-2.5 py-1 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${conversionMode === 'simple' ? 'bg-amber-500 text-white font-medium' : 'text-ink-muted hover:text-ink'}`}
+            title={t('advDashboard.modeSimpleTitle', { defaultValue: '간단 모드' })}
+            aria-pressed={conversionMode === 'simple'}
+          >
+            {t('advDashboard.modeSimple', { defaultValue: '간단' })}
+          </button>
+          <button
+            onClick={() => setConversionMode('expert')}
+            className={`px-2.5 py-1 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${conversionMode === 'expert' ? 'bg-amber-500 text-white font-medium' : 'text-ink-muted hover:text-ink'}`}
+            title={t('advDashboard.modeExpertTitle', { defaultValue: '전문가 모드' })}
+            aria-pressed={conversionMode === 'expert'}
+          >
+            {t('advDashboard.modeExpert', { defaultValue: '전문가' })}
+          </button>
+        </div>
+        </div>
         </div>
 
         {/* 2줄: 요약 지표(좌) + 액션 버튼(우) — 결과 + 저장/내보내기 */}
@@ -2270,14 +2301,21 @@ const AdvancedDashboard: React.FC = () => {
             <span className="cursor-help" title="원본 레시피의 총 반죽량">{t('advDashboard.original')}:<b className="text-ink-muted ml-1">{totalWeight}g</b></span>
             <span className="text-line-strong">→</span>
             <span className="cursor-help" title="변환(배수·팬 반영) 후 총 반죽량">{t('advDashboard.converted')}:<b className="text-brand-600 ml-1">{convertedTotal}g</b></span>
+            {/* 고급 지표(수화율·팬권장량·팬충전율): 제빵 전문 지표 — 전문가 모드에서만 노출 */}
+            {isExpertMode && (
+            <>
             <span className="text-line-strong">|</span>
             <span className="cursor-help" title="밀가루 대비 수분 비율입니다 (60~80% 권장)">{t('advDashboard.hydration')}:<b className="ml-1">{hydration}%</b></span>
             <span className="text-line-strong">|</span>
             <span className="cursor-help" title="팬 부피를 기준으로 권장되는 반죽량">{t('advDashboard.pan')}:<b className="ml-1">{panTotalWeight}g</b></span>
             <span className="text-line-strong">|</span>
             <span className="cursor-help" title="반죽량 ÷ 팬 권장량 (100%≈적정 충전, 110%↑ 과충전 주의)">{t('advDashboard.panFillRate')}:<b className={`ml-1 ${panFillRate > 110 ? 'text-danger' : panFillRate < 85 ? 'text-warning' : 'text-success'}`}>{panFillRate}%</b></span>
+            </>
+            )}
           </div>
           <div className="flex flex-wrap gap-1.5 print-hide">
+            {/* 초기화: 부가 기능 — 전문가 모드에서만 노출 */}
+            {isExpertMode && (
             <button
               onClick={resetAllConversion}
               className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-muted text-ink-muted rounded hover:bg-line border border-line"
@@ -2285,6 +2323,7 @@ const AdvancedDashboard: React.FC = () => {
             >
               <RotateCcw className="w-4 h-4" />{t('advDashboard.reset')}
             </button>
+            )}
             <button
               onClick={handleSaveRecipe}
               className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-amber-500 text-white rounded hover:bg-amber-600"
@@ -2299,6 +2338,8 @@ const AdvancedDashboard: React.FC = () => {
             >
               <Copy className="w-4 h-4" />{t('advDashboard.copy')}
             </button>
+            {/* JSON 내보내기: 부가 기능 — 전문가 모드에서만 노출 */}
+            {isExpertMode && (
             <button
               onClick={handleExportRecipe}
               className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs text-ink-disabled rounded hover:bg-surface-muted hover:text-ink-muted"
@@ -2306,6 +2347,7 @@ const AdvancedDashboard: React.FC = () => {
             >
               <FileText className="w-4 h-4" />{t('advDashboard.json')}
             </button>
+            )}
             <button
               onClick={() => window.print()}
               className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-paper text-ink-muted border border-line rounded hover:bg-surface-muted"
@@ -2313,6 +2355,8 @@ const AdvancedDashboard: React.FC = () => {
             >
               <Printer className="w-4 h-4" />{t('advDashboard.printShort', { defaultValue: '인쇄' })}
             </button>
+            {/* 타이머: 공정칩 Play·베이킹모드로도 도달 가능 — 헤더 버튼은 전문가 모드에서만 노출 */}
+            {isExpertMode && (
             <button
               onClick={() => { setTimerSeed(null); setIsTimerOpen(true); }}
               className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-surface-paper text-ink-muted border border-line rounded hover:bg-surface-muted"
@@ -2320,6 +2364,7 @@ const AdvancedDashboard: React.FC = () => {
             >
               <Timer className="w-4 h-4" />{t('advDashboard.timer', { defaultValue: '타이머' })}
             </button>
+            )}
           </div>
         </div>
       </div>
@@ -2327,6 +2372,10 @@ const AdvancedDashboard: React.FC = () => {
       {/* ===== 메인 콘텐츠 ===== */}
       {/* 모바일: 세로 스택(flex-col)으로 사이드바→본문 순서 흐름 / 데스크톱(lg): 기존 가로 분할 보존 */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-visible lg:overflow-hidden">
+        {/* 좌측 사이드바 + 리사이즈 핸들: 전문가 전용. 간단 모드는 전체 숨김 → 중앙 표가 전체폭.
+            팬/오븐/제법 등 도메인 state는 언마운트돼도 컴포넌트에 유지되어 전문가 복귀 시 그대로 복원(리셋 없음). */}
+        {isExpertMode && (
+        <>
         {/* ===== 좌측 사이드바 (리사이즈 가능) ===== */}
         {/* 모바일: 전체 너비(w-full)로 상단 배치 / 데스크톱(lg): 인라인 고정폭 적용 (isDesktop일 때만 width 지정해 가로 스크롤 방지) */}
         <div
@@ -2820,6 +2869,8 @@ const AdvancedDashboard: React.FC = () => {
             className="hover:bg-blue-100"
           />
         </div>
+        </>
+        )}
 
         {/* ===== 중앙: 레시피 테이블 (컴팩트) ===== */}
         <div className="flex-1 flex flex-col overflow-visible lg:overflow-hidden min-h-0">
@@ -2860,8 +2911,8 @@ const AdvancedDashboard: React.FC = () => {
                       <tr className={`text-ink-subtle ${dynamicStyles.fontSize}`}>
                         <th className="px-1.5 py-1 text-left w-16">{t('advDashboard.category')}</th>
                         <th className="px-1.5 py-1 text-left">{t('advDashboard.ingredients')}</th>
-                        <th className="px-1.5 py-1 text-left w-20 hidden sm:table-cell">{t('advDashboard.process')}</th>
-                        <th className="px-1.5 py-1 text-right w-14 hidden sm:table-cell">{t('advDashboard.tableHeaderPercent')}</th>
+                        <th className={`px-1.5 py-1 text-left w-20 hidden ${isExpertMode ? 'sm:table-cell' : ''}`}>{t('advDashboard.process')}</th>
+                        <th className={`px-1.5 py-1 text-right w-14 hidden ${isExpertMode ? 'sm:table-cell' : ''}`}>{t('advDashboard.tableHeaderPercent')}</th>
                         <th className="px-1.5 py-1 text-right w-16 border-l border-line">{t('advDashboard.tableHeaderGram')}</th>
                         <th className="w-5"></th>
                       </tr>
@@ -2925,7 +2976,7 @@ const AdvancedDashboard: React.FC = () => {
                                       maxSuggestions={6}
                                     />
                                   </td>
-                                  <td className="px-1.5 rounded focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-inset hidden sm:table-cell">
+                                  <td className={`px-1.5 rounded focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-inset hidden ${isExpertMode ? 'sm:table-cell' : ''}`}>
                                     <select
                                       value={ing.phase || 'main'}
                                       onChange={(e) => updateIngredient(ing.id, 'phase', e.target.value)}
@@ -2941,7 +2992,7 @@ const AdvancedDashboard: React.FC = () => {
                                       })}
                                     </select>
                                   </td>
-                                  <td className="px-1.5 text-right font-mono text-ink-subtle text-xs hidden sm:table-cell">{flourTotal > 0 ? Math.round((ing.amount / flourTotal) * 1000) / 10 : 0}%</td>
+                                  <td className={`px-1.5 text-right font-mono text-ink-subtle text-xs hidden ${isExpertMode ? 'sm:table-cell' : ''}`}>{flourTotal > 0 ? Math.round((ing.amount / flourTotal) * 1000) / 10 : 0}%</td>
                                   <td className="px-1.5 border-l border-line rounded focus-within:ring-2 focus-within:ring-brand-400 focus-within:ring-inset">
                                     <input type="number" value={ing.amount} onChange={(e) => updateIngredient(ing.id, 'amount', parseFloat(e.target.value) || 0)}
                                       className="w-full text-right font-mono bg-transparent border-0 p-0 focus:outline-none text-sm font-semibold text-ink" />
@@ -2982,7 +3033,7 @@ const AdvancedDashboard: React.FC = () => {
                         <th className="w-6 px-1 py-1 print-hide" title={t('advDashboard.miseEnPlace', { defaultValue: '계량 체크' })}></th>
                         <th className="px-2 py-1 text-left">{t('advDashboard.category')}</th>
                         <th className="px-2 py-1 text-left">{t('advDashboard.ingredients')}</th>
-                        <th className="px-2 py-1 text-right w-12">%</th>
+                        <th className={`px-2 py-1 text-right w-12 ${isExpertMode ? '' : 'hidden'}`}>%</th>
                         <th className="px-2 py-1 text-right w-16 border-l border-info-100">{t('advDashboard.tableHeaderGram')}</th>
                       </tr>
                     </thead>
@@ -3025,7 +3076,7 @@ const AdvancedDashboard: React.FC = () => {
                                 </td>
                                 <td className="px-2 text-info-600">{CATEGORY_LABELS[ing.category as keyof typeof CATEGORY_LABELS]}</td>
                                 <td className="px-2">{translateIngredient(ing.name)}</td>
-                                <td className="px-2 text-right font-mono text-ink-subtle">{convertedFlourTotal > 0 ? Math.round((ing.convertedAmount / convertedFlourTotal) * 1000) / 10 : 0}%</td>
+                                <td className={`px-2 text-right font-mono text-ink-subtle ${isExpertMode ? '' : 'hidden'}`}>{convertedFlourTotal > 0 ? Math.round((ing.convertedAmount / convertedFlourTotal) * 1000) / 10 : 0}%</td>
                                 <td className="px-2 text-right font-mono text-sm font-semibold text-info-700 border-l border-info-100"><span key={ing.convertedAmount} className="inline-block px-1 rounded animate-valueFlash">{formatWeight(ing.convertedAmount)}</span></td>
                               </tr>
                               );
@@ -3046,7 +3097,9 @@ const AdvancedDashboard: React.FC = () => {
               {!isConverted && (
                 <div className="rounded-md bg-surface-muted border border-line px-3 py-2 text-xs text-ink-muted flex items-center gap-1.5 self-start">
                   <Info className="w-3.5 h-3.5 flex-shrink-0" />
-                  {t('advDashboard.conversionHint', { defaultValue: '배수 또는 팬 크기를 바꾸면 변환 결과가 여기에 표시됩니다.' })}
+                  {isExpertMode
+                    ? t('advDashboard.conversionHint', { defaultValue: '배수 또는 팬 크기를 바꾸면 변환 결과가 여기에 표시됩니다.' })
+                    : t('advDashboard.conversionHintSimple', { defaultValue: '배수를 바꾸면 변환 결과가 여기에 표시됩니다.' })}
                 </div>
               )}
             </div>

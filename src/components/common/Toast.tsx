@@ -24,28 +24,28 @@ const ICON_MAP = {
 
 const STYLE_MAP = {
   success: {
-    bg: 'bg-green-50 border-green-200',
-    icon: 'text-green-600',
-    text: 'text-green-900',
-    button: 'text-green-700 hover:text-green-900'
+    bg: 'bg-success-50 border-success-100',
+    icon: 'text-success-600',
+    text: 'text-success-700',
+    button: 'text-success-600 hover:text-success-700'
   },
   error: {
-    bg: 'bg-red-50 border-red-200',
-    icon: 'text-red-600',
-    text: 'text-red-900',
-    button: 'text-red-700 hover:text-red-900'
+    bg: 'bg-danger-50 border-danger-100',
+    icon: 'text-danger-600',
+    text: 'text-danger-700',
+    button: 'text-danger-600 hover:text-danger-700'
   },
   warning: {
-    bg: 'bg-amber-50 border-amber-200',
-    icon: 'text-amber-600',
-    text: 'text-amber-900',
-    button: 'text-amber-700 hover:text-amber-900'
+    bg: 'bg-warning-50 border-warning-100',
+    icon: 'text-warning-600',
+    text: 'text-warning-700',
+    button: 'text-warning-600 hover:text-warning-700'
   },
   info: {
-    bg: 'bg-blue-50 border-blue-200',
-    icon: 'text-blue-600',
-    text: 'text-blue-900',
-    button: 'text-blue-700 hover:text-blue-900'
+    bg: 'bg-info-50 border-info-100',
+    icon: 'text-info-600',
+    text: 'text-info-700',
+    button: 'text-info-600 hover:text-info-700'
   }
 }
 
@@ -106,7 +106,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, onDismiss, onPause, onResum
       onFocus={handlePause}
       onBlur={handleResume}
       className={`
-        flex items-start gap-3 p-4 rounded-lg border shadow-lg
+        flex items-start gap-3 p-4 rounded-lg border shadow-dropdown
         min-w-[320px] max-w-[480px]
         transition-all duration-300 ease-out
         ${styles.bg}

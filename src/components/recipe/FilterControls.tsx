@@ -145,13 +145,13 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             text-ink font-medium text-sm
             transition-colors duration-200
             flex items-center gap-2
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500
           "
         >
           <Filter className="w-4 h-4" />
           <span>{t('filter.title')}</span>
           {activeFilterCount > 0 && (
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-bread-600 rounded-full">
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-brand-600 rounded-full">
               {activeFilterCount}
             </span>
           )}
@@ -173,7 +173,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               bg-surface-paper hover:bg-surface-muted
               text-ink text-sm
               transition-colors duration-200
-              focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500
               cursor-pointer
             "
           >
@@ -197,7 +197,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               text-ink-muted hover:text-ink text-sm
               transition-colors duration-200
               flex items-center gap-2
-              focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500
             "
           >
             <X className="w-4 h-4" />
@@ -224,7 +224,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 text-ink text-sm
                 transition-colors duration-200
                 flex items-center gap-2
-                focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500
               "
             >
               {t('filter.difficulty')}
@@ -237,7 +237,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               className={`
               absolute top-full left-0 mt-1
               w-48 max-w-[calc(100vw-1.5rem)]
-              bg-surface-paper border border-line rounded-lg shadow-lg
+              bg-surface-paper border border-line rounded-lg shadow-dropdown
               ${openDropdown === 'difficulty' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
               z-30
@@ -256,7 +256,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                       type="checkbox"
                       checked={filters.difficulty?.includes(value) || false}
                       onChange={() => handleDifficultyChange(value)}
-                      className="w-4 h-4 text-bread-600 border-line rounded focus:ring-bread-500"
+                      className="w-4 h-4 text-brand-600 border-line rounded focus:ring-brand-500"
                     />
                     <span className="text-sm text-ink">{t(labelKey)}</span>
                   </label>
@@ -280,7 +280,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 text-ink text-sm
                 transition-colors duration-200
                 flex items-center gap-2
-                focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500
               "
             >
               {t('filter.time')}
@@ -293,7 +293,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
               className={`
               absolute top-full left-0 mt-1
               w-48 max-w-[calc(100vw-1.5rem)]
-              bg-surface-paper border border-line rounded-lg shadow-lg
+              bg-surface-paper border border-line rounded-lg shadow-dropdown
               ${openDropdown === 'timeRange' ? 'opacity-100 visible' : 'opacity-0 invisible'}
               transition-all duration-200
               z-30
@@ -309,8 +309,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                     hover:bg-surface-muted rounded
                     transition-colors duration-150
                     text-sm text-ink
-                    focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
-                    ${!filters.timeRange ? 'bg-bread-100 font-medium' : ''}
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500
+                    ${!filters.timeRange ? 'bg-brand-100 font-medium' : ''}
                   `}
                 >
                   {t('common.all')}
@@ -330,11 +330,11 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                       hover:bg-surface-muted rounded
                       transition-colors duration-150
                       text-sm text-ink
-                      focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500
                       ${
                         filters.timeRange?.min === value.min &&
                         filters.timeRange?.max === value.max
-                          ? 'bg-bread-100 font-medium'
+                          ? 'bg-brand-100 font-medium'
                           : ''
                       }
                     `}
@@ -362,7 +362,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                   text-ink text-sm
                   transition-colors duration-200
                   flex items-center gap-2
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-bread-500
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500
                 "
               >
                 {t('filter.tags')}
@@ -375,7 +375,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                 className={`
                 absolute top-full left-0 mt-1
                 w-56 max-w-[calc(100vw-1.5rem)]
-                bg-surface-paper border border-line rounded-lg shadow-lg
+                bg-surface-paper border border-line rounded-lg shadow-dropdown
                 ${openDropdown === 'tags' ? 'opacity-100 visible' : 'opacity-0 invisible'}
                 transition-all duration-200
                 z-30
@@ -395,7 +395,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                         type="checkbox"
                         checked={filters.tags?.includes(tag) || false}
                         onChange={() => handleTagToggle(tag)}
-                        className="w-4 h-4 text-bread-600 border-line rounded focus:ring-bread-500"
+                        className="w-4 h-4 text-brand-600 border-line rounded focus:ring-brand-500"
                       />
                       <span className="text-sm text-ink">{tag}</span>
                     </label>

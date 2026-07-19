@@ -55,10 +55,16 @@
   .compact-section {
     @apply space-y-3;
   }
-  
+
   .compact-header {
     @apply text-base font-semibold mb-2;
   }
+}
+
+@layer utilities {
+  /* 계기판 자형: 수치 셀의 자릿수를 세로로 고정해 표가 흔들리지 않게 한다.
+     변환표 g/%, DDT 결과, 통계 수치 등 모든 계산 출력에 적용. 단위 g는 소문자, 베이커스 % 표기 유지. */
+  .tnum { font-variant-numeric: tabular-nums slashed-zero; }
 }
 
 /* 인쇄/PDF (C4): 앱 네비 등 크롬을 숨기고, 대시보드의 고정 높이·스크롤 컨테이너를

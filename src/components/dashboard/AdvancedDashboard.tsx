@@ -29,7 +29,10 @@ import {
   Save, Flame, Scale, Wheat, Droplets, TrendingDown,
   Cookie, Layers, ThermometerSun, Link, Unlink,
   Clock, ListOrdered, RotateCcw, GripVertical, Copy, FileText, Pin, Info,
-  Printer, CheckSquare, Square, Timer, Play
+  Printer, CheckSquare, Square, Timer, Play,
+  Soup, FlaskConical, Hourglass, Sparkles, CakeSlice, Brush, Droplet, Package,
+  ClipboardList, Hash, Target, Snowflake, Moon,
+  type LucideIcon
 } from 'lucide-react';
 import TimerManager from '@/components/pwa/TimerManager.jsx';
 import BakingMode from '@/components/pwa/BakingMode';
@@ -180,20 +183,20 @@ const METHOD_KEYS: Record<string, string> = {
 };
 
 // 단계(Phase) 메타데이터 - 구분선 표시용 (labelKey for translation)
-const PHASE_META: Record<string, { icon: string; labelKey: string; bgColor: string; textColor: string; borderColor: string }> = {
-  tangzhong: { icon: '🍜', labelKey: 'phase.tangzhong', bgColor: 'bg-pink-50', textColor: 'text-pink-700', borderColor: 'border-pink-200' },
-  preferment: { icon: '🧪', labelKey: 'phase.preferment', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
-  poolish: { icon: '🧪', labelKey: 'phase.poolish', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
-  biga: { icon: '🧪', labelKey: 'phase.biga', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
-  sponge: { icon: '🧪', labelKey: 'phase.sponge', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
-  levain: { icon: '🥖', labelKey: 'phase.levain', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
-  autolyse: { icon: '⏳', labelKey: 'phase.autolyse', bgColor: 'bg-purple-50', textColor: 'text-purple-700', borderColor: 'border-purple-200' },
-  main: { icon: '🍞', labelKey: 'phase.mainDough', bgColor: 'bg-blue-50', textColor: 'text-blue-700', borderColor: 'border-blue-200' },
-  topping: { icon: '✨', labelKey: 'phase.topping', bgColor: 'bg-orange-50', textColor: 'text-orange-700', borderColor: 'border-orange-200' },
-  filling: { icon: '🎂', labelKey: 'phase.filling', bgColor: 'bg-rose-50', textColor: 'text-rose-700', borderColor: 'border-rose-200' },
-  frosting: { icon: '🍰', labelKey: 'phase.frosting', bgColor: 'bg-indigo-50', textColor: 'text-indigo-700', borderColor: 'border-indigo-200' },
-  glaze: { icon: '💧', labelKey: 'phase.glaze', bgColor: 'bg-cyan-50', textColor: 'text-cyan-700', borderColor: 'border-cyan-200' },
-  other: { icon: '📦', labelKey: 'ingredientCategory.other', bgColor: 'bg-surface-muted', textColor: 'text-ink-muted', borderColor: 'border-line' },
+const PHASE_META: Record<string, { icon: LucideIcon; labelKey: string; bgColor: string; textColor: string; borderColor: string }> = {
+  tangzhong: { icon: Soup, labelKey: 'phase.tangzhong', bgColor: 'bg-pink-50', textColor: 'text-pink-700', borderColor: 'border-pink-200' },
+  preferment: { icon: FlaskConical, labelKey: 'phase.preferment', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  poolish: { icon: FlaskConical, labelKey: 'phase.poolish', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  biga: { icon: FlaskConical, labelKey: 'phase.biga', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  sponge: { icon: FlaskConical, labelKey: 'phase.sponge', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  levain: { icon: FlaskConical, labelKey: 'phase.levain', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+  autolyse: { icon: Hourglass, labelKey: 'phase.autolyse', bgColor: 'bg-purple-50', textColor: 'text-purple-700', borderColor: 'border-purple-200' },
+  main: { icon: Wheat, labelKey: 'phase.mainDough', bgColor: 'bg-blue-50', textColor: 'text-blue-700', borderColor: 'border-blue-200' },
+  topping: { icon: Sparkles, labelKey: 'phase.topping', bgColor: 'bg-orange-50', textColor: 'text-orange-700', borderColor: 'border-orange-200' },
+  filling: { icon: CakeSlice, labelKey: 'phase.filling', bgColor: 'bg-rose-50', textColor: 'text-rose-700', borderColor: 'border-rose-200' },
+  frosting: { icon: Brush, labelKey: 'phase.frosting', bgColor: 'bg-indigo-50', textColor: 'text-indigo-700', borderColor: 'border-indigo-200' },
+  glaze: { icon: Droplet, labelKey: 'phase.glaze', bgColor: 'bg-cyan-50', textColor: 'text-cyan-700', borderColor: 'border-cyan-200' },
+  other: { icon: Package, labelKey: 'ingredientCategory.other', bgColor: 'bg-surface-muted', textColor: 'text-ink-muted', borderColor: 'border-line' },
 };
 
 // 동적 크기 계산 (20-25개 재료 기준) - v2.2: 컴팩트 버전
@@ -219,7 +222,7 @@ interface CollapsibleSectionProps {
 }
 
 const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
-  title, icon, defaultOpen = true, badge, badgeColor = 'bg-amber-100 text-amber-700', onReset, children
+  title, icon, defaultOpen = true, badge, badgeColor = 'bg-surface-muted text-ink-muted', onReset, children
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -242,7 +245,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           {onReset && (
             <button
               onClick={(e) => { e.stopPropagation(); onReset(); }}
-              className="p-1 text-ink-disabled hover:text-amber-600 hover:bg-surface-muted rounded transition-colors"
+              className="p-1 text-ink-disabled hover:text-ink-muted hover:bg-surface-muted rounded transition-colors"
               title="초기화"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -2147,12 +2150,12 @@ const AdvancedDashboard: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 lg:gap-3">
         {/* 좌측: 제품 정보 + 출처 */}
         <div className="flex items-center flex-wrap gap-2 lg:gap-3 min-w-0">
-          <Cookie className="w-5 h-5 text-amber-600 flex-shrink-0" />
+          <Cookie className="w-5 h-5 text-ink-muted flex-shrink-0" strokeWidth={1.75} />
           <input
             type="text"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
-            className="text-lg font-bold w-36 min-h-[44px] lg:min-h-0 border-b border-transparent hover:border-line focus:border-amber-500 focus:outline-none"
+            className="text-lg font-bold w-36 min-h-[44px] lg:min-h-0 border-b border-transparent hover:border-line focus:border-brand-500 focus:outline-none"
             placeholder={t('advDashboard.productName')}
           />
           {exampleLoaded && (
@@ -2166,7 +2169,7 @@ const AdvancedDashboard: React.FC = () => {
               onClick={() => setProductType('bread')}
               className={`px-3 py-1 min-h-[44px] lg:min-h-0 text-xs rounded-l ${
                 productType === 'bread'
-                  ? 'bg-amber-500 text-white font-medium'
+                  ? 'bg-brand-500 text-white font-medium'
                   : 'bg-surface-muted text-ink-muted hover:bg-line'
               }`}
               title={t('advDashboard.productTypeBread')}
@@ -2177,7 +2180,7 @@ const AdvancedDashboard: React.FC = () => {
               onClick={() => setProductType('pastry')}
               className={`px-3 py-1 min-h-[44px] lg:min-h-0 text-xs rounded-r ${
                 productType === 'pastry'
-                  ? 'bg-amber-500 text-white font-medium'
+                  ? 'bg-brand-500 text-white font-medium'
                   : 'bg-surface-muted text-ink-muted hover:bg-line'
               }`}
               title={t('advDashboard.productTypePastry')}
@@ -2191,22 +2194,22 @@ const AdvancedDashboard: React.FC = () => {
             <select
               value={source.type}
               onChange={(e) => setSource({ ...source, type: e.target.value as SourceType })}
-              className="bg-surface-muted border border-line rounded px-1.5 py-1 text-xs focus:outline-none focus:border-amber-400"
+              className="bg-surface-muted border border-line rounded px-1.5 py-1 text-xs focus:outline-none focus:border-brand-400"
               title={t('advDashboard.sourceType')}
             >
-              <option value="youtube">📺 {t('advDashboard.sourceTypes.youtube')}</option>
-              <option value="blog">🌐 {t('advDashboard.sourceTypes.blog')}</option>
-              <option value="book">📖 {t('advDashboard.sourceTypes.book')}</option>
-              <option value="website">🔗 {t('advDashboard.sourceTypes.website')}</option>
-              <option value="personal">👤 {t('advDashboard.sourceTypes.personal')}</option>
-              <option value="school">🎓 {t('advDashboard.sourceTypes.school')}</option>
-              <option value="other">📌 {t('advDashboard.sourceTypes.other')}</option>
+              <option value="youtube">{t('advDashboard.sourceTypes.youtube')}</option>
+              <option value="blog">{t('advDashboard.sourceTypes.blog')}</option>
+              <option value="book">{t('advDashboard.sourceTypes.book')}</option>
+              <option value="website">{t('advDashboard.sourceTypes.website')}</option>
+              <option value="personal">{t('advDashboard.sourceTypes.personal')}</option>
+              <option value="school">{t('advDashboard.sourceTypes.school')}</option>
+              <option value="other">{t('advDashboard.sourceTypes.other')}</option>
             </select>
             <input
               type="text"
               value={source.name}
               onChange={(e) => setSource({ ...source, name: e.target.value })}
-              className="w-24 bg-surface-muted border border-line rounded px-2 py-1 text-xs focus:outline-none focus:border-amber-400"
+              className="w-24 bg-surface-muted border border-line rounded px-2 py-1 text-xs focus:outline-none focus:border-brand-400"
               placeholder={t('advDashboard.sourceName')}
               title={t('advDashboard.sourceNamePlaceholder')}
             />
@@ -2220,7 +2223,7 @@ const AdvancedDashboard: React.FC = () => {
         <div className="flex items-center flex-wrap gap-2 lg:gap-3">
           <button
             onClick={() => setIsPanLinked(!isPanLinked)}
-            className={`p-1.5 min-h-[44px] lg:min-h-0 rounded flex items-center gap-1 ${isPanLinked ? 'bg-green-100 text-green-600' : 'bg-surface-muted text-ink-disabled'}`}
+            className={`p-1.5 min-h-[44px] lg:min-h-0 rounded flex items-center gap-1 ${isPanLinked ? 'bg-success-100 text-success-600' : 'bg-surface-muted text-ink-disabled'}`}
             title={isPanLinked ? t('advDashboard.multiplierLinked') : t('advDashboard.multiplierUnlinked')}
           >
             {isPanLinked ? <Link className="w-4 h-4" /> : <Unlink className="w-4 h-4" />}
@@ -2229,8 +2232,8 @@ const AdvancedDashboard: React.FC = () => {
           <span className="text-xs text-ink-subtle">{t('advDashboard.multiplier')}:</span>
           {isPanLinked ? (
             /* 연동 모드: 자동 계산된 배수 표시 (읽기 전용) */
-            <div className="flex items-center border border-green-300 rounded overflow-hidden bg-green-50">
-              <div className="px-4 py-1 font-bold text-sm text-green-700 w-20 text-center">
+            <div className="flex items-center border border-success-100 rounded overflow-hidden bg-success-50">
+              <div className="px-4 py-1 font-bold text-sm text-success-700 w-20 text-center tnum">
                 ×{effectiveMultiplier}
               </div>
             </div>
@@ -2246,7 +2249,7 @@ const AdvancedDashboard: React.FC = () => {
                 onChange={(e) => handleMultiplierInputChange(e.target.value)}
                 onBlur={handleMultiplierInputConfirm}
                 onKeyDown={(e) => e.key === 'Enter' && handleMultiplierInputConfirm()}
-                className="w-20 text-center py-1 font-bold text-sm"
+                className="w-20 text-center py-1 font-bold text-sm tnum"
                 placeholder={t('advDashboard.multiplierPlaceholder')}
                 title={t('advDashboard.multiplierHint')}
               />
@@ -2261,9 +2264,9 @@ const AdvancedDashboard: React.FC = () => {
                 <button
                   key={m}
                   onClick={() => handleQuickMultiplier(m)}
-                  className={`px-2.5 py-1.5 lg:px-1.5 lg:py-0.5 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${
+                  className={`px-2.5 py-1.5 lg:px-1.5 lg:py-0.5 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors tnum ${
                     multiplier === m
-                      ? 'bg-amber-500 text-white'
+                      ? 'bg-brand-500 text-white'
                       : 'bg-surface-muted hover:bg-line text-ink-muted'
                   }`}
                 >
@@ -2277,7 +2280,7 @@ const AdvancedDashboard: React.FC = () => {
         <div className="flex items-center rounded-md bg-surface-muted p-0.5 print-hide flex-shrink-0 self-start sm:self-auto" role="group" aria-label={t('advDashboard.modeGroupLabel', { defaultValue: '표시 모드' })}>
           <button
             onClick={() => setConversionMode('simple')}
-            className={`px-2.5 py-1 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${conversionMode === 'simple' ? 'bg-amber-500 text-white font-medium' : 'text-ink-muted hover:text-ink'}`}
+            className={`px-2.5 py-1 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${conversionMode === 'simple' ? 'bg-brand-500 text-white font-medium' : 'text-ink-muted hover:text-ink'}`}
             title={t('advDashboard.modeSimpleTitle', { defaultValue: '간단 모드' })}
             aria-pressed={conversionMode === 'simple'}
           >
@@ -2285,7 +2288,7 @@ const AdvancedDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setConversionMode('expert')}
-            className={`px-2.5 py-1 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${conversionMode === 'expert' ? 'bg-amber-500 text-white font-medium' : 'text-ink-muted hover:text-ink'}`}
+            className={`px-2.5 py-1 min-h-[44px] lg:min-h-0 text-xs rounded transition-colors ${conversionMode === 'expert' ? 'bg-brand-500 text-white font-medium' : 'text-ink-muted hover:text-ink'}`}
             title={t('advDashboard.modeExpertTitle', { defaultValue: '전문가 모드' })}
             aria-pressed={conversionMode === 'expert'}
           >
@@ -2297,19 +2300,16 @@ const AdvancedDashboard: React.FC = () => {
 
         {/* 2줄: 요약 지표(좌) + 액션 버튼(우) — 결과 + 저장/내보내기 */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 lg:gap-3">
-          <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-ink-subtle bg-surface-muted px-3 py-1.5 rounded">
-            <span className="cursor-help" title="원본 레시피의 총 반죽량">{t('advDashboard.original')}:<b className="text-ink-muted ml-1">{totalWeight}g</b></span>
+          <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-ink-subtle bg-surface-muted px-3 py-1.5 rounded">
+            <span className="inline-flex items-baseline gap-1 cursor-help" title="원본 레시피의 총 반죽량">{t('advDashboard.original')}<b className="text-ink tnum">{totalWeight}g</b></span>
             <span className="text-line-strong">→</span>
-            <span className="cursor-help" title="변환(배수·팬 반영) 후 총 반죽량">{t('advDashboard.converted')}:<b className="text-brand-600 ml-1">{convertedTotal}g</b></span>
+            <span className="inline-flex items-baseline gap-1 cursor-help" title="변환(배수·팬 반영) 후 총 반죽량">{t('advDashboard.converted')}<b className="text-brand-600 tnum">{convertedTotal}g</b></span>
             {/* 고급 지표(수화율·팬권장량·팬충전율): 제빵 전문 지표 — 전문가 모드에서만 노출 */}
             {isExpertMode && (
             <>
-            <span className="text-line-strong">|</span>
-            <span className="cursor-help" title="밀가루 대비 수분 비율입니다 (60~80% 권장)">{t('advDashboard.hydration')}:<b className="ml-1">{hydration}%</b></span>
-            <span className="text-line-strong">|</span>
-            <span className="cursor-help" title="팬 부피를 기준으로 권장되는 반죽량">{t('advDashboard.pan')}:<b className="ml-1">{panTotalWeight}g</b></span>
-            <span className="text-line-strong">|</span>
-            <span className="cursor-help" title="반죽량 ÷ 팬 권장량 (100%≈적정 충전, 110%↑ 과충전 주의)">{t('advDashboard.panFillRate')}:<b className={`ml-1 ${panFillRate > 110 ? 'text-danger' : panFillRate < 85 ? 'text-warning' : 'text-success'}`}>{panFillRate}%</b></span>
+            <span className="inline-flex items-baseline gap-1 cursor-help" title="밀가루 대비 수분 비율입니다 (60~80% 권장)">{t('advDashboard.hydration')}<b className="text-ink tnum">{hydration}%</b></span>
+            <span className="inline-flex items-baseline gap-1 cursor-help" title="팬 부피를 기준으로 권장되는 반죽량">{t('advDashboard.pan')}<b className="text-ink tnum">{panTotalWeight}g</b></span>
+            <span className="inline-flex items-baseline gap-1 cursor-help" title="반죽량 ÷ 팬 권장량 (100%≈적정 충전, 110%↑ 과충전 주의)">{t('advDashboard.panFillRate')}<b className={`tnum ${panFillRate > 110 ? 'text-danger' : panFillRate < 85 ? 'text-warning' : 'text-success'}`}>{panFillRate}%</b></span>
             </>
             )}
           </div>
@@ -2326,7 +2326,7 @@ const AdvancedDashboard: React.FC = () => {
             )}
             <button
               onClick={handleSaveRecipe}
-              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-amber-500 text-white rounded hover:bg-amber-600"
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] lg:min-h-0 text-xs bg-brand-500 text-white rounded hover:bg-brand-600"
               title={t('advDashboard.saveRecipe')}
             >
               <Save className="w-4 h-4" />{t('advDashboard.save')}
@@ -2388,24 +2388,24 @@ const AdvancedDashboard: React.FC = () => {
             title={t('advDashboard.panSettings')}
             icon={<Layers className="w-4 h-4" />}
             badge={`${originalPan.quantity}${t('advDashboard.pan')}→${pans.reduce((s, p) => s + p.quantity, 0)}${t('advDashboard.pan')}`}
-            badgeColor="bg-blue-100 text-blue-700"
+            badgeColor="bg-surface-muted text-ink-muted"
             onReset={resetPanSettings}
           >
             <div className="space-y-3">
               {/* 원래 팬 (레시피 원본) */}
               <div className="bg-surface-muted rounded p-2">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-medium text-ink-muted">📋 {t('advDashboard.originalPan')}</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-ink-muted"><ClipboardList className="w-3 h-3" strokeWidth={1.75} />{t('advDashboard.originalPan')}</span>
                   {/* 팬/개수 모드 토글 */}
                   <div className="flex text-xs">
                     <button
                       onClick={() => updateOriginalPan('mode', 'pan')}
-                      className={`px-2 py-0.5 rounded-l border ${originalPan.mode === 'pan' ? 'bg-ink-subtle text-white border-ink-subtle' : 'bg-surface-paper text-ink-muted border-line'}`}
-                    >🍞 {t('advDashboard.panMode')}</button>
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-l border ${originalPan.mode === 'pan' ? 'bg-ink-subtle text-white border-ink-subtle' : 'bg-surface-paper text-ink-muted border-line'}`}
+                    ><Wheat className="w-3 h-3" strokeWidth={1.75} />{t('advDashboard.panMode')}</button>
                     <button
                       onClick={() => updateOriginalPan('mode', 'count')}
-                      className={`px-2 py-0.5 rounded-r border-l-0 border ${originalPan.mode === 'count' ? 'bg-green-500 text-white border-green-500' : 'bg-surface-paper text-ink-muted border-line'}`}
-                    >🔢 {t('advDashboard.countMode')}</button>
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-r border-l-0 border ${originalPan.mode === 'count' ? 'bg-ink-subtle text-white border-ink-subtle' : 'bg-surface-paper text-ink-muted border-line'}`}
+                    ><Hash className="w-3 h-3" strokeWidth={1.75} />{t('advDashboard.countMode')}</button>
                   </div>
                 </div>
 
@@ -2489,26 +2489,26 @@ const AdvancedDashboard: React.FC = () => {
 
               {/* 변환 팬 (목표) */}
               <div className="space-y-2">
-                <div className="text-xs font-medium text-blue-600">🎯 {t('advDashboard.convertedPan')}</div>
+                <div className="inline-flex items-center gap-1 text-xs font-medium text-info-600"><Target className="w-3 h-3" strokeWidth={1.75} />{t('advDashboard.convertedPan')}</div>
                 {pans.map((pan, idx) => (
-                  <div key={pan.id} className="bg-blue-50 rounded p-2 border border-blue-200">
+                  <div key={pan.id} className="bg-info-50 rounded p-2 border border-info-200">
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-blue-700">{t('advDashboard.pan')} {idx + 1}</span>
+                        <span className="text-xs font-medium text-info-700">{t('advDashboard.pan')} {idx + 1}</span>
                         {/* 팬/개수 모드 토글 */}
                         <div className="flex text-xs">
                           <button
                             onClick={() => updatePan(pan.id, 'mode', 'pan')}
-                            className={`px-2 py-0.5 rounded-l border ${pan.mode === 'pan' ? 'bg-blue-500 text-white border-blue-500' : 'bg-surface-paper text-ink-muted border-line'}`}
-                          >🍞 {t('advDashboard.panMode')}</button>
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-l border ${pan.mode === 'pan' ? 'bg-info-600 text-white border-info-600' : 'bg-surface-paper text-ink-muted border-line'}`}
+                          ><Wheat className="w-3 h-3" strokeWidth={1.75} />{t('advDashboard.panMode')}</button>
                           <button
                             onClick={() => updatePan(pan.id, 'mode', 'count')}
-                            className={`px-2 py-0.5 rounded-r border-l-0 border ${pan.mode === 'count' ? 'bg-green-500 text-white border-green-500' : 'bg-surface-paper text-ink-muted border-line'}`}
-                          >🔢 {t('advDashboard.countMode')}</button>
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-r border-l-0 border ${pan.mode === 'count' ? 'bg-info-600 text-white border-info-600' : 'bg-surface-paper text-ink-muted border-line'}`}
+                          ><Hash className="w-3 h-3" strokeWidth={1.75} />{t('advDashboard.countMode')}</button>
                         </div>
                       </div>
                       {pans.length > 1 && (
-                        <button onClick={() => removePan(pan.id)} className="text-red-400 hover:text-red-600">
+                        <button onClick={() => removePan(pan.id)} className="text-ink-subtle hover:text-danger">
                           <X className="w-4 h-4" />
                         </button>
                       )}
@@ -2581,11 +2581,11 @@ const AdvancedDashboard: React.FC = () => {
                     )}
                   </div>
                 ))}
-                <button onClick={addPan} className="w-full text-xs text-blue-600 hover:text-blue-700 py-1.5 border border-dashed border-blue-300 rounded">
+                <button onClick={addPan} className="w-full text-xs text-info-600 hover:text-info-700 py-1.5 border border-dashed border-info-200 rounded">
                   {t('advDashboard.addPan')}
                 </button>
-                <div className="text-xs text-blue-700 text-right">
-                  {t('advDashboard.total')}: <b>{panTotalWeight}g</b>
+                <div className="text-xs text-info-700 text-right">
+                  {t('advDashboard.total')}: <b className="tnum">{panTotalWeight}g</b>
                 </div>
               </div>
             </div>
@@ -2686,14 +2686,14 @@ const AdvancedDashboard: React.FC = () => {
                 : '';
               return `${typeLabel}${levelInfo} ${firstBake}${secondBake}`;
             })()}
-            badgeColor="bg-orange-100 text-orange-700"
+            badgeColor="bg-surface-muted text-ink-muted"
             onReset={resetOvenSettings}
           >
             <div className="space-y-2">
               <div className="flex gap-1.5">
                 {(['convection', 'deck', 'airfryer'] as const).map(type => (
                   <button key={type} onClick={() => setOven({ ...oven, type })}
-                    className={`flex-1 px-2 py-1 text-xs rounded ${oven.type === type ? 'bg-amber-500 text-white' : 'bg-surface-muted'}`}>
+                    className={`flex-1 px-2 py-1 text-xs rounded ${oven.type === type ? 'bg-brand-500 text-white' : 'bg-surface-muted'}`}>
                     {t(`advDashboard.ovenTypes.${type}`)}
                   </button>
                 ))}
@@ -2718,18 +2718,18 @@ const AdvancedDashboard: React.FC = () => {
                             }
                             setOven({ ...oven, level: newLevels.join(', ') });
                           }}
-                          className={`w-6 h-6 rounded text-xs font-medium ${isSelected ? 'bg-amber-500 text-white' : 'bg-surface-muted text-ink-muted hover:bg-line'}`}
+                          className={`w-6 h-6 rounded text-xs font-medium tnum ${isSelected ? 'bg-brand-500 text-white' : 'bg-surface-muted text-ink-muted hover:bg-line'}`}
                         >
                           {level}
                         </button>
                       );
                     })}
                   </div>
-                  {oven.level && <span className="text-amber-600 font-medium">{oven.level}{t('advDashboard.level')}</span>}
+                  {oven.level && <span className="text-ink-muted font-medium">{oven.level}{t('advDashboard.level')}</span>}
                 </div>
               )}
-              <div className="bg-orange-50 rounded p-2">
-                <div className="text-xs font-medium text-orange-700 mb-1.5">{t('advDashboard.firstBake')}</div>
+              <div className="bg-surface-muted rounded p-2">
+                <div className="text-xs font-medium text-ink-muted mb-1.5">{t('advDashboard.firstBake')}</div>
                 {oven.type === 'deck' ? (
                   /* 데크 오븐: 윗불/아랫불 분리 */
                   <div className="grid grid-cols-3 gap-1.5">
@@ -2803,24 +2803,26 @@ const AdvancedDashboard: React.FC = () => {
               defaultOpen={false}
               icon={<Wheat className="w-4 h-4" />}
               badge={t(METHOD_KEYS[method.type])}
-              badgeColor={method.type === 'straight' ? 'bg-surface-muted text-ink-muted' : 'bg-amber-100 text-amber-700'}
+              badgeColor="bg-surface-muted text-ink-muted"
             >
               <div className="space-y-2">
                 <div className="grid grid-cols-5 gap-1">
                   {Object.entries(METHOD_KEYS).map(([key, labelKey]) => (
                     <button key={key} onClick={() => handleMethodChange(key)}
-                      className={`px-1.5 py-1 text-xs rounded ${method.type === key ? 'bg-amber-500 text-white' : 'bg-surface-muted hover:bg-line'}`}>
+                      className={`px-1.5 py-1 text-xs rounded ${method.type === key ? 'bg-brand-500 text-white' : 'bg-surface-muted hover:bg-line'}`}>
                       {t(labelKey)}
                     </button>
                   ))}
                 </div>
                 {/* 저온발효/저온숙성: 이스트 조정 정보 표시 */}
                 {(method.type === 'coldFerment' || method.type === 'retard') && (
-                  <div className="bg-blue-50 rounded p-2">
-                    <div className="text-xs font-medium text-blue-700 mb-1">
-                      {method.type === 'coldFerment' ? `❄️ ${t('advDashboard.coldFerment')}` : `🌙 ${t('advDashboard.coldRetard')}`}
+                  <div className="bg-info-50 rounded p-2">
+                    <div className="inline-flex items-center gap-1 text-xs font-medium text-info-700 mb-1">
+                      {method.type === 'coldFerment'
+                        ? <><Snowflake className="w-3 h-3" strokeWidth={1.75} />{t('advDashboard.coldFerment')}</>
+                        : <><Moon className="w-3 h-3" strokeWidth={1.75} />{t('advDashboard.coldRetard')}</>}
                     </div>
-                    <div className="text-xs text-blue-600">
+                    <div className="text-xs text-info-600">
                       {method.type === 'coldFerment'
                         ? t('advDashboard.coldFermentDesc', { percent: Math.round(method.yeastAdjustment * 100) })
                         : t('advDashboard.coldRetardDesc')
@@ -2866,7 +2868,7 @@ const AdvancedDashboard: React.FC = () => {
           <ResizeHandle
             direction="horizontal"
             onResize={(delta) => setSidebarWidth(layoutSettings.sidebarWidth + delta)}
-            className="hover:bg-blue-100"
+            className="hover:bg-brand-100"
           />
         </div>
         </>
@@ -2901,14 +2903,14 @@ const AdvancedDashboard: React.FC = () => {
                   </span>
                   <div className="flex gap-2 print-hide">
                     {/* 가독 최소치 text-xs로 상향 + 모바일 터치영역(py) 확보 */}
-                    <button onClick={() => setIsBulkInputOpen(true)} className="text-xs text-blue-600 hover:text-blue-700 font-medium py-1.5 lg:py-0">📋 {t('advDashboard.bulkInput')}</button>
-                    <button onClick={addIngredient} className="text-xs text-amber-600 hover:text-amber-700 font-medium py-1.5 lg:py-0">{t('advDashboard.addIngredient')}</button>
+                    <button onClick={() => setIsBulkInputOpen(true)} className="inline-flex items-center gap-1 text-xs text-info-600 hover:text-info-700 font-medium py-1.5 lg:py-0"><ClipboardList className="w-3.5 h-3.5" strokeWidth={1.75} />{t('advDashboard.bulkInput')}</button>
+                    <button onClick={addIngredient} className="text-xs text-brand-600 hover:text-brand-700 font-medium py-1.5 lg:py-0">{t('advDashboard.addIngredient')}</button>
                   </div>
                 </div>
                 <div className="flex-1 overflow-auto">
                   <table className="w-full">
                     <thead className="bg-surface-muted sticky top-0">
-                      <tr className={`text-ink-subtle ${dynamicStyles.fontSize}`}>
+                      <tr className={`text-ink-subtle font-semibold tracking-wide ${dynamicStyles.fontSize}`}>
                         <th className="px-1.5 py-1 text-left w-16">{t('advDashboard.category')}</th>
                         <th className="px-1.5 py-1 text-left">{t('advDashboard.ingredients')}</th>
                         <th className={`px-1.5 py-1 text-left w-20 hidden ${isExpertMode ? 'sm:table-cell' : ''}`}>{t('advDashboard.process')}</th>
@@ -2920,17 +2922,18 @@ const AdvancedDashboard: React.FC = () => {
                     <tbody className={dynamicStyles.fontSize}>
                       {ingredientsByPhase.map(({ phase, items }, phaseIndex) => {
                         const phaseMeta = PHASE_META[phase] || PHASE_META.other;
+                        const PhaseIcon = phaseMeta.icon;
                         return (
                           <React.Fragment key={`${phase}-${phaseIndex}`}>
                             {/* 단계 구분선 (2개 이상 단계가 있을 때만 표시) */}
                             {hasMultiplePhases && (
                               <tr className={`${phaseMeta.bgColor} ${phaseMeta.borderColor} border-y-2`}>
-                                <td colSpan={5} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs`}>
-                                  <span className="flex items-center gap-1">
-                                    <span>{phaseMeta.icon}</span>
+                                <td colSpan={5} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs tracking-wide`}>
+                                  <span className="flex items-center gap-1.5">
+                                    <PhaseIcon className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} />
                                     <span>{t(phaseMeta.labelKey)}</span>
-                                    <span className="text-xs font-normal opacity-70">({t('advDashboard.itemCount', { count: items.length })})</span>
-                                    <span className="ml-auto font-mono font-semibold">{t('advDashboard.subtotal', { defaultValue: '소계' })} {formatWeight(items.reduce((s: number, i: any) => s + (i.amount || 0), 0))}g</span>
+                                    <span className="text-xs font-normal opacity-70 tnum">({t('advDashboard.itemCount', { count: items.length })})</span>
+                                    <span className="ml-auto font-mono font-semibold tnum">{t('advDashboard.subtotal', { defaultValue: '소계' })} {formatWeight(items.reduce((s: number, i: any) => s + (i.amount || 0), 0))}g</span>
                                   </span>
                                 </td>
                               </tr>
@@ -2986,7 +2989,7 @@ const AdvancedDashboard: React.FC = () => {
                                         const meta = PHASE_META[phaseKey];
                                         return (
                                           <option key={phaseKey} value={phaseKey}>
-                                            {meta.icon} {t(meta.labelKey)}
+                                            {t(meta.labelKey)}
                                           </option>
                                         );
                                       })}
@@ -3012,7 +3015,7 @@ const AdvancedDashboard: React.FC = () => {
                   </table>
                 </div>
                 <div className="bg-surface-muted border-t px-2 py-1 text-xs flex-shrink-0">
-                  <span>{t('advDashboard.total')}: <b>{totalWeight}g</b></span>
+                  <span>{t('advDashboard.total')}: <b className="tnum">{totalWeight}g</b></span>
                 </div>
               </div>
 
@@ -3029,7 +3032,7 @@ const AdvancedDashboard: React.FC = () => {
                 <div className="flex-1 overflow-auto">
                   <table className="w-full">
                     <thead className="bg-info-50 sticky top-0">
-                      <tr className={`text-info-700 ${dynamicStyles.fontSize}`}>
+                      <tr className={`text-info-700 font-semibold tracking-wide ${dynamicStyles.fontSize}`}>
                         <th className="w-6 px-1 py-1 print-hide" title={t('advDashboard.miseEnPlace', { defaultValue: '계량 체크' })}></th>
                         <th className="px-2 py-1 text-left">{t('advDashboard.category')}</th>
                         <th className="px-2 py-1 text-left">{t('advDashboard.ingredients')}</th>
@@ -3040,17 +3043,18 @@ const AdvancedDashboard: React.FC = () => {
                     <tbody className={dynamicStyles.fontSize}>
                       {convertedIngredientsByPhase.map(({ phase, items }, phaseIndex) => {
                         const phaseMeta = PHASE_META[phase] || PHASE_META.other;
+                        const PhaseIcon = phaseMeta.icon;
                         return (
                           <React.Fragment key={`${phase}-${phaseIndex}`}>
                             {/* 단계 구분선 (2개 이상 단계가 있을 때만 표시) */}
                             {convertedHasMultiplePhases && (
                               <tr className={`${phaseMeta.bgColor} ${phaseMeta.borderColor} border-y-2`}>
-                                <td colSpan={5} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs`}>
-                                  <span className="flex items-center gap-1">
-                                    <span>{phaseMeta.icon}</span>
+                                <td colSpan={5} className={`px-2 py-1 ${phaseMeta.textColor} font-semibold text-xs tracking-wide`}>
+                                  <span className="flex items-center gap-1.5">
+                                    <PhaseIcon className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} />
                                     <span>{t(phaseMeta.labelKey)}</span>
-                                    <span className="text-xs font-normal opacity-70">({t('advDashboard.itemCount', { count: items.length })})</span>
-                                    <span className="ml-auto font-mono font-semibold">{t('advDashboard.subtotal', { defaultValue: '소계' })} {formatWeight(items.reduce((s: number, i: any) => s + (i.convertedAmount || 0), 0))}g</span>
+                                    <span className="text-xs font-normal opacity-70 tnum">({t('advDashboard.itemCount', { count: items.length })})</span>
+                                    <span className="ml-auto font-mono font-semibold tnum">{t('advDashboard.subtotal', { defaultValue: '소계' })} {formatWeight(items.reduce((s: number, i: any) => s + (i.convertedAmount || 0), 0))}g</span>
                                   </span>
                                 </td>
                               </tr>
@@ -3088,7 +3092,7 @@ const AdvancedDashboard: React.FC = () => {
                   </table>
                 </div>
                 <div className="bg-info-50 border-t border-info-200 px-2 py-1 text-xs flex-shrink-0">
-                  <span className="text-info-700">{t('advDashboard.total')}: <b>{formatWeight(prefermentTotal + mainDoughTotal)}g</b></span>
+                  <span className="text-info-700">{t('advDashboard.total')}: <b className="tnum">{formatWeight(prefermentTotal + mainDoughTotal)}g</b></span>
                 </div>
               </div>
               )}
@@ -3110,7 +3114,7 @@ const AdvancedDashboard: React.FC = () => {
             <ResizeHandle
               direction="vertical"
               onResize={(delta) => setProcessPanelHeight(layoutSettings.processPanelHeight - delta)}
-              className="hover:bg-blue-100"
+              className="hover:bg-brand-100"
             />
           </div>
 
@@ -3143,7 +3147,7 @@ const AdvancedDashboard: React.FC = () => {
                 >
                   <Flame className="w-3.5 h-3.5" />{t('advDashboard.bakingMode.title', { defaultValue: '베이킹 모드' })}
                 </button>
-                <button onClick={addProcess} className="text-xs text-amber-600 hover:text-amber-700 font-medium">{t('advDashboard.addProcess')}</button>
+                <button onClick={addProcess} className="text-xs text-brand-600 hover:text-brand-700 font-medium">{t('advDashboard.addProcess')}</button>
               </div>
             </div>
             <div className="flex-1 overflow-auto px-2 py-1.5">
@@ -3151,11 +3155,12 @@ const AdvancedDashboard: React.FC = () => {
                 {/* H4: 공정을 phase 그룹(타임라인)으로 렌더. 단일 phase면 구분선 없이 기존 flat 동작. */}
                 {processesByPhase.map((group) => {
                   const groupMeta = PHASE_META[group.phase] || PHASE_META.other;
+                  const GroupIcon = groupMeta.icon;
                   return (
                   <React.Fragment key={group.phase}>
                     {hasMultipleProcessPhases && (
-                      <div className={`w-full lg:basis-full flex items-center gap-1 mt-1 first:mt-0 px-1.5 py-0.5 rounded text-[11px] font-semibold ${groupMeta.bgColor} ${groupMeta.textColor}`}>
-                        <span aria-hidden="true">{groupMeta.icon}</span>
+                      <div className={`w-full lg:basis-full flex items-center gap-1.5 mt-1 first:mt-0 px-1.5 py-0.5 rounded text-xs font-semibold tracking-wide ${groupMeta.bgColor} ${groupMeta.textColor}`}>
+                        <GroupIcon className="w-3 h-3 shrink-0" strokeWidth={1.75} aria-hidden="true" />
                         <span>{t(groupMeta.labelKey)}</span>
                       </div>
                     )}
@@ -3219,14 +3224,14 @@ const AdvancedDashboard: React.FC = () => {
                         <select
                           value={proc.phase || 'main'}
                           onChange={(e) => updateProcess(proc.id, 'phase', e.target.value)}
-                          className="text-[11px] text-ink-muted border border-line rounded px-1 py-0.5 bg-surface-paper focus:outline-none cursor-pointer"
+                          className="text-xs text-ink-muted border border-line rounded px-1 py-0.5 bg-surface-paper focus:outline-none cursor-pointer"
                           aria-label={t('advDashboard.processPhase', { defaultValue: '공정 단계' })}
                         >
                           {availablePhases.map(phaseKey => {
                             const m = PHASE_META[phaseKey];
                             return (
                               <option key={phaseKey} value={phaseKey}>
-                                {m.icon} {t(m.labelKey)}
+                                {t(m.labelKey)}
                               </option>
                             );
                           })}
@@ -3242,25 +3247,25 @@ const AdvancedDashboard: React.FC = () => {
                     )}
                     {/* 시간: 값이 있을 때 뱃지 표시 + 삭제 버튼 */}
                     {proc.time ? (
-                      <div className="flex items-center gap-0.5 text-xs text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded group/time">
+                      <div className="flex items-center gap-0.5 text-xs text-info-600 bg-info-50 px-1.5 py-0.5 rounded group/time">
                         <Clock className="w-3 h-3 flex-shrink-0" />
                         <input
                           type="number"
                           value={proc.time}
                           onChange={(e) => updateProcess(proc.id, 'time', parseInt(e.target.value) || 0)}
-                          className="w-8 bg-transparent border-0 p-0 text-center focus:outline-none"
+                          className="w-8 bg-transparent border-0 p-0 text-center focus:outline-none tnum"
                         />
                         <span className="text-xs flex-shrink-0">{t('units.minute')}</span>
                         <button
                           onClick={() => startTimerFromProcess(translateProcessStep(proc.description || '') || t('advDashboard.processStepN', { defaultValue: '공정 {{n}}', n: idx + 1 }), proc.time || 0)}
-                          className="text-blue-500 hover:text-blue-700 ml-0.5 flex-shrink-0 print-hide"
+                          className="text-info-600 hover:text-info-700 ml-0.5 flex-shrink-0 print-hide"
                           title={t('advDashboard.startTimer', { defaultValue: '이 시간으로 타이머 시작' })}
                         >
                           <Play className="w-3 h-3" />
                         </button>
                         <button
                           onClick={() => updateProcess(proc.id, 'time', undefined)}
-                          className="text-blue-400 hover:text-blue-600 opacity-100 lg:opacity-0 lg:group-hover/time:opacity-100 ml-0.5 flex-shrink-0 print-hide"
+                          className="text-info-600 hover:text-info-700 opacity-100 lg:opacity-0 lg:group-hover/time:opacity-100 ml-0.5 flex-shrink-0 print-hide"
                           title={t('advDashboard.deleteTime')}
                         >
                           <X className="w-2.5 h-2.5" />
@@ -3269,7 +3274,7 @@ const AdvancedDashboard: React.FC = () => {
                     ) : (
                       <button
                         onClick={() => updateProcess(proc.id, 'time', 1)}
-                        className="opacity-100 lg:opacity-0 lg:group-hover:opacity-60 hover:opacity-100 text-blue-400 bg-blue-50 px-1 py-0.5 rounded"
+                        className="opacity-100 lg:opacity-0 lg:group-hover:opacity-60 hover:opacity-100 text-info-600 bg-info-50 px-1 py-0.5 rounded"
                         title={t('advDashboard.addTime')}
                       >
                         <Clock className="w-3 h-3" />
@@ -3277,18 +3282,18 @@ const AdvancedDashboard: React.FC = () => {
                     )}
                     {/* 온도: 값이 있을 때 뱃지 표시 + 삭제 버튼 */}
                     {proc.temp ? (
-                      <div className="flex items-center gap-0.5 text-xs text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded group/temp">
+                      <div className="flex items-center gap-0.5 text-xs text-warning-600 bg-warning-50 px-1.5 py-0.5 rounded group/temp">
                         <ThermometerSun className="w-3 h-3 flex-shrink-0" />
                         <input
                           type="number"
                           value={proc.temp}
                           onChange={(e) => updateProcess(proc.id, 'temp', parseInt(e.target.value) || 0)}
-                          className="w-8 bg-transparent border-0 p-0 text-center focus:outline-none"
+                          className="w-8 bg-transparent border-0 p-0 text-center focus:outline-none tnum"
                         />
                         <span className="text-xs flex-shrink-0">{t('units.celsius')}</span>
                         <button
                           onClick={() => updateProcess(proc.id, 'temp', undefined)}
-                          className="text-orange-400 hover:text-orange-600 opacity-100 lg:opacity-0 lg:group-hover/temp:opacity-100 ml-0.5 flex-shrink-0"
+                          className="text-warning-600 hover:text-warning-700 opacity-100 lg:opacity-0 lg:group-hover/temp:opacity-100 ml-0.5 flex-shrink-0"
                           title={t('advDashboard.deleteTemp')}
                         >
                           <X className="w-2.5 h-2.5" />
@@ -3297,7 +3302,7 @@ const AdvancedDashboard: React.FC = () => {
                     ) : (
                       <button
                         onClick={() => updateProcess(proc.id, 'temp', 27)}
-                        className="opacity-100 lg:opacity-0 lg:group-hover:opacity-60 hover:opacity-100 text-orange-400 bg-orange-50 px-1 py-0.5 rounded"
+                        className="opacity-100 lg:opacity-0 lg:group-hover:opacity-60 hover:opacity-100 text-warning-600 bg-warning-50 px-1 py-0.5 rounded"
                         title={t('advDashboard.addTemp')}
                       >
                         <ThermometerSun className="w-3 h-3" />
@@ -3308,7 +3313,7 @@ const AdvancedDashboard: React.FC = () => {
                     </button>
                     {/* 너비 조절 핸들 (데스크톱 전용 - 모바일 세로 1열에선 불필요) */}
                     <div
-                      className="hidden lg:block absolute right-0 top-0 bottom-0 w-1 cursor-col-resize opacity-0 group-hover:opacity-100 hover:bg-blue-400 transition-colors print-hide"
+                      className="hidden lg:block absolute right-0 top-0 bottom-0 w-1 cursor-col-resize opacity-0 group-hover:opacity-100 hover:bg-brand-400 transition-colors print-hide"
                       onMouseDown={(e) => {
                         e.preventDefault();
                         const startX = e.clientX;
@@ -3334,7 +3339,7 @@ const AdvancedDashboard: React.FC = () => {
                       }}
                       title={t('advDashboard.resizeWidth')}
                     >
-                      <GripVertical className="w-2 h-full text-line-strong group-hover:text-blue-400" />
+                      <GripVertical className="w-2 h-full text-line-strong group-hover:text-brand-400" />
                     </div>
                   </div>
                   );
@@ -3353,7 +3358,7 @@ const AdvancedDashboard: React.FC = () => {
                   value={memo}
                   onChange={(e) => setMemo(e.target.value)}
                   placeholder={t('advDashboard.memoPlaceholder')}
-                  className="w-full text-xs border rounded px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full text-xs border rounded px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-brand-500"
                   rows={2}
                 />
               </div>

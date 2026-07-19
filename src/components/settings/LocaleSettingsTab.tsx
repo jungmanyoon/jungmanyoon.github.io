@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocaleStore } from '@/stores/useLocaleStore';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, UnitSystem, UNIT_SYSTEMS } from '@/i18n';
 import { TemperatureUnit, WeightUnit, VolumeUnit, LengthUnit } from '@/utils/unitConverter';
-import { Wheat } from 'lucide-react';
+import { Wheat, Globe, Languages, Ruler, Hash, Eye } from 'lucide-react';
 
 export default function LocaleSettingsTab() {
   const { t } = useTranslation();
@@ -36,9 +36,9 @@ export default function LocaleSettingsTab() {
   return (
     <div className="space-y-8">
       {/* 언어 설정 */}
-      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+      <section className="bg-surface-paper rounded-lg shadow-card border p-6">
         <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
-          <span className="text-xl">🌐</span>
+          <Globe size={18} className="text-ink-muted" />
           {t('settings.language')}
         </h3>
         <p className="text-sm text-ink-subtle mb-4">
@@ -52,13 +52,11 @@ export default function LocaleSettingsTab() {
               onClick={() => setLanguage(lang)}
               className={`p-4 rounded-lg border-2 transition-all ${
                 language === lang
-                  ? 'border-bread-500 bg-bread-50 text-bread-700'
+                  ? 'border-brand-500 bg-brand-50 text-brand-700'
                   : 'border-line hover:border-line text-ink-muted'
               }`}
             >
-              <div className="text-2xl mb-1">
-                {lang === 'ko' ? '🇰🇷' : '🇺🇸'}
-              </div>
+              <Languages className="w-6 h-6 mb-1 text-ink-muted" strokeWidth={1.75} />
               <div className="font-medium">{LANGUAGE_NAMES[lang]}</div>
             </button>
           ))}
@@ -66,9 +64,9 @@ export default function LocaleSettingsTab() {
       </section>
 
       {/* 단위 시스템 */}
-      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+      <section className="bg-surface-paper rounded-lg shadow-card border p-6">
         <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
-          <span className="text-xl">📏</span>
+          <Ruler size={18} className="text-ink-muted" />
           {t('settings.unitSystem')}
         </h3>
         <p className="text-sm text-ink-subtle mb-4">
@@ -82,7 +80,7 @@ export default function LocaleSettingsTab() {
               onClick={() => setUnitSystem(system)}
               className={`p-4 rounded-lg border-2 transition-all text-left ${
                 unitSystem === system
-                  ? 'border-bread-500 bg-bread-50'
+                  ? 'border-brand-500 bg-brand-50'
                   : 'border-line hover:border-line'
               }`}
             >
@@ -113,7 +111,7 @@ export default function LocaleSettingsTab() {
               <select
                 value={temperature}
                 onChange={(e) => setTemperatureUnit(e.target.value as TemperatureUnit)}
-                className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-bread-500 focus:border-bread-500"
+                className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
               >
                 <option value="celsius">°C (Celsius)</option>
                 <option value="fahrenheit">°F (Fahrenheit)</option>
@@ -128,7 +126,7 @@ export default function LocaleSettingsTab() {
               <select
                 value={weight}
                 onChange={(e) => setWeightUnit(e.target.value as WeightUnit)}
-                className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-bread-500 focus:border-bread-500"
+                className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
               >
                 <option value="gram">g (Gram)</option>
                 <option value="ounce">oz (Ounce)</option>
@@ -145,7 +143,7 @@ export default function LocaleSettingsTab() {
               <select
                 value={volume}
                 onChange={(e) => setVolumeUnit(e.target.value as VolumeUnit)}
-                className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-bread-500 focus:border-bread-500"
+                className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
               >
                 <option value="milliliter">ml (Milliliter)</option>
                 <option value="cup">cup (US Cup)</option>
@@ -162,7 +160,7 @@ export default function LocaleSettingsTab() {
               <select
                 value={length}
                 onChange={(e) => setLengthUnit(e.target.value as LengthUnit)}
-                className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-bread-500 focus:border-bread-500"
+                className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
               >
                 <option value="centimeter">cm (Centimeter)</option>
                 <option value="inch">in (Inch)</option>
@@ -173,9 +171,9 @@ export default function LocaleSettingsTab() {
       </section>
 
       {/* 숫자 포맷 */}
-      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+      <section className="bg-surface-paper rounded-lg shadow-card border p-6">
         <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
-          <span className="text-xl">🔢</span>
+          <Hash size={18} className="text-ink-muted" />
           {t('settings.numberFormat')}
         </h3>
 
@@ -190,7 +188,7 @@ export default function LocaleSettingsTab() {
                 onClick={() => setDecimalSeparator('.')}
                 className={`flex-1 py-2 px-4 rounded-lg border-2 transition-all ${
                   decimalSeparator === '.'
-                    ? 'border-bread-500 bg-bread-50 text-bread-700'
+                    ? 'border-brand-500 bg-brand-50 text-brand-700'
                     : 'border-line text-ink-muted'
                 }`}
               >
@@ -200,7 +198,7 @@ export default function LocaleSettingsTab() {
                 onClick={() => setDecimalSeparator(',')}
                 className={`flex-1 py-2 px-4 rounded-lg border-2 transition-all ${
                   decimalSeparator === ','
-                    ? 'border-bread-500 bg-bread-50 text-bread-700'
+                    ? 'border-brand-500 bg-brand-50 text-brand-700'
                     : 'border-line text-ink-muted'
                 }`}
               >
@@ -217,7 +215,7 @@ export default function LocaleSettingsTab() {
             <select
               value={decimalPlaces}
               onChange={(e) => setDecimalPlaces(Number(e.target.value))}
-              className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-bread-500 focus:border-bread-500"
+              className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
             >
               <option value={0}>0 (100)</option>
               <option value={1}>1 (100.5)</option>
@@ -229,7 +227,7 @@ export default function LocaleSettingsTab() {
       </section>
 
       {/* 재료 표시 옵션 */}
-      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+      <section className="bg-surface-paper rounded-lg shadow-card border p-6">
         <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
           <Wheat size={18} className="text-ink-muted" />
           {t('settings.ingredientDisplay')}
@@ -240,7 +238,7 @@ export default function LocaleSettingsTab() {
             type="checkbox"
             checked={showIngredientTranslation}
             onChange={(e) => setShowIngredientTranslation(e.target.checked)}
-            className="w-5 h-5 rounded border-line text-bread-500 focus:ring-bread-500"
+            className="w-5 h-5 rounded border-line text-brand-500 focus:ring-brand-500"
           />
           <span className="text-ink-muted">
             {t('settings.showIngredientTranslation')}
@@ -258,9 +256,9 @@ export default function LocaleSettingsTab() {
       </section>
 
       {/* 미리보기 */}
-      <section className="bg-surface-paper rounded-lg shadow-sm border p-6">
+      <section className="bg-surface-paper rounded-lg shadow-card border p-6">
         <h3 className="text-lg font-semibold text-ink mb-4 flex items-center gap-2">
-          <span className="text-xl">👁️</span>
+          <Eye size={18} className="text-ink-muted" />
           {t('settings.preview')}
         </h3>
 

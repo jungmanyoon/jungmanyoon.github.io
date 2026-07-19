@@ -44,7 +44,7 @@ export default function AdModal({
       {/* 모달 컨텐츠 */}
       <div className="relative bg-surface-paper rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
         {/* 헤더 */}
-        <div className="bg-gradient-to-r from-bread-500 to-amber-500 px-6 py-4">
+        <div className="bg-gradient-to-r from-brand-500 to-amber-500 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Heart className="w-5 h-5 text-white" />
@@ -90,7 +90,7 @@ export default function AdModal({
         <div className="px-6 pb-6">
           <button
             onClick={handleComplete}
-            className="w-full py-3 rounded-lg font-medium transition-all bg-bread-600 text-white hover:bg-bread-700 active:scale-[0.98]"
+            className="w-full py-3 rounded-lg font-medium transition-all bg-brand-600 text-white hover:bg-brand-700 active:scale-[0.98]"
           >
             {t('adModal.continueCreating')}
           </button>

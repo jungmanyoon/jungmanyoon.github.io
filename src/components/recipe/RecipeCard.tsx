@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Recipe, BreadMethod, SourceType } from '@/types/recipe.types'
-import { Pencil, Youtube, BookOpen, Globe, User, GraduationCap } from 'lucide-react'
+import { Pencil, Trash2, Youtube, BookOpen, Globe, User, GraduationCap } from 'lucide-react'
 import { toast } from '@utils/toast'
 import { useLocalization } from '@/hooks/useLocalization'
 import { getCategoryMeta } from '@/constants/recipeMeta'
@@ -31,14 +31,14 @@ const METHOD_KEYS: Record<BreadMethod, string> = {
   sourdough: 'productType.sourdough'
 } as const
 
-// 출처 타입별 아이콘 및 색상
+// 출처 타입별 아이콘 (색상은 뉴트럴 단색으로 통일 - de-amber/무지개 제거, 아이콘 형태로만 구분)
 const SOURCE_CONFIG: Record<SourceType, { icon: React.ElementType; color: string; bgColor: string }> = {
-  youtube: { icon: Youtube, color: 'text-red-600', bgColor: 'bg-red-50' },
-  blog: { icon: Globe, color: 'text-blue-600', bgColor: 'bg-blue-50' },
-  book: { icon: BookOpen, color: 'text-amber-700', bgColor: 'bg-amber-50' },
-  website: { icon: Globe, color: 'text-green-600', bgColor: 'bg-green-50' },
-  personal: { icon: User, color: 'text-purple-600', bgColor: 'bg-purple-50' },
-  school: { icon: GraduationCap, color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
+  youtube: { icon: Youtube, color: 'text-ink-muted', bgColor: 'bg-surface-muted' },
+  blog: { icon: Globe, color: 'text-ink-muted', bgColor: 'bg-surface-muted' },
+  book: { icon: BookOpen, color: 'text-ink-muted', bgColor: 'bg-surface-muted' },
+  website: { icon: Globe, color: 'text-ink-muted', bgColor: 'bg-surface-muted' },
+  personal: { icon: User, color: 'text-ink-muted', bgColor: 'bg-surface-muted' },
+  school: { icon: GraduationCap, color: 'text-ink-muted', bgColor: 'bg-surface-muted' },
   other: { icon: Globe, color: 'text-ink-muted', bgColor: 'bg-surface-muted' }
 } as const
 
@@ -138,7 +138,7 @@ const RecipeCard = memo<RecipeCardProps>(({
   if (compact) {
     return (
       <div
-        className="relative bg-surface-paper border border-line rounded-lg hover:shadow-md hover:border-line transition-all"
+        className="relative bg-surface-paper border border-line rounded-lg hover:shadow-cardHover hover:border-line-strong transition-all"
       >
         {/* H2: 카테고리 헤더밴드 (아이콘형) */}
         <CategoryHeaderBand category={recipe.category} size="sm" className="rounded-t-lg" />
@@ -158,8 +158,8 @@ const RecipeCard = memo<RecipeCardProps>(({
               </h3>
               {sourceInfo && (
                 <div className="relative z-10 flex items-center gap-1 mt-0.5 text-ink-subtle">
-                  <sourceInfo.Icon size={10} className={sourceInfo.color} />
-                  <span className="text-[10px] truncate">{sourceInfo.name}</span>
+                  <sourceInfo.Icon size={14} className={sourceInfo.color} />
+                  <span className="text-xs truncate">{sourceInfo.name}</span>
                 </div>
               )}
             </div>
@@ -178,11 +178,11 @@ const RecipeCard = memo<RecipeCardProps>(({
                 {onDelete && (
                   <button
                     onClick={handleDelete}
-                    className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
+                    className="text-ink-disabled hover:text-danger transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
                     aria-label={t('recipeList.deleteRecipe')}
                     type="button"
                   >
-                    ×
+                    <Trash2 size={14} />
                   </button>
                 )}
               </div>
@@ -201,7 +201,7 @@ const RecipeCard = memo<RecipeCardProps>(({
   // 기본 카드 뷰 렌더링
   return (
     <div
-      className="card relative hover:shadow-lg transition-shadow"
+      className="card relative hover:shadow-cardHover transition-shadow"
     >
       {/* H2: 카테고리 헤더밴드 (아이콘형) - .card 의 p-4 를 상쇄해 풀블리드 */}
       <CategoryHeaderBand category={recipe.category} size="md" className="-mx-4 -mt-4 mb-3 rounded-t-xl" />
@@ -241,11 +241,11 @@ const RecipeCard = memo<RecipeCardProps>(({
             {onDelete && (
               <button
                 onClick={handleDelete}
-                className="text-ink-disabled hover:text-danger transition-colors text-lg leading-none p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
+                className="text-ink-disabled hover:text-danger transition-colors p-2 -m-1 flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md focus-ring"
                 aria-label={t('recipeList.deleteRecipe')}
                 type="button"
               >
-                ×
+                <Trash2 size={16} />
               </button>
             )}
           </div>
@@ -263,8 +263,8 @@ const RecipeCard = memo<RecipeCardProps>(({
         )}
         {sourceInfo && (
           <span className={`text-xs px-2 py-1 ${sourceInfo.bgColor} ${sourceInfo.color} rounded flex items-center gap-1`}>
-            <sourceInfo.Icon size={10} />
-            {sourceInfo.type === 'youtube' ? 'YouTube' : sourceInfo.type}
+            <sourceInfo.Icon size={14} />
+            {t(`advDashboard.sourceTypes.${sourceInfo.type}`)}
           </span>
         )}
       </div>

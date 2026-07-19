@@ -20,23 +20,13 @@ export default {
           800: '#92400E',
           900: '#78350F',
         },
-        // bread: 하위호환 별칭 - brand와 100% 동일 hex로 재정의(기존 bread-* 281회가 자동으로 brand 톤으로 통일)
-        'bread': {
-          50: '#FFFBEB',
-          100: '#FEF3C7',
-          200: '#FDE7A6',
-          300: '#FBD174',
-          400: '#F8B43C',
-          500: '#F59E0B',
-          600: '#D97706',
-          700: '#B45309',
-          800: '#92400E',
-          900: '#78350F',
-        },
-        // semantic: 의미 토큰 (Tailwind 기본 emerald/amber/rose/blue와 동일값)
-        'success': '#10B981',
-        'warning': '#F59E0B',
-        'danger': '#F43F5E',
+        // (bread-* 별칭은 brand-*로 전량 수렴 완료 후 제거됨 - 사용처 0 확인)
+        // semantic: 의미 토큰 - flat 단일값을 스케일로 확장.
+        // DEFAULT를 함께 두어 기존 flat 참조(text-success/border-danger 등)는 그대로 동작(하위호환),
+        // 신규로 50/100/600/700 단계를 열어 raw green/red/yellow 팔레트를 토큰으로 흡수한다.
+        'success': { DEFAULT: '#10B981', 50: '#ECFDF5', 100: '#D1FAE5', 600: '#059669', 700: '#047857' },
+        'warning': { DEFAULT: '#F59E0B', 50: '#FFFBEB', 100: '#FEF3C7', 600: '#D97706', 700: '#B45309' },
+        'danger':  { DEFAULT: '#F43F5E', 50: '#FFF1F2', 100: '#FFE4E6', 600: '#E11D48', 700: '#BE123C' },
         // info: 변환/결과 강조용 블루 스케일(변환표 등). flat 사용처는 DEFAULT로 하위호환.
         'info': {
           DEFAULT: '#3B82F6',

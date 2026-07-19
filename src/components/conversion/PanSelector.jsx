@@ -77,7 +77,7 @@ function PanSelector({ onPanSelect }) {
                   onClick={() => handlePanSelect(pan.id)}
                   className={`p-3 border-2 rounded-lg cursor-pointer transition-all text-left ${
                     selectedPanId === pan.id && !useCustom
-                      ? 'border-bread-500 bg-bread-50'
+                      ? 'border-brand-500 bg-brand-50'
                       : 'border-line hover:border-line-strong'
                   }`}
                   aria-pressed={selectedPanId === pan.id && !useCustom}

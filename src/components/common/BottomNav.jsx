@@ -33,7 +33,7 @@ function BottomNav() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex flex-col items-center justify-center gap-0.5 min-h-[56px] py-1.5 text-[11px] font-medium focus-ring ${
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 min-h-[56px] py-1.5 text-xs font-medium focus-ring ${
               active ? 'text-brand-700' : 'text-ink-subtle'
             }`}
             aria-current={active ? 'page' : undefined}

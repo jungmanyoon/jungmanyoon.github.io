@@ -116,7 +116,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
             <select
               value={formData.category}
               onChange={(e) => handleInputChange('category', e.target.value)}
-              className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+              className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
               <option value="bread">{t('components.recipeEditor.categories.bread')}</option>
               <option value="cake">{t('components.recipeEditor.categories.cake')}</option>
@@ -133,7 +133,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
           <select
             value={formData.method}
             onChange={(e) => handleInputChange('method', e.target.value)}
-            className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+            className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand-400"
           >
             <option value="straight">{t('components.recipeEditor.methods.straight')}</option>
             <option value="sponge">{t('components.recipeEditor.methods.sponge')}</option>
@@ -152,7 +152,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
             rows={2}
-            className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+            className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand-400"
             placeholder={t('components.recipeEditor.descriptionPlaceholder')}
           />
         </div>
@@ -179,7 +179,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
                   newInstructions[index] = e.target.value
                   handleInputChange('instructions', newInstructions)
                 }}
-                className="flex-1 px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+                className="flex-1 px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand-400"
               />
               <Button
                 variant="danger"
@@ -211,7 +211,7 @@ function RecipeEditor({ recipe, onSave, onCancel }) {
           value={formData.notes}
           onChange={(e) => handleInputChange('notes', e.target.value)}
           rows={3}
-          className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+          className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand-400"
           placeholder={t('components.recipeEditor.notesPlaceholder')}
         />
       </div>

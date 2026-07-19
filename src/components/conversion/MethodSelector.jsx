@@ -25,7 +25,7 @@ function MethodSelector({ currentMethod, selectedMethod, onMethodChange }) {
             onClick={() => onMethodChange(method.id)}
             className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
               selectedMethod === method.id
-                ? 'border-bread-500 bg-bread-50'
+                ? 'border-brand-500 bg-brand-50'
                 : 'border-line hover:border-line-strong'
             }`}
           >

@@ -4,6 +4,7 @@
  */
 
 import { useTranslation } from 'react-i18next'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 import { useAppStore } from '@stores/useAppStore'
 
 export default function Footer() {
@@ -16,30 +17,30 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-slate-800 text-slate-300 mt-auto">
+    <footer className="bg-ink text-white/80 mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* 서비스 정보 */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-white font-bold text-lg mb-3">
+            <h3 className="text-ink-inverse font-bold text-lg mb-3">
               {t('footer.appName')}
             </h3>
-            <p className="text-sm text-slate-400 mb-4">
+            <p className="text-sm text-white/70 mb-4">
               {t('footer.description')}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-white/60">
               {t('footer.copyright')}
             </p>
           </div>
 
           {/* 빠른 링크 */}
           <div>
-            <h4 className="text-white font-semibold mb-3">{t('footer.quickLinks')}</h4>
+            <h4 className="text-ink-inverse font-semibold mb-3">{t('footer.quickLinks')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <button
                   onClick={() => handleNavigation('dashboard')}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-ink-inverse transition-colors"
                 >
                   {t('nav.converter')}
                 </button>
@@ -47,7 +48,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation('recipes')}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-ink-inverse transition-colors"
                 >
                   {t('footer.recipeList')}
                 </button>
@@ -55,7 +56,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation('calculator')}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-ink-inverse transition-colors"
                 >
                   {t('footer.ddtCalc')}
                 </button>
@@ -63,7 +64,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation('guide')}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-ink-inverse transition-colors"
                 >
                   {t('footer.userGuide')}
                 </button>
@@ -73,12 +74,12 @@ export default function Footer() {
 
           {/* 법적 정보 */}
           <div>
-            <h4 className="text-white font-semibold mb-3">{t('footer.info')}</h4>
+            <h4 className="text-ink-inverse font-semibold mb-3">{t('footer.info')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <button
                   onClick={() => handleNavigation('privacy')}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-ink-inverse transition-colors"
                 >
                   {t('footer.privacy')}
                 </button>
@@ -86,7 +87,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation('terms')}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-ink-inverse transition-colors"
                 >
                   {t('footer.terms')}
                 </button>
@@ -94,7 +95,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation('contact')}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-ink-inverse transition-colors"
                 >
                   {t('footer.contact')}
                 </button>
@@ -104,12 +105,10 @@ export default function Footer() {
                   href="https://github.com/jungmanyoon/baking-converter"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white transition-colors inline-flex items-center gap-1"
+                  className="hover:text-ink-inverse transition-colors inline-flex items-center gap-1"
                 >
                   GitHub
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
+                  <ExternalLink className="w-3 h-3" strokeWidth={1.75} />
                 </a>
               </li>
             </ul>
@@ -117,9 +116,10 @@ export default function Footer() {
         </div>
 
         {/* 면책 조항 */}
-        <div className="border-t border-slate-700 mt-8 pt-6">
-          <p className="text-xs text-slate-500 text-center">
-            ⚠️ {t('footer.disclaimer')}
+        <div className="border-t border-white/10 mt-8 pt-6">
+          <p className="text-xs text-white/60 text-center flex items-center justify-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={1.75} />
+            <span>{t('footer.disclaimer')}</span>
           </p>
         </div>
       </div>

@@ -159,7 +159,7 @@ export default function Contact({ onBack }: ContactProps) {
             </p>
             <button
               onClick={handleEmailClick}
-              className="px-6 py-2 bg-bread-600 text-white rounded-lg hover:bg-bread-700 transition-colors"
+              className="px-6 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
             >
               {t('legal.contact.sendFeedback')}
             </button>

@@ -8,6 +8,21 @@ import { useTranslation } from 'react-i18next'
 import { searchIngredients, sortByRelevance } from '@/utils/hangul'
 import { findIngredientInfo } from '@/data/ingredientDatabase'
 import { useSettingsStore } from '@/stores/useSettingsStore'
+import {
+  Wheat,
+  Droplet,
+  Milk,
+  Egg,
+  Apple,
+  Leaf,
+  Nut,
+  Package,
+  CircleDot,
+  Candy,
+  Cookie,
+  Sparkles,
+  type LucideIcon
+} from 'lucide-react'
 
 interface AutocompleteInputProps {
   value: string
@@ -172,27 +187,27 @@ export default function AutocompleteInput({
     }
   }, [highlightedIndex])
 
-  // 카테고리 이모지 매핑
-  const getCategoryEmoji = (name: string): string => {
+  // 카테고리 아이콘 매핑 (lucide - 1:1 없는 항목은 가장 가까운/중립 아이콘)
+  const getCategoryIcon = (name: string): LucideIcon | null => {
     const info = findIngredientInfo(name)
-    if (!info) return ''
+    if (!info) return null
 
-    const emojiMap: Record<string, string> = {
-      flour: '🌾',
-      liquid: '💧',
-      fat: '🧈',
-      sugar: '🍯',
-      egg: '🥚',
-      dairy: '🥛',
-      leavening: '🫧',
-      salt: '🧂',
-      flavoring: '🌿',
-      nut: '🥜',
-      fruit: '🍎',
-      chocolate: '🍫',
-      other: '📦'
+    const iconMap: Record<string, LucideIcon> = {
+      flour: Wheat,
+      liquid: Droplet,
+      fat: Droplet,      // 유지: 전용 아이콘 없어 Droplet
+      sugar: Candy,
+      egg: Egg,
+      dairy: Milk,
+      leavening: Sparkles, // 팽창(기포) 근사
+      salt: CircleDot,     // 소금 전용 아이콘 없어 중립 점
+      flavoring: Leaf,
+      nut: Nut,
+      fruit: Apple,
+      chocolate: Cookie,
+      other: Package
     }
-    return emojiMap[info.category] || ''
+    return iconMap[info.category] || null
   }
 
   // 표시할 값: 포커스 중에는 원본값(검색용), 아니면 displayValue 또는 원본값
@@ -216,7 +231,7 @@ export default function AutocompleteInput({
         placeholder={resolvedPlaceholder}
         disabled={disabled}
         autoFocus={autoFocus}
-        className={`w-full px-3 py-2 border border-line rounded-lg
+        className={`w-full px-3 py-2 border border-line rounded-md
           focus:ring-2 focus:ring-brand-400 focus:border-brand-400
           disabled:bg-surface-muted disabled:cursor-not-allowed
           ${className}`}
@@ -230,33 +245,38 @@ export default function AutocompleteInput({
           role="listbox"
           id={listboxId}
           className="absolute z-50 w-full mt-1 bg-surface-paper border border-line
-            rounded-lg shadow-lg max-h-60 overflow-auto"
+            rounded-lg shadow-dropdown max-h-60 overflow-auto"
         >
           {!value.trim() && recentIngredients.length > 0 && (
             <li role="presentation" className="px-3 py-1 text-xs text-ink-subtle bg-surface-muted border-b">
               {t('components.autocomplete.recentlyUsed')}
             </li>
           )}
-          {filteredSuggestions.map((item, index) => (
-            <li
-              key={item}
-              id={`${listboxId}-opt-${index}`}
-              role="option"
-              aria-selected={index === highlightedIndex}
-              onClick={() => handleSelect(item)}
-              className={`px-3 py-2 cursor-pointer flex items-center gap-2
-                ${index === highlightedIndex
-                  ? 'bg-brand-100 text-brand-900'
-                  : 'hover:bg-surface-muted'
-                }`}
-            >
-              <span className="text-sm">{getCategoryEmoji(item)}</span>
-              <span className="flex-1">{item}</span>
-              {index === highlightedIndex && (
-                <span className="text-xs text-ink-disabled">Enter</span>
-              )}
-            </li>
-          ))}
+          {filteredSuggestions.map((item, index) => {
+            const CategoryIcon = getCategoryIcon(item)
+            return (
+              <li
+                key={item}
+                id={`${listboxId}-opt-${index}`}
+                role="option"
+                aria-selected={index === highlightedIndex}
+                onClick={() => handleSelect(item)}
+                className={`px-3 py-2 cursor-pointer flex items-center gap-2
+                  ${index === highlightedIndex
+                    ? 'bg-brand-100 text-brand-900'
+                    : 'hover:bg-surface-muted'
+                  }`}
+              >
+                {CategoryIcon
+                  ? <CategoryIcon className="w-4 h-4 text-ink-subtle flex-shrink-0" strokeWidth={1.75} />
+                  : <span className="w-4 h-4 flex-shrink-0" />}
+                <span className="flex-1">{item}</span>
+                {index === highlightedIndex && (
+                  <span className="text-xs text-ink-disabled">Enter</span>
+                )}
+              </li>
+            )
+          })}
         </ul>
       )}
 

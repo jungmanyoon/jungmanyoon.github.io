@@ -44,102 +44,25 @@ const SETTINGS_GROUPS = [
   { id: 'system', labelKey: 'settingsGroups.system' },
 ] as const
 
+// 활성 탭 공통 스타일 (9개 탭 동일 → 개별 필드 대신 단일 상수로 축약). active=brand, inactive=gray.
+const TAB_ACTIVE_COLOR = 'text-brand-600'
+const TAB_ACTIVE_BG = 'bg-brand-50'
+const TAB_ACTIVE_BORDER = 'border-brand-200'
+
 // 탭 정의 (번역 키 사용). group 기준으로 렌더 시 묶으며, 배열 순서가 각 그룹 내 순서.
-// active=brand, inactive=gray 로 통일.
 const TABS = [
   // 일반
-  {
-    id: 'locale',
-    group: 'general',
-    nameKey: 'settingsTabs.locale',
-    icon: Globe,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.localeDesc'
-  },
+  { id: 'locale', group: 'general', nameKey: 'settingsTabs.locale', icon: Globe, descKey: 'settingsTabs.localeDesc' },
   // 계산 설정 (팬/제품 비용적/환경/제법/수율/재료 - 모두 변환 계산 입력)
-  {
-    id: 'pan',
-    group: 'calc',
-    nameKey: 'settingsTabs.pan',
-    icon: Box,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.panDesc'
-  },
-  {
-    id: 'product',
-    group: 'calc',
-    nameKey: 'settingsTabs.product',
-    icon: Scale,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.productDesc'
-  },
-  {
-    id: 'environment',
-    group: 'calc',
-    nameKey: 'settingsTabs.environment',
-    icon: Thermometer,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.environmentDesc'
-  },
-  {
-    id: 'method',
-    group: 'calc',
-    nameKey: 'settingsTabs.method',
-    icon: FlaskConical,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.methodDesc'
-  },
-  {
-    id: 'yieldLoss',
-    group: 'calc',
-    nameKey: 'settingsTabs.yieldLoss',
-    icon: TrendingDown,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.yieldLossDesc'
-  },
-  {
-    id: 'ingredient',
-    group: 'calc',
-    nameKey: 'settingsTabs.ingredient',
-    icon: Apple,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.ingredientDesc'
-  },
+  { id: 'pan', group: 'calc', nameKey: 'settingsTabs.pan', icon: Box, descKey: 'settingsTabs.panDesc' },
+  { id: 'product', group: 'calc', nameKey: 'settingsTabs.product', icon: Scale, descKey: 'settingsTabs.productDesc' },
+  { id: 'environment', group: 'calc', nameKey: 'settingsTabs.environment', icon: Thermometer, descKey: 'settingsTabs.environmentDesc' },
+  { id: 'method', group: 'calc', nameKey: 'settingsTabs.method', icon: FlaskConical, descKey: 'settingsTabs.methodDesc' },
+  { id: 'yieldLoss', group: 'calc', nameKey: 'settingsTabs.yieldLoss', icon: TrendingDown, descKey: 'settingsTabs.yieldLossDesc' },
+  { id: 'ingredient', group: 'calc', nameKey: 'settingsTabs.ingredient', icon: Apple, descKey: 'settingsTabs.ingredientDesc' },
   // 시스템 (저장/데이터, 고급/앱 설정)
-  {
-    id: 'storage',
-    group: 'system',
-    nameKey: 'settingsTabs.storage',
-    icon: HardDrive,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.storageDesc'
-  },
-  {
-    id: 'advanced',
-    group: 'system',
-    nameKey: 'settingsTabs.advanced',
-    icon: Cog,
-    color: 'text-brand-600',
-    bgColor: 'bg-brand-50',
-    borderColor: 'border-brand-200',
-    descKey: 'settingsTabs.advancedDesc'
-  }
+  { id: 'storage', group: 'system', nameKey: 'settingsTabs.storage', icon: HardDrive, descKey: 'settingsTabs.storageDesc' },
+  { id: 'advanced', group: 'system', nameKey: 'settingsTabs.advanced', icon: Cog, descKey: 'settingsTabs.advancedDesc' }
 ]
 
 interface SettingsPageProps {
@@ -300,7 +223,7 @@ export default function SettingsPage({
               <button
                 onClick={handleResetAll}
                 aria-label={t('common.reset')}
-                className="flex items-center justify-center gap-1 min-h-[44px] px-2 sm:px-3 text-sm text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                className="flex items-center justify-center gap-1 min-h-[44px] px-2 sm:px-3 text-sm text-danger-600 hover:bg-danger-50 rounded-lg transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('common.reset')}</span>
@@ -321,7 +244,7 @@ export default function SettingsPage({
               {SETTINGS_GROUPS.map(group => (
                 <Fragment key={group.id}>
                   {/* 그룹 소제목: 데스크톱 세로 사이드바에서만 (모바일 가로 탭엔 폭 낭비 방지) */}
-                  <div className="hidden lg:block px-4 pt-4 pb-1 first:pt-0 text-[11px] font-semibold uppercase tracking-wide text-ink-subtle">
+                  <div className="hidden lg:block px-4 pt-4 pb-1 first:pt-0 text-xs font-semibold uppercase tracking-wide text-ink-subtle">
                     {t(group.labelKey)}
                   </div>
                   {TABS.filter(tab => tab.group === group.id).map(tab => {
@@ -334,11 +257,11 @@ export default function SettingsPage({
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 lg:gap-3 min-h-[44px] flex-shrink-0 lg:w-full px-3 lg:px-4 py-2 lg:py-3 lg:mb-1 rounded-lg text-left whitespace-nowrap lg:whitespace-normal transition-all ${
                           isActive
-                            ? `${tab.bgColor} ${tab.borderColor} border-2`
+                            ? `${TAB_ACTIVE_BG} ${TAB_ACTIVE_BORDER} border-2`
                             : 'hover:bg-surface-muted border-2 border-transparent'
                         }`}
                       >
-                        <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? tab.color : 'text-ink-disabled'}`} />
+                        <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? TAB_ACTIVE_COLOR : 'text-ink-disabled'}`} />
                         <div className="min-w-0">
                           <div className={`text-sm font-medium ${isActive ? 'text-ink' : 'text-ink-muted'}`}>
                             {t(tab.nameKey)}
@@ -423,7 +346,7 @@ export default function SettingsPage({
             </div>
 
             {importSuccess ? (
-              <div className="flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-lg">
+              <div className="flex items-center gap-2 p-4 bg-success-50 text-success-700 rounded-lg">
                 <Check className="w-5 h-5" />
                 {t('settings.modal.importSuccess')}
               </div>
@@ -455,7 +378,7 @@ export default function SettingsPage({
                 </div>
 
                 {importError && (
-                  <div className="flex items-center gap-2 p-3 mb-4 bg-red-50 text-red-600 rounded-lg text-sm">
+                  <div className="flex items-center gap-2 p-3 mb-4 bg-danger-50 text-danger-600 rounded-lg text-sm">
                     <AlertTriangle className="w-4 h-4" />
                     {importError}
                   </div>

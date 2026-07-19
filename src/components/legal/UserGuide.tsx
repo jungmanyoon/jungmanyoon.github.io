@@ -207,13 +207,13 @@ export default function UserGuide({ onBack, onNavigate }: UserGuideProps) {
             <div className="flex flex-wrap justify-center gap-3">
               <button
                 onClick={() => onNavigate?.('dashboard')}
-                className="px-6 py-2 bg-bread-600 text-white rounded-lg hover:bg-bread-700 transition-colors"
+                className="px-6 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
               >
                 대시보드로 이동
               </button>
               <button
                 onClick={() => onNavigate?.('recipes')}
-                className="px-6 py-2 border border-bread-600 text-bread-600 rounded-lg hover:bg-bread-50 transition-colors"
+                className="px-6 py-2 border border-brand-600 text-brand-600 rounded-lg hover:bg-brand-50 transition-colors"
               >
                 레시피 둘러보기
               </button>

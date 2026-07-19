@@ -51,7 +51,7 @@ function Settings({ onClose }) {
             <select
               value={settings.defaultMethod}
               onChange={(e) => handleChange('defaultMethod', e.target.value)}
-              className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+              className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
               <option value="straight">스트레이트법</option>
               <option value="sponge">중종법</option>
@@ -69,7 +69,7 @@ function Settings({ onClose }) {
             <select
               value={settings.defaultUnit}
               onChange={(e) => handleChange('defaultUnit', e.target.value)}
-              className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-bread-400"
+              className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
               <option value="metric">미터법 (g, ml)</option>
               <option value="imperial">야드파운드법 (oz, cups)</option>

@@ -41,7 +41,7 @@ const SelectField = memo<{
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-3 py-2 border border-line rounded-md focus:ring-2 focus:ring-bread-500 focus:border-bread-500"
+      className="w-full px-3 py-2 border border-line rounded-md focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
     >
       {options.map(option => (
         <option key={option.value} value={option.value}>
@@ -66,13 +66,13 @@ const ResultDisplay = memo<{
   if (!waterTemp) return null
 
   return (
-    <div className="bg-bread-50 rounded-lg p-4 space-y-3">
+    <div className="bg-brand-50 rounded-lg p-4 space-y-3">
       <h4 className="font-semibold text-ink">{t('ddt.calculationResult')}</h4>
 
       <div className="space-y-2">
         <div className="flex justify-between">
           <span className="text-sm text-ink-muted">{t('ddt.requiredWaterTemp')}:</span>
-          <span className="font-semibold text-bread-700">
+          <span className="font-semibold text-brand-700 tnum">
             {waterTemp.toFixed(1)}°C
           </span>
         </div>
@@ -81,11 +81,11 @@ const ResultDisplay = memo<{
           <>
             <div className="flex justify-between">
               <span className="text-sm text-ink-muted">{t('ddt.ice')}:</span>
-              <span className="font-semibold">{iceAmount}g</span>
+              <span className="font-semibold tnum">{iceAmount}g</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-ink-muted">{t('ddt.coldWater')}:</span>
-              <span className="font-semibold">{waterAmount}g</span>
+              <span className="font-semibold tnum">{waterAmount}g</span>
             </div>
           </>
         )}
@@ -93,7 +93,7 @@ const ResultDisplay = memo<{
         {predictedTemp && (
           <div className="flex justify-between pt-2 border-t border-line">
             <span className="text-sm text-ink-muted">{t('ddt.labels.predictedTemp')}:</span>
-            <span className="font-semibold text-bread-700">
+            <span className="font-semibold text-brand-700 tnum">
               {predictedTemp.toFixed(1)}°C
             </span>
           </div>
@@ -101,13 +101,13 @@ const ResultDisplay = memo<{
       </div>
 
       {waterTemp < 5 && (
-        <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700 flex items-center gap-1.5">
+        <div className="mt-3 p-2 bg-info-50 border border-info-200 rounded text-sm text-info-700 flex items-center gap-1.5">
           <Lightbulb size={16} className="shrink-0" />{t('ddt.needsCooling')}
         </div>
       )}
 
       {waterTemp > 35 && (
-        <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded text-sm text-orange-700 flex items-center gap-1.5">
+        <div className="mt-3 p-2 bg-warning-50 border border-warning-100 rounded text-sm text-warning-700 flex items-center gap-1.5">
           <AlertTriangle size={16} className="shrink-0" />{t('ddt.warnings.tooHot')}
         </div>
       )}
@@ -434,7 +434,7 @@ const DDTCalculatorComponent = memo<DDTCalculatorProps>(({ recipe, environment }
                 handleInputChange('prefermentTemp', null)
               }
             }}
-            className="rounded border-line text-bread-600 focus:ring-bread-500"
+            className="rounded border-line text-brand-600 focus:ring-brand-500"
           />
           <label htmlFor="use-preferment" className="text-sm text-ink-muted">
             {t('ddt.labels.usePreferment')}

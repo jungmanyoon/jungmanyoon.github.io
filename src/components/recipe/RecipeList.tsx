@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
 import RecipeCard from './RecipeCard'
 import { Recipe } from '@/types/recipe.types'
-import { Plus } from 'lucide-react'
+import { Plus, BookOpen } from 'lucide-react'
 
 interface RecipeListProps {
   recipes: Recipe[]
@@ -31,7 +31,7 @@ const CategoryTab = memo<{
     onClick={onClick}
     className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
       isSelected
-        ? 'bg-bread-500 text-white'
+        ? 'bg-brand-500 text-white'
         : 'bg-surface-muted text-ink-muted hover:bg-line'
     }`}
   >
@@ -159,8 +159,9 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
       </div>
 
       {displayRecipes.length === 0 ? (
-        <div className="text-center py-8 bg-surface-muted rounded-lg">
-          <p className="text-ink-muted mb-3 text-sm">
+        <div className="text-center py-16 mt-4 bg-surface-muted rounded-lg">
+          <BookOpen className="w-12 h-12 mx-auto mb-4 text-ink-disabled" strokeWidth={1.5} />
+          <p className="text-ink-muted mb-4 text-sm">
             {selectedCategory === 'all'
               ? t('components.recipeList.noRecipes')
               : t('components.recipeList.noCategoryRecipes', { category: categorizedRecipes[selectedCategory]?.name })}
@@ -176,7 +177,7 @@ const RecipeList = memo<RecipeListProps>(({ recipes, onSelect, onDelete, onEdit,
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {displayRecipes.map(recipe => (
             <RecipeCard
               key={recipe.id}

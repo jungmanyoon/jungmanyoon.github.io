@@ -2,11 +2,20 @@
 
 > 이 파일 하나에만 모든 작업 진행상황을 기록한다. 새 문서를 여러 개 만들지 않는다.
 > 세션이 바뀌어도 이 파일 맨 위 "다음 세션 재개 지점"부터 이어서 작업한다.
-> 최종 갱신: 2026-07-05
+> 최종 갱신: 2026-07-19
 
 ---
 
 ## [다음 세션 재개 지점] <- 여기부터 읽고 이어서
+
+**[2026-07-19 세션 G] taste 스킬 UI/UX 개선 실제 적용 완료(+간단/전문가 2모드 동반). 다음: (대형)AdvancedDashboard 분해·좌우표 공용 IngredientTable 추출 / PHASE_META 단계색·카테고리밴드색 뉴트럴화 / 설정 모달 접근성 통합 / 부가패널(영양·비용·추천) raw색 스윕.**
+
+- **방법**: taste 스킬(design-taste-frontend)로 4개 화면군 감사(문제 40건)->3개 방향 경쟁 제안->심사. 승자 **"베이커의 작업대"**(89점, 사용성+브랜드+구현 석권)에 "프로 계기판"의 .tnum/게이지라벨 + "조용한 정밀 도구"의 하위호환·액센트잉크 원칙 이식. before/after 미리보기 `taste-preview.html` 선행 확인 후 적용.
+- **토큰 인프라(직접)**: tailwind.config semantic 토큰을 flat->스케일 확장(success/warning/danger에 50/100/600/700, **DEFAULT 병기로 기존 flat 참조 하위호환**). index.css `.tnum` 유틸(tabular-nums slashed-zero) 신설. **bread-* 색 클래스 43곳 전량 brand-*로 수렴(hex 동일=시각 무변화)** + 죽은 bread 별칭 제거.
+- **4화면군 병렬 스윕(파일 소유권 분할)**: 이모지->lucide(Footer 1·변환기 PHASE_META/source/모드/팬헤더/저온발효 다수·AutocompleteInput 13·삭제 X문자->Trash2) / raw색->semantic 토큰(Toast STYLE_MAP 24·설정탭 green/red/yellow/blue·변환기 amber/green/blue/orange) / 출처 6색 무지개->뉴트럴 단색 / 홈 장식아이콘 amber->ink-subtle+대표수치1개만 brand+히어로 CTA 신설 / 표 헤더 단위 **소문자 g·베이커스 % 유지**(게이지 라벨 uppercase 금지) / text-[10px]/[11px]->text-xs / shadow 토큰화.
+- **좌우 재료표는 좌우 배치 유지**(사용자 피드백: 재료 많을 때 스크롤 없이 원본<->변환 한눈 대조가 주방 실사용 필수). 세로 스택 금지. 공용 IngredientTable 추출(행 정렬)은 별도 PR로 이월.
+- **검증**: 3종(typecheck 0/test 164/build OK) + dev 서버 4탭(홈·변환기·레시피북·설정) 실렌더 콘솔에러 0. 홈 CTA·대표수치·출처뉴트럴·삭제아이콘·설정 danger 초기화 시각 확인.
+- **보류(별도 PR)**: PHASE_META 발효 단계 구분색 9곳(기능색이라 유지, amber만 후속 정리) / recipeMeta 카테고리밴드 색 / 좌우표 공용컴포넌트 / 설정 인라인모달 접근성 통합 / 부가패널 raw색(감사 스코프 밖).
 
 **[2026-07-05 세션 F] redesign H + 라이브 폴리시 + H1/C4 전부 완료·PR #9 머지·배포·라이브200. 다음: 잔여 소소(B6 sticky·G6 공정열접기·G7 key경고 dev전용) / (대형)AdvancedDashboard 3063줄 분해·변환기 간단전문가 2모드·좌우표 완전단일화 / F4~F6(편집화면).**
 

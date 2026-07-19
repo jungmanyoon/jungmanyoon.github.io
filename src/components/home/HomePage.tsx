@@ -100,25 +100,34 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 통계 카드 - canvas 위 화이트 카드 + amber 아이콘, 뉴트럴 수치 */}
+          {/* 대표 primary CTA - 히어로의 단일 주요 행동(새 레시피/변환 시작). handleNewRecipe 재사용 */}
+          <button
+            onClick={handleNewRecipe}
+            className="btn-primary inline-flex items-center justify-center gap-2 min-h-[44px] w-full sm:w-auto mb-3"
+          >
+            <Plus className="w-4 h-4" strokeWidth={1.75} />
+            {t('home.newRecipe')}
+          </button>
+
+          {/* 통계 카드 - canvas 위 화이트 카드 + 뉴트럴 아이콘, 대표 수치만 brand 강조 */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div className="bg-surface-paper border border-line rounded-xl px-3 py-2">
               <div className="flex items-center gap-1.5 text-ink-subtle text-xs">
-                <BookOpen className="w-3.5 h-3.5 text-brand-500" />
+                <BookOpen className="w-3.5 h-3.5 text-ink-subtle" />
                 {t('home.savedRecipes')}
               </div>
-              <div className="text-2xl font-bold text-ink">{stats.totalRecipes}</div>
+              <div className="text-2xl font-bold text-brand-600 tnum">{stats.totalRecipes}</div>
             </div>
             <div className="bg-surface-paper border border-line rounded-xl px-3 py-2">
               <div className="flex items-center gap-1.5 text-ink-subtle text-xs">
-                <Wheat className="w-3.5 h-3.5 text-brand-500" />
+                <Wheat className="w-3.5 h-3.5 text-ink-subtle" />
                 {t('home.breadRecipes')}
               </div>
               <div className="text-2xl font-bold text-ink">{stats.categoryCount['bread'] || 0}</div>
             </div>
             <div className="bg-surface-paper border border-line rounded-xl px-3 py-2">
               <div className="flex items-center gap-1.5 text-ink-subtle text-xs">
-                <Sparkles className="w-3.5 h-3.5 text-brand-500" />
+                <Sparkles className="w-3.5 h-3.5 text-ink-subtle" />
                 {t('home.cakeRecipes')}
               </div>
               <div className="text-2xl font-bold text-ink">
@@ -127,7 +136,7 @@ export default function HomePage() {
             </div>
             <div className="bg-surface-paper border border-line rounded-xl px-3 py-2">
               <div className="flex items-center gap-1.5 text-ink-subtle text-xs">
-                <Cookie className="w-3.5 h-3.5 text-brand-500" />
+                <Cookie className="w-3.5 h-3.5 text-ink-subtle" />
                 {t('home.pastryRecipes')}
               </div>
               <div className="text-2xl font-bold text-ink">
@@ -143,14 +152,14 @@ export default function HomePage() {
         {/* 빠른 시작 - 컴팩트 가로 버튼 */}
         <section className="mb-4">
           <h2 className="text-base font-bold text-ink mb-2 flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-brand-500" />
+            <Sparkles className="w-4 h-4 text-ink-subtle" />
             {t('home.quickStart')}
           </h2>
           {/* 빠른 시작: 모바일 2열, sm 이상 기존 4열 보존 */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <button
               onClick={handleNewRecipe}
-              className="flex flex-col items-center justify-center gap-1.5 min-h-[44px] py-3 px-2 bg-surface-paper rounded-lg shadow-sm border-2 border-brand-200 hover:border-brand-400 hover:shadow transition-all group"
+              className="flex flex-col items-center justify-center gap-1.5 min-h-[44px] py-3 px-2 bg-surface-paper rounded-lg shadow-card border border-brand-200 hover:border-brand-400 hover:shadow-cardHover transition-all group"
             >
               <div className="p-2 bg-brand-100 rounded-full group-hover:bg-brand-200 transition-colors">
                 <Plus className="w-5 h-5 text-brand-600" />
@@ -160,7 +169,7 @@ export default function HomePage() {
 
             <button
               onClick={() => setActiveTab('recipes')}
-              className="flex flex-col items-center justify-center gap-1.5 min-h-[44px] py-3 px-2 bg-surface-paper rounded-lg shadow-sm border border-line hover:border-brand-300 hover:shadow transition-all group"
+              className="flex flex-col items-center justify-center gap-1.5 min-h-[44px] py-3 px-2 bg-surface-paper rounded-lg shadow-card border border-line hover:border-brand-300 hover:shadow-cardHover transition-all group"
             >
               <div className="p-2 bg-surface-muted rounded-full group-hover:bg-line transition-colors">
                 <BookOpen className="w-5 h-5 text-ink-muted" />
@@ -170,7 +179,7 @@ export default function HomePage() {
 
             <button
               onClick={() => setActiveTab('calculator')}
-              className="flex flex-col items-center justify-center gap-1.5 min-h-[44px] py-3 px-2 bg-surface-paper rounded-lg shadow-sm border border-line hover:border-brand-300 hover:shadow transition-all group"
+              className="flex flex-col items-center justify-center gap-1.5 min-h-[44px] py-3 px-2 bg-surface-paper rounded-lg shadow-card border border-line hover:border-brand-300 hover:shadow-cardHover transition-all group"
             >
               <div className="p-2 bg-surface-muted rounded-full group-hover:bg-line transition-colors">
                 <Calculator className="w-5 h-5 text-ink-muted" />
@@ -180,7 +189,7 @@ export default function HomePage() {
 
             <button
               onClick={() => setActiveTab('settings')}
-              className="flex flex-col items-center justify-center gap-1.5 min-h-[44px] py-3 px-2 bg-surface-paper rounded-lg shadow-sm border border-line hover:border-brand-300 hover:shadow transition-all group"
+              className="flex flex-col items-center justify-center gap-1.5 min-h-[44px] py-3 px-2 bg-surface-paper rounded-lg shadow-card border border-line hover:border-brand-300 hover:shadow-cardHover transition-all group"
             >
               <div className="p-2 bg-surface-muted rounded-full group-hover:bg-line transition-colors">
                 <Settings className="w-5 h-5 text-ink-muted" />
@@ -195,7 +204,7 @@ export default function HomePage() {
           <section>
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-base font-bold text-ink flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-brand-500" />
+                <Clock className="w-4 h-4 text-ink-subtle" />
                 {t('home.recentRecipes')}
               </h2>
               <button
@@ -238,17 +247,17 @@ export default function HomePage() {
               </p>
               <button
                 onClick={handleNewRecipe}
-                className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors text-sm"
+                className="btn-primary inline-flex items-center justify-center gap-2 min-h-[44px] px-5 text-sm"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4" strokeWidth={1.75} />
                 {t('home.createNew')}
               </button>
             </div>
 
             {/* 주요 기능 소개 - SEO & AdSense 콘텐츠 */}
-            <div className="bg-surface-paper rounded-lg shadow-sm border border-line p-4 mb-4">
+            <div className="bg-surface-paper rounded-lg shadow-card border border-line p-4 mb-4">
               <h4 className="font-semibold text-ink mb-3 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-brand-500" />
+                <Sparkles className="w-4 h-4 text-ink-subtle" />
                 레시피북 주요 기능
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-ink-muted">
@@ -294,7 +303,7 @@ export default function HomePage() {
             {/* 베이킹 팁 - 추가 콘텐츠 */}
             <div className="bg-surface-muted rounded-lg p-4">
               <h4 className="font-semibold text-ink mb-2 flex items-center gap-1.5">
-                <Lightbulb className="w-4 h-4 text-brand-500" />
+                <Lightbulb className="w-4 h-4 text-ink-subtle" />
                 베이킹 팁
               </h4>
               <p className="text-sm text-ink-muted leading-relaxed">

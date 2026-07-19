@@ -444,7 +444,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
       <div
         key={panItem.id}
         className={`border rounded-lg overflow-hidden transition-all ${
-          panItem.isFavorite ? 'border-yellow-300 bg-yellow-50/30' : 'border-line bg-surface-paper'
+          panItem.isFavorite ? 'border-warning-100 bg-warning-50/40' : 'border-line bg-surface-paper'
         }`}
       >
         {/* 팬 헤더 - 모든 정보를 한 줄에 표시 */}
@@ -459,7 +459,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             <div className="flex items-center gap-2 min-w-0">
               <span className="font-medium text-ink truncate">{getPanDisplayName(panItem)}</span>
               {panItem.isFavorite && (
-                <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                <Star className="w-3.5 h-3.5 text-warning-600 fill-warning-600 flex-shrink-0" />
               )}
             </div>
 
@@ -471,7 +471,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             )}
 
             {/* 용량 */}
-            <span className="text-sm text-blue-600 font-mono font-medium flex-shrink-0">
+            <span className="text-sm text-info-600 font-mono font-medium flex-shrink-0">
               {panItem.volume.toLocaleString()}ml
             </span>
 
@@ -490,7 +490,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 togglePanFavorite(panItem.id)
               }}
               className={`p-1.5 rounded hover:bg-surface-muted ${
-                panItem.isFavorite ? 'text-yellow-500' : 'text-ink-disabled'
+                panItem.isFavorite ? 'text-warning-600' : 'text-ink-disabled'
               }`}
               title={t('settings.pan.favorites')}
             >
@@ -533,7 +533,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               {/* 액션 버튼 */}
               <button
                 onClick={() => startEditing(panItem)}
-                className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
+                className="flex items-center gap-1 px-2 py-1 text-xs bg-info-50 text-info-600 rounded hover:bg-info-100"
               >
                 <Edit2 className="w-3 h-3" />
                 {t('common.edit')}
@@ -551,7 +551,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                     deletePan(panItem.id)
                   }
                 }}
-                className="flex items-center gap-1 px-2 py-1 text-xs bg-red-50 text-red-600 rounded hover:bg-red-100"
+                className="flex items-center gap-1 px-2 py-1 text-xs bg-danger-50 text-danger-600 rounded hover:bg-danger-100"
               >
                 <Trash2 className="w-3 h-3" />
                 {t('common.delete')}
@@ -562,7 +562,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
         {/* 인라인 편집 폼 (해당 팬 편집 중일 때) */}
         {editingId === panItem.id && showForm && (
-          <div className="p-4 border-t border-orange-200 bg-orange-50/50">
+          <div className="p-4 border-t border-brand-200 bg-brand-50/50">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-medium text-ink">{t('settings.pan.editPan')}</h4>
               <button onClick={resetForm} className="p-1 hover:bg-surface-muted rounded">
@@ -626,17 +626,17 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               </div>
 
               {/* 계산된 부피 표시 */}
-              <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
-                <Box className="w-5 h-5 text-blue-600" />
+              <div className="flex items-center gap-2 p-3 bg-info-50 rounded-lg">
+                <Box className="w-5 h-5 text-info-600" />
                 <div>
-                  <div className="text-sm text-blue-700">
+                  <div className="text-sm text-info-700">
                     {t('settings.pan.calculatedVolume')}: {' '}
                     <span className="font-mono font-bold">
                       {calculatedVolume ? `${Math.round(calculatedVolume).toLocaleString()} ml` : t('settings.pan.enterDimensions')}
                     </span>
                   </div>
                   {!calculatedVolume && (
-                    <div className="text-xs text-blue-500 flex items-center gap-1 mt-0.5">
+                    <div className="text-xs text-info-600 flex items-center gap-1 mt-0.5">
                       <AlertCircle className="w-3 h-3" />
                       {t('settings.pan.dimensionsRequired')}
                     </div>
@@ -690,7 +690,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                   onChange={(e) => setFormData(prev => ({ ...prev, isFavorite: e.target.checked }))}
                   className="rounded border-line"
                 />
-                <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-yellow-500 fill-yellow-500' : 'text-ink-disabled'}`} />
+                <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-warning-600 fill-warning-600' : 'text-ink-disabled'}`} />
                 <span className="text-sm text-ink-muted">{t('settings.pan.addToFavorites')}</span>
               </label>
 
@@ -699,7 +699,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 <button
                   onClick={handleSave}
                   disabled={!calculatedVolume}
-                  className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-line-strong disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center gap-1 px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:bg-line-strong disabled:cursor-not-allowed transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   {t('common.save')}
@@ -733,7 +733,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             resetForm()
             setShowForm(true)
           }}
-          className="flex items-center gap-1 px-3 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+          className="flex items-center gap-1 px-3 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
           {t('settings.pan.addPan')}
@@ -766,7 +766,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
           onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
           className={`flex items-center gap-1 px-3 py-2 text-sm border rounded-lg transition-colors ${
             showFavoritesOnly
-              ? 'bg-yellow-50 border-yellow-300 text-yellow-700'
+              ? 'bg-warning-50 border-warning-100 text-warning-700'
               : 'hover:bg-surface-muted'
           }`}
         >
@@ -777,7 +777,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
 
       {/* 새 팬 추가 폼 (편집이 아닐 때만 상단에 표시) */}
       {showForm && !editingId && (
-        <div className="p-4 border border-orange-200 bg-orange-50/50 rounded-lg">
+        <div className="p-4 border border-brand-200 bg-brand-50/50 rounded-lg">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-medium text-ink">
               {editingId ? t('settings.pan.editPan') : t('settings.pan.newPan')}
@@ -843,17 +843,17 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
             </div>
 
             {/* 계산된 부피 표시 */}
-            <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
-              <Box className="w-5 h-5 text-blue-600" />
+            <div className="flex items-center gap-2 p-3 bg-info-50 rounded-lg">
+              <Box className="w-5 h-5 text-info-600" />
               <div>
-                <div className="text-sm text-blue-700">
+                <div className="text-sm text-info-700">
                   {t('settings.pan.calculatedVolume')}: {' '}
                   <span className="font-mono font-bold">
                     {calculatedVolume ? `${Math.round(calculatedVolume).toLocaleString()} ml` : t('settings.pan.enterDimensions')}
                   </span>
                 </div>
                 {!calculatedVolume && (
-                  <div className="text-xs text-blue-500 flex items-center gap-1 mt-0.5">
+                  <div className="text-xs text-info-600 flex items-center gap-1 mt-0.5">
                     <AlertCircle className="w-3 h-3" />
                     {t('settings.pan.dimensionsRequired')}
                   </div>
@@ -910,7 +910,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
                 onChange={(e) => setFormData(prev => ({ ...prev, isFavorite: e.target.checked }))}
                 className="rounded border-line"
               />
-              <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-yellow-500 fill-yellow-500' : 'text-ink-disabled'}`} />
+              <Star className={`w-4 h-4 ${formData.isFavorite ? 'text-warning-600 fill-warning-600' : 'text-ink-disabled'}`} />
               <span className="text-sm text-ink-muted">{t('settings.pan.addToFavorites')}</span>
             </label>
 
@@ -919,7 +919,7 @@ export default function PanSettingsTab({ className = '' }: PanSettingsTabProps) 
               <button
                 onClick={handleSave}
                 disabled={!calculatedVolume}
-                className="flex items-center gap-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-line-strong disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-1 px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:bg-line-strong disabled:cursor-not-allowed transition-colors"
               >
                 <Save className="w-4 h-4" />
                 {editingId ? t('common.save') : t('common.add')}

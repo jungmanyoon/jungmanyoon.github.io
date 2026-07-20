@@ -1,7 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from '../common/Button.jsx'
-import RecommendationPanel from '../recommendation/RecommendationPanel.jsx'
 import CategoryHeaderBand from './CategoryHeaderBand'
 import { getCategoryMeta } from '@/constants/recipeMeta'
 import { ClipboardList, RotateCcw } from 'lucide-react'
@@ -304,11 +303,6 @@ function RecipeView({ recipe, onEdit, onDelete, onConvert, onBack }) {
           <p className="text-sm text-ink-muted whitespace-pre-wrap">{recipe.notes}</p>
         </div>
       )}
-
-      {/* 추천 패널 */}
-      <div className="mt-6">
-        <RecommendationPanel recipes={[recipe]} currentRecipe={recipe} onRecipeSelect={() => {}} />
-      </div>
 
     </div>
   )
